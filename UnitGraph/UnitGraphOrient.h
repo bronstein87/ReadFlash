@@ -153,6 +153,7 @@
 		TMenuItem *MenuOpen;
 		TOpenDialog *OpenDialog1;
 		TCheckBox *SortFileCheckBox;
+	TScrollBox *FragmentShowScrollBox;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);

@@ -630,29 +630,27 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 	ImageVector.push_back(new TImage(ShowFragmentTab));
 	ImageVector.back()->Width=BitmapVector.back()->Width*5;
 	ImageVector.back()->Height=BitmapVector.back()->Height*5;
-	ImageVector.back()->Left=OffsetStep*WidthOffset;
-
-	// увеличиваем смещение по ширине
-	++WidthOffset;
 
 	// если координата правого края текущего фрагмента превосходит
 	// координату правого угла окна просмотра, сбрасываем смещение по ширине,
 	// увеличиваем смещение по высоте
 
-	if(ImageVector.back()->Left+ImageVector.back()->Width >
-	 ShowFragmentTab->Width)
+	if(OffsetStep*WidthOffset > FragmentShowScrollBox->Width)
 	{
 		WidthOffset=0;
 		HeightOffset+=150;
 	}
-
+	ImageVector.back()->Left=OffsetStep*WidthOffset;
 	ImageVector.back()->Top=HeightOffset;
+	// увеличиваем смещение по ширине
+	++WidthOffset;
 
 
 	ImageVector.back()->Canvas->
 	StretchDraw(Rect(0, 0, ImageVector.back()->Width, ImageVector.back()->Height),BitmapVector.back());
-	ImageVector.back()->SetParentComponent(ShowFragmentTab);
+	ImageVector.back()->SetParentComponent(FragmentShowScrollBox);
 	}
+	fclose(FragmentFile);
 
    }
 
@@ -1328,5 +1326,6 @@ void __fastcall TFormGraphOrient::MenuOpenClick(TObject *Sender)
 //	 Image1->Height=Image1->Height/2;
 //	}
 //}
+
 
 

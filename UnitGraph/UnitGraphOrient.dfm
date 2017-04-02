@@ -855,6 +855,14 @@ object FormGraphOrient: TFormGraphOrient
     object ShowFragmentTab: TTabSheet
       Caption = #1054#1090#1086#1073#1088#1072#1078#1077#1085#1080#1077' '#1092#1088#1072#1075#1084#1077#1085#1090#1086#1074
       ImageIndex = 8
+      object FragmentShowScrollBox: TScrollBox
+        Left = 0
+        Top = 0
+        Width = 1152
+        Height = 749
+        Align = alClient
+        TabOrder = 0
+      end
     end
   end
   object EditSizeX: TEdit
@@ -922,8 +930,8 @@ object FormGraphOrient: TFormGraphOrient
     Top = 792
   end
   object MainMenu1: TMainMenu
-    Left = 816
-    Top = 48
+    Left = 56
+    Top = 8
     object MenuOpen: TMenuItem
       Caption = #1042#1099#1073#1088#1072#1090#1100' '#1092#1072#1081#1083
       OnClick = MenuOpenClick
