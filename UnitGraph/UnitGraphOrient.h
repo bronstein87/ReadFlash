@@ -175,7 +175,7 @@
 		  bool &Handled);
 	void __fastcall FormMouseWheelUp(TObject *Sender, TShiftState Shift, TPoint &MousePos,
           bool &Handled);
-	void __fastcall FragmentShowScrollBoxClick(TObject *Sender);
+
 
 
 

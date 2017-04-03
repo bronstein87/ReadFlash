@@ -886,6 +886,12 @@ void __fastcall TFormGraphOrient::MenuOpenClick(TObject *Sender)
   if (OpenDialog1->Execute()) {
 		vCadrInfo.clear();
 		FileName=OpenDialog1->FileName;
+		if(!System::Strutils::ContainsStr(FileName,".dat"))
+		{
+			ShowMessage("Расширение файла не соответствует .dat");
+			return;
+		}
+
 		SetCurrentDir(ExtractFileDir(FileName));
 		GetFileTitles(FileName,&FileTitle);
 
@@ -1352,7 +1358,7 @@ void __fastcall TFormGraphOrient::FormMouseWheelUp(TObject *Sender, TShiftState 
 		  TPoint &MousePos, bool &Handled)
 {
 
-   if(!FindVCLWindow(MousePos)->Name=="FragmentShowScrollBox")
+   if(!(FindVCLWindow(MousePos)->Name=="FragmentShowScrollBox"))
    {
 		return;
    }
@@ -1381,7 +1387,7 @@ void __fastcall TFormGraphOrient::FormMouseWheelUp(TObject *Sender, TShiftState 
 					continue;
 				}
 
-				ImageVector[k]->Picture->Bitmap->Canvas->Pixels[i][j] = TColor(RGB(Red,Green,Blue));
+				ImageVector[currentFragment]->Picture->Bitmap->Canvas->Pixels[i][j] = TColor(RGB(Red,Green,Blue));
 
 			}
 		}
@@ -1393,7 +1399,7 @@ void __fastcall TFormGraphOrient::FormMouseWheelUp(TObject *Sender, TShiftState 
 void __fastcall TFormGraphOrient::FormMouseWheelDown(TObject *Sender, TShiftState Shift, TPoint &MousePos,
 bool &Handled)
 {
-       if(!FindVCLWindow(MousePos)->Name=="FragmentShowScrollBox")
+	   if(!(FindVCLWindow(MousePos)->Name=="FragmentShowScrollBox"))
    {
 		return;
    }
@@ -1405,7 +1411,7 @@ bool &Handled)
    }
 
 
-   	for(int currentFragment=0;currentFragment< ImageVector.size();currentFragment++)
+	for(int currentFragment=0;currentFragment< ImageVector.size();currentFragment++)
 	{
 		for(int i=0;i<ImageVector[currentFragment]->Picture->Bitmap->Height;i++)
 		{
@@ -1422,7 +1428,7 @@ bool &Handled)
 					continue;
 				}
 
-				ImageVector[k]->Picture->Bitmap->Canvas->Pixels[i][j] = TColor(RGB(Red,Green,Blue));
+				ImageVector[currentFragment]->Picture->Bitmap->Canvas->Pixels[i][j] = TColor(RGB(Red,Green,Blue));
 
 			}
 		}
