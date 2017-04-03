@@ -20,6 +20,7 @@
 	#include <ComCtrls.hpp>
 	#include "UnitGraphOrient.h"
 	#include "UnitAnimateSetting.h"
+#include <Vcl.WinXCtrls.hpp>
 
 //---------------------------------------------------------------------------
 class TMainForm : public TForm

@@ -598,13 +598,9 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 		return;
    }
 
-	int HeightOffset=0;
-	int WidthOffset=0;
-	const int OffsetStep=150;
+
 	for(int CurrentFragment=0;CurrentFragment<mCadr.CountWindows;CurrentFragment++)
 	{
-
-
 		int FragmentWidth=mCadr.WindowsList [CurrentFragment].Width;
 		int FragmentHeight=mCadr.WindowsList [CurrentFragment].Height;
 		int FragmentSize= FragmentWidth*FragmentHeight;
@@ -614,6 +610,7 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 		BitmapVector.back()->PixelFormat= pf24bit;
 		BitmapVector.back()->Width = FragmentWidth;
 		BitmapVector.back()->Height = FragmentHeight;
+
 
 		TRGBTriple *BitmapLine;
 	for (int currentColumn = 0; currentColumn < FragmentWidth; currentColumn++)
@@ -627,35 +624,77 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 		}
 	}
 
-	ImageVector.push_back(new TImage(ShowFragmentTab));
+	ImageVector.push_back(new TImage(FragmentShowScrollBox));
 	ImageVector.back()->Width=BitmapVector.back()->Width*5;
 	ImageVector.back()->Height=BitmapVector.back()->Height*5;
+    ImageVector.back()->Canvas->
+	StretchDraw(Rect(0, 0, ImageVector.back()->Width, ImageVector.back()->Height),BitmapVector.back());
+
 
 	// если координата правого края текущего фрагмента превосходит
 	// координату правого угла окна просмотра, сбрасываем смещение по ширине,
 	// увеличиваем смещение по высоте
 
-	if(OffsetStep*WidthOffset > FragmentShowScrollBox->Width)
-	{
-		WidthOffset=0;
-		HeightOffset+=150;
+//	int HeightOffset=0;
+//	int WidthOffset=0;
+//	const int OffsetStep=150;
+//	if(OffsetStep*WidthOffset > FragmentShowScrollBox->Width)
+//	{
+//		WidthOffset=0;
+//		HeightOffset+=150;
+//	}
+//	ImageVector.back()->Left=OffsetStep*WidthOffset;
+//	ImageVector.back()->Top=HeightOffset;
+//	// увеличиваем смещение по ширине
+//	++WidthOffset;
+//
+//	ImageVector.back()->SetParentComponent(FragmentShowScrollBox);
 	}
-	ImageVector.back()->Left=OffsetStep*WidthOffset;
-	ImageVector.back()->Top=HeightOffset;
-	// увеличиваем смещение по ширине
-	++WidthOffset;
+    PlaceImageFragments(ImageVector);
 
-
-	ImageVector.back()->Canvas->
-	StretchDraw(Rect(0, 0, ImageVector.back()->Width, ImageVector.back()->Height),BitmapVector.back());
-	ImageVector.back()->SetParentComponent(FragmentShowScrollBox);
-	}
 	fclose(FragmentFile);
 
    }
 
 
 }
+
+
+void TFormGraphOrient::PlaceImageFragments (const vector<TImage*>& FragmentImages)
+{
+	if(FragmentImages.empty())
+	{
+		return;
+	}
+
+	int HeightOffset=0;
+	int WidthOffset=0;
+	const int OffsetStep=150;
+	for(unsigned int CurrentImage=0;CurrentImage<FragmentImages.size();CurrentImage++)
+	{
+		if(OffsetStep*WidthOffset+FragmentImages[CurrentImage]->Width > FragmentShowScrollBox->Width)
+		{
+			WidthOffset=0;
+			HeightOffset+=150;
+		}
+
+		FragmentImages[CurrentImage]->Left = OffsetStep*WidthOffset;
+		FragmentImages[CurrentImage]->Top = HeightOffset;
+		++WidthOffset;
+	}
+
+	// если размещаем в первый раз, задаем родителя
+	if(FragmentImages[0]->Parent==NULL)
+	{
+		for(unsigned int CurrentImage=0;CurrentImage<FragmentImages.size();CurrentImage++)
+		{
+			FragmentImages[CurrentImage]->SetParentComponent(FragmentShowScrollBox);
+		}
+	}
+
+}
+
+
 
 void __fastcall TFormGraphOrient::UpDown1Click(TObject *Sender, TUDBtnType Button)
 {
@@ -1308,24 +1347,105 @@ void __fastcall TFormGraphOrient::MenuOpenClick(TObject *Sender)
 
 		this->UpDown1Click(MainForm,NULL);
 		this->UpDown1->Max=vCadrInfo.size();
+
 	 }
 }
 
 
-//void __fastcall TFormGraphOrient::Image1MouseDown(TObject *Sender, TMouseButton Button,
-//		  TShiftState Shift, int X, int Y)
-//{
-//	if(Button==mbLeft)
-//	{
-//	 Image1->Width=Image1->Width*2 ;
-//	 Image1->Height=Image1->Height*2;
-//	}
-//	else if(Button==mbRight)
-//	{
-//	 Image1->Width=Image1->Width/2 ;
-//	 Image1->Height=Image1->Height/2;
-//	}
-//}
+
+
+void __fastcall TFormGraphOrient::FragmentShowScrollBoxResize(TObject *Sender)
+{
+	PlaceImageFragments(ImageVector);
+}
+//---------------------------------------------------------------------------
+
+
+
+
+void __fastcall TFormGraphOrient::FormMouseWheelUp(TObject *Sender, TShiftState Shift,
+		  TPoint &MousePos, bool &Handled)
+{
+
+   if(!FindVCLWindow(MousePos)->Name=="FragmentShowScrollBox")
+   {
+		return;
+   }
+
+	static bool AlreadyIncreased=false;
+
+	if(AlreadyIncreased)
+	{
+		return;
+	}
+
+	for(int currentFragment=0;currentFragment< ImageVector.size();currentFragment++)
+	{
+		for(int i=0;i<ImageVector[currentFragment]->Picture->Bitmap->Height;i++)
+		{
+			for(int j=0;j<ImageVector[currentFragment]->Picture->Bitmap->Width;j++)
+			{
+				TColor Color =  ImageVector[currentFragment]->Picture->Bitmap->Canvas->Pixels[i][j];
+
+				unsigned Red   = GetRValue(Color) * 2;
+				unsigned Green = GetGValue(Color) * 2;
+				unsigned Blue =  GetBValue(Color) * 2;
+
+				if(Red > 255)
+				{
+					continue;
+				}
+
+				ImageVector[k]->Picture->Bitmap->Canvas->Pixels[i][j] = TColor(RGB(Red,Green,Blue));
+
+			}
+		}
+	}
+	AlreadyIncreased== true;
+}
+
+
+void __fastcall TFormGraphOrient::FormMouseWheelDown(TObject *Sender, TShiftState Shift, TPoint &MousePos,
+bool &Handled)
+{
+       if(!FindVCLWindow(MousePos)->Name=="FragmentShowScrollBox")
+   {
+		return;
+   }
+
+   static bool AlreadyDecreased=false;
+   if (AlreadyDecreased)
+   {
+		return;
+   }
+
+
+   	for(int currentFragment=0;currentFragment< ImageVector.size();currentFragment++)
+	{
+		for(int i=0;i<ImageVector[currentFragment]->Picture->Bitmap->Height;i++)
+		{
+			for(int j=0;j<ImageVector[currentFragment]->Picture->Bitmap->Width;j++)
+			{
+				TColor Color =  ImageVector[currentFragment]->Picture->Bitmap->Canvas->Pixels[i][j];
+
+				unsigned Red   = GetRValue(Color) / 2;
+				unsigned Green = GetGValue(Color) / 2;
+				unsigned Blue =  GetBValue(Color) / 2;
+
+				if(Red > 255)
+				{
+					continue;
+				}
+
+				ImageVector[k]->Picture->Bitmap->Canvas->Pixels[i][j] = TColor(RGB(Red,Green,Blue));
+
+			}
+		}
+	}
+	AlreadyDecreased== true;
+
+}
+//---------------------------------------------------------------------------
 
 
 

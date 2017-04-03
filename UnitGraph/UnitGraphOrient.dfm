@@ -5,6 +5,7 @@ object FormGraphOrient: TFormGraphOrient
   ClientHeight = 825
   ClientWidth = 1184
   Color = clBtnFace
+  Constraints.MinWidth = 825
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -16,6 +17,8 @@ object FormGraphOrient: TFormGraphOrient
   Visible = True
   OnClose = FormClose
   OnCreate = FormCreate
+  OnMouseWheelDown = FormMouseWheelDown
+  OnMouseWheelUp = FormMouseWheelUp
   DesignSize = (
     1184
     825)
@@ -862,6 +865,9 @@ object FormGraphOrient: TFormGraphOrient
         Height = 749
         Align = alClient
         TabOrder = 0
+        OnClick = FragmentShowScrollBoxClick
+        OnResize = FragmentShowScrollBoxResize
+        ExplicitHeight = 721
       end
     end
   end
@@ -916,14 +922,22 @@ object FormGraphOrient: TFormGraphOrient
   end
   object SortFileCheckBox: TCheckBox
     Left = 944
-    Top = 9
+    Top = 8
     Width = 117
-    Height = 17
+    Height = 20
     Alignment = taLeftJustify
     BiDiMode = bdLeftToRight
     Caption = #1057#1086#1088#1090#1080#1088#1086#1074#1072#1090#1100' '#1092#1072#1081#1083
     ParentBiDiMode = False
     TabOrder = 8
+  end
+  object Button1: TButton
+    Left = 968
+    Top = 792
+    Width = 75
+    Height = 25
+    Caption = 'Button1'
+    TabOrder = 9
   end
   object OpenDialogG: TOpenDialog
     Left = 1060

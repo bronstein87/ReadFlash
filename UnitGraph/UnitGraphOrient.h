@@ -43,6 +43,7 @@
 	#include "VCLTee.TeeShape.hpp"
 	#include <VclTee.TeeGDIPlus.hpp>
 	#include <Vcl.ExtCtrls.hpp>
+	#include <Vcl.WinXCtrls.hpp>
 	#include <vector>
 	#include <Classes.hpp>
 	#include <Controls.hpp>
@@ -62,6 +63,7 @@
 	#include <vcl.h>
 	#include <System.IOUtils.hpp>
 	#include <System.StrUtils.hpp>
+    #include <System.Uitypes.hpp>
 	#include <stdio.h>
 	#include <memory>
 
@@ -154,6 +156,7 @@
 		TOpenDialog *OpenDialog1;
 		TCheckBox *SortFileCheckBox;
 	TScrollBox *FragmentShowScrollBox;
+	TButton *Button1;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -167,6 +170,12 @@
 		void __fastcall MenuOptionsClick(TObject *Sender);
 		void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 		void __fastcall MenuOpenClick(TObject *Sender);
+	void __fastcall FragmentShowScrollBoxResize(TObject *Sender);
+	void __fastcall FormMouseWheelDown(TObject *Sender, TShiftState Shift, TPoint &MousePos,
+		  bool &Handled);
+	void __fastcall FormMouseWheelUp(TObject *Sender, TShiftState Shift, TPoint &MousePos,
+          bool &Handled);
+	void __fastcall FragmentShowScrollBoxClick(TObject *Sender);
 
 
 
@@ -182,6 +191,7 @@
 		void DrawAnimate(const struct CadrInfo &mCadr);
 		void DrawBlock(const struct CadrInfo &mCadr);
 		void DrawFragment(const struct CadrInfo &mCadr);
+		void PlaceImageFragments (const vector<TImage*>& FragmentImages);
 		AnsiString SortRawFlashFile(const AnsiString &RawFileName);
 
 		unique_ptr<TFormAnimateSetting> FormAnimateSetting;
