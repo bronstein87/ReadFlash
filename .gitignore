@@ -1,6 +1,9 @@
 #Dirs
 Debug/
 UnitGraph/__recovery/
+UnitGraph/__history/
+__recovery/
+__history/
 
 
 # Compiled Object files
