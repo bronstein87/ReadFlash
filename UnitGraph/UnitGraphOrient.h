@@ -157,6 +157,9 @@
 		TCheckBox *SortFileCheckBox;
 	TScrollBox *FragmentShowScrollBox;
 	TButton *Button1;
+	TMenuItem *MenuOpenFlash;
+	TMenuItem *MenuOpenTMI;
+	TMenuItem *n2;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -175,6 +178,8 @@
 		  bool &Handled);
 	void __fastcall FormMouseWheelUp(TObject *Sender, TShiftState Shift, TPoint &MousePos,
           bool &Handled);
+	void __fastcall MenuOpenFlashClick(TObject *Sender);
+	void __fastcall MenuOpenTMIClick(TObject *Sender);
 
 
 

@@ -881,7 +881,7 @@ void __fastcall TFormGraphOrient::FormClose(TObject *Sender, TCloseAction &Actio
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TFormGraphOrient::MenuOpenClick(TObject *Sender)
+void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 {
   if (OpenDialog1->Execute()) {
 		vCadrInfo.clear();
@@ -1370,25 +1370,18 @@ void __fastcall TFormGraphOrient::FormMouseWheelUp(TObject *Sender, TShiftState 
 		return;
 	}
 
+	TRGBTriple *BitmapLine;
 	for(int currentFragment=0;currentFragment< ImageVector.size();currentFragment++)
 	{
 		for(int i=0;i<ImageVector[currentFragment]->Picture->Bitmap->Height;i++)
 		{
+			BitmapLine = (TRGBTriple*)ImageVector[currentFragment]->Picture->Bitmap->ScanLine[i];
+
 			for(int j=0;j<ImageVector[currentFragment]->Picture->Bitmap->Width;j++)
 			{
-				TColor Color =  ImageVector[currentFragment]->Picture->Bitmap->Canvas->Pixels[i][j];
-
-				unsigned Red   = GetRValue(Color) * 2;
-				unsigned Green = GetGValue(Color) * 2;
-				unsigned Blue =  GetBValue(Color) * 2;
-
-				if(Red > 255)
-				{
-					continue;
-				}
-
-				ImageVector[currentFragment]->Picture->Bitmap->Canvas->Pixels[i][j] = TColor(RGB(Red,Green,Blue));
-
+			   BitmapLine[j].rgbtBlue == BitmapLine[j].rgbtBlue / 2;
+			   BitmapLine[j].rgbtGreen == BitmapLine[j].rgbtGreen / 2;
+			   BitmapLine[j].rgbtRed = BitmapLine[j].rgbtRed / 2;
 			}
 		}
 	}
@@ -1411,25 +1404,19 @@ bool &Handled)
    }
 
 
+
+	TRGBTriple *BitmapLine;
 	for(int currentFragment=0;currentFragment< ImageVector.size();currentFragment++)
 	{
 		for(int i=0;i<ImageVector[currentFragment]->Picture->Bitmap->Height;i++)
 		{
+			BitmapLine = (TRGBTriple*)ImageVector[currentFragment]->Picture->Bitmap->ScanLine[i];
+
 			for(int j=0;j<ImageVector[currentFragment]->Picture->Bitmap->Width;j++)
 			{
-				TColor Color =  ImageVector[currentFragment]->Picture->Bitmap->Canvas->Pixels[i][j];
-
-				unsigned Red   = GetRValue(Color) / 2;
-				unsigned Green = GetGValue(Color) / 2;
-				unsigned Blue =  GetBValue(Color) / 2;
-
-				if(Red > 255)
-				{
-					continue;
-				}
-
-				ImageVector[currentFragment]->Picture->Bitmap->Canvas->Pixels[i][j] = TColor(RGB(Red,Green,Blue));
-
+			   BitmapLine[currentRow].rgbtBlue == BitmapLine[currentRow].rgbtBlue * 2;
+			   BitmapLine[currentRow].rgbtGreen == BitmapLine[currentRow].rgbtGreen * 2;
+			   BitmapLine[currentRow].rgbtRed = BitmapLine[currentRow].rgbtRed * 2;
 			}
 		}
 	}
@@ -1437,6 +1424,223 @@ bool &Handled)
 
 }
 //---------------------------------------------------------------------------
+ //---------------------------------------------------------------------------
+#define MAX_STAT 16
+#define MAX_LOCAL 15
+#define MAX_WINDOW 16
 
+struct SHTMI2
+{
+	std::string timeBOKZ, status1, status2, post;
+	int serialNumber, timeExp;
+	int cntCommandWord, cntCallNO, cntNOtoSLEZH;
+	int cntCallTO, cntTOtoSLEZH, cntSLEZH;
+	int cntStatOrient[MAX_STAT];
+} mSHTMI2;
+
+struct DTMI
+{
+	std::string timeBOKZ, status1, status2, post;
+	int serialNumber, timeExp;
+	int nLocalObj, nFixedObj, nWindows, epsillon;
+	float dTimeBOKZ, LocalList[MAX_LOCAL][4];
+	float quatBoard[4], omega[3], centrWindow[MAX_WINDOW][2];
+	int levelWindow[MAX_WINDOW], nObjectWindow[MAX_WINDOW];
+} mDTMI;
+
+std::string arrStatError[MAX_STAT]={{"EC1"},{"EC2"},{"EC3"},{"EC4"},
+							{"EC5"},{"EC6"},{"EC7"},{"EC8"},
+							{"EC9"},{"EC10"},{"EC11"},{"EC12"},
+							{"EC13"},{"EC14"},{"EC15"},{"EC16"}};
+
+int TryReadSHTMI2(ifstream &finp, struct SHTMI2 &tmi)
+{
+		std::string line, word;
+
+		while (!finp.eof()){
+			finp>>word;
+			if (word=="KC1") finp>>tmi.status1;
+			else if (word=="KC2") finp>>tmi.status2;
+			else if ((word=="ÑÅÐ")||(word=="CEP")) {
+				finp>>word;
+				if ((word=="ÍÎÌ")||(word=="HOM")) {
+					finp>>tmi.serialNumber;
+				}
+			}
+			else if (word=="ÏÎÑÒ") finp>>tmi.post;
+			else if ((word=="T")||(word=="Ò")) {
+				finp>>word; if (word=="ÝÊÑÏ") finp>>tmi.timeExp;
+			}
+			else
+			{
+				int i=0, fl_find=0;
+				while ((i < MAX_STAT)&&(!fl_find))
+				{
+					if (word==arrStatError[i]) {
+						finp>>tmi.cntStatOrient[i];
+						fl_find=1;
+					}
+					i++;
+				}
+			}
+			if (word=="EC16") {
+				return 1;
+			}
+			getline(finp, line, '\n' );
+		}
+		return 0;
+}
+
+int TryReadDTMI(ifstream &finp, struct DTMI &tmi)
+{
+		std::string line, word;
+
+		int indexObject=0,indexParam=0, intVal, flLow=1;
+
+		while (!finp.eof()){
+			finp>>word;
+			if (word=="KC1") finp>>tmi.status1;
+			else if (word=="KC2") finp>>tmi.status2;
+			else if ((word=="ÑÅÐ")||(word=="CEP")) {
+				finp>>word;
+				if ((word=="ÍÎÌ")||(word=="HOM")) {
+					finp>>tmi.serialNumber;
+				}
+			}
+			else if (word=="ÏÎÑÒ") finp>>tmi.post;
+			else if ((word=="T")||(word=="Ò")) {
+				finp>>word; if (word=="ÝÊÑÏ") finp>>tmi.timeExp;
+			}
+			else
+			{
+				if (word=="ËÎÊ") {
+					if (flLow) {
+						finp>>intVal;
+						indexObject=(int)intVal/10;
+						indexParam=intVal%10;
+						finp>>tmi.LocalList[indexObject][indexParam];
+						if ((indexObject==9)&&(indexParam==3)) flLow=0;
+					}
+					else
+					{
+						finp>>indexObject>>indexParam;
+						finp>>tmi.LocalList[indexObject][indexParam];
+
+					}
+					if ((indexObject==15)&&(indexParam==3)) {
+						return 1;
+					}
+				}
+			}
+			getline(finp, line, '\n' );
+		}
+		return 0;
+}
+
+void PrintSHTMI2(ofstream &file, struct SHTMI2 tmi)
+{
+	file<<"ÊÑ1:\t"<<tmi.status1<<"\n";
+	file<<"ÊÑ2:\t"<<tmi.status2<<"\n";
+	file<<"POST:\t"<<tmi.post<<"\n";
+	file<<"Çàâ. ¹\t"<<tmi.serialNumber<<"\n";
+	file<<"Texp, ìñ:\t"<<tmi.timeExp<<"\n";
+	for (int i = 0; i < MAX_STAT; i++) {
+		file<<"Ñ÷åò÷èê ¹ "<<(i+1)<<":\t"<<tmi.cntStatOrient[i]<<"\n";
+	}
+}
+
+void PrintDTMI(ofstream &file, struct DTMI tmi)
+{
+	std::string str;
+	file<<"ÊÑ1\t"<<tmi.status1<<"\n";
+	file<<"ÊÑ2\t"<<tmi.status2<<"\n";
+	file<<"POST\t"<<tmi.post<<"\n";
+	file<<"Çàâ. ¹\t"<<tmi.serialNumber<<"\n";
+	file<<"Texp, ìñ:\t"<<tmi.timeExp<<"\n";
+	for (int i = 0; i < MAX_LOCAL; i++) {
+		file<<std::setw(6)<<(i+1)<<"\t";
+		file<<tmi.LocalList[i][0]<<"\t"<<tmi.LocalList[i][1]<<"\t";
+		file<<tmi.LocalList[i][2]<<"\t"<<tmi.LocalList[i][3]<<"\n";
+	}
+}
+
+void ConvertDataDTMI(struct DTMI tmi, struct CadrInfo &mCadr)
+{
+//	mCadr.IsBinary=true;
+//	mCadr.IsReverse=true;
+//	mCadr.ImageHeight=1024;
+//	mCadr.ImageWidth=1024;
+//	mCadr.Time=data.Tpr_sec+data.Tpr_msec/1000.;
+	mCadr.CountLocalObj=32;//tmi.nFixedObj;
+//	mCadr.CountDeterObj=tmi.NumDet;
+	mCadr.ObjectsList = new struct ObjectsInfo[mCadr.CountLocalObj];
+	for (int i=0; i<mCadr.CountLocalObj; i++) {
+		mCadr.ObjectsList[i].X=tmi.LocalList[i][0];
+		mCadr.ObjectsList[i].Y=tmi.LocalList[i][1];
+		mCadr.ObjectsList[i].Bright=tmi.LocalList[i][2];
+		mCadr.ObjectsList[i].Square  =abs(tmi.LocalList[i][3]);
+		mCadr.ObjectsList[i].Dx=0;
+		mCadr.ObjectsList[i].Dy=0;
+		mCadr.ObjectsList[i].StarID=0;
+		mCadr.ObjectsList[i].Mv=0;
+		mCadr.ObjectsList[i].Sp[0]='_';
+		mCadr.ObjectsList[i].Sp[1]='_';
+	}
+	mCadr.CountBlock=0;
+	mCadr.CountWindows=0;
+	mCadr.CountDeterObj=0;
+	mCadr.CountStars=0;
+}
+
+void __fastcall TFormGraphOrient::MenuOpenTMIClick(TObject *Sender)
+{
+	if (OpenDialog1->Execute()) {
+		vCadrInfo.clear();
+		FileName=OpenDialog1->FileName;
+		SetCurrentDir(ExtractFileDir(FileName));
+		GetFileTitles(FileName,&FileTitle);
+
+		ifstream finp(FileName.c_str());
+		ofstream fout((FileTitle+"_decode.txt").c_str());
+		if (!finp.is_open()) {
+			ShowMessage("Ôàéë íå ìîæåò áûòü îòêðûò!");
+			return;
+		}
+
+		std::string line;
+		int cntRecDTMI=0;
+		while (!finp.eof())
+		{
+			getline(finp, line, '\n' );
+
+			if (line.find("ØÒÌÈ2")!=std::string::npos) {     //ïåðåíåñòè line.find("ØÒÌÈ2");
+				if(TryReadSHTMI2(finp,mSHTMI2)) {
+					PrintSHTMI2(fout,mSHTMI2);
+				}
+			}
+			else if (line.find("ÄÒÌÈ1")!=std::string::npos) {
+
+				if (TryReadDTMI(finp,mDTMI)) {
+					struct CadrInfo mCadr;
+					PrintDTMI(fout,mDTMI);
+					ConvertDataDTMI(mDTMI, mCadr);
+					mCadr.Time=cntRecDTMI++;
+					vCadrInfo.push_back(mCadr);
+				}
+			}
+		}
+
+		finp.close();
+		fout.close();
+		this->NumLine=1;
+
+		this->UpDown1Click(MainForm,NULL);
+		this->UpDown1->Max=vCadrInfo.size();
+	}
+}
+
+
+
+//---------------------------------------------------------------------------
 
 
