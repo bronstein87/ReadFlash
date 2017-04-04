@@ -17,6 +17,7 @@ __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 		: TForm(Owner),FragID(0),FormAnimateSetting(new TFormAnimateSetting(this))
 {
 
+
 }
 //рисование сводных графиков по серии
 //---------------------------------------------------------------------------
@@ -834,7 +835,7 @@ void GetFileTitles(AnsiString file_name, AnsiString *file_title)
 					return "";
 			   }
 
-			   // -1 т.к размер блока в следующем элементе
+			   // -1 т.к размер блока хранится  в следующем элементе
 			   for(unsigned int CurrentFlashStruct=0; CurrentFlashStruct< RawFileInfoVector.size()-1 ;CurrentFlashStruct++)
 			   {
 					fseek(RawFlashFile,RawFileInfoVector[CurrentFlashStruct].Pos,SEEK_SET);
@@ -972,6 +973,22 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 		  fread(&Marker,sizeof(int),1,fflesh);
 		  int NumPixH, PixMas[3];
 
+		// хэш мэп для с соответствиями перечислений
+//		std::unordered_map<unsigned int ,unsigned int> MarkerMap
+//		({
+//			{SECTOR_MARKER,SECTOR_MARKER_ACCORDANCE},
+//			{HO_MARKER,HO_MARKER_ACCORDANCE},
+//			{SL_MARKER,SL_MARKER_ACCORDANCE},
+//			{PIX_0_MARKER,PIX_0_MARKER_ACCORDANCE},
+//			{PIX_1_MARKER,PIX_1_MARKER_ACCORDANCE},
+//			{ALL_REG_MARKER,ALL_REG_MARKER_ACCORDANCE},
+//			{SINGLE_REG_MARKER,SINGLE_REG_MARKER_ACCORDANCE},
+//			{FRAG_MARKER,FRAG_MARKER_ACCORDANCE}
+//		});
+
+//		  MARKER_ACCORDANCE MarkerAccordance=
+//		  static_cast<MARKER_ACCORDANCE>(MarkerMap.at(GetInt(Marker)));
+
 		  switch (GetInt(Marker))
 		  {
 			case PIX_0_MARKER:
@@ -1077,7 +1094,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 	          break;
 			}
 
-	        case SL_MARKER:
+			case SL_MARKER:
 			{
               DataSLEZH mDataSLEZH;
 	          fread(&mDataSLEZH,sizeof(struct DataSLEZH_st),1,fflesh);
@@ -1326,7 +1343,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 		fclose(flog_orient);
 		this->NumLine=1;
 
-		this->UpDown1Click(MainForm,NULL);
+		this->UpDown1Click(MainForm,btNext);
 		this->UpDown1->Max=vCadrInfo.size();
 
 	 }
@@ -1352,65 +1369,29 @@ void __fastcall TFormGraphOrient::FormMouseWheelUp(TObject *Sender, TShiftState 
    {
 		return;
    }
+;
 
-	static bool AlreadyIncreased=false;
-
-	if(AlreadyIncreased)
-	{
-		return;
-	}
-
-	TRGBTriple *BitmapLine;
 	for(int currentFragment=0;currentFragment< ImageVector.size();currentFragment++)
 	{
-		for(int i=0;i<ImageVector[currentFragment]->Picture->Bitmap->Height;i++)
-		{
-			BitmapLine = (TRGBTriple*)ImageVector[currentFragment]->Picture->Bitmap->ScanLine[i];
-
-			for(int j=0;j<ImageVector[currentFragment]->Picture->Bitmap->Width;j++)
-			{
-			   BitmapLine[j].rgbtBlue == BitmapLine[j].rgbtBlue / 2;
-			   BitmapLine[j].rgbtGreen == BitmapLine[j].rgbtGreen / 2;
-			   BitmapLine[j].rgbtRed = BitmapLine[j].rgbtRed / 2;
-			}
-		}
+	   changeContrast(50, ImageVector[currentFragment]);
 	}
-	AlreadyIncreased== true;
+
 }
 
 
 void __fastcall TFormGraphOrient::FormMouseWheelDown(TObject *Sender, TShiftState Shift, TPoint &MousePos,
 bool &Handled)
 {
-	   if(!(FindVCLWindow(MousePos)->Name=="FragmentShowScrollBox"))
-   {
+	if(!(FindVCLWindow(MousePos)->Name=="FragmentShowScrollBox"))
+	{
 		return;
-   }
-
-   static bool AlreadyDecreased=false;
-   if (AlreadyDecreased)
-   {
-		return;
-   }
+	}
 
 
-
-	TRGBTriple *BitmapLine;
 	for(int currentFragment=0;currentFragment< ImageVector.size();currentFragment++)
 	{
-		for(int i=0;i<ImageVector[currentFragment]->Picture->Bitmap->Height;i++)
-		{
-			BitmapLine = (TRGBTriple*)ImageVector[currentFragment]->Picture->Bitmap->ScanLine[i];
-
-			for(int j=0;j<ImageVector[currentFragment]->Picture->Bitmap->Width;j++)
-			{
-			   BitmapLine[j].rgbtBlue == BitmapLine[j].rgbtBlue * 2;
-			   BitmapLine[j].rgbtGreen == BitmapLine[j].rgbtGreen * 2;
-			   BitmapLine[j].rgbtRed = BitmapLine[j].rgbtRed * 2;
-			}
-		}
+		changeContrast(-50, ImageVector[currentFragment]);
 	}
-	AlreadyDecreased== true;
 
 }
 //---------------------------------------------------------------------------
@@ -1625,7 +1606,7 @@ void __fastcall TFormGraphOrient::MenuOpenTMIClick(TObject *Sender)
 		fout.close();
 		this->NumLine=1;
 
-		this->UpDown1Click(MainForm,NULL);
+		this->UpDown1Click(MainForm,btNext);
 		this->UpDown1->Max=vCadrInfo.size();
 	}
 }

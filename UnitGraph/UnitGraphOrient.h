@@ -48,6 +48,8 @@
 	#include <memory>
 	#include <fstream>
 	#include <iomanip>
+	#include "ImageProcessingFcns.h"
+	#include <unordered_map>
 
 
 

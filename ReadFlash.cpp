@@ -8,7 +8,7 @@ USEFORM("UnitGraph\UnitAnimateSetting.cpp", FormAnimateSetting);
 USEFORM("UnitGraph\UnitGraphOrient.cpp", FormGraphOrient);
 USEFORM("UnitMain.cpp", MainForm);
 //---------------------------------------------------------------------------
-WINAPI _tWinMain(HINSTANCE, HINSTANCE, LPTSTR, int)
+int WINAPI _tWinMain(HINSTANCE, HINSTANCE, LPTSTR, int)
 {
 	try
 	{

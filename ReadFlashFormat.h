@@ -1,12 +1,13 @@
 
-#ifndef ReadFlash
-#define ReadFlash
+#ifndef ReadFlashH
+#define ReadFlashH
 
 #include <stdio.h>
 #include <string>
 #include <vcl.h>
 #include "MathM.h"
 #include "InfoCadrFormat.h"
+
 
 #define INT8U unsigned char
 #define INT16U unsigned short
@@ -23,6 +24,8 @@
 #define MaxStarCad  100
 #define MaxPix 18432
 
+
+
 #define SECTOR_MARKER 		0x55550000
 #define HO_MARKER 			0xAAAA0000
 #define SL_MARKER 			0xAAAA1111
@@ -32,6 +35,37 @@
 #define SINGLE_REG_MARKER 	0xAAAA5555
 #define FRAG_MARKER 		0xAAAA6666
 #define COUNT_REG  			128
+
+
+//enum MARKER_TYPE : unsigned int
+//{
+//	 SECTOR_MARKER =		0x55550000,
+//	 HO_MARKER =			0xAAAA0000,
+//	 SL_MARKER =			0xAAAA1111,
+//	 PIX_0_MARKER =			0xAAAA2222,
+//	 PIX_1_MARKER = 		0xAAAA3333,
+//	 ALL_REG_MARKER = 		0xAAAA4444,
+//	 SINGLE_REG_MARKER = 	0xAAAA5555,
+//	 FRAG_MARKER = 			0xAAAA6666,
+//
+//};
+//
+////  соответствие для MARKER_TYPE, используется в функции считывания flash-файла
+////  чтобы компилировался switch-case с новым компилятором
+//
+//enum MARKER_ACCORDANCE //  соответствие для MARKER_TYPE
+//{
+//	 SECTOR_MARKER_ACCORDANCE,
+//	 HO_MARKER_ACCORDANCE,
+//	 SL_MARKER_ACCORDANCE,
+//	 PIX_0_MARKER_ACCORDANCE,
+//	 PIX_1_MARKER_ACCORDANCE,
+//	 ALL_REG_MARKER_ACCORDANCE,
+//	 SINGLE_REG_MARKER_ACCORDANCE,
+//	 FRAG_MARKER_ACCORDANCE
+//
+//};
+
 
 struct DataPixHeader
 {
