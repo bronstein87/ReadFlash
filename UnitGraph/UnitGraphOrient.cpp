@@ -7,11 +7,7 @@
 #include "UnitGraphOrient.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
-// раскомментировать для старой версии
-//#pragma link "ArrowCha"
-//#pragma link "BubbleCh"
-//#pragma link "GanttCh"
-//#pragma link "TeeShape"
+
 #pragma resource "*.dfm"
 
 
@@ -886,12 +882,6 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
   if (OpenDialog1->Execute()) {
 		vCadrInfo.clear();
 		FileName=OpenDialog1->FileName;
-		if(!System::Strutils::ContainsStr(FileName,".dat"))
-		{
-			ShowMessage("Расширение файла не соответствует .dat");
-			return;
-		}
-
 		SetCurrentDir(ExtractFileDir(FileName));
 		GetFileTitles(FileName,&FileTitle);
 
@@ -1414,9 +1404,9 @@ bool &Handled)
 
 			for(int j=0;j<ImageVector[currentFragment]->Picture->Bitmap->Width;j++)
 			{
-			   BitmapLine[currentRow].rgbtBlue == BitmapLine[currentRow].rgbtBlue * 2;
-			   BitmapLine[currentRow].rgbtGreen == BitmapLine[currentRow].rgbtGreen * 2;
-			   BitmapLine[currentRow].rgbtRed = BitmapLine[currentRow].rgbtRed * 2;
+			   BitmapLine[j].rgbtBlue == BitmapLine[j].rgbtBlue * 2;
+			   BitmapLine[j].rgbtGreen == BitmapLine[j].rgbtGreen * 2;
+			   BitmapLine[j].rgbtRed = BitmapLine[j].rgbtRed * 2;
 			}
 		}
 	}
@@ -1594,7 +1584,8 @@ void ConvertDataDTMI(struct DTMI tmi, struct CadrInfo &mCadr)
 
 void __fastcall TFormGraphOrient::MenuOpenTMIClick(TObject *Sender)
 {
-	if (OpenDialog1->Execute()) {
+	if (OpenDialog2->Execute()) {
+
 		vCadrInfo.clear();
 		FileName=OpenDialog1->FileName;
 		SetCurrentDir(ExtractFileDir(FileName));

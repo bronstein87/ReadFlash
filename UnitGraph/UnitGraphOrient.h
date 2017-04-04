@@ -4,26 +4,6 @@
 	#define UnitGraphOrientH
 	//---------------------------------------------------------------------------
 
-	//»—œŒÀ‹«Œ¬¿“‹ ƒÀﬂ —“¿–Œ… ¬≈–—»»
-	//#include <Classes.hpp>
-	//#include <Controls.hpp>
-	//#include <StdCtrls.hpp>
-	//#include <Forms.hpp>
-	//#include <Chart.hpp>
-	//#include <ExtCtrls.hpp>
-	//#include <Series.hpp>
-	//#include <TeEngine.hpp>
-	//#include <TeeProcs.hpp>
-	//#include <ComCtrls.hpp>
-	//#include <Dialogs.hpp>
-	//#include <Grids.hpp>
-	//#include <Menus.hpp>
-	//#include "ArrowCha.hpp"
-	//#include "BubbleCh.hpp"
-	//#include "GanttCh.hpp"
-	//#include "TeeShape.hpp"
-
-	//ƒÀﬂ XE7
 	#include <Classes.hpp>
 	#include <Controls.hpp>
 	#include <StdCtrls.hpp>
@@ -66,6 +46,8 @@
     #include <System.Uitypes.hpp>
 	#include <stdio.h>
 	#include <memory>
+	#include <fstream>
+	#include <iomanip>
 
 
 
@@ -155,11 +137,11 @@
 		TMenuItem *MenuOpen;
 		TOpenDialog *OpenDialog1;
 		TCheckBox *SortFileCheckBox;
-	TScrollBox *FragmentShowScrollBox;
-	TButton *Button1;
-	TMenuItem *MenuOpenFlash;
-	TMenuItem *MenuOpenTMI;
-	TMenuItem *n2;
+		TScrollBox *FragmentShowScrollBox;
+		TButton *Button1;
+		TMenuItem *MenuOpenFlash;
+		TMenuItem *MenuOpenTMI;
+	TOpenDialog *OpenDialog2;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -172,14 +154,13 @@
 			  TGridDrawState State);
 		void __fastcall MenuOptionsClick(TObject *Sender);
 		void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
-		void __fastcall MenuOpenClick(TObject *Sender);
-	void __fastcall FragmentShowScrollBoxResize(TObject *Sender);
-	void __fastcall FormMouseWheelDown(TObject *Sender, TShiftState Shift, TPoint &MousePos,
+		void __fastcall FragmentShowScrollBoxResize(TObject *Sender);
+		void __fastcall FormMouseWheelDown(TObject *Sender, TShiftState Shift, TPoint &MousePos,
 		  bool &Handled);
-	void __fastcall FormMouseWheelUp(TObject *Sender, TShiftState Shift, TPoint &MousePos,
+		void __fastcall FormMouseWheelUp(TObject *Sender, TShiftState Shift, TPoint &MousePos,
           bool &Handled);
-	void __fastcall MenuOpenFlashClick(TObject *Sender);
-	void __fastcall MenuOpenTMIClick(TObject *Sender);
+		void __fastcall MenuOpenFlashClick(TObject *Sender);
+		void __fastcall MenuOpenTMIClick(TObject *Sender);
 
 
 
