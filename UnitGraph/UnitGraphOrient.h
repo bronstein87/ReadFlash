@@ -140,10 +140,8 @@
 		TOpenDialog *OpenDialog1;
 		TCheckBox *SortFileCheckBox;
 		TScrollBox *FragmentShowScrollBox;
-		TButton *Button1;
 		TMenuItem *MenuOpenFlash;
 		TMenuItem *MenuOpenTMI;
-	TOpenDialog *OpenDialog2;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -157,12 +155,14 @@
 		void __fastcall MenuOptionsClick(TObject *Sender);
 		void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 		void __fastcall FragmentShowScrollBoxResize(TObject *Sender);
-		void __fastcall FormMouseWheelDown(TObject *Sender, TShiftState Shift, TPoint &MousePos,
+		void __fastcall FormMouseWheelDown(TObject *Sender, TShiftState Shift,const TPoint &MousePos,
 		  bool &Handled);
-		void __fastcall FormMouseWheelUp(TObject *Sender, TShiftState Shift, TPoint &MousePos,
+		void __fastcall FormMouseWheelUp(TObject *Sender, TShiftState Shift,const TPoint &MousePos,
           bool &Handled);
 		void __fastcall MenuOpenFlashClick(TObject *Sender);
 		void __fastcall MenuOpenTMIClick(TObject *Sender);
+
+
 
 
 
@@ -179,8 +179,11 @@
 		void DrawAnimate(const struct CadrInfo &mCadr);
 		void DrawBlock(const struct CadrInfo &mCadr);
 		void DrawFragment(const struct CadrInfo &mCadr);
-		void PlaceImageFragments (const vector<TImage*>& FragmentImages);
+		void PlaceImageFragments (const vector<TScrollBox*>& FragmentImages);
 		AnsiString SortRawFlashFile(const AnsiString &RawFileName);
+		void __fastcall ImageOnClick(TObject *Sender,
+		  TMouseButton Button, TShiftState Shift, int X, int Y);
+
 
 		unique_ptr<TFormAnimateSetting> FormAnimateSetting;
 		TLineSeries *LineSeries[MaxSeries*NumGraph];
@@ -199,7 +202,8 @@
 
 		vector <CadrInfo> vCadrInfo;
 		vector <TImage*> ImageVector;
-		vector <TBitmap*> BitmapVector;
+		vector <TScrollBox*> ImageScrollBoxVector;
+	   //	vector <TBitmap*> BitmapVector;
 
 	public:		// User declarations
 

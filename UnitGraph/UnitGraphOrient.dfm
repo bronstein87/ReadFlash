@@ -63,15 +63,11 @@ object FormGraphOrient: TFormGraphOrient
     Top = 8
     Width = 1160
     Height = 777
-    ActivePage = TabSheet5
+    ActivePage = ShowFragmentTab
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
     object TabSheet5: TTabSheet
       Caption = #1059#1075#1083#1099' '#1086#1088#1080#1077#1085#1090#1072#1094#1080#1080
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
@@ -148,10 +144,6 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheet6: TTabSheet
       Caption = #1059#1075#1083#1086#1074#1072#1103' '#1089#1082#1086#1088#1086#1089#1090#1100
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
@@ -228,10 +220,6 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheet7: TTabSheet
       Caption = #1056#1072#1089#1089#1086#1075#1083#1072#1089#1086#1074#1072#1085#1080#1103
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
@@ -308,10 +296,6 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheet8: TTabSheet
       Caption = #1063#1080#1089#1083#1086' '#1086#1073#1098#1077#1082#1090#1086#1074
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
@@ -388,10 +372,6 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheet9: TTabSheet
       Caption = #1055#1072#1088#1072#1084#1077#1090#1088#1099' '#1080#1079#1086#1073#1088#1072#1078#1077#1085#1080#1103
       ImageIndex = 4
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
@@ -468,10 +448,6 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheet10: TTabSheet
       Caption = #1044#1074#1080#1078#1077#1085#1080#1077' '#1079#1074#1077#1079#1076
       ImageIndex = 5
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
@@ -543,12 +519,23 @@ object FormGraphOrient: TFormGraphOrient
         object Series9: TBubbleSeries
           Marks.Frame.Visible = False
           ClickableLine = False
+          Pointer.Brush.Gradient.Direction = gdFromTopLeft
           Pointer.Brush.Gradient.EndColor = 6144242
+          Pointer.Brush.Gradient.Visible = True
+          Pointer.FullGradient = True
+          Pointer.Gradient.Direction = gdFromTopLeft
           Pointer.Gradient.EndColor = 6144242
-          Pointer.HorizSize = 69
+          Pointer.Gradient.Visible = True
+          Pointer.HorizSize = 77
           Pointer.InflateMargins = False
+          Pointer.Shadow.Color = 15790320
+          Pointer.Shadow.HorizSize = 27
+          Pointer.Shadow.SmoothBlur = 40
+          Pointer.Shadow.Transparency = 82
+          Pointer.Shadow.VertSize = 27
+          Pointer.Shadow.Visible = True
           Pointer.Style = psCircle
-          Pointer.VertSize = 69
+          Pointer.VertSize = 77
           XValues.Name = 'X'
           XValues.Order = loAscending
           YValues.Name = 'Y'
@@ -615,10 +602,6 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheet1: TTabSheet
       Caption = #1060#1088#1072#1075#1084#1077#1085#1090#1099
       ImageIndex = 6
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
@@ -774,10 +757,6 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheet2: TTabSheet
       Caption = #1054#1073#1098#1077#1082#1090#1099
       ImageIndex = 7
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
@@ -890,10 +869,6 @@ object FormGraphOrient: TFormGraphOrient
     object ShowFragmentTab: TTabSheet
       Caption = #1054#1090#1086#1073#1088#1072#1078#1077#1085#1080#1077' '#1092#1088#1072#1075#1084#1077#1085#1090#1086#1074
       ImageIndex = 8
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object FragmentShowScrollBox: TScrollBox
         Left = 0
         Top = 0
@@ -965,14 +940,6 @@ object FormGraphOrient: TFormGraphOrient
     ParentBiDiMode = False
     TabOrder = 8
   end
-  object Button1: TButton
-    Left = 968
-    Top = 792
-    Width = 75
-    Height = 25
-    Caption = 'Button1'
-    TabOrder = 9
-  end
   object OpenDialogG: TOpenDialog
     Left = 1060
     Top = 792
@@ -1005,13 +972,7 @@ object FormGraphOrient: TFormGraphOrient
     end
   end
   object OpenDialog1: TOpenDialog
-    Filter = 'dat|*.dat'
     Left = 48
     Top = 64
-  end
-  object OpenDialog2: TOpenDialog
-    Filter = 'txt|.txt'
-    Left = 120
-    Top = 72
   end
 end

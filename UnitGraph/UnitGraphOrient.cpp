@@ -200,6 +200,7 @@ void __fastcall TFormGraphOrient::FormCreate(TObject *Sender)
 //InitFrameSeries
 	for (int i=0; i < MaxBlockSeries; i++) {
 		BlockSeries[i]= new TChartShape(this->Chart1);
+		BlockSeries[i]->Selected->Hover->Hide();
 		Chart1->AddSeries(this->BlockSeries[i]);
 		BlockSeries[i]->Style=chasRectangle;
 		BlockSeries[i]->X0=0;
@@ -213,6 +214,7 @@ void __fastcall TFormGraphOrient::FormCreate(TObject *Sender)
 //InitFrameSeries
 	for (int i=0; i < MaxFrameSeries; i++) {
 		FrameSeries[i]= new TChartShape(this->Chart1);
+		FrameSeries[i]->Selected->Hover->Hide();
 		Chart1->AddSeries(this->FrameSeries[i]);
 		FrameSeries[i]->Style=chasRectangle;
 		FrameSeries[i]->X0=0;
@@ -545,17 +547,14 @@ double X0, Y0, X1, Y1, Dx, Dy, Ist, Nel;
 
 void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 {
+
+
 	for(unsigned int i=0;i<ImageVector.size();i++)
 	{
-     	ImageVector[i]->Free();
+		ImageVector[i]->Free();
 	}
 	ImageVector.clear();
 
-	for(unsigned int i=0;i<BitmapVector.size();i++)
-	{
-		delete BitmapVector[i];
-	}
-	BitmapVector.clear();
 
 	AnsiString NeededDirectory=GetCurrentDir()+"\\Frag_"+FileTitle;
 	if (!TDirectory::Exists(NeededDirectory))
@@ -603,32 +602,54 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 		int FragmentSize= FragmentWidth*FragmentHeight;
 		unique_ptr<unsigned short[]> RawFragment(new unsigned short [FragmentSize]);
 		fread(RawFragment.get(),sizeof(unsigned short),FragmentSize,FragmentFile);
-		BitmapVector.push_back(new TBitmap());
-		BitmapVector.back()->PixelFormat= pf24bit;
-		BitmapVector.back()->Width = FragmentWidth;
-		BitmapVector.back()->Height = FragmentHeight;
+		std::unique_ptr<TBitmap> Fragment (new TBitmap());
+		Fragment->PixelFormat= pf24bit;
+		Fragment->Width = FragmentWidth;
+		Fragment->Height = FragmentHeight;
 
 
-		TRGBTriple *BitmapLine;
+		TRGBTriple *BitmapLine; // структура, хранящая RBG
 	for (int currentColumn = 0; currentColumn < FragmentWidth; currentColumn++)
 	{
-		BitmapLine = (TRGBTriple*) BitmapVector.back()->ScanLine[currentColumn];
+		// указатель на currentColumn строку Bitmap
+		BitmapLine = (TRGBTriple*) Fragment->ScanLine[currentColumn];
 		for (unsigned int currentRow = 0, adress = 0; currentRow < FragmentHeight; currentRow++, adress = currentColumn * 24 + currentRow)
 		{           // снижаем градацию 255=4095/16
-					BitmapLine[currentRow].rgbtBlue = RawFragment[adress]/16;
-					BitmapLine[currentRow].rgbtGreen = RawFragment[adress]/16;
-					BitmapLine[currentRow].rgbtRed = RawFragment[adress]/16;
+					BitmapLine[currentRow].rgbtBlue = RawFragment[adress]/8;
+					BitmapLine[currentRow].rgbtGreen = RawFragment[adress]/8;
+					BitmapLine[currentRow].rgbtRed = RawFragment[adress]/8;
 		}
 	}
 
-	ImageVector.push_back(new TImage(FragmentShowScrollBox));
-	ImageVector.back()->Width=BitmapVector.back()->Width*5;
-	ImageVector.back()->Height=BitmapVector.back()->Height*5;
-    ImageVector.back()->Canvas->
-	StretchDraw(Rect(0, 0, ImageVector.back()->Width, ImageVector.back()->Height),BitmapVector.back());
+	const float ScaleFactorForScrollBox=6.5;
+
+	ImageScrollBoxVector.push_back(new TScrollBox(FragmentShowScrollBox));
+	ImageScrollBoxVector.back()->Width=Fragment->Width*ScaleFactorForScrollBox;
+	ImageScrollBoxVector.back()->Height=Fragment->Height*ScaleFactorForScrollBox;
+	ImageScrollBoxVector.back()->OnMouseWheelUp= &FormMouseWheelUp;
+	ImageScrollBoxVector.back()->OnMouseWheelDown= &FormMouseWheelDown;
+
+
+	const int ScaleFactorForImage=6;
+
+	ImageVector.push_back(new TImage(ImageScrollBoxVector.back()));
+	ImageVector.back()->Width=Fragment->Width*ScaleFactorForImage;
+	ImageVector.back()->Height=Fragment->Height*ScaleFactorForImage;
+	ImageVector.back()->Left=0;
+	ImageVector.back()->Top=0;
+	ImageVector.back()->OnMouseDown=&ImageOnClick;
+	ImageVector.back()->Stretch=true;
+	ImageVector.back()->Canvas->
+	StretchDraw(Rect(0, 0, ImageVector.back()->Width, ImageVector.back()->Height),Fragment.get());
+
 
 	}
-    PlaceImageFragments(ImageVector);
+
+	for(int i=0;i<ImageVector.size();i++)
+	{
+		ImageVector[i]->SetParentComponent(ImageScrollBoxVector[i]);
+	}
+	PlaceImageFragments(ImageScrollBoxVector);
 
 	fclose(FragmentFile);
 
@@ -638,7 +659,7 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 }
 
 
-void TFormGraphOrient::PlaceImageFragments (const vector<TImage*>& FragmentImages)
+void TFormGraphOrient::PlaceImageFragments (const vector<TScrollBox*>& FragmentImages)
 {
 	if(FragmentImages.empty())
 	{
@@ -647,7 +668,7 @@ void TFormGraphOrient::PlaceImageFragments (const vector<TImage*>& FragmentImage
 
 	int HeightOffset=0;
 	int WidthOffset=0;
-	const int OffsetStep=150;
+	const int OffsetStep=170;
 	for(unsigned int CurrentImage=0;CurrentImage<FragmentImages.size();CurrentImage++)
 	{
 
@@ -657,7 +678,7 @@ void TFormGraphOrient::PlaceImageFragments (const vector<TImage*>& FragmentImage
 		if(OffsetStep*WidthOffset+FragmentImages[CurrentImage]->Width > FragmentShowScrollBox->Width)
 		{
 			WidthOffset=0;
-			HeightOffset+=150;
+			HeightOffset+=170;
 		}
 
 		FragmentImages[CurrentImage]->Left = OffsetStep*WidthOffset;
@@ -764,7 +785,7 @@ void GetFileTitles(AnsiString file_name, AnsiString *file_title)
 }
 
 
-	// сортируем и перезаписываем исходный файл
+	// сортируем и перезаписываем исходный файл в новый файл с постфиксом _sorted
 			AnsiString TFormGraphOrient::SortRawFlashFile(const AnsiString &RawFileName)
 			{
 			   FILE* RawFlashFile;
@@ -880,6 +901,8 @@ void __fastcall TFormGraphOrient::FormClose(TObject *Sender, TCloseAction &Actio
 
 void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 {
+
+  OpenDialog1->Filter="dat|*.dat";
   if (OpenDialog1->Execute()) {
 		vCadrInfo.clear();
 		FileName=OpenDialog1->FileName;
@@ -1354,7 +1377,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 
 void __fastcall TFormGraphOrient::FragmentShowScrollBoxResize(TObject *Sender)
 {
-	PlaceImageFragments(ImageVector);
+	PlaceImageFragments(ImageScrollBoxVector);
 }
 //---------------------------------------------------------------------------
 
@@ -1362,39 +1385,69 @@ void __fastcall TFormGraphOrient::FragmentShowScrollBoxResize(TObject *Sender)
 
 
 void __fastcall TFormGraphOrient::FormMouseWheelUp(TObject *Sender, TShiftState Shift,
-		  TPoint &MousePos, bool &Handled)
+		  const TPoint &MousePos, bool &Handled)
 {
 
-   if(!(FindVCLWindow(MousePos)->Name=="FragmentShowScrollBox"))
+	if(!(FindVCLWindow(MousePos)->Name=="FragmentShowScrollBox") &&
+	!(FindVCLWindow(MousePos)->ClassName()=="TScrollBox"))
    {
 		return;
    }
-;
 
 	for(int currentFragment=0;currentFragment< ImageVector.size();currentFragment++)
 	{
-	   changeContrast(50, ImageVector[currentFragment]);
+	   changeContrast(20, ImageVector[currentFragment]);
 	}
 
 }
 
-
-void __fastcall TFormGraphOrient::FormMouseWheelDown(TObject *Sender, TShiftState Shift, TPoint &MousePos,
+void __fastcall TFormGraphOrient::FormMouseWheelDown(TObject *Sender, TShiftState Shift, const TPoint &MousePos,
 bool &Handled)
 {
-	if(!(FindVCLWindow(MousePos)->Name=="FragmentShowScrollBox"))
-	{
+	if(!(FindVCLWindow(MousePos)->Name=="FragmentShowScrollBox") &&
+	!(FindVCLWindow(MousePos)->ClassName()=="TScrollBox"))
+   {
 		return;
-	}
-
+   }
 
 	for(int currentFragment=0;currentFragment< ImageVector.size();currentFragment++)
 	{
-		changeContrast(-50, ImageVector[currentFragment]);
+		changeContrast(-20, ImageVector[currentFragment]);
 	}
 
 }
-//---------------------------------------------------------------------------
+
+
+
+
+
+
+ void __fastcall TFormGraphOrient::ImageOnClick(TObject *Sender,
+		  TMouseButton Button, TShiftState Shift, int X, int Y)
+{
+	TImage* Image = dynamic_cast<TImage*> (Sender);
+	TScrollBox* ScrollBox= dynamic_cast<TScrollBox*>(Image->Parent);
+	if(Button==mbLeft)
+	{
+		Image->Width= Image->Width * 1.2;
+		Image->Height= Image->Height * 1.2;
+		ScrollBox->VertScrollBar->Position=Y;
+		ScrollBox->HorzScrollBar->Position=X;
+	}
+	else if(Button==mbRight)
+	{   Image->Width= Image->Width / 1.2;
+		Image->Height= Image->Height / 1.2;
+		ScrollBox->VertScrollBar->Position=ScrollBox->VertScrollBar->Position-20;
+		ScrollBox->HorzScrollBar->Position=ScrollBox->HorzScrollBar->Position-20;
+	}
+
+
+
+
+}
+
+
+
  //---------------------------------------------------------------------------
 #define MAX_STAT 16
 #define MAX_LOCAL 15
@@ -1565,7 +1618,8 @@ void ConvertDataDTMI(struct DTMI tmi, struct CadrInfo &mCadr)
 
 void __fastcall TFormGraphOrient::MenuOpenTMIClick(TObject *Sender)
 {
-	if (OpenDialog2->Execute()) {
+    OpenDialog1->Filter="txt|*.txt";
+	if (OpenDialog1->Execute()) {
 
 		vCadrInfo.clear();
 		FileName=OpenDialog1->FileName;
@@ -1585,7 +1639,7 @@ void __fastcall TFormGraphOrient::MenuOpenTMIClick(TObject *Sender)
 		{
 			getline(finp, line, '\n' );
 
-			if (line.find("ШТМИ2")!=std::string::npos) {     //перенести line.find("ШТМИ2");
+			if (line.find("ШТМИ2")!=std::string::npos) {
 				if(TryReadSHTMI2(finp,mSHTMI2)) {
 					PrintSHTMI2(fout,mSHTMI2);
 				}
@@ -1613,6 +1667,8 @@ void __fastcall TFormGraphOrient::MenuOpenTMIClick(TObject *Sender)
 
 
 
-//---------------------------------------------------------------------------
+
+
+
 
 
