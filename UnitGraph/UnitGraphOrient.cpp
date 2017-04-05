@@ -227,6 +227,11 @@ void __fastcall TFormGraphOrient::FormCreate(TObject *Sender)
 
 	InitTableWindows();
 	InitTableObjects();
+
+	Series1->Selected->Hover->Hide();
+	Series2->Selected->Hover->Hide();
+	Series3->Selected->Hover->Hide();
+	Series9->Selected->Hover->Hide();
 }
 //---------------------------------------------------------------------------
 void TFormGraphOrient::InitTableWindows(void)
@@ -370,11 +375,11 @@ unsigned short CountLines, CountBlock, TabTakeAway[MaxBlockSeries][2];
 unsigned short Border=10;
 
 	Chart1->LeftAxis->Automatic=false;
-	Chart1->LeftAxis->Minimum=-Border;
-	Chart1->LeftAxis->Maximum=mCadr.ImageHeight+Border;
+	Chart1->LeftAxis->Minimum=0;
+	Chart1->LeftAxis->Maximum=mCadr.ImageHeight;
 	Chart1->BottomAxis->Automatic=false;
-	Chart1->BottomAxis->Minimum=-Border;
-	Chart1->BottomAxis->Maximum=mCadr.ImageWidth+Border;
+	Chart1->BottomAxis->Minimum=0;
+	Chart1->BottomAxis->Maximum=mCadr.ImageWidth;
 
 //DrawBlocks()
 	CountLines=0;
@@ -392,6 +397,8 @@ unsigned short Border=10;
 			TabTakeAway[i][1]=mCadr.LinesList[i].Height>>1;
 		}
 		BlockSeries[i]->Visible=true;
+		BlockSeries[i]->X0=0;
+		BlockSeries[i]->X1=mCadr.ImageWidth;
 		BlockSeries[i]->Y0=TabTakeAway[i][0];
 		BlockSeries[i]->Y1=TabTakeAway[i][0]+TabTakeAway[i][1];
 		CountLines+=mCadr.LinesList[i].Height;
@@ -559,9 +566,13 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 	AnsiString NeededDirectory=GetCurrentDir()+"\\Frag_"+FileTitle;
 	if (!TDirectory::Exists(NeededDirectory))
 	{
-		Application->MessageBox(L"Указан неверный путь к директории фрагментов", L"Ошибка", MB_OK);
+//		Application->MessageBox(L"Указан неверный путь к директории фрагментов", L"Ошибка", MB_OK);
+		LabelFrameError->Visible=true;
+        LabelFrameError->Caption="Директория фрагментов не найдена";
 		return;
 	}
+
+   LabelFrameError->Visible=false;
 
    TStringDynArray FileNameList;
    FileNameList=TDirectory::GetFiles(NeededDirectory);
@@ -990,7 +1001,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 		this->CreateGraph(this->NumLine);
 		this->ApplySeriesSetting(this->NumLine, "мБОКЗ-2В",
 											clBlue);//ColorRes[FormGraphOrient->NumLine]);
-		DataPixHeader mDataPixHdr;
+//		DataPixHeader mDataPixHdr;
 		while (!feof(fflesh))
 		{
 		  fread(&Marker,sizeof(int),1,fflesh);
@@ -1016,7 +1027,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 		  {
 			case PIX_0_MARKER:
 			{
-
+			  DataPixHeader mDataPixHdr;
 			  fread(&mDataPixHdr,sizeof(struct DataPixHeader),1,fflesh);
 			  ChangeWordPix(mDataPixHdr);
 			  PrintDataPix(ftxt, mDataPixHdr, 1);
@@ -1038,8 +1049,9 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 
 			case PIX_1_MARKER:
 			{
-//			  DataPixHeader mDataPixHdr;
-			  fread(&mDataPixHdr.T,sizeof(struct DataPixHeader)-4,1,fflesh);
+			  DataPixHeader mDataPixHdr;
+			  fread(&mDataPixHdr,sizeof(struct DataPixHeader),1,fflesh);
+//			  fread(&mDataPixHdr.T,sizeof(struct DataPixHeader)-4,1,fflesh);
 			  ChangeWordPix(mDataPixHdr);
 			  PrintDataPix(ftxt, mDataPixHdr,2);
 
@@ -1590,10 +1602,10 @@ void PrintDTMI(ofstream &file, struct DTMI tmi)
 
 void ConvertDataDTMI(struct DTMI tmi, struct CadrInfo &mCadr)
 {
-//	mCadr.IsBinary=true;
+	mCadr.IsBinary=true;
 //	mCadr.IsReverse=true;
-//	mCadr.ImageHeight=1024;
-//	mCadr.ImageWidth=1024;
+	mCadr.ImageHeight=256;
+	mCadr.ImageWidth=256;
 //	mCadr.Time=data.Tpr_sec+data.Tpr_msec/1000.;
 	mCadr.CountLocalObj=32;//tmi.nFixedObj;
 //	mCadr.CountDeterObj=tmi.NumDet;
