@@ -1,5 +1,6 @@
 #Dirs
 Debug/
+Release/
 UnitGraph/__recovery/
 UnitGraph/__history/
 __recovery/
