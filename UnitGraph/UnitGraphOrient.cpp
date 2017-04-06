@@ -554,12 +554,13 @@ double X0, Y0, X1, Y1, Dx, Dy, Ist, Nel;
 void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 {
 
-	for(unsigned int i=0;i<ImageVector.size();i++)
+	for(unsigned int i=0;i<ImageScrollBoxVector.size();i++)
 	{
-		ImageVector[i]->Free();
+		 ImageScrollBoxVector[i]->Free();
 	}
-	ImageVector.clear();
 
+	ImageVector.clear();
+	ImageScrollBoxVector.clear();
 	AnsiString NeededDirectory=GetCurrentDir()+"\\Frag_"+FileTitle;
 	if (!TDirectory::Exists(NeededDirectory))
 	{
@@ -633,6 +634,7 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 	ImageScrollBoxVector.back()->Height=Fragment->Height*ScaleFactorForScrollBox;
 	ImageScrollBoxVector.back()->OnMouseWheelUp= &FormMouseWheelUp;
 	ImageScrollBoxVector.back()->OnMouseWheelDown= &FormMouseWheelDown;
+	ImageScrollBoxVector.back()->SetParentComponent(FragmentShowScrollBox);
 
 
 	const int ScaleFactorForImage=6;
@@ -673,6 +675,7 @@ void TFormGraphOrient::PlaceImageFragments (const vector<TScrollBox*>& FragmentI
 	int HeightOffset=0;
 	int WidthOffset=0;
 	const int OffsetStep=170;
+
 	for(unsigned int CurrentImage=0;CurrentImage<FragmentImages.size();CurrentImage++)
 	{
 
@@ -690,14 +693,6 @@ void TFormGraphOrient::PlaceImageFragments (const vector<TScrollBox*>& FragmentI
 		++WidthOffset;
 	}
 
-	// если размещаем в первый раз, задаем родителя
-	if(FragmentImages[0]->Parent==NULL)
-	{
-		for(unsigned int CurrentImage=0;CurrentImage<FragmentImages.size();CurrentImage++)
-		{
-			FragmentImages[CurrentImage]->SetParentComponent(FragmentShowScrollBox);
-		}
-	}
 
 }
 
@@ -705,14 +700,12 @@ void TFormGraphOrient::PlaceImageFragments (const vector<TScrollBox*>& FragmentI
 
 void __fastcall TFormGraphOrient::UpDown1Click(TObject *Sender, TUDBtnType Button)
 {
-	EditNumCadrChange(this);
+	DrawAnimateHandler();
 }
 //---------------------------------------------------------------------------
-
-
-void __fastcall TFormGraphOrient::EditNumCadrChange(TObject *Sender)
+void TFormGraphOrient::DrawAnimateHandler()
 {
-try
+  try
 {
 struct CadrInfo CurCadr;
 int cnt=StrToInt(EditNumCadr->Text);
@@ -728,13 +721,9 @@ catch(std::exception &e)
 {
 	ShowMessage(e.what());
 }
-catch(...)
-{
-	ShowMessage("Неизвестная ошибка");
-}
 
 }
-//---------------------------------------------------------------------------
+
 
 
 void __fastcall TFormGraphOrient::TableObjectsInfoDrawCell(TObject *Sender, int ACol,
@@ -1383,7 +1372,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 		fclose(flog_orient);
 		this->NumLine=1;
 
-		this->UpDown1Click(MainForm,btNext);
+		//this->UpDown1Click(MainForm,btNext);
 		this->UpDown1->Max=vCadrInfo.size();
 
 	 }
@@ -1677,10 +1666,12 @@ void __fastcall TFormGraphOrient::MenuOpenTMIClick(TObject *Sender)
 		fout.close();
 		this->NumLine=1;
 
-		this->UpDown1Click(MainForm,btNext);
+	   //	this->UpDown1Click(MainForm,btNext);
 		this->UpDown1->Max=vCadrInfo.size();
 	}
 }
+
+
 
 
 
