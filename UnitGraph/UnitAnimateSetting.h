@@ -42,7 +42,7 @@ __published:	// IDE-managed Components
 	TCheckBox *CheckBoxFrameMv;
 	TCheckBox *CheckBoxFrameSp;
 	TCheckBox *CheckBoxFrameStarID;
-	TCheckBox *CheckBoxlFrameID;
+	TCheckBox *CheckBoxFrameID;
 	void __fastcall ShapeColorLocObjTableMouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y);
 	void __fastcall ShapeColorZeroObjTableMouseDown(TObject *Sender, TMouseButton Button,

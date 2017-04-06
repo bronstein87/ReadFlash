@@ -191,7 +191,7 @@ object FormAnimateSetting: TFormAnimateSetting
       Caption = #1053#1086#1084#1077#1088' '#1079#1074#1077#1079#1076#1099
       TabOrder = 3
     end
-    object CheckBoxlFrameID: TCheckBox
+    object CheckBoxFrameID: TCheckBox
       Left = 40
       Top = 47
       Width = 120

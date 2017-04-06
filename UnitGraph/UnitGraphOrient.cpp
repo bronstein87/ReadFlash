@@ -358,7 +358,6 @@ void TFormGraphOrient::ClearAnimate(void)
 //ObjectsBar
 	Series7->Clear();
 	Series8->Clear();
-
 }
 
 void TFormGraphOrient::SetVisibleLabelFrame(bool isVisible)
@@ -1465,6 +1464,14 @@ bool &Handled)
 #define MAX_LOCAL 15
 #define MAX_WINDOW 16
 
+struct SHTMI1
+{
+	std::string timeBOKZ, status1, status2, post;
+	int serialNumber;
+	float Foc, Xg, Yg;
+	unsigned short timeExp, Mean, Sigma, countDefect;
+} mSHTMI1;
+
 struct SHTMI2
 {
 	std::string timeBOKZ, status1, status2, post;
@@ -1489,6 +1496,38 @@ std::string arrStatError[MAX_STAT]={{"EC1"},{"EC2"},{"EC3"},{"EC4"},
 							{"EC9"},{"EC10"},{"EC11"},{"EC12"},
 							{"EC13"},{"EC14"},{"EC15"},{"EC16"}};
 
+int TryReadSHTMI1(ifstream &finp, struct SHTMI1 &tmi)
+{
+		std::string line, word;
+
+		while (!finp.eof()){
+			finp>>word;
+			if (word=="KC1") finp>>tmi.status1;
+			else if (word=="KC2") finp>>tmi.status2;
+			else if ((word=="ÑÅÐ")||(word=="CEP")) {
+				finp>>word;
+				if ((word=="ÍÎÌ")||(word=="HOM")) {
+					finp>>tmi.serialNumber;
+				}
+			}
+			else if (word=="ÏOCT") finp>>tmi.post;
+			else if ((word=="T")||(word=="Ò")) {
+				finp>>word; if (word=="ÝÊÑÏ") finp>>tmi.timeExp;
+			}
+			else if (word=="Õ0") finp>>tmi.Xg;
+			else if (word=="Ó0") finp>>tmi.Yg;
+			else if (word=="ÌÒ") finp>>tmi.Mean;
+			else if (word=="ÑÒ") finp>>tmi.Sigma;
+			else if (word=="ÍÀÌ") {
+				finp>>word; if (word=="ÄÅÔ") finp>>tmi.countDefect;
+			}
+
+			if (word=="ÂÅÐÑÈß") {
+				return 1;
+			}
+        }
+}
+
 int TryReadSHTMI2(ifstream &finp, struct SHTMI2 &tmi)
 {
 		std::string line, word;
@@ -1503,7 +1542,7 @@ int TryReadSHTMI2(ifstream &finp, struct SHTMI2 &tmi)
 					finp>>tmi.serialNumber;
 				}
 			}
-			else if (word=="ÏÎÑÒ") finp>>tmi.post;
+			else if (word=="ÏOCT") finp>>tmi.post;
 			else if ((word=="T")||(word=="Ò")) {
 				finp>>word; if (word=="ÝÊÑÏ") finp>>tmi.timeExp;
 			}
@@ -1519,7 +1558,7 @@ int TryReadSHTMI2(ifstream &finp, struct SHTMI2 &tmi)
 					i++;
 				}
 			}
-			if (word=="EC16") {
+			if (word==arrStatError[MAX_STAT-1]) {
 				return 1;
 			}
 			getline(finp, line, '\n' );
@@ -1534,7 +1573,7 @@ int TryReadDTMI(ifstream &finp, struct DTMI &tmi)
 		int indexObject=0,indexParam=0, intVal, flLow=1;
 
 		while (!finp.eof()){
-			finp>>word;
+		   	finp>>word;
 			if (word=="KC1") finp>>tmi.status1;
 			else if (word=="KC2") finp>>tmi.status2;
 			else if ((word=="ÑÅÐ")||(word=="CEP")) {
@@ -1543,7 +1582,7 @@ int TryReadDTMI(ifstream &finp, struct DTMI &tmi)
 					finp>>tmi.serialNumber;
 				}
 			}
-			else if (word=="ÏÎÑÒ") finp>>tmi.post;
+			else if (word=="ÏOCT") finp>>tmi.post;
 			else if ((word=="T")||(word=="Ò")) {
 				finp>>word; if (word=="ÝÊÑÏ") finp>>tmi.timeExp;
 			}
@@ -1573,8 +1612,22 @@ int TryReadDTMI(ifstream &finp, struct DTMI &tmi)
 		return 0;
 }
 
+void PrintSHTMI1(ofstream &file, struct SHTMI1 tmi)
+{
+	file<<"____________________________________"<<"\n";
+	file<<"Ìàññèâ ØÒÌÈ1"<<"\n";
+	file<<"ÊÑ1:\t"<<tmi.status1<<"\n";
+	file<<"ÊÑ2:\t"<<tmi.status2<<"\n";
+	file<<"POST:\t"<<tmi.post<<"\n";
+	file<<"Çàâ. ¹\t"<<tmi.serialNumber<<"\n";
+	file<<"Texp, ìñ:\t"<<tmi.timeExp<<"\n";
+	file<<"____________________________________"<<"\n";
+}
+
 void PrintSHTMI2(ofstream &file, struct SHTMI2 tmi)
 {
+	file<<"____________________________________"<<"\n";
+	file<<"Ìàññèâ ØÒÌÈ2"<<"\n";
 	file<<"ÊÑ1:\t"<<tmi.status1<<"\n";
 	file<<"ÊÑ2:\t"<<tmi.status2<<"\n";
 	file<<"POST:\t"<<tmi.post<<"\n";
@@ -1583,11 +1636,13 @@ void PrintSHTMI2(ofstream &file, struct SHTMI2 tmi)
 	for (int i = 0; i < MAX_STAT; i++) {
 		file<<"Ñ÷åò÷èê ¹ "<<(i+1)<<":\t"<<tmi.cntStatOrient[i]<<"\n";
 	}
+	file<<"____________________________________"<<"\n";
 }
 
 void PrintDTMI(ofstream &file, struct DTMI tmi)
 {
-	std::string str;
+	file<<"____________________________________"<<"\n";
+	file<<"Ìàññèâ ÄÒÌÈ"<<"\n";
 	file<<"ÊÑ1\t"<<tmi.status1<<"\n";
 	file<<"ÊÑ2\t"<<tmi.status2<<"\n";
 	file<<"POST\t"<<tmi.post<<"\n";
@@ -1598,6 +1653,7 @@ void PrintDTMI(ofstream &file, struct DTMI tmi)
 		file<<tmi.LocalList[i][0]<<"\t"<<tmi.LocalList[i][1]<<"\t";
 		file<<tmi.LocalList[i][2]<<"\t"<<tmi.LocalList[i][3]<<"\n";
 	}
+	file<<"____________________________________"<<"\n";
 }
 
 void ConvertDataDTMI(struct DTMI tmi, struct CadrInfo &mCadr)
@@ -1639,21 +1695,42 @@ void __fastcall TFormGraphOrient::MenuOpenTMIClick(TObject *Sender)
 		GetFileTitles(FileName,&FileTitle);
 
 		ifstream finp(FileName.c_str());
-		ofstream fout((FileTitle+"_decode.txt").c_str());
 		if (!finp.is_open()) {
 			ShowMessage("Ôàéë íå ìîæåò áûòü îòêðûò!");
 			return;
 		}
+
+		ofstream fout((FileTitle+"_decode.txt").c_str());
+		ofstream fshtmi2((FileTitle+"_shtmi2.txt").c_str());
+
+		fshtmi2<<std::setw(16)<<"KC1"<<std::setw(18)<<"KC2"<<std::setw(18)<<"POST";
+		fshtmi2<<std::setw(6)<<"¹"<<std::setw(6)<<"Texp";
+		for (int i = 0; i < MAX_STAT; i++) {
+			std::string str="EC"+(i+1);
+			fshtmi2<<std::setw(6)<<str;
+		}
+		fshtmi2<<"\n";
 
 		std::string line;
 		int cntRecDTMI=0;
 		while (!finp.eof())
 		{
 			getline(finp, line, '\n' );
-
-			if (line.find("ØÒÌÈ2")!=std::string::npos) {
+			if (line.find("ØÒÌÈ1")!=std::string::npos) {
+				if(TryReadSHTMI1(finp,mSHTMI1)) {
+					PrintSHTMI1(fout,mSHTMI1);
+				}
+			}
+			else if (line.find("ØÒÌÈ2")!=std::string::npos) {
 				if(TryReadSHTMI2(finp,mSHTMI2)) {
 					PrintSHTMI2(fout,mSHTMI2);
+					fshtmi2<<std::setw(16)<<mSHTMI2.status1<<std::setw(18)<<mSHTMI2.status2;
+					fshtmi2<<std::setw(18)<<mSHTMI2.post;
+					fshtmi2<<std::setw(6)<<mSHTMI2.serialNumber;
+					fshtmi2<<std::setw(6)<<mSHTMI2.timeExp;
+					for (int i = 0; i < MAX_STAT; i++) {
+						fshtmi2<<std::setw(8)<<mSHTMI2.cntStatOrient[i];
+	}               fshtmi2<<"\n";
 				}
 			}
 			else if (line.find("ÄÒÌÈ1")!=std::string::npos) {
@@ -1670,6 +1747,7 @@ void __fastcall TFormGraphOrient::MenuOpenTMIClick(TObject *Sender)
 
 		finp.close();
 		fout.close();
+		fshtmi2.close();
 		this->NumLine=1;
 
 		this->UpDown1Click(MainForm,btNext);

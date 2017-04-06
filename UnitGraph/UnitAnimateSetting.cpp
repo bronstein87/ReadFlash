@@ -169,3 +169,4 @@ void __fastcall TFormAnimateSetting::CheckBoxLabelFrameClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
+
