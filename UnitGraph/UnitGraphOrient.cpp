@@ -563,9 +563,12 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 	AnsiString NeededDirectory=GetCurrentDir()+"\\Frag_"+FileTitle;
 	if (!TDirectory::Exists(NeededDirectory))
 	{
-		Application->MessageBox(L"”казан неверный путь к директории фрагментов", L"ќшибка", MB_OK);
+//		Application->MessageBox(L"”казан неверный путь к директории фрагментов", L"ќшибка", MB_OK);
+		LabelFrameError->Visible=true;
+		LabelFrameError->Caption="”казан неверный путь к директории фрагментов";
 		return;
 	}
+    else 		LabelFrameError->Visible=false;
    TStringDynArray FileNameList;
    FileNameList=TDirectory::GetFiles(NeededDirectory);
    AnsiString TimePrStr=FloatToStrF(mCadr.Time,ffFixed,10,10);
@@ -695,36 +698,28 @@ void TFormGraphOrient::PlaceImageFragments (const vector<TScrollBox*>& FragmentI
 
 }
 
-
-
-void __fastcall TFormGraphOrient::UpDown1Click(TObject *Sender, TUDBtnType Button)
+void __fastcall TFormGraphOrient::EditNumCadrChange(TObject *Sender)
 {
 	DrawAnimateHandler();
 }
 //---------------------------------------------------------------------------
-void TFormGraphOrient::DrawAnimateHandler()
+void  TFormGraphOrient::DrawAnimateHandler(void)
 {
-  try
-{
-struct CadrInfo CurCadr;
-int cnt=StrToInt(EditNumCadr->Text);
-
-
-	if (!this->GetCadrInfo(cnt, CurCadr))
+	try
 	{
-		  DrawAnimate(CurCadr);
+		struct CadrInfo CurCadr;
+		int cnt=StrToInt(EditNumCadr->Text);
+
+		if (!this->GetCadrInfo(cnt, CurCadr))
+		{
+			  DrawAnimate(CurCadr);
+		}
 	}
-
+	catch(std::exception &e)
+	{
+		ShowMessage(e.what());
+	}
 }
-catch(std::exception &e)
-{
-	ShowMessage(e.what());
-}
-
-}
-
-
-
 void __fastcall TFormGraphOrient::TableObjectsInfoDrawCell(TObject *Sender, int ACol,
 		  int ARow, TRect &Rect, TGridDrawState State)
 {
@@ -1012,13 +1007,15 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 //			{SINGLE_REG_MARKER,SINGLE_REG_MARKER_ACCORDANCE},
 //			{FRAG_MARKER,FRAG_MARKER_ACCORDANCE}
 //		});
-
+//
 //		  MARKER_ACCORDANCE MarkerAccordance=
 //		  static_cast<MARKER_ACCORDANCE>(MarkerMap.at(GetInt(Marker)));
 
-		  switch (GetInt(Marker))
-		  {
-			case PIX_0_MARKER:
+//		  switch (MarkerAccordance)
+//		  {
+//			case PIX_0_MARKER_ACCORDANCE:
+			int nn=GetInt(Marker);
+			if (nn==PIX_0_MARKER)
 			{
 			  DataPixHeader mDataPixHdr;
 			  fread(&mDataPixHdr,sizeof(struct DataPixHeader),1,fflesh);
@@ -1037,10 +1034,10 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 			  fprintf(flog_pix,"    %02d PIX1 %6d %10ld %10ld %6ld.%03ld %8d\n",
 					  mDataPixHdr.SerNum, mDataPixHdr.CntRecord, mDataPixHdr.T, mDataPixHdr.Tbshv,
 					  mDataPixHdr.Tpr_sec, mDataPixHdr.Tpr_msec, mDataPixHdr.NumPix);
-			  break;
+//			  break;
 			}
-
-			case PIX_1_MARKER:
+			else if (nn==PIX_1_MARKER)
+//			case PIX_1_MARKER_ACCORDANCE:
 			{
 			  DataPixHeader mDataPixHdr;
 			  fread(&mDataPixHdr,sizeof(struct DataPixHeader),1,fflesh);
@@ -1060,10 +1057,10 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 			  fprintf(flog_pix,"    %02d PIX2 %6d %10ld %10ld %6ld.%03ld %8d\n",
 					  mDataPixHdr.SerNum, mDataPixHdr.CntRecord, mDataPixHdr.T, mDataPixHdr.Tbshv,
 					  mDataPixHdr.Tpr_sec, mDataPixHdr.Tpr_msec, mDataPixHdr.NumPix);
-			  break;
+//			  break;
 			}
-
-			case HO_MARKER:
+			else if (nn==HO_MARKER)
+//			case HO_MARKER_ACCORDANCE:
 			{
               DataNO mDataNO;
 			  fread(&mDataNO,sizeof(struct DataNO_st),1,fflesh);
@@ -1119,13 +1116,14 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 	            fclose(floc);
 	          }
 /**/
-	          break;
+//	          break;
 			}
 
-			case SL_MARKER:
+//			case SL_MARKER_ACCORDANCE:
+			else if (nn==SL_MARKER)
 			{
               DataSLEZH mDataSLEZH;
-	          fread(&mDataSLEZH,sizeof(struct DataSLEZH_st),1,fflesh);
+			  fread(&mDataSLEZH,sizeof(struct DataSLEZH_st),1,fflesh);
 	          if (mDataSLEZH.NumLoc>MaxObj)
 			  {
 	            fprintf(ftxt,"\nќшибка чтени€ данных!\n");
@@ -1299,10 +1297,10 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 	//          delete [] StructIKI->ImageData.WindowsData.Info;
 	//          delete StructIKI;
 /**/
-	          break;
+//	          break;
 			}
-
-			case SINGLE_REG_MARKER:
+			else if (nn==SINGLE_REG_MARKER)
+//			case SINGLE_REG_MARKER_ACCORDANCE:
 			{
               DataSingleReg mDataSingleReg;
 			  fread(&mDataSingleReg,sizeof(struct DataSingleReg),1,fflesh);
@@ -1312,18 +1310,19 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 				  mDataSingleReg.SerNum, mDataSingleReg.CntRecord, mDataSingleReg.T,
 				  mDataSingleReg.Tbshv, mDataSingleReg.Tpr_sec, mDataSingleReg.Tpr_msec,
 				  mDataSingleReg.CntErr, mDataSingleReg.Nreg, mDataSingleReg.RegVal);
-			  break;
+//			  break;
 			}
 
-			case ALL_REG_MARKER:
+			else if (nn==ALL_REG_MARKER)
+//			case ALL_REG_MARKER_ACCORDANCE:
 			{
 			  unsigned char Reg[COUNT_REG];
 			  fread(Reg,sizeof(Reg),1,fflesh);
 			  PrintReg(ftxt, Reg);
-			  break;
+//			  break;
 			}
-
-			case FRAG_MARKER:
+			else if (GetInt(Marker)==FRAG_MARKER)
+//			case FRAG_MARKER_ACCORDANCE:
 			{
 			  DataFragHeader mDataFragHdr;
 			  fread(&mDataFragHdr,sizeof(struct DataFragHeader),1,fflesh);
@@ -1360,9 +1359,9 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 			  delete StructIKI;
 	/**/
 
-			  break;
+//			  break;
 			}
-		  }
+//		  }
 		}
 		fclose(fflesh);
 		fclose(ftxt);
@@ -1390,7 +1389,7 @@ void __fastcall TFormGraphOrient::FragmentShowScrollBoxResize(TObject *Sender)
 
 
 void __fastcall TFormGraphOrient::FormMouseWheelUp(TObject *Sender, TShiftState Shift,
-		  const TPoint &MousePos, bool &Handled)
+		 const TPoint& MousePos, bool &Handled)
 {
 
 	if(!(FindVCLWindow(MousePos)->Name=="FragmentShowScrollBox") &&
@@ -1406,7 +1405,7 @@ void __fastcall TFormGraphOrient::FormMouseWheelUp(TObject *Sender, TShiftState 
 
 }
 
-void __fastcall TFormGraphOrient::FormMouseWheelDown(TObject *Sender, TShiftState Shift, const TPoint &MousePos,
+void __fastcall TFormGraphOrient::FormMouseWheelDown(TObject *Sender, TShiftState Shift, const TPoint& MousePos,
 bool &Handled)
 {
 	if(!(FindVCLWindow(MousePos)->Name=="FragmentShowScrollBox") &&
@@ -1748,6 +1747,8 @@ void __fastcall TFormGraphOrient::MenuOpenTMIClick(TObject *Sender)
 		this->UpDown1->Max=vCadrInfo.size();
 	}
 }
+
+
 
 
 

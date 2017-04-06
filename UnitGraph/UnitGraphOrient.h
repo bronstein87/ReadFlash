@@ -51,6 +51,7 @@
 	#include <iomanip>
 	#include "ImageProcessingFcns.h"
 	#include <exception>
+	#include <unordered_map>
 
 
 
@@ -148,7 +149,6 @@
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
 		void __fastcall FormCreate(TObject *Sender);
-		void __fastcall UpDown1Click(TObject *Sender, TUDBtnType Button);
 		void __fastcall TableObjectsInfoDrawCell(TObject *Sender, int ACol, int ARow, TRect &Rect,
 			  TGridDrawState State);
 		void __fastcall TableWindowsInfoDrawCell(TObject *Sender, int ACol, int ARow, TRect &Rect,
@@ -156,12 +156,13 @@
 		void __fastcall MenuOptionsClick(TObject *Sender);
 		void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 		void __fastcall FragmentShowScrollBoxResize(TObject *Sender);
-		void __fastcall FormMouseWheelDown(TObject *Sender, TShiftState Shift,const TPoint &MousePos,
+		void __fastcall FormMouseWheelDown(TObject *Sender, TShiftState Shift,const TPoint& MousePos,
 		  bool &Handled);
-		void __fastcall FormMouseWheelUp(TObject *Sender, TShiftState Shift,const TPoint &MousePos,
-          bool &Handled);
+		void __fastcall FormMouseWheelUp(TObject *Sender, TShiftState Shift,const TPoint& MousePos,
+		  bool &Handled);
 		void __fastcall MenuOpenFlashClick(TObject *Sender);
 		void __fastcall MenuOpenTMIClick(TObject *Sender);
+	void __fastcall EditNumCadrChange(TObject *Sender);
 
 
 
@@ -216,10 +217,8 @@
 			void SetVisible(int CheckLine, bool tf);
 			void ApplySeriesSetting(int CheckLine, AnsiString Title, TColor color);
 			void SetVisibleLabelFrame(bool isVisible);
-			int GetCadrInfo(int NC, struct CadrInfo &mCadr);
-			void DrawAnimateHandler();
-
-
+			int  GetCadrInfo(int NC, struct CadrInfo &mCadr);
+			void DrawAnimateHandler(void);
 	};
 	//---------------------------------------------------------------------------
 	extern PACKAGE TFormGraphOrient *FormGraphOrient;

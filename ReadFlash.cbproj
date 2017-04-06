@@ -4,7 +4,7 @@
         <ProjectVersion>18.2</ProjectVersion>
         <MainSource>ReadFlash.cpp</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Release</Config>
+        <Config Condition="'$(Config)'==''">Debug</Config>
         <AppType>Application</AppType>
         <FrameworkType>VCL</FrameworkType>
         <TargetedPlatforms>1</TargetedPlatforms>
@@ -146,11 +146,6 @@
         <TASM_Debugging>None</TASM_Debugging>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <BT_BuildType>Debug</BT_BuildType>
-        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
-        <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <LinkPackageStatics>rtl.lib;vcl.lib;vclimg.lib;Tee924.lib;vclwinx.lib</LinkPackageStatics>
         <Defines>NDEBUG;$(Defines)</Defines>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">

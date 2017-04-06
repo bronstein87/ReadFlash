@@ -36,7 +36,7 @@
 #define FRAG_MARKER 		0xAAAA6666
 #define COUNT_REG  			128
 
-
+//
 //enum MARKER_TYPE : unsigned int
 //{
 //	 SECTOR_MARKER =		0x55550000,
@@ -49,7 +49,7 @@
 //	 FRAG_MARKER = 			0xAAAA6666,
 //
 //};
-//
+
 ////  соответствие для MARKER_TYPE, используется в функции считывания flash-файла
 ////  чтобы компилировался switch-case с новым компилятором
 //
