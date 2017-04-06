@@ -17,7 +17,6 @@ __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 		: TForm(Owner),FragID(0),FormAnimateSetting(new TFormAnimateSetting(this))
 {
 
-
 }
 //рисование сводных графиков по серии
 //---------------------------------------------------------------------------
@@ -366,6 +365,8 @@ void TFormGraphOrient::SetVisibleLabelFrame(bool isVisible)
 
 void TFormGraphOrient::DrawBlock(const struct CadrInfo &mCadr)
 {
+
+
 unsigned short CountLines, CountBlock, TabTakeAway[MaxBlockSeries][2];
 unsigned short Border=10;
 
@@ -380,7 +381,6 @@ unsigned short Border=10;
 	CountLines=0;
 	CountBlock=mCadr.CountBlock;
 	if (CountBlock>MaxBlockSeries) {
-		ShowMessage("Превышено число допустимых блоков!");
 		CountBlock=MaxBlockSeries;
 	}
 
@@ -511,6 +511,8 @@ unsigned short Border=10;
 
 void TFormGraphOrient::DrawAnimate(const struct CadrInfo &mCadr)
 {
+try
+{
 double X0, Y0, X1, Y1, Dx, Dy, Ist, Nel;
 
   EditTimeDev->Text=FloatToStrF(mCadr.Time,ffFixed, 10,3);
@@ -538,23 +540,35 @@ double X0, Y0, X1, Y1, Dx, Dy, Ist, Nel;
 //						(int)(sqrtm(mCadr.StarsList[i].Square)+1));
 
   }
+
   DrawBlock(mCadr);
   PrintTableWindows(mCadr);
   PrintTableObjects(mCadr);
   DrawFragment(mCadr);
 }
 
+catch(std::exception &e)
+{
+	ShowMessage(e.what());
+}
+
+catch(...)
+{
+	ShowMessage("Неизвестная ошибка");
+}
+
+
+}
+
 
 void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 {
-
-
-	for(unsigned int i=0;i<ImageVector.size();i++)
+   try
+{	for(unsigned int i=0;i<ImageVector.size();i++)
 	{
 		ImageVector[i]->Free();
 	}
 	ImageVector.clear();
-
 
 	AnsiString NeededDirectory=GetCurrentDir()+"\\Frag_"+FileTitle;
 	if (!TDirectory::Exists(NeededDirectory))
@@ -562,13 +576,16 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 		Application->MessageBox(L"Указан неверный путь к директории фрагментов", L"Ошибка", MB_OK);
 		return;
 	}
-
    TStringDynArray FileNameList;
    FileNameList=TDirectory::GetFiles(NeededDirectory);
    AnsiString TimePrStr=FloatToStrF(mCadr.Time,ffFixed,10,10);
-   TStringDynArray TimePrTwoParts=System::Strutils::SplitString(TimePrStr,",");
-   TimePrTwoParts[1].Delete(4,TimePrTwoParts[1].Length()-1);
-   TimePrTwoParts[1]="00000"+TimePrTwoParts[1];
+   TStringDynArray TimePrTwoParts=System::Strutils::SplitString(TimePrStr,".");
+
+   // отсекаем лишние нули с конца
+   int IndexOfZeroStart = 3;
+	UnicodeString TimePrWithOutNulls=TimePrTwoParts[1].SubString(0,IndexOfZeroStart);
+   // и добавляем их в конце, чтобы было как в названии файла фрагментов
+   TimePrTwoParts[1]="00000"+TimePrWithOutNulls;
 
    AnsiString FragmentFileStr;
    for(int CurrentFileName=0;CurrentFileName<FileNameList.Length;CurrentFileName++)
@@ -580,7 +597,6 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 				 FragmentFileStr=FileNameList[CurrentFileName];
 				 break;
 		  }
-
    }
 
    if(FragmentFileStr!="")
@@ -593,7 +609,6 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 		ShowMessage(AnsiString("Не удалось открыть файл ")+FragmentFileStr.c_str());
 		return;
    }
-
 
 	for(int CurrentFragment=0;CurrentFragment<mCadr.CountWindows;CurrentFragment++)
 	{
@@ -654,6 +669,15 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 	fclose(FragmentFile);
 
    }
+}
+catch(std::exception &e)
+{
+	ShowMessage(e.what());
+}
+catch(...)
+{
+	ShowMessage("Неизвестная ошибка");
+}
 
 
 }
@@ -661,6 +685,9 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 
 void TFormGraphOrient::PlaceImageFragments (const vector<TScrollBox*>& FragmentImages)
 {
+
+	try
+	{
 	if(FragmentImages.empty())
 	{
 		return;
@@ -694,14 +721,35 @@ void TFormGraphOrient::PlaceImageFragments (const vector<TScrollBox*>& FragmentI
 			FragmentImages[CurrentImage]->SetParentComponent(FragmentShowScrollBox);
 		}
 	}
+	}
+	catch(std::exception &e)
+{
+	ShowMessage(e.what());
+}
+catch(...)
+{
+	ShowMessage("Неизвестная ошибка4");
+}
 
 }
 
 
 
 void __fastcall TFormGraphOrient::UpDown1Click(TObject *Sender, TUDBtnType Button)
-{
+{   try
+	{
 	EditNumCadrChange(this);
+	}
+	catch(std::exception &e)
+	{
+	ShowMessage(e.what());
+	}
+	catch(...)
+	{
+	  ShowMessage("Неизвестная ошибка1");
+	}
+
+
 }
 //---------------------------------------------------------------------------
 
@@ -1134,6 +1182,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 			  PrintDataSLEZH(ftxt, mDataSLEZH);
 
 			  CadrInfo mCadrInfo;
+
 			  ConvertDataSLEZH(mDataSLEZH, mCadrInfo);
 			  vCadrInfo.push_back(mCadrInfo);
 
@@ -1366,7 +1415,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 		fclose(flog_orient);
 		this->NumLine=1;
 
-		this->UpDown1Click(MainForm,btNext);
+	   //	this->UpDown1Click(MainForm,btNext);
 		this->UpDown1->Max=vCadrInfo.size();
 
 	 }
@@ -1660,7 +1709,7 @@ void __fastcall TFormGraphOrient::MenuOpenTMIClick(TObject *Sender)
 		fout.close();
 		this->NumLine=1;
 
-		this->UpDown1Click(MainForm,btNext);
+	  //	this->UpDown1Click(MainForm,btNext);
 		this->UpDown1->Max=vCadrInfo.size();
 	}
 }

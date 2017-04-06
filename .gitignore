@@ -4,7 +4,7 @@ UnitGraph/__recovery/
 UnitGraph/__history/
 __recovery/
 __history/
-
+*.cbproj.local
 
 # Compiled Object files
 *.slo

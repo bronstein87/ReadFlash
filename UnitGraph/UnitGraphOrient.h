@@ -42,6 +42,7 @@
 	#include "UnitAnimateSetting.h"
 	#include <vcl.h>
 	#include <System.IOUtils.hpp>
+	#include <SysUtils.hpp>
 	#include <System.StrUtils.hpp>
     #include <System.Uitypes.hpp>
 	#include <stdio.h>
@@ -49,7 +50,7 @@
 	#include <fstream>
 	#include <iomanip>
 	#include "ImageProcessingFcns.h"
-	#include <unordered_map>
+	#include <exception>
 
 
 
