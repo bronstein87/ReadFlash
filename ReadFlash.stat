@@ -1,4 +1,5 @@
 [Stats]
+<<<<<<< HEAD
 EditorSecs=35889
 DesignerSecs=1804
 InspectorSecs=748
@@ -8,3 +9,14 @@ StartTime=29.03.2017 19:05:38
 RealKeys=0
 EffectiveKeys=0
 DebugSecs=3966
+=======
+EditorSecs=36928
+DesignerSecs=1744
+InspectorSecs=794
+CompileSecs=4574592
+OtherSecs=6389
+StartTime=29.03.2017 19:05:38
+RealKeys=0
+EffectiveKeys=0
+DebugSecs=4365
+>>>>>>> origin/master

@@ -151,7 +151,7 @@ void ConvertDataSLEZH(struct DataSLEZH data, struct CadrInfo &mCadr)
 	mCadr.Time=data.Tpr_sec+data.Tpr_msec/1000.;
 	mCadr.CountLocalObj=data.NumLoc;
 	mCadr.CountDeterObj=data.NumDet;
-	mCadr.ObjectsList = new struct ObjectsInfo[mCadr.CountLocalObj];
+	mCadr.ObjectsList = new struct ObjectsInfo[mCadr.CountLocalObj];  // гдеяэ сревйю
 	for (int i=0; i<mCadr.CountLocalObj; i++) {
 		mCadr.ObjectsList[i].X=data.RsLocT[i][0];
 		mCadr.ObjectsList[i].Y=data.RsLocT[i][1];

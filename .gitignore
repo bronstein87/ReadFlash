@@ -1,10 +1,11 @@
 #Dirs
 Debug/
+Release/
 UnitGraph/__recovery/
 UnitGraph/__history/
 __recovery/
 __history/
-
+*.cbproj.local
 
 # Compiled Object files
 *.slo
@@ -86,3 +87,4 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 *.ini
+ReadFlash.stat

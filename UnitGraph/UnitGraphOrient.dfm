@@ -71,7 +71,7 @@ object FormGraphOrient: TFormGraphOrient
     Top = 8
     Width = 1160
     Height = 777
-    ActivePage = TabSheet10
+    ActivePage = ShowFragmentTab
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
     object TabSheet5: TTabSheet
@@ -526,7 +526,7 @@ object FormGraphOrient: TFormGraphOrient
         Caption = 'Label6'
       end
       object Chart1: TChart
-        Left = 3
+        Left = 61
         Top = 41
         Width = 1146
         Height = 705
@@ -566,7 +566,7 @@ object FormGraphOrient: TFormGraphOrient
           Pointer.Gradient.MidColor = 16059031
           Pointer.Gradient.StartColor = 14540754
           Pointer.Gradient.Visible = True
-          Pointer.HorizSize = 43
+          Pointer.HorizSize = 30
           Pointer.InflateMargins = False
           Pointer.Pen.Color = 1358954496
           Pointer.Pen.Width = 0
@@ -579,7 +579,7 @@ object FormGraphOrient: TFormGraphOrient
           Pointer.Shadow.VertSize = 19
           Pointer.Shadow.Visible = True
           Pointer.Style = psCircle
-          Pointer.VertSize = 43
+          Pointer.VertSize = 30
           XValues.Name = 'X'
           XValues.Order = loAscending
           YValues.Name = 'Y'
@@ -972,12 +972,11 @@ object FormGraphOrient: TFormGraphOrient
     NumbersOnly = True
     TabOrder = 6
     Text = '0'
-    OnChange = EditNumCadrChange
   end
   object UpDown1: TUpDown
     Left = 539
     Top = 796
-    Width = 16
+    Width = 17
     Height = 21
     Anchors = [akLeft, akBottom]
     Associate = EditNumCadr

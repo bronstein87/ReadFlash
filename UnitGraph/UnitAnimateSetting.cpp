@@ -75,7 +75,7 @@ void __fastcall TFormAnimateSetting::ShapeColorLocObjTableMouseDown(TObject *Sen
 	if (ColorDialog1->Execute()) {
 		ShapeColorLocObjTable->Brush->Color=ColorDialog1->Color;
 		TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
-		FormGraphOrient->EditNumCadrChange(Sender);
+		FormGraphOrient->DrawAnimateHandler();
 	}
 }
 //---------------------------------------------------------------------------
@@ -85,7 +85,7 @@ void __fastcall TFormAnimateSetting::ShapeColorDetObjTableMouseDown(TObject *Sen
 	if (ColorDialog1->Execute()) {
 		ShapeColorDetObjTable->Brush->Color=ColorDialog1->Color;
 		TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
-		FormGraphOrient->EditNumCadrChange(Sender);
+		FormGraphOrient->DrawAnimateHandler();
 	}
 }
 //---------------------------------------------------------------------------
@@ -96,7 +96,7 @@ void __fastcall TFormAnimateSetting::ShapeColorZeroObjTableMouseDown(TObject *Se
 	if (ColorDialog1->Execute()) {
 		ShapeColorZeroObjTable->Brush->Color=ColorDialog1->Color;
 		TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
-		FormGraphOrient->EditNumCadrChange(Sender);
+		FormGraphOrient->DrawAnimateHandler();
 	}
 }
 //---------------------------------------------------------------------------
@@ -107,7 +107,7 @@ void __fastcall TFormAnimateSetting::ShapeColorOneObjTableMouseDown(TObject *Sen
 	if (ColorDialog1->Execute()) {
 		ShapeColorOneObjTable->Brush->Color=ColorDialog1->Color;
 		TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
-		FormGraphOrient->EditNumCadrChange(Sender);
+		FormGraphOrient->DrawAnimateHandler();
 	}
 }
 //---------------------------------------------------------------------------
@@ -118,7 +118,7 @@ void __fastcall TFormAnimateSetting::ShapeColorTwoObjTableMouseDown(TObject *Sen
 	if (ColorDialog1->Execute()) {
 		ShapeColorTwoObjTable->Brush->Color=ColorDialog1->Color;
 		TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
-		FormGraphOrient->EditNumCadrChange(Sender);
+		FormGraphOrient->DrawAnimateHandler();
 	}
 }
 //---------------------------------------------------------------------------
@@ -129,7 +129,7 @@ void __fastcall TFormAnimateSetting::ShapeColorThreeObjTableMouseDown(TObject *S
 	if (ColorDialog1->Execute()) {
 		ShapeColorThreeObjTable->Brush->Color=ColorDialog1->Color;
 		TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
-		FormGraphOrient->EditNumCadrChange(Sender);
+		FormGraphOrient->DrawAnimateHandler();
 	}
 }
 //---------------------------------------------------------------------------
@@ -137,28 +137,28 @@ void __fastcall TFormAnimateSetting::ShapeColorThreeObjTableMouseDown(TObject *S
 void __fastcall TFormAnimateSetting::CheckBoxApplyObjectsSeriesClick(TObject *Sender)
 {
 	TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
-	FormGraphOrient->EditNumCadrChange(Sender);
+	FormGraphOrient->DrawAnimateHandler();
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TFormAnimateSetting::CheckBoxApplyWindowsSeriesClick(TObject *Sender)
 {
 	TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
-	FormGraphOrient->EditNumCadrChange(Sender);
+	FormGraphOrient->DrawAnimateHandler();
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TFormAnimateSetting::CheckBoxFillTableObjectsClick(TObject *Sender)
 {
 	TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
-	FormGraphOrient->EditNumCadrChange(Sender);
+	FormGraphOrient->DrawAnimateHandler();
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TFormAnimateSetting::CheckBoxFillTableWindowsClick(TObject *Sender)
 {
 	TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
-	FormGraphOrient->EditNumCadrChange(Sender);
+	FormGraphOrient->DrawAnimateHandler();
 }
 //---------------------------------------------------------------------------
 

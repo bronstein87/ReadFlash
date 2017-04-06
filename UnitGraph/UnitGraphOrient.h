@@ -42,6 +42,7 @@
 	#include "UnitAnimateSetting.h"
 	#include <vcl.h>
 	#include <System.IOUtils.hpp>
+	#include <SysUtils.hpp>
 	#include <System.StrUtils.hpp>
     #include <System.Uitypes.hpp>
 	#include <stdio.h>
@@ -49,7 +50,7 @@
 	#include <fstream>
 	#include <iomanip>
 	#include "ImageProcessingFcns.h"
-	#include <unordered_map>
+	#include <exception>
 
 
 
@@ -148,7 +149,6 @@
 		void __fastcall MenuClearClick(TObject *Sender);
 		void __fastcall FormCreate(TObject *Sender);
 		void __fastcall UpDown1Click(TObject *Sender, TUDBtnType Button);
-		void __fastcall EditNumCadrChange(TObject *Sender);
 		void __fastcall TableObjectsInfoDrawCell(TObject *Sender, int ACol, int ARow, TRect &Rect,
 			  TGridDrawState State);
 		void __fastcall TableWindowsInfoDrawCell(TObject *Sender, int ACol, int ARow, TRect &Rect,
@@ -183,7 +183,8 @@
 		void PlaceImageFragments (const vector<TScrollBox*>& FragmentImages);
 		AnsiString SortRawFlashFile(const AnsiString &RawFileName);
 		void __fastcall ImageOnClick(TObject *Sender,
-		  TMouseButton Button, TShiftState Shift, int X, int Y);
+		TMouseButton Button, TShiftState Shift, int X, int Y);
+
 
 
 		unique_ptr<TFormAnimateSetting> FormAnimateSetting;
@@ -216,6 +217,7 @@
 			void ApplySeriesSetting(int CheckLine, AnsiString Title, TColor color);
 			void SetVisibleLabelFrame(bool isVisible);
 			int GetCadrInfo(int NC, struct CadrInfo &mCadr);
+			void DrawAnimateHandler();
 
 
 	};
