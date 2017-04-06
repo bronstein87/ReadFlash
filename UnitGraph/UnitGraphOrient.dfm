@@ -40,6 +40,14 @@ object FormGraphOrient: TFormGraphOrient
     Anchors = [akLeft, akBottom]
     Caption = #8470' '#1082#1072#1076#1088#1072
   end
+  object LabelFrameError: TLabel
+    Left = 610
+    Top = 799
+    Width = 77
+    Height = 13
+    Caption = 'LabelFrameError'
+    Visible = False
+  end
   object ButtonAdd: TButton
     Left = 1040
     Top = 600
@@ -63,7 +71,7 @@ object FormGraphOrient: TFormGraphOrient
     Top = 8
     Width = 1160
     Height = 777
-    ActivePage = ShowFragmentTab
+    ActivePage = TabSheet10
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
     object TabSheet5: TTabSheet
@@ -502,14 +510,14 @@ object FormGraphOrient: TFormGraphOrient
         Title.Text.Strings = (
           'TChart')
         BottomAxis.Automatic = False
-        BottomAxis.AutomaticMaximum = False
         BottomAxis.AutomaticMinimum = False
-        BottomAxis.Maximum = 1024.000000000000000000
+        Chart3DPercent = 1
         LeftAxis.Automatic = False
-        LeftAxis.AutomaticMaximum = False
         LeftAxis.AutomaticMinimum = False
-        LeftAxis.Maximum = 1024.000000000000000000
+        LeftAxis.Inverted = True
         View3D = False
+        View3DOptions.OrthoAngle = 0
+        View3DOptions.Perspective = 0
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 0
@@ -519,23 +527,35 @@ object FormGraphOrient: TFormGraphOrient
         object Series9: TBubbleSeries
           Marks.Frame.Visible = False
           ClickableLine = False
+          Pointer.Brush.Gradient.Angle = 38
           Pointer.Brush.Gradient.Direction = gdFromTopLeft
           Pointer.Brush.Gradient.EndColor = 6144242
+          Pointer.Brush.Gradient.MidColor = 16059031
+          Pointer.Brush.Gradient.StartColor = 14540754
           Pointer.Brush.Gradient.Visible = True
-          Pointer.FullGradient = True
+          Pointer.DarkPen = -42
+          Pointer.Emboss.Transparency = 47
+          Pointer.Emboss.Visible = True
+          Pointer.Gradient.Angle = 38
           Pointer.Gradient.Direction = gdFromTopLeft
           Pointer.Gradient.EndColor = 6144242
+          Pointer.Gradient.MidColor = 16059031
+          Pointer.Gradient.StartColor = 14540754
           Pointer.Gradient.Visible = True
-          Pointer.HorizSize = 77
+          Pointer.HorizSize = 43
           Pointer.InflateMargins = False
-          Pointer.Shadow.Color = 15790320
-          Pointer.Shadow.HorizSize = 27
-          Pointer.Shadow.SmoothBlur = 40
-          Pointer.Shadow.Transparency = 82
-          Pointer.Shadow.VertSize = 27
+          Pointer.Pen.Color = 1358954496
+          Pointer.Pen.Width = 0
+          Pointer.Pen.Fill.Gradient.Direction = gdLeftRight
+          Pointer.Pen.Fill.Gradient.Visible = True
+          Pointer.Shadow.Color = clWhite
+          Pointer.Shadow.HorizSize = 19
+          Pointer.Shadow.SmoothBlur = 41
+          Pointer.Shadow.Transparency = 100
+          Pointer.Shadow.VertSize = 19
           Pointer.Shadow.Visible = True
           Pointer.Style = psCircle
-          Pointer.VertSize = 77
+          Pointer.VertSize = 43
           XValues.Name = 'X'
           XValues.Order = loAscending
           YValues.Name = 'Y'

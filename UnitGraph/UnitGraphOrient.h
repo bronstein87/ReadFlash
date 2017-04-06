@@ -143,6 +143,7 @@
 		TScrollBox *FragmentShowScrollBox;
 		TMenuItem *MenuOpenFlash;
 		TMenuItem *MenuOpenTMI;
+	TLabel *LabelFrameError;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
