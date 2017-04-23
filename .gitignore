@@ -88,3 +88,5 @@ $RECYCLE.BIN/
 *.lnk
 *.ini
 ReadFlash.stat
+*.stat
+ReadFlash.cbproj.local

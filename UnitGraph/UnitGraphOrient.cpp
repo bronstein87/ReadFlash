@@ -1,4 +1,4 @@
-
+п»ї
 
 #pragma hdrstop
 
@@ -18,7 +18,7 @@ __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 
 
 }
-//рисование сводных графиков по серии
+//СЂРёСЃРѕРІР°РЅРёРµ СЃРІРѕРґРЅС‹С… РіСЂР°С„РёРєРѕРІ РїРѕ СЃРµСЂРёРё
 //---------------------------------------------------------------------------
 void TFormGraphOrient::CreateGraph(int CurLine)
 {
@@ -185,16 +185,16 @@ void TFormGraphOrient::SetVisible(int CheckLine, bool tf)
   }
 }
 
-//рисование анимации по одному кадру
+//СЂРёСЃРѕРІР°РЅРёРµ Р°РЅРёРјР°С†РёРё РїРѕ РѕРґРЅРѕРјСѓ РєР°РґСЂСѓ
 //---------------------------------------------------------------------------
 void __fastcall TFormGraphOrient::FormCreate(TObject *Sender)
 {
-  Label1->Caption="Звезд в поле зрения: 0";
-  Label2->Caption="Фрагментов в обработке: 0";
-  Label3->Caption="Локализовано объектов: 0";
-  Label4->Caption="Распознано объектов: 0";
-  Label5->Caption="Блоков для чтения: 0";
-  Label6->Caption="Общее число строк: 0";
+  Label1->Caption="Р—РІРµР·Рґ РІ РїРѕР»Рµ Р·СЂРµРЅРёСЏ: 0";
+  Label2->Caption="Р¤СЂР°РіРјРµРЅС‚РѕРІ РІ РѕР±СЂР°Р±РѕС‚РєРµ: 0";
+  Label3->Caption="Р›РѕРєР°Р»РёР·РѕРІР°РЅРѕ РѕР±СЉРµРєС‚РѕРІ: 0";
+  Label4->Caption="Р Р°СЃРїРѕР·РЅР°РЅРѕ РѕР±СЉРµРєС‚РѕРІ: 0";
+  Label5->Caption="Р‘Р»РѕРєРѕРІ РґР»СЏ С‡С‚РµРЅРёСЏ: 0";
+  Label6->Caption="РћР±С‰РµРµ С‡РёСЃР»Рѕ СЃС‚СЂРѕРє: 0";
 
 //InitFrameSeries
 	for (int i=0; i < MaxBlockSeries; i++) {
@@ -242,13 +242,13 @@ void TFormGraphOrient::InitTableWindows(void)
 	TableWindowsInfo->FixedCols=0;
 	TableWindowsInfo->FixedRows=1;
 /**/
-	TableWindowsInfo->Cells[k++][0]="№";
+	TableWindowsInfo->Cells[k++][0]="в„–";
 	TableWindowsInfo->Cells[k++][0]="Mv";
 	TableWindowsInfo->Cells[k++][0]="Xstart";
 	TableWindowsInfo->Cells[k++][0]="Ystart";
 //	TableWindowsInfo->Cells[k++][0]="Width";
 //	TableWindowsInfo->Cells[k++][0]="Height";
-//	TableWindowsInfo->Cells[k++][0]="№ CAT";
+//	TableWindowsInfo->Cells[k++][0]="в„– CAT";
 	TableWindowsInfo->Cells[k++][0]="Mean";
 	TableWindowsInfo->Cells[k++][0]="Sigma";
 	TableWindowsInfo->Cells[k++][0]="Level";
@@ -293,12 +293,12 @@ void TFormGraphOrient::InitTableObjects(void)
 	TableObjectsInfo->FixedCols=0;
 	TableObjectsInfo->FixedRows=1;
 
-	TableObjectsInfo->Cells[k++][0]="№";
+	TableObjectsInfo->Cells[k++][0]="в„–";
 	TableObjectsInfo->Cells[k++][0]="Xloc";
 	TableObjectsInfo->Cells[k++][0]="Yloc";
 	TableObjectsInfo->Cells[k++][0]="Bright";
 	TableObjectsInfo->Cells[k++][0]="CountPix";
-	TableObjectsInfo->Cells[k++][0]="Star №";
+	TableObjectsInfo->Cells[k++][0]="Star в„–";
 	TableObjectsInfo->Cells[k++][0]="Mv";
 	TableObjectsInfo->Cells[k++][0]="Sp";
 	TableObjectsInfo->Cells[k++][0]="Dx, mkm";
@@ -383,7 +383,7 @@ unsigned short Border=10;
 	CountLines=0;
 	CountBlock=mCadr.CountBlock;
 	if (CountBlock>MaxBlockSeries) {
-		ShowMessage("Превышено число допустимых блоков!");
+		ShowMessage("РџСЂРµРІС‹С€РµРЅРѕ С‡РёСЃР»Рѕ РґРѕРїСѓСЃС‚РёРјС‹С… Р±Р»РѕРєРѕРІ!");
 		CountBlock=MaxBlockSeries;
 	}
 
@@ -421,7 +421,7 @@ unsigned short Border=10;
 		FrameSeries[i]->Marks->Item[1]->Visible=true;
 		FrameSeries[i]->Marks->Item[1]->Text->Clear();
 
-		LabelWindow.sprintf("%d) Mv = %.2f,\r\n № CAT = %ld", i+1,
+		LabelWindow.sprintf("%d) Mv = %.2f,\r\n в„– CAT = %ld", i+1,
 					mCadr.WindowsList[i].Mv, mCadr.WindowsList[i].StarID);
 		FrameSeries[i]->Marks->Item[1]->Text->Add(LabelWindow);
 		FrameSeries[i]->Visible=true;
@@ -479,7 +479,7 @@ unsigned short Border=10;
 		}
 
 		if (CountLocalObj!=mCadr.CountLocalObj) {
-			ShowMessage("Несоответствие числа фрагментов и массива ObjFrag[]!");
+			ShowMessage("РќРµСЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ С‡РёСЃР»Р° С„СЂР°РіРјРµРЅС‚РѕРІ Рё РјР°СЃСЃРёРІР° ObjFrag[]!");
 		}
 		delete [] ObjShiftWnd;
 
@@ -501,17 +501,17 @@ unsigned short Border=10;
 	  Series1->AddXY(mCadr.StarsList[i].X,mCadr.StarsList[i].Y);//,LabelStar);
   }
 
-  Label1->Caption="Звезд в поле зрения: "+IntToStr(mCadr.CountStars);
-  Label2->Caption="Фрагментов в обработке: "+IntToStr(mCadr.CountWindows);
-  Label3->Caption="Локализовано объектов: "+IntToStr(mCadr.CountLocalObj);
-  Label4->Caption="Распознано объектов: "+IntToStr(mCadr.CountDeterObj);
-  Label5->Caption="Блоков для чтения: "+IntToStr(mCadr.CountBlock);
+  Label1->Caption="Р—РІРµР·Рґ РІ РїРѕР»Рµ Р·СЂРµРЅРёСЏ: "+IntToStr(mCadr.CountStars);
+  Label2->Caption="Р¤СЂР°РіРјРµРЅС‚РѕРІ РІ РѕР±СЂР°Р±РѕС‚РєРµ: "+IntToStr(mCadr.CountWindows);
+  Label3->Caption="Р›РѕРєР°Р»РёР·РѕРІР°РЅРѕ РѕР±СЉРµРєС‚РѕРІ: "+IntToStr(mCadr.CountLocalObj);
+  Label4->Caption="Р Р°СЃРїРѕР·РЅР°РЅРѕ РѕР±СЉРµРєС‚РѕРІ: "+IntToStr(mCadr.CountDeterObj);
+  Label5->Caption="Р‘Р»РѕРєРѕРІ РґР»СЏ С‡С‚РµРЅРёСЏ: "+IntToStr(mCadr.CountBlock);
 
   if (CountLines==mCadr.CountLines)
-	this->Label6->Caption="Общее число строк: "+IntToStr(mCadr.CountLines);
+	this->Label6->Caption="РћР±С‰РµРµ С‡РёСЃР»Рѕ СЃС‚СЂРѕРє: "+IntToStr(mCadr.CountLines);
   else
-	this->Label6->Caption="ОШИБКА! Число строк: "+IntToStr(CountLines)
-	+" вместо "+IntToStr(mCadr.CountLines);
+	this->Label6->Caption="РћРЁРР‘РљРђ! Р§РёСЃР»Рѕ СЃС‚СЂРѕРє: "+IntToStr(CountLines)
+	+" РІРјРµСЃС‚Рѕ "+IntToStr(mCadr.CountLines);
 }
 
 void TFormGraphOrient::DrawAnimate(const struct CadrInfo &mCadr)
@@ -561,11 +561,12 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 	ImageVector.clear();
 	ImageScrollBoxVector.clear();
 	AnsiString NeededDirectory=GetCurrentDir()+"\\Frag_"+FileTitle;
+
 	if (!TDirectory::Exists(NeededDirectory))
 	{
-//		Application->MessageBox(L"Указан неверный путь к директории фрагментов", L"Ошибка", MB_OK);
+//		Application->MessageBox(L"РЈРєР°Р·Р°РЅ РЅРµРІРµСЂРЅС‹Р№ РїСѓС‚СЊ Рє РґРёСЂРµРєС‚РѕСЂРёРё С„СЂР°РіРјРµРЅС‚РѕРІ", L"РћС€РёР±РєР°", MB_OK);
 		LabelFrameError->Visible=true;
-		LabelFrameError->Caption="Указан неверный путь к директории фрагментов";
+		LabelFrameError->Caption="РЈРєР°Р·Р°РЅ РЅРµРІРµСЂРЅС‹Р№ РїСѓС‚СЊ Рє РґРёСЂРµРєС‚РѕСЂРёРё С„СЂР°РіРјРµРЅС‚РѕРІ";
 		return;
 	}
     else 		LabelFrameError->Visible=false;
@@ -574,10 +575,10 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
    AnsiString TimePrStr=FloatToStrF(mCadr.Time,ffFixed,10,10);
    TStringDynArray TimePrTwoParts=System::Strutils::SplitString(TimePrStr,".");
 
-   // отсекаем лишние нули с конца
+   // РѕС‚СЃРµРєР°РµРј Р»РёС€РЅРёРµ РЅСѓР»Рё СЃ РєРѕРЅС†Р°
    int IndexOfZeroStart = 3;
 	UnicodeString TimePrWithOutNulls=TimePrTwoParts[1].SubString(0,IndexOfZeroStart);
-   // и добавляем их в конце, чтобы было как в названии файла фрагментов
+   // Рё РґРѕР±Р°РІР»СЏРµРј РёС… РІ РєРѕРЅС†Рµ, С‡С‚РѕР±С‹ Р±С‹Р»Рѕ РєР°Рє РІ РЅР°Р·РІР°РЅРёРё С„Р°Р№Р»Р° С„СЂР°РіРјРµРЅС‚РѕРІ
    TimePrTwoParts[1]="00000"+TimePrWithOutNulls;
 
    AnsiString FragmentFileStr;
@@ -599,7 +600,7 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
    FragmentFile=fopen(FragmentFileStr.c_str(),"rb");
    if(!FragmentFile)
    {
-		ShowMessage(AnsiString("Не удалось открыть файл ")+FragmentFileStr.c_str());
+		ShowMessage(AnsiString("РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РєСЂС‹С‚СЊ С„Р°Р№Р» ")+FragmentFileStr.c_str());
 		return;
    }
 
@@ -616,13 +617,13 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 		Fragment->Height = FragmentHeight;
 
 
-		TRGBTriple *BitmapLine; // структура, хранящая RBG
+		TRGBTriple *BitmapLine; // СЃС‚СЂСѓРєС‚СѓСЂР°, С…СЂР°РЅСЏС‰Р°СЏ RBG
 	for (int currentColumn = 0; currentColumn < FragmentWidth; currentColumn++)
 	{
-		// указатель на currentColumn строку Bitmap
+		// СѓРєР°Р·Р°С‚РµР»СЊ РЅР° currentColumn СЃС‚СЂРѕРєСѓ Bitmap
 		BitmapLine = (TRGBTriple*) Fragment->ScanLine[currentColumn];
 		for (unsigned int currentRow = 0, adress = 0; currentRow < FragmentHeight; currentRow++, adress = currentColumn * 24 + currentRow)
-		{           // снижаем градацию 255=4095/16
+		{           // СЃРЅРёР¶Р°РµРј РіСЂР°РґР°С†РёСЋ 255=4095/16
 					BitmapLine[currentRow].rgbtBlue = RawFragment[adress]/8;
 					BitmapLine[currentRow].rgbtGreen = RawFragment[adress]/8;
 					BitmapLine[currentRow].rgbtRed = RawFragment[adress]/8;
@@ -650,14 +651,14 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 	ImageVector.back()->Stretch=true;
 	ImageVector.back()->Canvas->
 	StretchDraw(Rect(0, 0, ImageVector.back()->Width, ImageVector.back()->Height),Fragment.get());
-
+	ImageVector.back()->SetParentComponent(ImageScrollBoxVector.back());
 
 	}
 
-	for(int i=0;i<ImageVector.size();i++)
-	{
-		ImageVector[i]->SetParentComponent(ImageScrollBoxVector[i]);
-	}
+//	for(int i=0;i<ImageVector.size();i++)
+//	{
+//		ImageVector[i]->SetParentComponent(ImageScrollBoxVector[i]);
+//	}
 	PlaceImageFragments(ImageScrollBoxVector);
 
 	fclose(FragmentFile);
@@ -681,9 +682,9 @@ void TFormGraphOrient::PlaceImageFragments (const vector<TScrollBox*>& FragmentI
 	for(unsigned int CurrentImage=0;CurrentImage<FragmentImages.size();CurrentImage++)
 	{
 
-	// если координата правого края текущего фрагмента превосходит
-	// координату правого угла окна просмотра, сбрасываем смещение по ширине,
-	// увеличиваем смещение по высоте
+	// РµСЃР»Рё РєРѕРѕСЂРґРёРЅР°С‚Р° РїСЂР°РІРѕРіРѕ РєСЂР°СЏ С‚РµРєСѓС‰РµРіРѕ С„СЂР°РіРјРµРЅС‚Р° РїСЂРµРІРѕСЃС…РѕРґРёС‚
+	// РєРѕРѕСЂРґРёРЅР°С‚Сѓ РїСЂР°РІРѕРіРѕ СѓРіР»Р° РѕРєРЅР° РїСЂРѕСЃРјРѕС‚СЂР°, СЃР±СЂР°СЃС‹РІР°РµРј СЃРјРµС‰РµРЅРёРµ РїРѕ С€РёСЂРёРЅРµ,
+	// СѓРІРµР»РёС‡РёРІР°РµРј СЃРјРµС‰РµРЅРёРµ РїРѕ РІС‹СЃРѕС‚Рµ
 		if(OffsetStep*WidthOffset+FragmentImages[CurrentImage]->Width > FragmentShowScrollBox->Width)
 		{
 			WidthOffset=0;
@@ -784,7 +785,7 @@ void GetFileTitles(AnsiString file_name, AnsiString *file_title)
 }
 
 
-	// сортируем и перезаписываем исходный файл в новый файл с постфиксом _sorted
+	// СЃРѕСЂС‚РёСЂСѓРµРј Рё РїРµСЂРµР·Р°РїРёСЃС‹РІР°РµРј РёСЃС…РѕРґРЅС‹Р№ С„Р°Р№Р» РІ РЅРѕРІС‹Р№ С„Р°Р№Р» СЃ РїРѕСЃС‚С„РёРєСЃРѕРј _sorted
 			AnsiString TFormGraphOrient::SortRawFlashFile(const AnsiString &RawFileName)
 			{
 			   FILE* RawFlashFile;
@@ -803,7 +804,7 @@ void GetFileTitles(AnsiString file_name, AnsiString *file_title)
 					{
 							RawFileInfo CurrentInfo;
 
-							// текущая позиция на начале заголовочной структуры
+							// С‚РµРєСѓС‰Р°СЏ РїРѕР·РёС†РёСЏ РЅР° РЅР°С‡Р°Р»Рµ Р·Р°РіРѕР»РѕРІРѕС‡РЅРѕР№ СЃС‚СЂСѓРєС‚СѓСЂС‹
 							CurrentInfo.Pos =  ftell(RawFlashFile)-4 ;
 
 							if(RawFileInfoVector.size()==0)
@@ -823,17 +824,17 @@ void GetFileTitles(AnsiString file_name, AnsiString *file_title)
 					}
 			   }
 
-			   // забиваем вручную для последней структуры
+			   // Р·Р°Р±РёРІР°РµРј РІСЂСѓС‡РЅСѓСЋ РґР»СЏ РїРѕСЃР»РµРґРЅРµР№ СЃС‚СЂСѓРєС‚СѓСЂС‹
 				fseek (RawFlashFile, 0, SEEK_END);
 				RawFileInfo LastInfo;
 				LastInfo.Pos= ftell(RawFlashFile);
 				LastInfo.Size=LastInfo.Pos - RawFileInfoVector.back().Pos;
-				// для того чтобы после сортировки всегда был в конце
+				// РґР»СЏ С‚РѕРіРѕ С‡С‚РѕР±С‹ РїРѕСЃР»Рµ СЃРѕСЂС‚РёСЂРѕРІРєРё РІСЃРµРіРґР° Р±С‹Р» РІ РєРѕРЅС†Рµ
 				LastInfo.SecuenceCounter= LONG_MAX;
 				RawFileInfoVector.push_back(LastInfo);
 
 
-			   // функтор для сортировки
+			   // С„СѓРЅРєС‚РѕСЂ РґР»СЏ СЃРѕСЂС‚РёСЂРѕРІРєРё
 			struct {
 
 				bool operator()(const RawFileInfo& a,const RawFileInfo& b)
@@ -855,7 +856,7 @@ void GetFileTitles(AnsiString file_name, AnsiString *file_title)
 					return "";
 			   }
 
-			   // -1 т.к размер блока хранится  в следующем элементе
+			   // -1 С‚.Рє СЂР°Р·РјРµСЂ Р±Р»РѕРєР° С…СЂР°РЅРёС‚СЃСЏ  РІ СЃР»РµРґСѓСЋС‰РµРј СЌР»РµРјРµРЅС‚Рµ
 			   for(unsigned int CurrentFlashStruct=0; CurrentFlashStruct< RawFileInfoVector.size()-1 ;CurrentFlashStruct++)
 			   {
 					fseek(RawFlashFile,RawFileInfoVector[CurrentFlashStruct].Pos,SEEK_SET);
@@ -913,7 +914,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 			FileName=SortRawFlashFile(FileName);
 			if(FileName=="")
 			{
-				ShowMessage("Не удалось отсортировать файл. Возможно, исходный файл не удалось открыть");
+				ShowMessage("РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°С‚СЊ С„Р°Р№Р». Р’РѕР·РјРѕР¶РЅРѕ, РёСЃС…РѕРґРЅС‹Р№ С„Р°Р№Р» РЅРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РєСЂС‹С‚СЊ");
 				return;
 			}
 		}
@@ -952,16 +953,16 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 
 		fflesh=fopen(FileName.c_str(),"rb");
 		ftxt=fopen((FileTitle+".txt").c_str(),"wt");
-		
-		
-		
+
+
+
 		CurDir=GetCurrentDir();
 		FragDir=CurDir+"\\Frag_"+FileTitle;
 	    LocDir=CurDir+"\\Loc_"+FileTitle;
 		CreateDir(FragDir);
 		CreateDir(LocDir);
 
-		
+
 		FILE *flog_pix;
 		flog_pix=fopen((FileTitle+"_LogPix.txt").c_str(),"wt");
 		fprintf(flog_pix,"%6s  NC  %6s %10s %10s %10s %8s\n",
@@ -979,7 +980,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 						"SerNum","CntRec","T","Tbshv","Tpr","Stat","NumProg",
 						"NumFrag","NumLoc","NumDet","al,deg","dl,deg","Az,deg");
 
-		
+
 		fprintf(flog_orient,"%10s %8s %8s %8s %12s %12s %12s %8s %8s %8s %8s\n",
 						"m_cur,mm","Temp","Texp,ms","dT,c","Wx","Wy","Wz",
 						"mean_bf","sigma_bf","mean_fr","sigma_fr");
@@ -987,7 +988,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 
 		this->NumLine=0;
 		this->CreateGraph(this->NumLine);
-		this->ApplySeriesSetting(this->NumLine, "мБОКЗ-2В",
+		this->ApplySeriesSetting(this->NumLine, "РјР‘РћРљР—-2Р’",
 											clBlue);//ColorRes[FormGraphOrient->NumLine]);
 //		DataPixHeader mDataPixHdr;
 		while (!feof(fflesh))
@@ -995,7 +996,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 		  fread(&Marker,sizeof(int),1,fflesh);
 		  int NumPixH, PixMas[3];
 
-		// хэш мэп для с соответствиями перечислений
+		// С…СЌС€ РјСЌРї РґР»СЏ СЃ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏРјРё РїРµСЂРµС‡РёСЃР»РµРЅРёР№
 //		std::unordered_map<unsigned int ,unsigned int> MarkerMap
 //		({
 //			{SECTOR_MARKER,SECTOR_MARKER_ACCORDANCE},
@@ -1007,15 +1008,13 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 //			{SINGLE_REG_MARKER,SINGLE_REG_MARKER_ACCORDANCE},
 //			{FRAG_MARKER,FRAG_MARKER_ACCORDANCE}
 //		});
-//
+
 //		  MARKER_ACCORDANCE MarkerAccordance=
 //		  static_cast<MARKER_ACCORDANCE>(MarkerMap.at(GetInt(Marker)));
 
-//		  switch (MarkerAccordance)
-//		  {
-//			case PIX_0_MARKER_ACCORDANCE:
-			int nn=GetInt(Marker);
-			if (nn==PIX_0_MARKER)
+		  switch (GetInt(Marker))
+		  {
+			case PIX_0_MARKER:
 			{
 			  DataPixHeader mDataPixHdr;
 			  fread(&mDataPixHdr,sizeof(struct DataPixHeader),1,fflesh);
@@ -1034,10 +1033,10 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 			  fprintf(flog_pix,"    %02d PIX1 %6d %10ld %10ld %6ld.%03ld %8d\n",
 					  mDataPixHdr.SerNum, mDataPixHdr.CntRecord, mDataPixHdr.T, mDataPixHdr.Tbshv,
 					  mDataPixHdr.Tpr_sec, mDataPixHdr.Tpr_msec, mDataPixHdr.NumPix);
-//			  break;
+			  break;
 			}
-			else if (nn==PIX_1_MARKER)
-//			case PIX_1_MARKER_ACCORDANCE:
+
+			case PIX_1_MARKER:
 			{
 			  DataPixHeader mDataPixHdr;
 			  fread(&mDataPixHdr,sizeof(struct DataPixHeader),1,fflesh);
@@ -1057,16 +1056,16 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 			  fprintf(flog_pix,"    %02d PIX2 %6d %10ld %10ld %6ld.%03ld %8d\n",
 					  mDataPixHdr.SerNum, mDataPixHdr.CntRecord, mDataPixHdr.T, mDataPixHdr.Tbshv,
 					  mDataPixHdr.Tpr_sec, mDataPixHdr.Tpr_msec, mDataPixHdr.NumPix);
-//			  break;
+			  break;
 			}
-			else if (nn==HO_MARKER)
-//			case HO_MARKER_ACCORDANCE:
+
+			case HO_MARKER:
 			{
               DataNO mDataNO;
 			  fread(&mDataNO,sizeof(struct DataNO_st),1,fflesh);
 			  if ((mDataNO.NumL[0]>MaxObj)||(mDataNO.NumL[1]>MaxObj))
 			  {
-				fprintf(ftxt,"\nОшибка чтения данных!\n");
+				fprintf(ftxt,"\nРћС€РёР±РєР° С‡С‚РµРЅРёСЏ РґР°РЅРЅС‹С…!\n");
 				break;
 	          }
 
@@ -1116,17 +1115,16 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 	            fclose(floc);
 	          }
 /**/
-//	          break;
+	          break;
 			}
 
-//			case SL_MARKER_ACCORDANCE:
-			else if (nn==SL_MARKER)
+			case SL_MARKER:
 			{
               DataSLEZH mDataSLEZH;
-			  fread(&mDataSLEZH,sizeof(struct DataSLEZH_st),1,fflesh);
+	          fread(&mDataSLEZH,sizeof(struct DataSLEZH_st),1,fflesh);
 	          if (mDataSLEZH.NumLoc>MaxObj)
 			  {
-	            fprintf(ftxt,"\nОшибка чтения данных!\n");
+	            fprintf(ftxt,"\nРћС€РёР±РєР° С‡С‚РµРЅРёСЏ РґР°РЅРЅС‹С…!\n");
 				break;
 			  }
 
@@ -1196,8 +1194,8 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 			  if (!mDataSLEZH.res_stat)
 			  {
 				for (int i=0; i<mDataSLEZH.NumDet; i++) {
-				  int iloc=mDataSLEZH.MasRes[i][1]; //меняем местами  0-1
-				  int ifrag=mDataSLEZH.MasRes[i][0]; //меняем местами  0-1
+				  int iloc=mDataSLEZH.MasRes[i][1]; //РјРµРЅСЏРµРј РјРµСЃС‚Р°РјРё  0-1
+				  int ifrag=mDataSLEZH.MasRes[i][0]; //РјРµРЅСЏРµРј РјРµСЃС‚Р°РјРё  0-1
 				  StructIKI->StarsData.StarsList[iloc].NumberStar=
 									(unsigned int)mDataSLEZH.XYc[ifrag][2];
 				  StructIKI->StarsData.StarsList[iloc].StellarMagnitude=
@@ -1215,8 +1213,8 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 				this->LineSeries[this->NumLine*NumGraph+3]->AddXY(Tpr,mDataSLEZH.Wop[0]*RTS);
 				this->LineSeries[this->NumLine*NumGraph+4]->AddXY(Tpr,mDataSLEZH.Wop[1]*RTS);
 				this->LineSeries[this->NumLine*NumGraph+5]->AddXY(Tpr,mDataSLEZH.Wop[2]*RTS);
-	//			FormGraphOrient->LineSeries[FormGraphOrient->NumLine*NumGraph+6]->AddXY(Tpr,mx); //рассчитать
-	//			FormGraphOrient->LineSeries[FormGraphOrient->NumLine*NumGraph+7]->AddXY(Tpr,my); //рассчитать
+	//			FormGraphOrient->LineSeries[FormGraphOrient->NumLine*NumGraph+6]->AddXY(Tpr,mx); //СЂР°СЃСЃС‡РёС‚Р°С‚СЊ
+	//			FormGraphOrient->LineSeries[FormGraphOrient->NumLine*NumGraph+7]->AddXY(Tpr,my); //СЂР°СЃСЃС‡РёС‚Р°С‚СЊ
 				this->LineSeries[this->NumLine*NumGraph+8]->AddXY(Tpr,mDataSLEZH.m_cur);
 				this->LineSeries[this->NumLine*NumGraph+9]->AddXY(Tpr,mDataSLEZH.NumFrag);
 				this->LineSeries[this->NumLine*NumGraph+11]->AddXY(Tpr,mDataSLEZH.NumDet);
@@ -1244,13 +1242,13 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 	          StructIKI->ImageData.WindowsData.BottomRight=true;
 			  StructIKI->ImageData.WindowsData.Info= new datawindow[mDataSLEZH.NumFrag];
 	          for (int i=0; i<mDataSLEZH.NumFrag; i++) {
-	            StructIKI->ImageData.WindowsData.Info[i].WindowWidth =mDataSLEZH.PfragXY0[i][1]; //меняем местами 0-1
-				StructIKI->ImageData.WindowsData.Info[i].WindowHeight=mDataSLEZH.PfragXY0[i][0]; //меняем местами 0-1
-				StructIKI->ImageData.WindowsData.Info[i].Average=mDataSLEZH.MeanFrag[i][1];  //меняем местами 0-1
-				StructIKI->ImageData.WindowsData.Info[i].SKO=mDataSLEZH.MeanFrag[i][0];      //меняем местами 0-1
+	            StructIKI->ImageData.WindowsData.Info[i].WindowWidth =mDataSLEZH.PfragXY0[i][1]; //РјРµРЅСЏРµРј РјРµСЃС‚Р°РјРё 0-1
+				StructIKI->ImageData.WindowsData.Info[i].WindowHeight=mDataSLEZH.PfragXY0[i][0]; //РјРµРЅСЏРµРј РјРµСЃС‚Р°РјРё 0-1
+				StructIKI->ImageData.WindowsData.Info[i].Average=mDataSLEZH.MeanFrag[i][1];  //РјРµРЅСЏРµРј РјРµСЃС‚Р°РјРё 0-1
+				StructIKI->ImageData.WindowsData.Info[i].SKO=mDataSLEZH.MeanFrag[i][0];      //РјРµРЅСЏРµРј РјРµСЃС‚Р°РјРё 0-1
 				StructIKI->ImageData.WindowsData.Info[i].Limit=mDataSLEZH.ThFrag[i];
 				StructIKI->ImageData.WindowsData.Info[i].ObjCount=mDataSLEZH.ObjFrag[i];
-				StructIKI->ImageData.WindowsData.Info[i].X=mDataSLEZH.FragYX[i][0];          //меняем местами 0-1
+				StructIKI->ImageData.WindowsData.Info[i].X=mDataSLEZH.FragYX[i][0];          //РјРµРЅСЏРµРј РјРµСЃС‚Р°РјРё 0-1
 				StructIKI->ImageData.WindowsData.Info[i].Y=mDataSLEZH.YendLoc[i];
 			  }
 
@@ -1273,8 +1271,8 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 			  if (!mDataSLEZH.res_stat)
 			  {
 				for (int i=0; i<mDataSLEZH.NumDet; i++) {
-				  int iloc=mDataSLEZH.MasRes[i][1]; //меняем местами  0-1
-				  int ifrag=mDataSLEZH.MasRes[i][0]; //меняем местами  0-1
+				  int iloc=mDataSLEZH.MasRes[i][1]; //РјРµРЅСЏРµРј РјРµСЃС‚Р°РјРё  0-1
+				  int ifrag=mDataSLEZH.MasRes[i][0]; //РјРµРЅСЏРµРј РјРµСЃС‚Р°РјРё  0-1
 				  StructIKI->StarsData.StarsList[iloc].NumberStar=
 									(unsigned int)mDataSLEZH.XYc[ifrag][2];
 				  StructIKI->StarsData.StarsList[iloc].StellarMagnitude=
@@ -1297,10 +1295,10 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 	//          delete [] StructIKI->ImageData.WindowsData.Info;
 	//          delete StructIKI;
 /**/
-//	          break;
+	          break;
 			}
-			else if (nn==SINGLE_REG_MARKER)
-//			case SINGLE_REG_MARKER_ACCORDANCE:
+
+			case SINGLE_REG_MARKER:
 			{
               DataSingleReg mDataSingleReg;
 			  fread(&mDataSingleReg,sizeof(struct DataSingleReg),1,fflesh);
@@ -1310,23 +1308,22 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 				  mDataSingleReg.SerNum, mDataSingleReg.CntRecord, mDataSingleReg.T,
 				  mDataSingleReg.Tbshv, mDataSingleReg.Tpr_sec, mDataSingleReg.Tpr_msec,
 				  mDataSingleReg.CntErr, mDataSingleReg.Nreg, mDataSingleReg.RegVal);
-//			  break;
+			  break;
 			}
 
-			else if (nn==ALL_REG_MARKER)
-//			case ALL_REG_MARKER_ACCORDANCE:
+			case ALL_REG_MARKER:
 			{
 			  unsigned char Reg[COUNT_REG];
 			  fread(Reg,sizeof(Reg),1,fflesh);
 			  PrintReg(ftxt, Reg);
-//			  break;
+			  break;
 			}
-			else if (GetInt(Marker)==FRAG_MARKER)
-//			case FRAG_MARKER_ACCORDANCE:
+
+			case FRAG_MARKER:
 			{
 			  DataFragHeader mDataFragHdr;
 			  fread(&mDataFragHdr,sizeof(struct DataFragHeader),1,fflesh);
-	//          NumPixF*=2; // Игорь исправит!!!
+	//          NumPixF*=2; // РРіРѕСЂСЊ РёСЃРїСЂР°РІРёС‚!!!
 			  ChangeWordFrag(mDataFragHdr);
 			  if (mDataFragHdr.NumPix%2) mDataFragHdr.NumPix--;
 			  if (mDataFragHdr.NumPix>MaxPix) mDataFragHdr.NumPix=MaxPix;
@@ -1359,9 +1356,9 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 			  delete StructIKI;
 	/**/
 
-//			  break;
+			  break;
 			}
-//		  }
+		  }
 		}
 		fclose(fflesh);
 		fclose(ftxt);
@@ -1370,7 +1367,6 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 		fclose(flog_orient);
 		this->NumLine=1;
 
-		//this->UpDown1Click(MainForm,btNext);
 		this->UpDown1->Max=vCadrInfo.size();
 
 	 }
@@ -1497,25 +1493,25 @@ int TryReadSHTMI1(ifstream &finp, struct SHTMI1 &tmi)
 			finp>>word;
 			if (word=="KC1") finp>>tmi.status1;
 			else if (word=="KC2") finp>>tmi.status2;
-			else if ((word=="СЕР")||(word=="CEP")) {
+			else if ((word=="РЎР•Р ")||(word=="CEP")) {
 				finp>>word;
-				if ((word=="НОМ")||(word=="HOM")) {
+				if ((word=="РќРћРњ")||(word=="HOM")) {
 					finp>>tmi.serialNumber;
 				}
 			}
-			else if (word=="ПOCT") finp>>tmi.post;
-			else if ((word=="T")||(word=="Т")) {
-				finp>>word; if (word=="ЭКСП") finp>>tmi.timeExp;
+			else if (word=="РџOCT") finp>>tmi.post;
+			else if ((word=="T")||(word=="Рў")) {
+				finp>>word; if (word=="Р­РљРЎРџ") finp>>tmi.timeExp;
 			}
-			else if (word=="Х0") finp>>tmi.Xg;
-			else if (word=="У0") finp>>tmi.Yg;
-			else if (word=="МТ") finp>>tmi.Mean;
-			else if (word=="СТ") finp>>tmi.Sigma;
-			else if (word=="НАМ") {
-				finp>>word; if (word=="ДЕФ") finp>>tmi.countDefect;
+			else if (word=="РҐ0") finp>>tmi.Xg;
+			else if (word=="РЈ0") finp>>tmi.Yg;
+			else if (word=="РњРў") finp>>tmi.Mean;
+			else if (word=="РЎРў") finp>>tmi.Sigma;
+			else if (word=="РќРђРњ") {
+				finp>>word; if (word=="Р”Р•Р¤") finp>>tmi.countDefect;
 			}
 
-			if (word=="ВЕРСИЯ") {
+			if (word=="Р’Р•Р РЎРРЇ") {
 				return 1;
 			}
         }
@@ -1529,15 +1525,15 @@ int TryReadSHTMI2(ifstream &finp, struct SHTMI2 &tmi)
 			finp>>word;
 			if (word=="KC1") finp>>tmi.status1;
 			else if (word=="KC2") finp>>tmi.status2;
-			else if ((word=="СЕР")||(word=="CEP")) {
+			else if ((word=="РЎР•Р ")||(word=="CEP")) {
 				finp>>word;
-				if ((word=="НОМ")||(word=="HOM")) {
+				if ((word=="РќРћРњ")||(word=="HOM")) {
 					finp>>tmi.serialNumber;
 				}
 			}
-			else if (word=="ПOCT") finp>>tmi.post;
-			else if ((word=="T")||(word=="Т")) {
-				finp>>word; if (word=="ЭКСП") finp>>tmi.timeExp;
+			else if (word=="РџOCT") finp>>tmi.post;
+			else if ((word=="T")||(word=="Рў")) {
+				finp>>word; if (word=="Р­РљРЎРџ") finp>>tmi.timeExp;
 			}
 			else
 			{
@@ -1569,19 +1565,19 @@ int TryReadDTMI(ifstream &finp, struct DTMI &tmi)
 		   	finp>>word;
 			if (word=="KC1") finp>>tmi.status1;
 			else if (word=="KC2") finp>>tmi.status2;
-			else if ((word=="СЕР")||(word=="CEP")) {
+			else if ((word=="РЎР•Р ")||(word=="CEP")) {
 				finp>>word;
-				if ((word=="НОМ")||(word=="HOM")) {
+				if ((word=="РќРћРњ")||(word=="HOM")) {
 					finp>>tmi.serialNumber;
 				}
 			}
-			else if (word=="ПOCT") finp>>tmi.post;
-			else if ((word=="T")||(word=="Т")) {
-				finp>>word; if (word=="ЭКСП") finp>>tmi.timeExp;
+			else if (word=="РџOCT") finp>>tmi.post;
+			else if ((word=="T")||(word=="Рў")) {
+				finp>>word; if (word=="Р­РљРЎРџ") finp>>tmi.timeExp;
 			}
 			else
 			{
-				if (word=="ЛОК") {
+				if (word=="Р›РћРљ") {
 					if (flLow) {
 						finp>>intVal;
 						indexObject=(int)intVal/10;
@@ -1608,26 +1604,26 @@ int TryReadDTMI(ifstream &finp, struct DTMI &tmi)
 void PrintSHTMI1(ofstream &file, struct SHTMI1 tmi)
 {
 	file<<"____________________________________"<<"\n";
-	file<<"Массив ШТМИ1"<<"\n";
-	file<<"КС1:\t"<<tmi.status1<<"\n";
-	file<<"КС2:\t"<<tmi.status2<<"\n";
+	file<<"РњР°СЃСЃРёРІ РЁРўРњР1"<<"\n";
+	file<<"РљРЎ1:\t"<<tmi.status1<<"\n";
+	file<<"РљРЎ2:\t"<<tmi.status2<<"\n";
 	file<<"POST:\t"<<tmi.post<<"\n";
-	file<<"Зав. №\t"<<tmi.serialNumber<<"\n";
-	file<<"Texp, мс:\t"<<tmi.timeExp<<"\n";
+	file<<"Р—Р°РІ. в„–\t"<<tmi.serialNumber<<"\n";
+	file<<"Texp, РјСЃ:\t"<<tmi.timeExp<<"\n";
 	file<<"____________________________________"<<"\n";
 }
 
 void PrintSHTMI2(ofstream &file, struct SHTMI2 tmi)
 {
 	file<<"____________________________________"<<"\n";
-	file<<"Массив ШТМИ2"<<"\n";
-	file<<"КС1:\t"<<tmi.status1<<"\n";
-	file<<"КС2:\t"<<tmi.status2<<"\n";
+	file<<"РњР°СЃСЃРёРІ РЁРўРњР2"<<"\n";
+	file<<"РљРЎ1:\t"<<tmi.status1<<"\n";
+	file<<"РљРЎ2:\t"<<tmi.status2<<"\n";
 	file<<"POST:\t"<<tmi.post<<"\n";
-	file<<"Зав. №\t"<<tmi.serialNumber<<"\n";
-	file<<"Texp, мс:\t"<<tmi.timeExp<<"\n";
+	file<<"Р—Р°РІ. в„–\t"<<tmi.serialNumber<<"\n";
+	file<<"Texp, РјСЃ:\t"<<tmi.timeExp<<"\n";
 	for (int i = 0; i < MAX_STAT; i++) {
-		file<<"Счетчик № "<<(i+1)<<":\t"<<tmi.cntStatOrient[i]<<"\n";
+		file<<"РЎС‡РµС‚С‡РёРє в„– "<<(i+1)<<":\t"<<tmi.cntStatOrient[i]<<"\n";
 	}
 	file<<"____________________________________"<<"\n";
 }
@@ -1635,12 +1631,12 @@ void PrintSHTMI2(ofstream &file, struct SHTMI2 tmi)
 void PrintDTMI(ofstream &file, struct DTMI tmi)
 {
 	file<<"____________________________________"<<"\n";
-	file<<"Массив ДТМИ"<<"\n";
-	file<<"КС1\t"<<tmi.status1<<"\n";
-	file<<"КС2\t"<<tmi.status2<<"\n";
+	file<<"РњР°СЃСЃРёРІ Р”РўРњР"<<"\n";
+	file<<"РљРЎ1\t"<<tmi.status1<<"\n";
+	file<<"РљРЎ2\t"<<tmi.status2<<"\n";
 	file<<"POST\t"<<tmi.post<<"\n";
-	file<<"Зав. №\t"<<tmi.serialNumber<<"\n";
-	file<<"Texp, мс:\t"<<tmi.timeExp<<"\n";
+	file<<"Р—Р°РІ. в„–\t"<<tmi.serialNumber<<"\n";
+	file<<"Texp, РјСЃ:\t"<<tmi.timeExp<<"\n";
 	for (int i = 0; i < MAX_LOCAL; i++) {
 		file<<std::setw(6)<<(i+1)<<"\t";
 		file<<tmi.LocalList[i][0]<<"\t"<<tmi.LocalList[i][1]<<"\t";
@@ -1689,7 +1685,7 @@ void __fastcall TFormGraphOrient::MenuOpenTMIClick(TObject *Sender)
 
 		ifstream finp(FileName.c_str());
 		if (!finp.is_open()) {
-			ShowMessage("Файл не может быть открыт!");
+			ShowMessage("Р¤Р°Р№Р» РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РѕС‚РєСЂС‹С‚!");
 			return;
 		}
 
@@ -1697,7 +1693,7 @@ void __fastcall TFormGraphOrient::MenuOpenTMIClick(TObject *Sender)
 		ofstream fshtmi2((FileTitle+"_shtmi2.txt").c_str());
 
 		fshtmi2<<std::setw(16)<<"KC1"<<std::setw(18)<<"KC2"<<std::setw(18)<<"POST";
-		fshtmi2<<std::setw(6)<<"№"<<std::setw(6)<<"Texp";
+		fshtmi2<<std::setw(6)<<"в„–"<<std::setw(6)<<"Texp";
 		for (int i = 0; i < MAX_STAT; i++) {
 			std::string str="EC"+(i+1);
 			fshtmi2<<std::setw(6)<<str;
@@ -1709,12 +1705,12 @@ void __fastcall TFormGraphOrient::MenuOpenTMIClick(TObject *Sender)
 		while (!finp.eof())
 		{
 			getline(finp, line, '\n' );
-			if (line.find("ШТМИ1")!=std::string::npos) {
+			if (line.find("РЁРўРњР1")!=std::string::npos) {
 				if(TryReadSHTMI1(finp,mSHTMI1)) {
 					PrintSHTMI1(fout,mSHTMI1);
 				}
 			}
-			else if (line.find("ШТМИ2")!=std::string::npos) {
+			else if (line.find("РЁРўРњР2")!=std::string::npos) {
 				if(TryReadSHTMI2(finp,mSHTMI2)) {
 					PrintSHTMI2(fout,mSHTMI2);
 					fshtmi2<<std::setw(16)<<mSHTMI2.status1<<std::setw(18)<<mSHTMI2.status2;
@@ -1726,7 +1722,7 @@ void __fastcall TFormGraphOrient::MenuOpenTMIClick(TObject *Sender)
 	}               fshtmi2<<"\n";
 				}
 			}
-			else if (line.find("ДТМИ1")!=std::string::npos) {
+			else if (line.find("Р”РўРњР1")!=std::string::npos) {
 
 				if (TryReadDTMI(finp,mDTMI)) {
 					struct CadrInfo mCadr;
