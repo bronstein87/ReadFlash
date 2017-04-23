@@ -1427,21 +1427,26 @@ bool &Handled)
 {
 	TImage* Image = dynamic_cast<TImage*> (Sender);
 	TScrollBox* ScrollBox= dynamic_cast<TScrollBox*>(Image->Parent);
+
 	if(Button==mbLeft)
 	{
 		Image->Width= Image->Width * 1.2;
 		Image->Height= Image->Height * 1.2;
-		ScrollBox->VertScrollBar->Position=Y;
-		ScrollBox->HorzScrollBar->Position=X;
+		// определяем диапазоны ползунков ( ThumpSize всегда почему-то возвращает ноль, так что только таким способом )
+		ScrollBox->VertScrollBar->Position= INT_MAX;
+		ScrollBox->HorzScrollBar->Position= INT_MAX;
+		ScrollBox->VertScrollBar->Position=(((double)(ScrollBox->VertScrollBar->Position)/Image->Width) * Y) * 1.2;
+		ScrollBox->HorzScrollBar->Position=(((double)(ScrollBox->HorzScrollBar->Position)/Image->Height)* X) * 1.2;
 	}
 	else if(Button==mbRight)
-	{   Image->Width= Image->Width / 1.2;
+	{
+		Image->Width= Image->Width / 1.2;
 		Image->Height= Image->Height / 1.2;
-		ScrollBox->VertScrollBar->Position=ScrollBox->VertScrollBar->Position-20;
-		ScrollBox->HorzScrollBar->Position=ScrollBox->HorzScrollBar->Position-20;
+		ScrollBox->VertScrollBar->Position= INT_MAX;
+		ScrollBox->HorzScrollBar->Position= INT_MAX;
+		ScrollBox->VertScrollBar->Position=(((double)(ScrollBox->VertScrollBar->Position)/Image->Width) * Y) / 1.2;
+		ScrollBox->HorzScrollBar->Position=(((double)(ScrollBox->HorzScrollBar->Position)/Image->Height)* X) / 1.2;
 	}
-
-
 
 
 }
@@ -1739,7 +1744,6 @@ void __fastcall TFormGraphOrient::MenuOpenTMIClick(TObject *Sender)
 		fshtmi2.close();
 		this->NumLine=1;
 
-	   //	this->UpDown1Click(MainForm,btNext);
 		this->UpDown1->Max=vCadrInfo.size();
 	}
 }
