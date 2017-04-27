@@ -71,7 +71,7 @@ object FormGraphOrient: TFormGraphOrient
     Top = 8
     Width = 1160
     Height = 777
-    ActivePage = ShowFragmentTab
+    ActivePage = TabSheet8
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
     object TabSheet5: TTabSheet
@@ -975,6 +975,13 @@ object FormGraphOrient: TFormGraphOrient
       object MenuOpenTMI: TMenuItem
         Caption = #1055#1088#1086#1090#1086#1082#1086#1083' '#1090#1077#1083#1077#1084#1077#1090#1088#1080#1080
         OnClick = MenuOpenTMIClick
+      end
+      object N1: TMenuItem
+        Caption = #1057#1095#1080#1090#1072#1090#1100' '#1087#1088#1086#1090#1086#1082#1086#1083
+        object BOKZ60ParseProtocol: TMenuItem
+          Caption = #1041#1054#1050#1047'-'#1052'60'
+          OnClick = BOKZ60ParseProtocolClick
+        end
       end
     end
     object MenuSave: TMenuItem

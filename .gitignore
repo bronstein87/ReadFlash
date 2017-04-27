@@ -90,3 +90,5 @@ $RECYCLE.BIN/
 ReadFlash.stat
 *.stat
 ReadFlash.cbproj.local
+*.stat
+ReadFlash.cbproj.local

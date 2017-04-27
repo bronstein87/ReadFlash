@@ -20,89 +20,78 @@ __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 }
 //рисование сводных графиков по серии
 //---------------------------------------------------------------------------
-void TFormGraphOrient::CreateGraph(int CurLine)
+void TFormGraphOrient::CreateGraph()
 {
-int num;
 
-		if (NumLine<MaxSeries)
-        {
-				  num=NumGraph*CurLine;
-				  LineSeries[num]= new TLineSeries(ChartAl);
-				  ChartAl->AddSeries(LineSeries[num]);
-				  num++;
-				  LineSeries[num]= new TLineSeries(ChartDl);
-				  ChartDl->AddSeries(LineSeries[num]);
-				  num++;
-				  LineSeries[num]= new TLineSeries(ChartAz);
-				  ChartAz->AddSeries(LineSeries[num]);
-                  num++;
-				  LineSeries[num]= new TLineSeries(ChartWx);
-				  ChartWx->AddSeries(LineSeries[num]);
-				  num++;
-				  LineSeries[num]= new TLineSeries(ChartWy);
-				  ChartWy->AddSeries(LineSeries[num]);
-				  num++;
-				  LineSeries[num]= new TLineSeries(ChartWz);
-				  ChartWz->AddSeries(LineSeries[num]);
-                  num++;
-				  LineSeries[num]= new TLineSeries(ChartMx);
-				  ChartMx->AddSeries(LineSeries[num]);
-				  num++;
-				  LineSeries[num]= new TLineSeries(ChartMy);
-				  ChartMy->AddSeries(LineSeries[num]);
-				  num++;
-				  LineSeries[num]= new TLineSeries(ChartNst);
-				  ChartNst->AddSeries(LineSeries[num]);
-				  num++;
-				  LineSeries[num]= new TLineSeries(ChartFoc);
-				  ChartFoc->AddSeries(LineSeries[num]);
-				  num++;
-				  LineSeries[num]= new TLineSeries(ChartX0);
-				  ChartX0->AddSeries(LineSeries[num]);
-				  num++;
-				  LineSeries[num]= new TLineSeries(ChartY0);
-				  ChartY0->AddSeries(LineSeries[num]);
-                  num++;
-				  LineSeries[num]= new TLineSeries(ChartFone);
-				  ChartFone->AddSeries(LineSeries[num]);
-				  num++;
-				  LineSeries[num]= new TLineSeries(ChartNoise);
-				  ChartNoise->AddSeries(LineSeries[num]);
-				  num++;
-				  LineSeries[num]= new TLineSeries(ChartNloc);
-				  ChartNloc->AddSeries(LineSeries[num]);
-        }
+				  int numberOfSeries = 0;
+				  LineSeries[numberOfSeries]= new TLineSeries(ChartAl);
+				  ChartAl->AddSeries(LineSeries[numberOfSeries]);
+				  numberOfSeries++;
+				  LineSeries[numberOfSeries]= new TLineSeries(ChartDl);
+				  ChartDl->AddSeries(LineSeries[numberOfSeries]);
+				  numberOfSeries++;
+				  LineSeries[numberOfSeries]= new TLineSeries(ChartAz);
+				  ChartAz->AddSeries(LineSeries[numberOfSeries]);
+				  numberOfSeries++;
+				  LineSeries[numberOfSeries]= new TLineSeries(ChartWx);
+				  ChartWx->AddSeries(LineSeries[numberOfSeries]);
+				  numberOfSeries++;
+				  LineSeries[numberOfSeries]= new TLineSeries(ChartWy);
+				  ChartWy->AddSeries(LineSeries[numberOfSeries]);
+				  numberOfSeries++;
+				  LineSeries[numberOfSeries]= new TLineSeries(ChartWz);
+				  ChartWz->AddSeries(LineSeries[numberOfSeries]);
+				  numberOfSeries++;
+				  LineSeries[numberOfSeries]= new TLineSeries(ChartMx);
+				  ChartMx->AddSeries(LineSeries[numberOfSeries]);
+				  numberOfSeries++;
+				  LineSeries[numberOfSeries]= new TLineSeries(ChartMy);
+				  ChartMy->AddSeries(LineSeries[numberOfSeries]);
+				  numberOfSeries++;
+				  LineSeries[numberOfSeries]= new TLineSeries(ChartNst);
+				  ChartNst->AddSeries(LineSeries[numberOfSeries]);
+				  numberOfSeries++;
+				  LineSeries[numberOfSeries]= new TLineSeries(ChartFoc);
+				  ChartFoc->AddSeries(LineSeries[numberOfSeries]);
+				  numberOfSeries++;
+				  LineSeries[numberOfSeries]= new TLineSeries(ChartX0);
+				  ChartX0->AddSeries(LineSeries[numberOfSeries]);
+				  numberOfSeries++;
+				  LineSeries[numberOfSeries]= new TLineSeries(ChartY0);
+				  ChartY0->AddSeries(LineSeries[numberOfSeries]);
+				  numberOfSeries++;
+				  LineSeries[numberOfSeries]= new TLineSeries(ChartFone);
+				  ChartFone->AddSeries(LineSeries[numberOfSeries]);
+				  numberOfSeries++;
+				  LineSeries[numberOfSeries]= new TLineSeries(ChartNoise);
+				  ChartNoise->AddSeries(LineSeries[numberOfSeries]);
+				  numberOfSeries++;
+				  LineSeries[numberOfSeries]= new TLineSeries(ChartNloc);
+				  ChartNloc->AddSeries(LineSeries[numberOfSeries]);
+
 
 }
 
-void TFormGraphOrient::DeleteGraph(int CurLine)
+void TFormGraphOrient::DeleteGraph()
 {
-int num;
-
-  if ((NumLine<MaxSeries)&&(CurLine>=0)&&(CurLine<NumLine))
-  {
-	for (int num=NumGraph*CurLine; num<NumGraph*(CurLine+1);num++)
+	for (int numberOfSeries = 0; numberOfSeries < NumGraph ;numberOfSeries ++)
     {
-      LineSeries[num]->Clear();
-      delete LineSeries[num];
+	  LineSeries[numberOfSeries]->Clear();
+      delete LineSeries[numberOfSeries];
 	}
-  }
+
 }
 
 //---------------------------------------------------------------------------
 void __fastcall TFormGraphOrient::MenuClearClick(TObject *Sender)
 {
-//  for (int i=0; i<FormSetting->ListBoxSeries->Count;i++) {
-	for (int i=0; i<NumLine;i++) {
-	DeleteGraph(i);
-  }
-
+	DeleteGraph();
 //  for (int i=0; i<MaxSeries; i++) {
 //    ColorArr[i]=DefColors[i%NumColor];
 //	FreeIndex[i]=0;
 //  }
 
-  NumLine=0;
+
 //  FormSetting->ListBoxSeries->Clear();
 //  FormSetting->EditFileName->Text="";
 //  FormSetting->EditSeriesName->Text="";
@@ -148,7 +137,7 @@ void __fastcall TFormGraphOrient::MenuSaveClick(TObject *Sender)
    SaveGraph(ChartY0, "Yg");
 }
 //---------------------------------------------------------------------------
-void TFormGraphOrient::ApplySeriesSetting(int CheckLine, AnsiString Title, TColor color)
+void TFormGraphOrient::ApplySeriesSetting(AnsiString Title, TColor color)
 {
 //  int CheckLine=MainForm->SeriesID[ListBoxSeries->ItemIndex];
 //  MainForm->FilesName[CheckLine]=EditFileName->Text;
@@ -158,17 +147,17 @@ void TFormGraphOrient::ApplySeriesSetting(int CheckLine, AnsiString Title, TColo
 //  MainForm->SeriesColor[CheckLine]=ColorBoxSeries->Selected;
 //  MainForm->SeriesLineWidth[CheckLine]=StrToInt(EditLineWidth->Text);
 
-  for (int num=NumGraph*CheckLine; num<NumGraph*(CheckLine+1); num++)
+  for (int numberOfSeries = 0; numberOfSeries < NumGraph; numberOfSeries++)
   {
-	if (LineSeries[num]!=NULL)
+	if (LineSeries[numberOfSeries] != NULL)
 	{
-	  LineSeries[num]->Title=Title;
-	  LineSeries[num]->SeriesColor=color;
-	  LineSeries[num]->Pointer->Visible=true;
-	  LineSeries[num]->Pointer->Style=psCircle;
-	  LineSeries[num]->Pointer->Size=3;
-	  LineSeries[num]->Pointer->Pen->Visible=false;
-	  LineSeries[num]->Pen->Visible=false;
+	  LineSeries[numberOfSeries]->Title=Title;
+	  LineSeries[numberOfSeries]->SeriesColor=color;
+	  LineSeries[numberOfSeries]->Pointer->Visible=true;
+	  LineSeries[numberOfSeries]->Pointer->Style=psCircle;
+	  LineSeries[numberOfSeries]->Pointer->Size=3;
+	  LineSeries[numberOfSeries]->Pointer->Pen->Visible=false;
+	  LineSeries[numberOfSeries]->Pen->Visible=false;
 //	  LineSeries[num]->LinePen->Width=StrToInt(EditLineWidth->Text);
 	}
   }
@@ -655,10 +644,6 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 
 	}
 
-//	for(int i=0;i<ImageVector.size();i++)
-//	{
-//		ImageVector[i]->SetParentComponent(ImageScrollBoxVector[i]);
-//	}
 	PlaceImageFragments(ImageScrollBoxVector);
 
 	fclose(FragmentFile);
@@ -986,9 +971,8 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 						"mean_bf","sigma_bf","mean_fr","sigma_fr");
 
 
-		this->NumLine=0;
-		this->CreateGraph(this->NumLine);
-		this->ApplySeriesSetting(this->NumLine, "мБОКЗ-2В",
+		this->CreateGraph();
+		this->ApplySeriesSetting("мБОКЗ-2В",
 											clBlue);//ColorRes[FormGraphOrient->NumLine]);
 //		DataPixHeader mDataPixHdr;
 		while (!feof(fflesh))
@@ -1207,22 +1191,23 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 /**/
 			  double Tpr=mDataSLEZH.Tpr_sec+mDataSLEZH.Tpr_msec/1000.;
 			  if (mDataSLEZH.NumDet>=3) {
-				this->LineSeries[this->NumLine*NumGraph+0]->AddXY(Tpr,al);
-				this->LineSeries[this->NumLine*NumGraph+1]->AddXY(Tpr,dl);
-				this->LineSeries[this->NumLine*NumGraph+2]->AddXY(Tpr,Az);
-				this->LineSeries[this->NumLine*NumGraph+3]->AddXY(Tpr,mDataSLEZH.Wop[0]*RTS);
-				this->LineSeries[this->NumLine*NumGraph+4]->AddXY(Tpr,mDataSLEZH.Wop[1]*RTS);
-				this->LineSeries[this->NumLine*NumGraph+5]->AddXY(Tpr,mDataSLEZH.Wop[2]*RTS);
+
+				this->LineSeries[0]->AddXY(Tpr,al);
+				this->LineSeries[1]->AddXY(Tpr,dl);
+				this->LineSeries[2]->AddXY(Tpr,Az);
+				this->LineSeries[3]->AddXY(Tpr,mDataSLEZH.Wop[0]*RTS);
+				this->LineSeries[4]->AddXY(Tpr,mDataSLEZH.Wop[1]*RTS);
+				this->LineSeries[5]->AddXY(Tpr,mDataSLEZH.Wop[2]*RTS);
 	//			FormGraphOrient->LineSeries[FormGraphOrient->NumLine*NumGraph+6]->AddXY(Tpr,mx); //рассчитать
 	//			FormGraphOrient->LineSeries[FormGraphOrient->NumLine*NumGraph+7]->AddXY(Tpr,my); //рассчитать
-				this->LineSeries[this->NumLine*NumGraph+8]->AddXY(Tpr,mDataSLEZH.m_cur);
-				this->LineSeries[this->NumLine*NumGraph+9]->AddXY(Tpr,mDataSLEZH.NumFrag);
-				this->LineSeries[this->NumLine*NumGraph+11]->AddXY(Tpr,mDataSLEZH.NumDet);
+				this->LineSeries[8]->AddXY(Tpr,mDataSLEZH.m_cur);
+				this->LineSeries[9]->AddXY(Tpr,mDataSLEZH.NumFrag);
+				this->LineSeries[11]->AddXY(Tpr,mDataSLEZH.NumDet);
 			  }
-			  this->LineSeries[this->NumLine*NumGraph+10]->AddXY(Tpr,mDataSLEZH.NumLoc);
-			  this->LineSeries[this->NumLine*NumGraph+12]->AddXY(Tpr,mean_frag);
-			  this->LineSeries[this->NumLine*NumGraph+13]->AddXY(Tpr,sigma_frag);
-			  this->LineSeries[this->NumLine*NumGraph+14]->AddXY(Tpr,mDataSLEZH.Temp);
+			  this->LineSeries[10]->AddXY(Tpr,mDataSLEZH.NumLoc);
+			  this->LineSeries[12]->AddXY(Tpr,mean_frag);
+			  this->LineSeries[13]->AddXY(Tpr,sigma_frag);
+			  this->LineSeries[14]->AddXY(Tpr,mDataSLEZH.Temp);
 /**
 			  sprintf(loc_name,"%s\\Loc_%06d_%08d.txt",LocDir.c_str(),mDataSLEZH.T,mDataSLEZH.Tbshv);
 			  floc=fopen(loc_name,"wt");
@@ -1365,7 +1350,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 		fclose(flog_reg);
 		fclose(flog_pix);
 		fclose(flog_orient);
-		this->NumLine=1;
+
 
 		this->UpDown1->Max=vCadrInfo.size();
 
@@ -1742,7 +1727,6 @@ void __fastcall TFormGraphOrient::MenuOpenTMIClick(TObject *Sender)
 		finp.close();
 		fout.close();
 		fshtmi2.close();
-		this->NumLine=1;
 
 		this->UpDown1->Max=vCadrInfo.size();
 	}
@@ -1755,4 +1739,315 @@ void __fastcall TFormGraphOrient::MenuOpenTMIClick(TObject *Sender)
 
 
 
+//---------------------------------------------------------------------------
+// проверяем содержит ли протокол режим локализации
+bool checkLocFile(ifstream& in)
+{
+	std::string line;
+	for(int i = 0; i < 3 ; i++)
+	{
+		std::getline(in,line);
+	}
+	// проверим, возвращаем указатель на начало файла
+	in.seekg(0);
+	
+	if(line.find("Локализация") == std::string::npos)
+	{
+		return false;
+	}
+	return true;
+}
+
+template <typename Stream>
+size_t findWord(Stream& in,const std::string& word)
+{
+  std::string lineToWrite;
+  while(lineToWrite.find(word) == std::string::npos && !in.eof())
+  {
+	in >> lineToWrite;
+  }
+
+  if(in.eof())
+  {
+	 return std::string::npos;
+  }
+
+  return in.tellg() - lineToWrite.size();
+
+
+}
+
+template <typename Stream>
+size_t findLine(Stream& in,const std::string& line)
+{
+  std::string lineToWrite;
+  while(lineToWrite.find(line) == std::string::npos && !in.eof())
+  {
+	  std::getline(in,lineToWrite);
+  }
+
+  if(in.eof())
+  {
+	 return std::string::npos;
+  }
+
+  return in.tellg() - lineToWrite.size();
+
+
+
+}
+
+template <typename Out>
+void split(const std::string &s, char delim, Out result) {
+	std::stringstream ss;
+	ss.str(s);
+	std::string item;
+	while (std::getline(ss, item, delim))
+	{
+		result = item;
+	}
+}
+
+
+std::vector<std::string> split(const std::string &s, char delim) {
+
+	std::vector<std::string> elems;
+    split(s, delim, std::back_inserter(elems));
+    return elems;
+}
+
+
+
+void readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
+{
+	std::string line;
+	while(!in.eof())
+	{
+		   std::getline(in,line);
+		   if(line.find("Номер такта") != std::string::npos)
+		   {
+				CadrInfo cadrInfo;
+				// считываем время привязки
+				if(findWord(in,"информации") != std::string::npos)
+				{
+					in >> cadrInfo.Time;
+				}
+				else throw ("Порядок считывания протокола нарушен");
+
+				// ищем число локализованных объектов
+				if(findWord(in,"объектов") != std::string::npos)
+				{
+					in >> cadrInfo.CountLocalObj;
+					//ShowMessage(cadrInfo.CountLocalObj);
+				}
+				else throw ("Порядок считывания протокола нарушен");
+
+				  //ищем число распознанных объектов
+				if(findWord(in,"объектов") != std::string::npos)
+				{
+					in >> cadrInfo.CountDeterObj;
+					//ShowMessage(cadrInfo.CountDeterObj);
+				}
+				else throw ("Порядок считывания протокола нарушен");
+
+				// ищем начало массива лок
+				if(findLine(in,"	Х			Y			I			N") != -1)
+				{
+					vector<string> splittedLocData;
+					int maxCountLocObj = 32;
+					ObjectsInfo* objectsList = new ObjectsInfo[maxCountLocObj];
+
+					for(int i = 0 ; i < maxCountLocObj; i ++)
+					{
+						std::getline(in,line);
+						splittedLocData = split(line,'\t');
+						
+						objectsList[i].X = std::atof (splittedLocData[1].c_str());
+						objectsList[i].Y = std::atof (splittedLocData[2].c_str());
+						objectsList[i].Bright = std::atof (splittedLocData[3].c_str());
+						objectsList[i].Square = std::atoi (splittedLocData[4].c_str()); 
+
+					}
+
+				   cadrInfo.ObjectsList = objectsList;
+				}
+				else throw ("Порядок считывания протокола нарушен");
+				cadrInfoVec.push_back(cadrInfo);
+		   }
+
+	}
+
+}
+
+void readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
+{
+	std::string line;
+	while(!in.eof())
+	{
+		std::getline(in,line);
+		if(line.find("и) Ориентация				определена") != std::string::npos)
+		{
+		   CadrInfo cadrInfo;
+		   // ищем время привязки
+			if(findWord(in,"информации") != std::string::npos)
+			{
+				in >> cadrInfo.Time;
+			}
+		   else throw ("Порядок считывания протокола нарушен");
+
+		   if(findLine(in,"4) Кватернион ориентации, Qо") != std::string::npos)
+		   {
+				
+				for(int i = 0; i < 4; i++)
+				{
+					std::getline(in,line);
+					vector<string> splittedStr = split(line,'\t');
+					cadrInfo.QuatOrient[i] = std::atof(splittedStr[1].c_str());
+				}
+
+				
+
+		   }
+		   else throw ("Порядок считывания протокола нарушен");
+		   
+
+		
+
+		   if(findWord(in,"объектов") != std::string::npos)
+		   {
+				in >> cadrInfo.CountLocalObj;
+				//ShowMessage(cadrInfo.CountLocalObj);
+		   }
+		   else throw ("Порядок считывания протокола нарушен");
+
+				 // ищем число распознанных объектов
+		   if(findWord(in,"объектов") != std::string::npos)
+		   {
+				in >> cadrInfo.CountDeterObj;
+					//ShowMessage(cadrInfo.CountDeterObj);
+		   }
+		   else throw ("Порядок считывания протокола нарушен");
+
+				// ищем начало массива лок
+		   if(findLine(in,"	Х			Y			I			N") != -1)
+		   {
+				vector<string> splittedLocData;
+				int maxCountLocObj = 16;
+				ObjectsInfo* objectsList = new ObjectsInfo[maxCountLocObj];
+
+				for(int i = 0 ; i < maxCountLocObj; i ++)
+				{
+					std::getline(in,line);
+					splittedLocData = split(line,'\t');
+						
+					objectsList[i].X = std::atof (splittedLocData[1].c_str());
+					objectsList[i].Y = std::atof (splittedLocData[2].c_str());
+					objectsList[i].Bright = std::atof (splittedLocData[3].c_str());
+
+				}
+				cadrInfo.ObjectsList = objectsList;
+
+		   }
+			else throw ("Порядок считывания протокола нарушен");
+
+		   if(findLine(in,"14) Проекции угловой скорости на оси ПСК") != std::string::npos)
+		   {
+				for(int i = 0; i < 3; i++)
+				{
+					std::getline(in,line);
+					vector<string> splittedStr = split(line,'\t');
+					cadrInfo.OmegaOrient[i] = std::atof(splittedStr[1].c_str());
+				}
+				
+		   }
+		   else throw ("Порядок считывания протокола нарушен");
+
+	   
+		   if(findLine(in,"15) Координаты центров фрагментов") != std::string::npos)
+		   {
+				WindowsInfo *WindowsList = new WindowsInfo [16];
+				for(int i = 0; i < 16; i++)
+				{
+					std::getline(in,line);
+					vector<string> splittedStr = split(line,'\t');
+					if(std::atoi(splittedStr[1].c_str()) == 0)
+					{
+						cadrInfo.CountWindows = i + 1;
+						break;
+					}
+					
+					WindowsList[i].Xstart = (std::atoi(splittedStr[1].c_str()));
+					WindowsList[i].Ystart = (std::atoi(splittedStr[2].c_str()));
+				}
+				cadrInfo.WindowsList =  WindowsList;
+				
+		   }
+		   else throw ("Порядок считывания протокола нарушен");
+
+		   if(findLine(in,"16) Значение порогов во фрагментах") != std::string::npos)
+		   {
+				for(int i = 0; i < cadrInfo.CountWindows; i++)
+				{
+					std::getline(in,line);
+					vector<string> splittedStr = split(line,'\t');
+					cadrInfo.WindowsList[i].Level = std::atoi(splittedStr[1].c_str());
+				}
+				
+		   }
+		   else throw ("Порядок считывания протокола нарушен");
+
+		   
+		   if(findLine(in,"17) Количество объектов во фрагментах") != std::string::npos)
+		   {
+				for(int i = 0; i < cadrInfo.CountWindows; i++)
+				{
+					std::getline(in,line);
+					vector<string> splittedStr = split(line,'\t');
+					cadrInfo.WindowsList[i].CountObj = std::atoi(splittedStr[1].c_str());
+				}
+				
+		   }
+		   else throw ("Порядок считывания протокола нарушен");
+
+		   
+			cadrInfoVec.push_back(cadrInfo);  
+		}
+		
+	}
+	ShowMessage(cadrInfoVec.size());
+}
+
+
+void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
+{
+     OpenDialog1->Filter="txt|*.txt";
+	if (OpenDialog1->Execute()) {
+
+		FileName=OpenDialog1->FileName;
+		SetCurrentDir(ExtractFileDir(FileName));
+		GetFileTitles(FileName,&FileTitle);
+
+		ifstream in(FileName.c_str());
+		if (!in.is_open()) {
+			ShowMessage("Не удалось открыть файл");
+			return;
+		}
+
+		if(checkLocFile(in))
+		{
+			readBOKZ60LocProtocol(in,vCadrInfo);
+		}
+
+		else
+		{
+			readBOKZ60Protocol(in,vCadrInfo);
+		}
+
+	}
+}
+
+
+
+
+//---------------------------------------------------------------------------
 
