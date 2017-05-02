@@ -36,6 +36,7 @@ struct LinesInfo
 
 struct CadrInfo
 {
+	CadrInfo();
 	double Time;
 	bool IsBinary, IsReverse;   //признак бинирования
 	unsigned short CountPixFilter;       //число пикселей выше порога
@@ -52,10 +53,27 @@ struct CadrInfo
 	double QuatOrient[4], MatrixOrient[3][3], AnglesOrient[3];   //кватернион, матрица и углы ориентации
 	double OmegaOrient[3], MatrixProg[3][3]; //угловая скорость, прогнозируемая матрица ориентации
 	double MatrixTemp;     //температура КМОП-матрицы
-//	double Foc, Xg, Yg;
+
+	~CadrInfo();
 };
 
 
+	CadrInfo::CadrInfo()
+	{
+		StarsList = NULL;
+		ObjectsList = NULL;
+		LinesList = NULL;
+		WindowsList = NULL
+
+	}
+	 CadrInfo::~CadrInfo()
+	 {
+
+		delete [] StarsList;
+		delete [] ObjectsList;
+		delete [] LinesList;
+		delete [] WindowsList;
+	}
 
 
 #endif

@@ -69,14 +69,16 @@
 
 	//---------------------------------------------------------------------------
 
-	class TFormAnimateSetting;
-
-	 struct RawFileInfo
+	struct RawFileInfo
 	{
 	long int Pos;
 	int Size;
 	int SecuenceCounter;
 	}  ;
+
+	class TFormAnimateSetting;
+
+
 
 	class TFormGraphOrient : public TForm
 	{

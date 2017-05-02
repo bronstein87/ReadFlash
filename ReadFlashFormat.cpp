@@ -151,18 +151,20 @@ void ConvertDataSLEZH(struct DataSLEZH data, struct CadrInfo &mCadr)
 	mCadr.Time=data.Tpr_sec+data.Tpr_msec/1000.;
 	mCadr.CountLocalObj=data.NumLoc;
 	mCadr.CountDeterObj=data.NumDet;
-	mCadr.ObjectsList = new struct ObjectsInfo[mCadr.CountLocalObj];  // гдеяэ сревйю
+
+	ObjectsInfo objInfo;
 	for (int i=0; i<mCadr.CountLocalObj; i++) {
-		mCadr.ObjectsList[i].X=data.RsLocT[i][0];
-		mCadr.ObjectsList[i].Y=data.RsLocT[i][1];
-		mCadr.ObjectsList[i].Bright=data.RsLocT[i][2];
-		mCadr.ObjectsList[i].Square  =abs(data.RsLocT[i][3]);
-		mCadr.ObjectsList[i].StarID=0;
-		mCadr.ObjectsList[i].Mv=0;
-		mCadr.ObjectsList[i].Sp[0]='_';
-		mCadr.ObjectsList[i].Sp[1]='_';
-		mCadr.ObjectsList[i].Dx=0;
-		mCadr.ObjectsList[i].Dy=0;
+		objInfo.X=data.RsLocT[i][0];
+		objInfo.Y=data.RsLocT[i][1];
+		objInfo.Bright=data.RsLocT[i][2];
+		objInfo.Square  =abs(data.RsLocT[i][3]);
+		objInfo.StarID=0;
+		objInfo.Mv=0;
+		objInfo.Sp[0]='_';
+		objInfo.Sp[1]='_';
+		objInfo.Dx=0;
+		objInfo.Dy=0;
+		mCadr.ObjectsList.push_back(objInfo) ;
 	}
 
 	if (!data.res_stat)
@@ -179,33 +181,39 @@ void ConvertDataSLEZH(struct DataSLEZH data, struct CadrInfo &mCadr)
 
 	mCadr.CountBlock=data.CountBlock;
 	mCadr.CountLines=data.EndBufFrag;
-	mCadr.LinesList = new struct LinesInfo[mCadr.CountLines];
+
+	LinesInfo linesInfo;
 	for (int i=0; i<mCadr.CountBlock; i++) {
-		mCadr.LinesList[i].Start=data.TabTakeAway[i][0];
-		mCadr.LinesList[i].Height=data.TabTakeAway[i][1];
+		linesInfo.Start=data.TabTakeAway[i][0];
+		linesInfo.Height=data.TabTakeAway[i][1];
+		mCadr.LinesList.push_back(linesInfo);
 	}
 
 	mCadr.CountStars=data.NumProgFrag;
-	mCadr.StarsList = new struct StarsInfo[mCadr.CountStars];
+
+	StarsInfo starsInfo;
 	for (int i = 0; i < mCadr.CountStars; i++) {
-		mCadr.StarsList[i].X=data.XYcProg[i][0];
-		mCadr.StarsList[i].Y=data.XYcProg[i][1];
+		starsInfo.X=data.XYcProg[i][0];
+		starsInfo.Y=data.XYcProg[i][1];
+		mCadr.StarsList.push_back(starsInfo);
 //		mCadr.StarsList[i].Mv=data.XYcProg[i][2];
 //		mCadr.StarsList[i].StarID=data.XYcProg[i][2];
 	}
 	mCadr.CountWindows=data.NumFrag;
-	mCadr.WindowsList = new struct WindowsInfo[data.NumFrag];
+
+	WindowsInfo winInfo;
 	for (int i = 0; i < mCadr.CountWindows; i++) {
-		mCadr.WindowsList[i].Xstart = data.FragYX[i][1]-data.PfragXY[i][0]+1;
-		mCadr.WindowsList[i].Ystart = data.YendLoc[i]-data.PfragXY[i][1]+1;
-		mCadr.WindowsList[i].Width = data.PfragXY[i][0];
-		mCadr.WindowsList[i].Height = data.PfragXY[i][1];
-		mCadr.WindowsList[i].Mean = data.MeanFrag[i][0];
-		mCadr.WindowsList[i].Sigma = data.MeanFrag[i][1];
-		mCadr.WindowsList[i].Level = data.ThFrag[i];
-		mCadr.WindowsList[i].CountObj = data.ObjFrag[i];
-		mCadr.WindowsList[i].StarID = data.XYc[i][2];
-		mCadr.WindowsList[i].Mv = data.XYc[i][3];
+		winInfo.Xstart = data.FragYX[i][1]-data.PfragXY[i][0]+1;
+		winInfo.Ystart = data.YendLoc[i]-data.PfragXY[i][1]+1;
+		winInfo.Width = data.PfragXY[i][0];
+		winInfo.Height = data.PfragXY[i][1];
+		winInfo.Mean = data.MeanFrag[i][0];
+		winInfo.Sigma = data.MeanFrag[i][1];
+		winInfo.Level = data.ThFrag[i];
+		winInfo.CountObj = data.ObjFrag[i];
+		winInfo.StarID = data.XYc[i][2];
+		winInfo.Mv = data.XYc[i][3];
+		mCadr.WindowsList.push_back(winInfo);
 	}
 }
 
@@ -218,18 +226,21 @@ void ConvertDataNO(struct DataNO data, struct CadrInfo &mCadr, int NC)
 	mCadr.Time=data.Tpr_sec+data.Tpr_msec/1000.;
 	mCadr.CountLocalObj=data.NumLoc[NC];
 	mCadr.CountDeterObj=data.NumDet;
-	mCadr.ObjectsList = new struct ObjectsInfo[mCadr.CountLocalObj];
+
+	ObjectsInfo objInfo;
+
 	for (int i=0; i<mCadr.CountLocalObj; i++) {
-		mCadr.ObjectsList[i].X=data.RsLocT[NC][i][0];
-		mCadr.ObjectsList[i].Y=data.RsLocT[NC][i][1];
-		mCadr.ObjectsList[i].Bright=data.RsLocT[NC][i][2];
-		mCadr.ObjectsList[i].Square  = abs(data.RsLocT[NC][i][3]);
-		mCadr.ObjectsList[i].StarID=0;
-		mCadr.ObjectsList[i].Mv=0;
-		mCadr.ObjectsList[i].Sp[0]='_';
-		mCadr.ObjectsList[i].Sp[1]='_';
-		mCadr.ObjectsList[i].Dx=0;
-		mCadr.ObjectsList[i].Dy=0;
+		objInfo.X=data.RsLocT[NC][i][0];
+		objInfo.Y=data.RsLocT[NC][i][1];
+		objInfo.Bright=data.RsLocT[NC][i][2];
+		objInfo.Square  = abs(data.RsLocT[NC][i][3]);
+		objInfo.StarID=0;
+		objInfo.Mv=0;
+		objInfo.Sp[0]='_';
+		objInfo.Sp[1]='_';
+		objInfo.Dx=0;
+		objInfo.Dy=0;
+		mCadr.ObjectsList.push_back(objInfo);
 	}
 
 	if (NC) {

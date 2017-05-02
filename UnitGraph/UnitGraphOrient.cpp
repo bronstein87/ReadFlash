@@ -23,51 +23,51 @@ __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 void TFormGraphOrient::CreateGraph()
 {
 
-				  int numberOfSeries = 0;
-				  LineSeries[numberOfSeries]= new TLineSeries(ChartAl);
-				  ChartAl->AddSeries(LineSeries[numberOfSeries]);
-				  numberOfSeries++;
-				  LineSeries[numberOfSeries]= new TLineSeries(ChartDl);
-				  ChartDl->AddSeries(LineSeries[numberOfSeries]);
-				  numberOfSeries++;
-				  LineSeries[numberOfSeries]= new TLineSeries(ChartAz);
-				  ChartAz->AddSeries(LineSeries[numberOfSeries]);
-				  numberOfSeries++;
-				  LineSeries[numberOfSeries]= new TLineSeries(ChartWx);
-				  ChartWx->AddSeries(LineSeries[numberOfSeries]);
-				  numberOfSeries++;
-				  LineSeries[numberOfSeries]= new TLineSeries(ChartWy);
-				  ChartWy->AddSeries(LineSeries[numberOfSeries]);
-				  numberOfSeries++;
-				  LineSeries[numberOfSeries]= new TLineSeries(ChartWz);
-				  ChartWz->AddSeries(LineSeries[numberOfSeries]);
-				  numberOfSeries++;
-				  LineSeries[numberOfSeries]= new TLineSeries(ChartMx);
-				  ChartMx->AddSeries(LineSeries[numberOfSeries]);
-				  numberOfSeries++;
-				  LineSeries[numberOfSeries]= new TLineSeries(ChartMy);
-				  ChartMy->AddSeries(LineSeries[numberOfSeries]);
-				  numberOfSeries++;
-				  LineSeries[numberOfSeries]= new TLineSeries(ChartNst);
-				  ChartNst->AddSeries(LineSeries[numberOfSeries]);
-				  numberOfSeries++;
-				  LineSeries[numberOfSeries]= new TLineSeries(ChartFoc);
-				  ChartFoc->AddSeries(LineSeries[numberOfSeries]);
-				  numberOfSeries++;
-				  LineSeries[numberOfSeries]= new TLineSeries(ChartX0);
-				  ChartX0->AddSeries(LineSeries[numberOfSeries]);
-				  numberOfSeries++;
-				  LineSeries[numberOfSeries]= new TLineSeries(ChartY0);
-				  ChartY0->AddSeries(LineSeries[numberOfSeries]);
-				  numberOfSeries++;
-				  LineSeries[numberOfSeries]= new TLineSeries(ChartFone);
-				  ChartFone->AddSeries(LineSeries[numberOfSeries]);
-				  numberOfSeries++;
-				  LineSeries[numberOfSeries]= new TLineSeries(ChartNoise);
-				  ChartNoise->AddSeries(LineSeries[numberOfSeries]);
-				  numberOfSeries++;
-				  LineSeries[numberOfSeries]= new TLineSeries(ChartNloc);
-				  ChartNloc->AddSeries(LineSeries[numberOfSeries]);
+	int numberOfSeries = 0;
+	LineSeries[numberOfSeries]= new TLineSeries(ChartAl);
+	ChartAl->AddSeries(LineSeries[numberOfSeries]);
+	numberOfSeries++;
+	LineSeries[numberOfSeries]= new TLineSeries(ChartDl);
+	ChartDl->AddSeries(LineSeries[numberOfSeries]);
+	numberOfSeries++;
+	LineSeries[numberOfSeries]= new TLineSeries(ChartAz);
+	ChartAz->AddSeries(LineSeries[numberOfSeries]);
+	numberOfSeries++;
+	LineSeries[numberOfSeries]= new TLineSeries(ChartWx);
+	ChartWx->AddSeries(LineSeries[numberOfSeries]);
+	numberOfSeries++;
+	LineSeries[numberOfSeries]= new TLineSeries(ChartWy);
+	ChartWy->AddSeries(LineSeries[numberOfSeries]);
+	numberOfSeries++;
+	LineSeries[numberOfSeries]= new TLineSeries(ChartWz);
+	ChartWz->AddSeries(LineSeries[numberOfSeries]);
+	numberOfSeries++;
+	LineSeries[numberOfSeries]= new TLineSeries(ChartMx);
+	ChartMx->AddSeries(LineSeries[numberOfSeries]);
+	numberOfSeries++;
+	LineSeries[numberOfSeries]= new TLineSeries(ChartMy);
+	ChartMy->AddSeries(LineSeries[numberOfSeries]);
+	numberOfSeries++;
+	LineSeries[numberOfSeries]= new TLineSeries(ChartNst);
+	ChartNst->AddSeries(LineSeries[numberOfSeries]);
+	numberOfSeries++;
+	LineSeries[numberOfSeries]= new TLineSeries(ChartFoc);
+	ChartFoc->AddSeries(LineSeries[numberOfSeries]);
+	numberOfSeries++;
+	LineSeries[numberOfSeries]= new TLineSeries(ChartX0);
+	ChartX0->AddSeries(LineSeries[numberOfSeries]);
+	numberOfSeries++;
+	LineSeries[numberOfSeries]= new TLineSeries(ChartY0);
+	ChartY0->AddSeries(LineSeries[numberOfSeries]);
+	numberOfSeries++;
+	LineSeries[numberOfSeries]= new TLineSeries(ChartFone);
+	ChartFone->AddSeries(LineSeries[numberOfSeries]);
+	numberOfSeries++;
+	LineSeries[numberOfSeries]= new TLineSeries(ChartNoise);
+	ChartNoise->AddSeries(LineSeries[numberOfSeries]);
+	numberOfSeries++;
+	LineSeries[numberOfSeries]= new TLineSeries(ChartNloc);
+	ChartNloc->AddSeries(LineSeries[numberOfSeries]);
 
 
 }
@@ -693,7 +693,7 @@ void  TFormGraphOrient::DrawAnimateHandler(void)
 {
 	try
 	{
-		struct CadrInfo CurCadr;
+		CadrInfo CurCadr;
 		int cnt=StrToInt(EditNumCadr->Text);
 
 		if (!this->GetCadrInfo(cnt, CurCadr))
@@ -862,7 +862,7 @@ void GetFileTitles(AnsiString file_name, AnsiString *file_title)
 int TFormGraphOrient::GetCadrInfo(int NC, struct CadrInfo &mCadr)
 {
 	if ((NC>=0)&&(NC<vCadrInfo.size()))
-		mCadr=vCadrInfo[NC];
+		mCadr = vCadrInfo[NC];
 	else
 		return -1;
 
@@ -1163,7 +1163,8 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 	//SaveSLEZH_IKI
 /**
 			  for (int i=0; i<mDataSLEZH.NumLoc; i++) {
-				StructIKI->StarsData.StarsList[i].X_coordinate=mDataSLEZH.RsLocT[i][0];
+				StructIKI->StarsData.StarsList
+				[i].X_coordinate=mDataSLEZH.RsLocT[i][0];
 				StructIKI->StarsData.StarsList[i].Y_coordinate=mDataSLEZH.RsLocT[i][1];
 				StructIKI->StarsData.StarsList[i].BrightnessObject=mDataSLEZH.RsLocT[i][2];
 				StructIKI->StarsData.StarsList[i].PixelsCount=mDataSLEZH.RsLocT[i][3];
@@ -1644,18 +1645,20 @@ void ConvertDataDTMI(struct DTMI tmi, struct CadrInfo &mCadr)
 //	mCadr.Time=data.Tpr_sec+data.Tpr_msec/1000.;
 	mCadr.CountLocalObj=32;//tmi.nFixedObj;
 //	mCadr.CountDeterObj=tmi.NumDet;
-	mCadr.ObjectsList = new struct ObjectsInfo[mCadr.CountLocalObj];
+
+	ObjectsInfo objInfo;
 	for (int i=0; i<mCadr.CountLocalObj; i++) {
-		mCadr.ObjectsList[i].X=tmi.LocalList[i][0];
-		mCadr.ObjectsList[i].Y=tmi.LocalList[i][1];
-		mCadr.ObjectsList[i].Bright=tmi.LocalList[i][2];
-		mCadr.ObjectsList[i].Square  =abs(tmi.LocalList[i][3]);
-		mCadr.ObjectsList[i].Dx=0;
-		mCadr.ObjectsList[i].Dy=0;
-		mCadr.ObjectsList[i].StarID=0;
-		mCadr.ObjectsList[i].Mv=0;
-		mCadr.ObjectsList[i].Sp[0]='_';
-		mCadr.ObjectsList[i].Sp[1]='_';
+		objInfo.X=tmi.LocalList[i][0];
+		objInfo.Y=tmi.LocalList[i][1];
+		objInfo.Bright=tmi.LocalList[i][2];
+		objInfo.Square  =abs(tmi.LocalList[i][3]);
+		objInfo.Dx=0;
+		objInfo.Dy=0;
+		objInfo.StarID=0;
+		objInfo.Mv=0;
+		objInfo.Sp[0]='_';
+		objInfo.Sp[1]='_';
+		mCadr.ObjectsList.push_back(objInfo);
 	}
 	mCadr.CountBlock=0;
 	mCadr.CountWindows=0;
@@ -1824,7 +1827,7 @@ void readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
 	while(!in.eof())
 	{
 		   std::getline(in,line);
-		   if(line.find("Номер такта") != std::string::npos)
+		   if(line.find("Состав ДТМИ ЛОК:") != std::string::npos)
 		   {
 				CadrInfo cadrInfo;
 				// считываем время привязки
@@ -1832,51 +1835,54 @@ void readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
 				{
 					in >> cadrInfo.Time;
 				}
-				else throw ("Порядок считывания протокола нарушен");
+				else throw (string("Cчитывание протокола завершено необычным образом."
+				"Возможно работа прибора была остановлена."));
 
 				// ищем число локализованных объектов
 				if(findWord(in,"объектов") != std::string::npos)
 				{
 					in >> cadrInfo.CountLocalObj;
-					//ShowMessage(cadrInfo.CountLocalObj);
 				}
-				else throw ("Порядок считывания протокола нарушен");
+
+				else throw (string("Cчитывание протокола завершено необычным образом."
+				"Возможно работа прибора была остановлена."));
+
 
 				  //ищем число распознанных объектов
 				if(findWord(in,"объектов") != std::string::npos)
 				{
 					in >> cadrInfo.CountDeterObj;
-					//ShowMessage(cadrInfo.CountDeterObj);
 				}
-				else throw ("Порядок считывания протокола нарушен");
+				else throw (string("Cчитывание протокола завершено необычным образом."
+				"Возможно работа прибора была остановлена."));
 
 				// ищем начало массива лок
 				if(findLine(in,"	Х			Y			I			N") != -1)
 				{
 					vector<string> splittedLocData;
 					int maxCountLocObj = 32;
-					ObjectsInfo* objectsList = new ObjectsInfo[maxCountLocObj];
-
+					ObjectsInfo objInfo;
 					for(int i = 0 ; i < maxCountLocObj; i ++)
 					{
 						std::getline(in,line);
 						splittedLocData = split(line,'\t');
-						
-						objectsList[i].X = std::atof (splittedLocData[1].c_str());
-						objectsList[i].Y = std::atof (splittedLocData[2].c_str());
-						objectsList[i].Bright = std::atof (splittedLocData[3].c_str());
-						objectsList[i].Square = std::atoi (splittedLocData[4].c_str()); 
+						objInfo.X = std::atof (splittedLocData[1].c_str());
+						objInfo.Y = std::atof (splittedLocData[2].c_str());
+						objInfo.Bright = std::atof (splittedLocData[3].c_str());
+						objInfo.Square = std::atoi (splittedLocData[4].c_str());
+						cadrInfo.ObjectsList.push_back(objInfo);
 
 					}
 
-				   cadrInfo.ObjectsList = objectsList;
+
 				}
-				else throw ("Порядок считывания протокола нарушен");
+				else throw (string("Cчитывание протокола завершено необычным образом."
+				"Возможно работа прибора была остановлена."));
 				cadrInfoVec.push_back(cadrInfo);
 		   }
 
 	}
-
+	ShowMessage(cadrInfoVec.size());
 }
 
 void readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
@@ -1893,11 +1899,12 @@ void readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
 			{
 				in >> cadrInfo.Time;
 			}
-		   else throw ("Порядок считывания протокола нарушен");
+		   else throw (string("Cчитывание протокола завершено необычным образом."
+				"Возможно работа прибора была остановлена."));
 
 		   if(findLine(in,"4) Кватернион ориентации, Qо") != std::string::npos)
 		   {
-				
+
 				for(int i = 0; i < 4; i++)
 				{
 					std::getline(in,line);
@@ -1908,7 +1915,8 @@ void readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
 				
 
 		   }
-		   else throw ("Порядок считывания протокола нарушен");
+		   else throw (string("Cчитывание протокола завершено необычным образом."
+				"Возможно работа прибора была остановлена."));
 		   
 
 		
@@ -1916,39 +1924,40 @@ void readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
 		   if(findWord(in,"объектов") != std::string::npos)
 		   {
 				in >> cadrInfo.CountLocalObj;
-				//ShowMessage(cadrInfo.CountLocalObj);
 		   }
-		   else throw ("Порядок считывания протокола нарушен");
+		   else throw (string("Cчитывание протокола завершено необычным образом."
+				"Возможно работа прибора была остановлена."));
 
 				 // ищем число распознанных объектов
 		   if(findWord(in,"объектов") != std::string::npos)
 		   {
 				in >> cadrInfo.CountDeterObj;
-					//ShowMessage(cadrInfo.CountDeterObj);
 		   }
-		   else throw ("Порядок считывания протокола нарушен");
+		   else throw (string("Cчитывание протокола завершено необычным образом."
+				"Возможно работа прибора была остановлена."));
 
 				// ищем начало массива лок
 		   if(findLine(in,"	Х			Y			I			N") != -1)
 		   {
 				vector<string> splittedLocData;
 				int maxCountLocObj = 16;
-				ObjectsInfo* objectsList = new ObjectsInfo[maxCountLocObj];
+				ObjectsInfo objInfo;
 
 				for(int i = 0 ; i < maxCountLocObj; i ++)
 				{
-					std::getline(in,line);
-					splittedLocData = split(line,'\t');
-						
-					objectsList[i].X = std::atof (splittedLocData[1].c_str());
-					objectsList[i].Y = std::atof (splittedLocData[2].c_str());
-					objectsList[i].Bright = std::atof (splittedLocData[3].c_str());
-
+						std::getline(in,line);
+						splittedLocData = split(line,'\t');
+						objInfo.X = std::atof (splittedLocData[1].c_str());
+						objInfo.Y = std::atof (splittedLocData[2].c_str());
+						objInfo.Bright = std::atof (splittedLocData[3].c_str());
+						objInfo.Square = std::atoi (splittedLocData[4].c_str());
+						cadrInfo.ObjectsList.push_back(objInfo);
 				}
-				cadrInfo.ObjectsList = objectsList;
+
 
 		   }
-			else throw ("Порядок считывания протокола нарушен");
+			else throw (string("Cчитывание протокола завершено необычным образом."
+				"Возможно работа прибора была остановлена."));
 
 		   if(findLine(in,"14) Проекции угловой скорости на оси ПСК") != std::string::npos)
 		   {
@@ -1960,29 +1969,34 @@ void readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
 				}
 				
 		   }
-		   else throw ("Порядок считывания протокола нарушен");
+		   else throw (string("Cчитывание протокола завершено необычным образом."
+				"Возможно работа прибора была остановлена."));
 
 	   
 		   if(findLine(in,"15) Координаты центров фрагментов") != std::string::npos)
 		   {
-				WindowsInfo *WindowsList = new WindowsInfo [16];
-				for(int i = 0; i < 16; i++)
+				WindowsInfo winInfo;
+				const int maxCountOfObjects = 16;
+				for(int i = 0; i < maxCountOfObjects; i++)
 				{
 					std::getline(in,line);
 					vector<string> splittedStr = split(line,'\t');
+
 					if(std::atoi(splittedStr[1].c_str()) == 0)
 					{
 						cadrInfo.CountWindows = i + 1;
 						break;
 					}
 					
-					WindowsList[i].Xstart = (std::atoi(splittedStr[1].c_str()));
-					WindowsList[i].Ystart = (std::atoi(splittedStr[2].c_str()));
+					winInfo.Xstart = (std::atoi(splittedStr[1].c_str()));
+					winInfo.Ystart = (std::atoi(splittedStr[2].c_str()));
+					cadrInfo.WindowsList.push_back(winInfo);
 				}
-				cadrInfo.WindowsList =  WindowsList;
+
 				
 		   }
-		   else throw ("Порядок считывания протокола нарушен");
+		  else throw (string("Cчитывание протокола завершено необычным образом."
+				"Возможно работа прибора была остановлена."));
 
 		   if(findLine(in,"16) Значение порогов во фрагментах") != std::string::npos)
 		   {
@@ -1994,7 +2008,8 @@ void readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
 				}
 				
 		   }
-		   else throw ("Порядок считывания протокола нарушен");
+		   else throw (string("Cчитывание протокола завершено необычным образом."
+				"Возможно работа прибора была остановлена."));
 
 		   
 		   if(findLine(in,"17) Количество объектов во фрагментах") != std::string::npos)
@@ -2007,10 +2022,11 @@ void readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
 				}
 				
 		   }
-		   else throw ("Порядок считывания протокола нарушен");
+		   else throw (string("Cчитывание протокола завершено необычным образом."
+				"Возможно работа прибора была остановлена."));
 
 		   
-			cadrInfoVec.push_back(cadrInfo);  
+			cadrInfoVec.push_back(cadrInfo);
 		}
 		
 	}
@@ -2020,9 +2036,12 @@ void readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
 
 void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 {
-     OpenDialog1->Filter="txt|*.txt";
-	if (OpenDialog1->Execute()) {
 
+	try
+	{
+	 OpenDialog1->Filter="txt|*.txt";
+	if (OpenDialog1->Execute()) {
+		vCadrInfo.clear();
 		FileName=OpenDialog1->FileName;
 		SetCurrentDir(ExtractFileDir(FileName));
 		GetFileTitles(FileName,&FileTitle);
@@ -2043,6 +2062,17 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 			readBOKZ60Protocol(in,vCadrInfo);
 		}
 
+	}
+	}
+
+	catch(std::string &s)
+	{
+		ShowMessage(s.c_str());
+	}
+
+	catch(std::exception &e)
+	{
+		ShowMessage(e.what());
 	}
 }
 
