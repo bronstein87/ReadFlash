@@ -171,8 +171,8 @@
 		  bool &Handled);
 		void __fastcall MenuOpenFlashClick(TObject *Sender);
 		void __fastcall MenuOpenTMIClick(TObject *Sender);
-	void __fastcall EditNumCadrChange(TObject *Sender);
-	void __fastcall BOKZ60ParseProtocolClick(TObject *Sender);
+		void __fastcall EditNumCadrChange(TObject *Sender);
+		void __fastcall BOKZ60ParseProtocolClick(TObject *Sender);
 
 
 
@@ -195,6 +195,8 @@
 		AnsiString SortRawFlashFile(const AnsiString &RawFileName);
 		void __fastcall ImageOnClick(TObject *Sender,
 		TMouseButton Button, TShiftState Shift, int X, int Y);
+		void readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
+		void readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
 
 
 

@@ -319,7 +319,7 @@ object FormGraphOrient: TFormGraphOrient
         Title.Font.Height = -13
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
-          #1063#1080#1089#1083#1086' '#1092#1088#1072#1075#1072#1084#1077#1085#1090#1086#1074)
+          #1063#1080#1089#1083#1086' '#1092#1088#1072#1075#1084#1077#1085#1090#1086#1074)
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
         View3D = False

@@ -24,7 +24,6 @@
 	void __fastcall  TMainForm::MenuLookClick(TObject *Sender)
 	{
 		TFormGraphOrient *FormGraphOrient= new  TFormGraphOrient(this);
-		TFormAnimateSetting* lol;
 		FormGraphOrient->Show();
 	}
 	//---------------------------------------------------------------------------

@@ -167,7 +167,7 @@ void TFormGraphOrient::SetVisible(int CheckLine, bool tf)
 {
   for (int num=NumGraph*CheckLine; num<NumGraph*(CheckLine+1); num++)
   {
-	if (LineSeries[num]!=NULL)
+	if (LineSeries[num] != NULL)
 	{
 	  LineSeries[num]->Visible=tf;
 	}
@@ -369,8 +369,8 @@ unsigned short Border=10;
 	Chart1->BottomAxis->Maximum=mCadr.ImageWidth;
 
 //DrawBlocks()
-	CountLines=0;
-	CountBlock=mCadr.CountBlock;
+	CountLines = 0;
+	CountBlock = mCadr.CountBlock;
 	if (CountBlock>MaxBlockSeries) {
 		ShowMessage("Превышено число допустимых блоков!");
 		CountBlock=MaxBlockSeries;
@@ -392,7 +392,7 @@ unsigned short Border=10;
 	}
 
 //DrawWindows()
-	for (int i=0; i<mCadr.CountWindows; i++)
+	for (int i=0; i < mCadr.CountWindows; i++)
 	{
 		FrameSeries[i]->X0=mCadr.WindowsList[i].Xstart;
 		FrameSeries[i]->X1=mCadr.WindowsList[i].Xstart
@@ -431,7 +431,7 @@ unsigned short Border=10;
 		TColor CurColor, ColorBrightDef=Series7->Color;
 		TColor ColorBright[]={ColorBrightDef, clYellow, clRed};
 		ObjShiftWnd=new unsigned short [mCadr.CountWindows];
-		CountLocalObj=0;
+		CountLocalObj = 0;
 		for (int k=0;k<mCadr.CountWindows; k++)
 		{
 			if (!k) ObjShiftWnd[k]=0;
@@ -467,7 +467,7 @@ unsigned short Border=10;
 			}
 		}
 
-		if (CountLocalObj!=mCadr.CountLocalObj) {
+		if (CountLocalObj != mCadr.CountLocalObj) {
 			ShowMessage("Несоответствие числа фрагментов и массива ObjFrag[]!");
 		}
 		delete [] ObjShiftWnd;
@@ -532,7 +532,8 @@ double X0, Y0, X1, Y1, Dx, Dy, Ist, Nel;
 //						(int)(sqrtm(mCadr.StarsList[i].Square)+1));
 
   }
-  DrawBlock(mCadr);
+
+  if(mCadr.CountBlock) DrawBlock(mCadr);
   PrintTableWindows(mCadr);
   PrintTableObjects(mCadr);
   DrawFragment(mCadr);
@@ -1800,61 +1801,62 @@ size_t findLine(Stream& in,const std::string& line)
 
 }
 
-template <typename Out>
-void split(const std::string &s, char delim, Out result) {
-	std::stringstream ss;
-	ss.str(s);
-	std::string item;
-	while (std::getline(ss, item, delim))
-	{
-		result = item;
-	}
+vector<string> split(const string& str, const string& delim)
+{
+    vector<string> tokens;
+    size_t prev = 0, pos = 0;
+    do
+    {
+        pos = str.find(delim, prev);
+        if (pos == string::npos) pos = str.length();
+		string token = str.substr(prev, pos-prev);
+        if (!token.empty()) tokens.push_back(token);
+        prev = pos + delim.length();
+    }
+    while (pos < str.length() && prev < str.length());
+
+	return tokens;
 }
 
 
-std::vector<std::string> split(const std::string &s, char delim) {
 
-	std::vector<std::string> elems;
-    split(s, delim, std::back_inserter(elems));
-    return elems;
-}
-
-
-
-void readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
+void TFormGraphOrient::readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
 {
 	std::string line;
+	string errorMessage = string("Cчитывание протокола завершено необычным образом. "
+				"Возможно работа прибора была остановлена.");
 	while(!in.eof())
 	{
 		   std::getline(in,line);
 		   if(line.find("Состав ДТМИ ЛОК:") != std::string::npos)
 		   {
 				CadrInfo cadrInfo;
+				cadrInfo.CountBlock=0;
+				cadrInfo.CountStars=0;
 				// считываем время привязки
 				if(findWord(in,"информации") != std::string::npos)
 				{
 					in >> cadrInfo.Time;
 				}
-				else throw (string("Cчитывание протокола завершено необычным образом."
-				"Возможно работа прибора была остановлена."));
+				else throw (errorMessage);
 
 				// ищем число локализованных объектов
 				if(findWord(in,"объектов") != std::string::npos)
 				{
 					in >> cadrInfo.CountLocalObj;
+					this->LineSeries[10]->AddXY(cadrInfo.Time,cadrInfo.CountLocalObj);
 				}
 
-				else throw (string("Cчитывание протокола завершено необычным образом."
-				"Возможно работа прибора была остановлена."));
+				else throw (errorMessage);
 
 
 				  //ищем число распознанных объектов
 				if(findWord(in,"объектов") != std::string::npos)
 				{
 					in >> cadrInfo.CountDeterObj;
+					this->LineSeries[11]->AddXY(cadrInfo.Time,cadrInfo.CountDeterObj);
 				}
-				else throw (string("Cчитывание протокола завершено необычным образом."
-				"Возможно работа прибора была остановлена."));
+				else throw (errorMessage);
 
 				// ищем начало массива лок
 				if(findLine(in,"	Х			Y			I			N") != -1)
@@ -1865,29 +1867,42 @@ void readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
 					for(int i = 0 ; i < maxCountLocObj; i ++)
 					{
 						std::getline(in,line);
-						splittedLocData = split(line,'\t');
-						objInfo.X = std::atof (splittedLocData[1].c_str());
-						objInfo.Y = std::atof (splittedLocData[2].c_str());
-						objInfo.Bright = std::atof (splittedLocData[3].c_str());
-						objInfo.Square = std::atoi (splittedLocData[4].c_str());
-						cadrInfo.ObjectsList.push_back(objInfo);
+						// см. эту строку в протоколе, чтобы понять почему так
+						splittedLocData = split(line,")\t");
+						splittedLocData = split(splittedLocData[1],"\t");
 
+						objInfo.X = std::atof (splittedLocData[0].c_str());
+						objInfo.Y = std::atof (splittedLocData[1].c_str());
+						objInfo.Bright = std::atof (splittedLocData[2].c_str());
+						//objInfo.Square = std::atoi (splittedLocData[3].c_str());
+						objInfo.Square = 0;
+						objInfo.StarID = 0;
+						objInfo.Mv = 0;
+						objInfo.Sp[0]='_';
+						objInfo.Sp[1]='_';
+						objInfo.Dx = 0;
+						objInfo.Dy = 0;
+						cadrInfo.ObjectsList.push_back(objInfo);
 					}
 
 
 				}
-				else throw (string("Cчитывание протокола завершено необычным образом."
-				"Возможно работа прибора была остановлена."));
+				else throw (errorMessage);
+
+				cadrInfo.CountBlock = 0;
+				cadrInfo.CountWindows = 0;
+				cadrInfo.CountStars = 0;
 				cadrInfoVec.push_back(cadrInfo);
 		   }
 
 	}
-	ShowMessage(cadrInfoVec.size());
 }
 
-void readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
+void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
 {
 	std::string line;
+	string errorMessage = string("Cчитывание протокола завершено необычным образом. "
+				"Возможно работа прибора была остановлена.");
 	while(!in.eof())
 	{
 		std::getline(in,line);
@@ -1899,44 +1914,43 @@ void readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
 			{
 				in >> cadrInfo.Time;
 			}
-		   else throw (string("Cчитывание протокола завершено необычным образом."
-				"Возможно работа прибора была остановлена."));
+		   else throw (errorMessage);
+
 
 		   if(findLine(in,"4) Кватернион ориентации, Qо") != std::string::npos)
 		   {
 
 				for(int i = 0; i < 4; i++)
 				{
-					std::getline(in,line);
-					vector<string> splittedStr = split(line,'\t');
+                    std::getline(in,line);
+					vector<string> splittedStr = split(line,"\t\t\t\t\t");
 					cadrInfo.QuatOrient[i] = std::atof(splittedStr[1].c_str());
 				}
 
-				
+
 
 		   }
-		   else throw (string("Cчитывание протокола завершено необычным образом."
-				"Возможно работа прибора была остановлена."));
-		   
+		   else throw (errorMessage);
 
-		
 
 		   if(findWord(in,"объектов") != std::string::npos)
 		   {
 				in >> cadrInfo.CountLocalObj;
-		   }
-		   else throw (string("Cчитывание протокола завершено необычным образом."
-				"Возможно работа прибора была остановлена."));
+				this->LineSeries[10]->AddXY(cadrInfo.Time,cadrInfo.CountLocalObj);
 
-				 // ищем число распознанных объектов
+		   }
+		   else throw (errorMessage);
+
+
+		   //ищем число распознанных объектов
 		   if(findWord(in,"объектов") != std::string::npos)
 		   {
 				in >> cadrInfo.CountDeterObj;
+				this->LineSeries[11]->AddXY(cadrInfo.Time,cadrInfo.CountDeterObj);
 		   }
-		   else throw (string("Cчитывание протокола завершено необычным образом."
-				"Возможно работа прибора была остановлена."));
+		   else throw (errorMessage);
 
-				// ищем начало массива лок
+		   // ищем начало массива лок
 		   if(findLine(in,"	Х			Y			I			N") != -1)
 		   {
 				vector<string> splittedLocData;
@@ -1946,31 +1960,41 @@ void readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
 				for(int i = 0 ; i < maxCountLocObj; i ++)
 				{
 						std::getline(in,line);
-						splittedLocData = split(line,'\t');
-						objInfo.X = std::atof (splittedLocData[1].c_str());
-						objInfo.Y = std::atof (splittedLocData[2].c_str());
-						objInfo.Bright = std::atof (splittedLocData[3].c_str());
-						objInfo.Square = std::atoi (splittedLocData[4].c_str());
+						splittedLocData = split(line,")\t");
+						splittedLocData = split(splittedLocData[1],"\t\t");
+
+				        objInfo.X = std::atof (splittedLocData[0].c_str());
+						objInfo.Y = std::atof (splittedLocData[1].c_str());
+						objInfo.Bright = std::atof (splittedLocData[2].c_str());
+						objInfo.Square = 0;
+						//objInfo.Square = std::atoi (splittedLocData[3].c_str());
+						objInfo.StarID = 0;
+						objInfo.Mv = 0;
+						objInfo.Sp[0]='_';
+						objInfo.Sp[1]='_';
+						objInfo.Dx = 0;
+						objInfo.Dy = 0;
 						cadrInfo.ObjectsList.push_back(objInfo);
 				}
 
 
 		   }
-			else throw (string("Cчитывание протокола завершено необычным образом."
-				"Возможно работа прибора была остановлена."));
+			else throw (errorMessage);
 
 		   if(findLine(in,"14) Проекции угловой скорости на оси ПСК") != std::string::npos)
 		   {
 				for(int i = 0; i < 3; i++)
 				{
 					std::getline(in,line);
-					vector<string> splittedStr = split(line,'\t');
+					vector<string> splittedStr = split(line,"\t");
 					cadrInfo.OmegaOrient[i] = std::atof(splittedStr[1].c_str());
 				}
-				
+				this->LineSeries[3]->AddXY(cadrInfo.Time,cadrInfo.OmegaOrient[0]*RTS);
+				this->LineSeries[4]->AddXY(cadrInfo.Time,cadrInfo.OmegaOrient[1]*RTS);
+				this->LineSeries[5]->AddXY(cadrInfo.Time,cadrInfo.OmegaOrient[2]*RTS);
+
 		   }
-		   else throw (string("Cчитывание протокола завершено необычным образом."
-				"Возможно работа прибора была остановлена."));
+		   else throw (errorMessage);
 
 	   
 		   if(findLine(in,"15) Координаты центров фрагментов") != std::string::npos)
@@ -1980,36 +2004,36 @@ void readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
 				for(int i = 0; i < maxCountOfObjects; i++)
 				{
 					std::getline(in,line);
-					vector<string> splittedStr = split(line,'\t');
+					vector<string> splittedStr = split(line,"\t");
 
 					if(std::atoi(splittedStr[1].c_str()) == 0)
 					{
-						cadrInfo.CountWindows = i + 1;
+						this->LineSeries[9]->AddXY(cadrInfo.Time,i);
 						break;
 					}
-					
-					winInfo.Xstart = (std::atoi(splittedStr[1].c_str()));
-					winInfo.Ystart = (std::atoi(splittedStr[2].c_str()));
+
+					winInfo.Xstart = (std::atof(splittedStr[1].c_str()));
+					winInfo.Ystart = (std::atof(splittedStr[2].c_str()));
 					cadrInfo.WindowsList.push_back(winInfo);
 				}
+				this->LineSeries[9]->AddXY(cadrInfo.Time,maxCountOfObjects);
+				cadrInfo.CountWindows = maxCountOfObjects;
 
-				
+
 		   }
-		  else throw (string("Cчитывание протокола завершено необычным образом."
-				"Возможно работа прибора была остановлена."));
+		  else throw (errorMessage);
 
 		   if(findLine(in,"16) Значение порогов во фрагментах") != std::string::npos)
 		   {
 				for(int i = 0; i < cadrInfo.CountWindows; i++)
 				{
 					std::getline(in,line);
-					vector<string> splittedStr = split(line,'\t');
+					vector<string> splittedStr = split(line,"\t");
 					cadrInfo.WindowsList[i].Level = std::atoi(splittedStr[1].c_str());
 				}
 				
 		   }
-		   else throw (string("Cчитывание протокола завершено необычным образом."
-				"Возможно работа прибора была остановлена."));
+		   else throw (errorMessage);
 
 		   
 		   if(findLine(in,"17) Количество объектов во фрагментах") != std::string::npos)
@@ -2017,21 +2041,23 @@ void readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
 				for(int i = 0; i < cadrInfo.CountWindows; i++)
 				{
 					std::getline(in,line);
-					vector<string> splittedStr = split(line,'\t');
+					vector<string> splittedStr = split(line,"\t");
 					cadrInfo.WindowsList[i].CountObj = std::atoi(splittedStr[1].c_str());
 				}
 				
 		   }
-		   else throw (string("Cчитывание протокола завершено необычным образом."
-				"Возможно работа прибора была остановлена."));
+		   else throw (errorMessage);
 
-		   
-			cadrInfoVec.push_back(cadrInfo);
+		   cadrInfo.CountBlock = 0;
+		   cadrInfo.CountStars = 0;
+		   cadrInfoVec.push_back(cadrInfo);
 		}
 		
 	}
 	ShowMessage(cadrInfoVec.size());
 }
+
+
 
 
 void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
@@ -2051,6 +2077,9 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 			ShowMessage("Не удалось открыть файл");
 			return;
 		}
+		this->CreateGraph();
+		this->ApplySeriesSetting("мБОКЗ-2В",
+											clBlue);
 
 		if(checkLocFile(in))
 		{
@@ -2061,6 +2090,8 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 		{
 			readBOKZ60Protocol(in,vCadrInfo);
 		}
+		ShowMessage(vCadrInfo.size());
+		this->UpDown1->Max=vCadrInfo.size();
 
 	}
 	}
