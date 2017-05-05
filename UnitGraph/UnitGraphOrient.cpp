@@ -2054,7 +2054,7 @@ void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrIn
 		}
 		
 	}
-	ShowMessage(cadrInfoVec.size());
+
 }
 
 
