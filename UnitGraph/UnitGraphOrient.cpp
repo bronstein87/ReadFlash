@@ -74,10 +74,14 @@ void TFormGraphOrient::CreateGraph()
 
 void TFormGraphOrient::DeleteGraph()
 {
-	for (int numberOfSeries = 0; numberOfSeries < NumGraph ;numberOfSeries ++)
-    {
-	  LineSeries[numberOfSeries]->Clear();
-      delete LineSeries[numberOfSeries];
+	if(LineSeries[0] != NULL)
+	{
+		for (int numberOfSeries = 0; numberOfSeries < NumGraph ;numberOfSeries ++)
+		{
+			LineSeries[numberOfSeries]->Clear();
+			delete LineSeries[numberOfSeries];
+			LineSeries[numberOfSeries] = NULL;
+		}
 	}
 
 }
@@ -361,12 +365,12 @@ void TFormGraphOrient::DrawBlock(const struct CadrInfo &mCadr)
 unsigned short CountLines, CountBlock, TabTakeAway[MaxBlockSeries][2];
 unsigned short Border=10;
 
-	Chart1->LeftAxis->Automatic=false;
-	Chart1->LeftAxis->Minimum=0;
-	Chart1->LeftAxis->Maximum=mCadr.ImageHeight;
-	Chart1->BottomAxis->Automatic=false;
-	Chart1->BottomAxis->Minimum=0;
-	Chart1->BottomAxis->Maximum=mCadr.ImageWidth;
+	Chart1->LeftAxis->Automatic = false;
+	Chart1->LeftAxis->Minimum = 0;
+	Chart1->LeftAxis->Maximum = mCadr.ImageHeight;
+	Chart1->BottomAxis->Automatic = false;
+	Chart1->BottomAxis->Minimum = 0;
+	Chart1->BottomAxis->Maximum = mCadr.ImageWidth;
 
 //DrawBlocks()
 	CountLines = 0;
@@ -432,7 +436,7 @@ unsigned short Border=10;
 		TColor ColorBright[]={ColorBrightDef, clYellow, clRed};
 		ObjShiftWnd=new unsigned short [mCadr.CountWindows];
 		CountLocalObj = 0;
-		for (int k=0;k<mCadr.CountWindows; k++)
+		for (int k=0;k < mCadr.CountWindows; k++)
 		{
 			if (!k) ObjShiftWnd[k]=0;
 			else ObjShiftWnd[k]=ObjShiftWnd[k-1]+mCadr.WindowsList[k-1].CountObj;
@@ -468,6 +472,7 @@ unsigned short Border=10;
 		}
 
 		if (CountLocalObj != mCadr.CountLocalObj) {
+
 			ShowMessage("Несоответствие числа фрагментов и массива ObjFrag[]!");
 		}
 		delete [] ObjShiftWnd;
@@ -533,7 +538,8 @@ double X0, Y0, X1, Y1, Dx, Dy, Ist, Nel;
 
   }
 
-  if(mCadr.CountBlock) DrawBlock(mCadr);
+
+  DrawBlock(mCadr);
   PrintTableWindows(mCadr);
   PrintTableObjects(mCadr);
   DrawFragment(mCadr);
@@ -594,7 +600,7 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 		return;
    }
 
-	for(int CurrentFragment=0;CurrentFragment<mCadr.CountWindows;CurrentFragment++)
+	for(int CurrentFragment = 0;CurrentFragment < mCadr.CountWindows;CurrentFragment++)
 	{
 		int FragmentWidth=mCadr.WindowsList [CurrentFragment].Width;
 		int FragmentHeight=mCadr.WindowsList [CurrentFragment].Height;
@@ -783,9 +789,8 @@ void GetFileTitles(AnsiString file_name, AnsiString *file_title)
 
 			  std::vector<RawFileInfo>  RawFileInfoVector;
 			  int Marker;
-			   while(!feof(RawFlashFile))
+			   while(fread(&Marker,sizeof(int),1,RawFlashFile) == 1)
 			   {
-					fread(&Marker,sizeof(int),1,RawFlashFile);
 					if (GetInt(Marker)==0x55550000)
 					{
 							RawFileInfo CurrentInfo;
@@ -808,6 +813,11 @@ void GetFileTitles(AnsiString file_name, AnsiString *file_title)
 							RawFileInfoVector.push_back(CurrentInfo);
 
 					}
+			   }
+
+			   if(ferror(RawFlashFile))
+			   {
+                    throw("Ошибка чтения файла");
 			   }
 
 			   // забиваем вручную для последней структуры
@@ -862,7 +872,7 @@ void GetFileTitles(AnsiString file_name, AnsiString *file_title)
 
 int TFormGraphOrient::GetCadrInfo(int NC, struct CadrInfo &mCadr)
 {
-	if ((NC>=0)&&(NC<vCadrInfo.size()))
+	if ((NC >= 0)&&(NC < vCadrInfo.size()))
 		mCadr = vCadrInfo[NC];
 	else
 		return -1;
@@ -887,7 +897,8 @@ void __fastcall TFormGraphOrient::FormClose(TObject *Sender, TCloseAction &Actio
 
 void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 {
-
+  try
+  {
   OpenDialog1->Filter="dat|*.dat";
   if (OpenDialog1->Execute()) {
 		vCadrInfo.clear();
@@ -972,6 +983,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 						"mean_bf","sigma_bf","mean_fr","sigma_fr");
 
 
+        this->DeleteGraph();
 		this->CreateGraph();
 		this->ApplySeriesSetting("мБОКЗ-2В",
 											clBlue);//ColorRes[FormGraphOrient->NumLine]);
@@ -1317,7 +1329,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 			  PrintDataFrag(ftxt, mDataFragHdr);
 
 			  FragID++;
-              int NumPixF=0;
+			  int NumPixF = 0;
 			  NumPixF=mDataFragHdr.NumPix;
 			  unsigned short buf_frag[MaxPix];
 			  fread(buf_frag, sizeof(short),NumPixF, fflesh);
@@ -1353,10 +1365,21 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 		fclose(flog_pix);
 		fclose(flog_orient);
 
-
+		this->EditNumCadr->Text=0;
 		this->UpDown1->Max=vCadrInfo.size();
 
 	 }
+  }
+  	catch(std::string &s)
+	{
+		ShowMessage(s.c_str());
+	}
+
+	catch(std::exception &e)
+	{
+		ShowMessage(e.what());
+	}
+
 }
 
 
@@ -1766,17 +1789,22 @@ template <typename Stream>
 size_t findWord(Stream& in,const std::string& word)
 {
   std::string lineToWrite;
-  while(lineToWrite.find(word) == std::string::npos && !in.eof())
+  while(in >> lineToWrite )
   {
-	in >> lineToWrite;
+	if( lineToWrite.find(word) != std::string::npos )
+	{
+		return  in.tellg() - lineToWrite.size();
+	}
   }
 
-  if(in.eof())
+  // если это ошибка, а не конец файла - бросаем исключение
+  if(in.fail())
   {
-	 return std::string::npos;
+	 throw(string("Ошибка считывания файла"));
   }
 
-  return in.tellg() - lineToWrite.size();
+  // иначе это конец файла, возвращаем идентификатор неудачного поиска
+  return std::string::npos;
 
 
 }
@@ -1785,18 +1813,22 @@ template <typename Stream>
 size_t findLine(Stream& in,const std::string& line)
 {
   std::string lineToWrite;
-  while(lineToWrite.find(line) == std::string::npos && !in.eof())
+  while(std::getline(in,lineToWrite))
   {
-	  std::getline(in,lineToWrite);
+   if( lineToWrite.find(line) != std::string::npos )
+	{
+		return  in.tellg() - lineToWrite.size();
+	}
   }
 
-  if(in.eof())
+  // если это ошибка, а не конец файла - бросаем исключение
+  if(in.fail())
   {
-	 return std::string::npos;
+	 throw(string("Ошибка считывания файла"));
   }
 
-  return in.tellg() - lineToWrite.size();
-
+  // иначе это конец файла, возвращаем идентификатор неудачного поиска
+  return std::string::npos;
 
 
 }
@@ -1825,9 +1857,8 @@ void TFormGraphOrient::readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cad
 	std::string line;
 	string errorMessage = string("Cчитывание протокола завершено необычным образом. "
 				"Возможно работа прибора была остановлена.");
-	while(!in.eof())
+	while(std::getline(in,line))
 	{
-		   std::getline(in,line);
 		   if(line.find("Состав ДТМИ ЛОК:") != std::string::npos)
 		   {
 				CadrInfo cadrInfo;
@@ -1882,6 +1913,7 @@ void TFormGraphOrient::readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cad
 						objInfo.Sp[1]='_';
 						objInfo.Dx = 0;
 						objInfo.Dy = 0;
+
 						cadrInfo.ObjectsList.push_back(objInfo);
 					}
 
@@ -1903,9 +1935,9 @@ void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrIn
 	std::string line;
 	string errorMessage = string("Cчитывание протокола завершено необычным образом. "
 				"Возможно работа прибора была остановлена.");
-	while(!in.eof())
+	while(std::getline(in,line))
 	{
-		std::getline(in,line);
+
 		if(line.find("и) Ориентация				определена") != std::string::npos)
 		{
 		   CadrInfo cadrInfo;
@@ -1965,7 +1997,7 @@ void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrIn
 
 				        objInfo.X = std::atof (splittedLocData[0].c_str());
 						objInfo.Y = std::atof (splittedLocData[1].c_str());
-						objInfo.Bright = std::atof (splittedLocData[2].c_str());
+						objInfo.Bright = std::atof(splittedLocData[2].c_str());
 						objInfo.Square = 0;
 						//objInfo.Square = std::atoi (splittedLocData[3].c_str());
 						objInfo.StarID = 0;
@@ -2001,23 +2033,27 @@ void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrIn
 		   {
 				WindowsInfo winInfo;
 				const int maxCountOfObjects = 16;
-				for(int i = 0; i < maxCountOfObjects; i++)
+				cadrInfo.CountWindows = maxCountOfObjects;
+				for(int i = 0; i < cadrInfo.CountWindows; i++)
 				{
 					std::getline(in,line);
 					vector<string> splittedStr = split(line,"\t");
 
 					if(std::atoi(splittedStr[1].c_str()) == 0)
 					{
+						cadrInfo.CountWindows = i;
 						this->LineSeries[9]->AddXY(cadrInfo.Time,i);
 						break;
 					}
 
 					winInfo.Xstart = (std::atof(splittedStr[1].c_str()));
 					winInfo.Ystart = (std::atof(splittedStr[2].c_str()));
+					winInfo.Mean = 0;
+					winInfo.Sigma = 0;
 					cadrInfo.WindowsList.push_back(winInfo);
 				}
 				this->LineSeries[9]->AddXY(cadrInfo.Time,maxCountOfObjects);
-				cadrInfo.CountWindows = maxCountOfObjects;
+
 
 
 		   }
@@ -2031,7 +2067,7 @@ void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrIn
 					vector<string> splittedStr = split(line,"\t");
 					cadrInfo.WindowsList[i].Level = std::atoi(splittedStr[1].c_str());
 				}
-				
+
 		   }
 		   else throw (errorMessage);
 
@@ -2068,7 +2104,7 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 	 OpenDialog1->Filter="txt|*.txt";
 	if (OpenDialog1->Execute()) {
 		vCadrInfo.clear();
-		FileName=OpenDialog1->FileName;
+		FileName = OpenDialog1->FileName;
 		SetCurrentDir(ExtractFileDir(FileName));
 		GetFileTitles(FileName,&FileTitle);
 
@@ -2077,6 +2113,7 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 			ShowMessage("Не удалось открыть файл");
 			return;
 		}
+		this->DeleteGraph();
 		this->CreateGraph();
 		this->ApplySeriesSetting("мБОКЗ-2В",
 											clBlue);
@@ -2091,6 +2128,7 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 			readBOKZ60Protocol(in,vCadrInfo);
 		}
 		ShowMessage(vCadrInfo.size());
+		this->EditNumCadr->Text=0;
 		this->UpDown1->Max=vCadrInfo.size();
 
 	}
