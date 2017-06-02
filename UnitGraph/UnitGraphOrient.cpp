@@ -115,7 +115,7 @@ unsigned int SaveHeigth, SaveWidth;
 		SaveWidth=Chart->Width;
 		Chart->Visible=false;      // paint user's size image
 		Chart->Height=StrToInt(this->EditSizeY->Text);
-		Chart->Width=StrToInt(this->EditSizeX->Text);
+		Chart->Width=StrToInt(EditSizeX->Text);
 		Chart->SaveToBitmapFile(suff+".bmp");   // save image
 		Chart->Visible=true;      // return souse size image
 		Chart->Height=SaveHeigth;
@@ -151,17 +151,17 @@ void TFormGraphOrient::ApplySeriesSetting(AnsiString Title, TColor color)
 //  MainForm->SeriesColor[CheckLine]=ColorBoxSeries->Selected;
 //  MainForm->SeriesLineWidth[CheckLine]=StrToInt(EditLineWidth->Text);
 
-  for (int numberOfSeries = 0; numberOfSeries < NumGraph; numberOfSeries++)
+  for (int numberOfSeries = 0; numberOfSeries < NumGraph; numberOfSeries ++)
   {
 	if (LineSeries[numberOfSeries] != NULL)
 	{
-	  LineSeries[numberOfSeries]->Title=Title;
-	  LineSeries[numberOfSeries]->SeriesColor=color;
-	  LineSeries[numberOfSeries]->Pointer->Visible=true;
-	  LineSeries[numberOfSeries]->Pointer->Style=psCircle;
-	  LineSeries[numberOfSeries]->Pointer->Size=3;
-	  LineSeries[numberOfSeries]->Pointer->Pen->Visible=false;
-	  LineSeries[numberOfSeries]->Pen->Visible=false;
+	  LineSeries[numberOfSeries]->Title = Title;
+	  LineSeries[numberOfSeries]->SeriesColor = color;
+	  LineSeries[numberOfSeries]->Pointer->Visible = true;
+	  LineSeries[numberOfSeries]->Pointer->Style = psCircle;
+	  LineSeries[numberOfSeries]->Pointer->Size = 3;
+	  LineSeries[numberOfSeries]->Pointer->Pen->Visible = false;
+	  LineSeries[numberOfSeries]->Pen->Visible = false;
 //	  LineSeries[num]->LinePen->Width=StrToInt(EditLineWidth->Text);
 	}
   }
@@ -169,11 +169,11 @@ void TFormGraphOrient::ApplySeriesSetting(AnsiString Title, TColor color)
 //---------------------------------------------------------------------------
 void TFormGraphOrient::SetVisible(int CheckLine, bool tf)
 {
-  for (int num=NumGraph*CheckLine; num<NumGraph*(CheckLine+1); num++)
+  for (int num = NumGraph*CheckLine; num < NumGraph * (CheckLine + 1); num ++)
   {
 	if (LineSeries[num] != NULL)
 	{
-	  LineSeries[num]->Visible=tf;
+	  LineSeries[num]->Visible = tf;
 	}
   }
 }
@@ -191,9 +191,9 @@ void __fastcall TFormGraphOrient::FormCreate(TObject *Sender)
 
 //InitFrameSeries
 	for (int i=0; i < MaxBlockSeries; i++) {
-		BlockSeries[i]= new TChartShape(this->Chart1);
+		BlockSeries[i]= new TChartShape(Chart1);
 		BlockSeries[i]->Selected->Hover->Hide();
-		Chart1->AddSeries(this->BlockSeries[i]);
+		Chart1->AddSeries(BlockSeries[i]);
 		BlockSeries[i]->Style=chasRectangle;
 		BlockSeries[i]->X0=0;
 		BlockSeries[i]->X1=1024;
@@ -205,9 +205,9 @@ void __fastcall TFormGraphOrient::FormCreate(TObject *Sender)
 
 //InitFrameSeries
 	for (int i=0; i < MaxFrameSeries; i++) {
-		FrameSeries[i]= new TChartShape(this->Chart1);
+		FrameSeries[i]= new TChartShape(Chart1);
 		FrameSeries[i]->Selected->Hover->Hide();
-		Chart1->AddSeries(this->FrameSeries[i]);
+		Chart1->AddSeries(FrameSeries[i]);
 		FrameSeries[i]->Style=chasRectangle;
 		FrameSeries[i]->X0=0;
 		FrameSeries[i]->X1=0;
@@ -334,9 +334,9 @@ void TFormGraphOrient::ClearAnimate(void)
 {
 //AnimateShapes
 	for (int i=0; i<MaxBlockSeries; i++)
-		this->BlockSeries[i]->Visible=false;
+		BlockSeries[i]->Visible=false;
 	for (int i=0; i<MaxFrameSeries; i++)
-		this->FrameSeries[i]->Visible=false;
+		FrameSeries[i]->Visible=false;
 
 //AnimatePoints
 	Series9->Clear();
@@ -502,9 +502,9 @@ unsigned short Border=10;
   Label5->Caption="Блоков для чтения: "+IntToStr(mCadr.CountBlock);
 
   if (CountLines==mCadr.CountLines)
-	this->Label6->Caption="Общее число строк: "+IntToStr(mCadr.CountLines);
+	Label6->Caption="Общее число строк: "+IntToStr(mCadr.CountLines);
   else
-	this->Label6->Caption="ОШИБКА! Число строк: "+IntToStr(CountLines)
+	Label6->Caption="ОШИБКА! Число строк: "+IntToStr(CountLines)
 	+" вместо "+IntToStr(mCadr.CountLines);
 }
 
@@ -703,7 +703,7 @@ void  TFormGraphOrient::DrawAnimateHandler(void)
 		CadrInfo CurCadr;
 		int cnt=StrToInt(EditNumCadr->Text);
 
-		if (!this->GetCadrInfo(cnt, CurCadr))
+		if (!GetCadrInfo(cnt, CurCadr))
 		{
 			  DrawAnimate(CurCadr);
 		}
@@ -906,7 +906,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 		SetCurrentDir(ExtractFileDir(FileName));
 		GetFileTitles(FileName,&FileTitle);
 
-		if(this->SortFileCheckBox->Checked)
+		if(SortFileCheckBox->Checked)
 		{
 			FileName=SortRawFlashFile(FileName);
 			if(FileName=="")
@@ -983,9 +983,9 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 						"mean_bf","sigma_bf","mean_fr","sigma_fr");
 
 
-        this->DeleteGraph();
-		this->CreateGraph();
-		this->ApplySeriesSetting("мБОКЗ-2В",
+        DeleteGraph();
+		CreateGraph();
+		ApplySeriesSetting("мБОКЗ-2В",
 											clBlue);//ColorRes[FormGraphOrient->NumLine]);
 //		DataPixHeader mDataPixHdr;
 		while (!feof(fflesh))
@@ -1206,22 +1206,22 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 			  double Tpr=mDataSLEZH.Tpr_sec+mDataSLEZH.Tpr_msec/1000.;
 			  if (mDataSLEZH.NumDet>=3) {
 
-				this->LineSeries[0]->AddXY(Tpr,al);
-				this->LineSeries[1]->AddXY(Tpr,dl);
-				this->LineSeries[2]->AddXY(Tpr,Az);
-				this->LineSeries[3]->AddXY(Tpr,mDataSLEZH.Wop[0]*RTS);
-				this->LineSeries[4]->AddXY(Tpr,mDataSLEZH.Wop[1]*RTS);
-				this->LineSeries[5]->AddXY(Tpr,mDataSLEZH.Wop[2]*RTS);
+				LineSeries[0]->AddXY(Tpr,al);
+				LineSeries[1]->AddXY(Tpr,dl);
+				LineSeries[2]->AddXY(Tpr,Az);
+				LineSeries[3]->AddXY(Tpr,mDataSLEZH.Wop[0]*RTS);
+				LineSeries[4]->AddXY(Tpr,mDataSLEZH.Wop[1]*RTS);
+				LineSeries[5]->AddXY(Tpr,mDataSLEZH.Wop[2]*RTS);
 	//			FormGraphOrient->LineSeries[FormGraphOrient->NumLine*NumGraph+6]->AddXY(Tpr,mx); //рассчитать
 	//			FormGraphOrient->LineSeries[FormGraphOrient->NumLine*NumGraph+7]->AddXY(Tpr,my); //рассчитать
-				this->LineSeries[8]->AddXY(Tpr,mDataSLEZH.m_cur);
-				this->LineSeries[9]->AddXY(Tpr,mDataSLEZH.NumFrag);
-				this->LineSeries[11]->AddXY(Tpr,mDataSLEZH.NumDet);
+				LineSeries[8]->AddXY(Tpr,mDataSLEZH.m_cur);
+				LineSeries[9]->AddXY(Tpr,mDataSLEZH.NumFrag);
+				LineSeries[11]->AddXY(Tpr,mDataSLEZH.NumDet);
 			  }
-			  this->LineSeries[10]->AddXY(Tpr,mDataSLEZH.NumLoc);
-			  this->LineSeries[12]->AddXY(Tpr,mean_frag);
-			  this->LineSeries[13]->AddXY(Tpr,sigma_frag);
-			  this->LineSeries[14]->AddXY(Tpr,mDataSLEZH.Temp);
+			  LineSeries[10]->AddXY(Tpr,mDataSLEZH.NumLoc);
+			  LineSeries[12]->AddXY(Tpr,mean_frag);
+			  LineSeries[13]->AddXY(Tpr,sigma_frag);
+			  LineSeries[14]->AddXY(Tpr,mDataSLEZH.Temp);
 /**
 			  sprintf(loc_name,"%s\\Loc_%06d_%08d.txt",LocDir.c_str(),mDataSLEZH.T,mDataSLEZH.Tbshv);
 			  floc=fopen(loc_name,"wt");
@@ -1365,8 +1365,8 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 		fclose(flog_pix);
 		fclose(flog_orient);
 
-		this->EditNumCadr->Text=0;
-		this->UpDown1->Max=vCadrInfo.size();
+		EditNumCadr->Text=0;
+		UpDown1->Max=vCadrInfo.size();
 
 	 }
   }
@@ -1755,7 +1755,7 @@ void __fastcall TFormGraphOrient::MenuOpenTMIClick(TObject *Sender)
 		fout.close();
 		fshtmi2.close();
 
-		this->UpDown1->Max=vCadrInfo.size();
+		UpDown1->Max=vCadrInfo.size();
 	}
 }
 
@@ -1833,6 +1833,8 @@ size_t findLine(Stream& in,const std::string& line)
 
 }
 
+
+
 vector<string> split(const string& str, const string& delim)
 {
     vector<string> tokens;
@@ -1852,6 +1854,8 @@ vector<string> split(const string& str, const string& delim)
 
 
 
+
+
 void TFormGraphOrient::readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
 {
 	std::string line;
@@ -1862,8 +1866,8 @@ void TFormGraphOrient::readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cad
 		   if(line.find("Состав ДТМИ ЛОК:") != std::string::npos)
 		   {
 				CadrInfo cadrInfo;
-				cadrInfo.CountBlock=0;
-				cadrInfo.CountStars=0;
+				cadrInfo.CountBlock = 0;
+				cadrInfo.CountStars = 0;
 				// считываем время привязки
 				if(findWord(in,"информации") != std::string::npos)
 				{
@@ -1875,7 +1879,7 @@ void TFormGraphOrient::readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cad
 				if(findWord(in,"объектов") != std::string::npos)
 				{
 					in >> cadrInfo.CountLocalObj;
-					this->LineSeries[10]->AddXY(cadrInfo.Time,cadrInfo.CountLocalObj);
+					LineSeries[10]->AddXY(cadrInfo.Time,cadrInfo.CountLocalObj);
 				}
 
 				else throw (errorMessage);
@@ -1885,7 +1889,7 @@ void TFormGraphOrient::readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cad
 				if(findWord(in,"объектов") != std::string::npos)
 				{
 					in >> cadrInfo.CountDeterObj;
-					this->LineSeries[11]->AddXY(cadrInfo.Time,cadrInfo.CountDeterObj);
+					LineSeries[11]->AddXY(cadrInfo.Time,cadrInfo.CountDeterObj);
 				}
 				else throw (errorMessage);
 
@@ -1893,9 +1897,9 @@ void TFormGraphOrient::readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cad
 				if(findLine(in,"	Х			Y			I			N") != -1)
 				{
 					vector<string> splittedLocData;
-					int maxCountLocObj = 32;
+					const int сountLocObj = cadrInfo.CountLocalObj;
 					ObjectsInfo objInfo;
-					for(int i = 0 ; i < maxCountLocObj; i ++)
+					for(int i = 0 ; i < сountLocObj; i ++)
 					{
 						std::getline(in,line);
 						// см. эту строку в протоколе, чтобы понять почему так
@@ -1930,6 +1934,10 @@ void TFormGraphOrient::readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cad
 	}
 }
 
+
+
+
+
 void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
 {
 	std::string line;
@@ -1954,7 +1962,7 @@ void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrIn
 
 				for(int i = 0; i < 4; i++)
 				{
-                    std::getline(in,line);
+					std::getline(in,line);
 					vector<string> splittedStr = split(line,"\t\t\t\t\t");
 					cadrInfo.QuatOrient[i] = std::atof(splittedStr[1].c_str());
 				}
@@ -1968,7 +1976,7 @@ void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrIn
 		   if(findWord(in,"объектов") != std::string::npos)
 		   {
 				in >> cadrInfo.CountLocalObj;
-				this->LineSeries[10]->AddXY(cadrInfo.Time,cadrInfo.CountLocalObj);
+				LineSeries[10]->AddXY(cadrInfo.Time,cadrInfo.CountLocalObj);
 
 		   }
 		   else throw (errorMessage);
@@ -1978,7 +1986,7 @@ void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrIn
 		   if(findWord(in,"объектов") != std::string::npos)
 		   {
 				in >> cadrInfo.CountDeterObj;
-				this->LineSeries[11]->AddXY(cadrInfo.Time,cadrInfo.CountDeterObj);
+				LineSeries[11]->AddXY(cadrInfo.Time,cadrInfo.CountDeterObj);
 		   }
 		   else throw (errorMessage);
 
@@ -1986,10 +1994,10 @@ void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrIn
 		   if(findLine(in,"	Х			Y			I			N") != -1)
 		   {
 				vector<string> splittedLocData;
-				int maxCountLocObj = 16;
+				const int сountLocObj = cadrInfo.CountLocalObj;
 				ObjectsInfo objInfo;
 
-				for(int i = 0 ; i < maxCountLocObj; i ++)
+				for(int i = 0 ; i < сountLocObj; i ++)
 				{
 						std::getline(in,line);
 						splittedLocData = split(line,")\t");
@@ -2021,14 +2029,14 @@ void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrIn
 					vector<string> splittedStr = split(line,"\t");
 					cadrInfo.OmegaOrient[i] = std::atof(splittedStr[1].c_str());
 				}
-				this->LineSeries[3]->AddXY(cadrInfo.Time,cadrInfo.OmegaOrient[0]*RTS);
-				this->LineSeries[4]->AddXY(cadrInfo.Time,cadrInfo.OmegaOrient[1]*RTS);
-				this->LineSeries[5]->AddXY(cadrInfo.Time,cadrInfo.OmegaOrient[2]*RTS);
+				LineSeries[3]->AddXY(cadrInfo.Time,cadrInfo.OmegaOrient[0]*RTS);
+				LineSeries[4]->AddXY(cadrInfo.Time,cadrInfo.OmegaOrient[1]*RTS);
+				LineSeries[5]->AddXY(cadrInfo.Time,cadrInfo.OmegaOrient[2]*RTS);
 
 		   }
 		   else throw (errorMessage);
 
-	   
+
 		   if(findLine(in,"15) Координаты центров фрагментов") != std::string::npos)
 		   {
 				WindowsInfo winInfo;
@@ -2042,7 +2050,7 @@ void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrIn
 					if(std::atoi(splittedStr[1].c_str()) == 0)
 					{
 						cadrInfo.CountWindows = i;
-						this->LineSeries[9]->AddXY(cadrInfo.Time,i);
+						LineSeries[9]->AddXY(cadrInfo.Time,i);
 						break;
 					}
 
@@ -2052,7 +2060,7 @@ void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrIn
 					winInfo.Sigma = 0;
 					cadrInfo.WindowsList.push_back(winInfo);
 				}
-				this->LineSeries[9]->AddXY(cadrInfo.Time,maxCountOfObjects);
+				LineSeries[9]->AddXY(cadrInfo.Time,maxCountOfObjects);
 
 
 
@@ -2080,7 +2088,7 @@ void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrIn
 					vector<string> splittedStr = split(line,"\t");
 					cadrInfo.WindowsList[i].CountObj = std::atoi(splittedStr[1].c_str());
 				}
-				
+
 		   }
 		   else throw (errorMessage);
 
@@ -2088,10 +2096,11 @@ void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrIn
 		   cadrInfo.CountStars = 0;
 		   cadrInfoVec.push_back(cadrInfo);
 		}
-		
+
 	}
 
 }
+
 
 
 
@@ -2113,10 +2122,9 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 			ShowMessage("Не удалось открыть файл");
 			return;
 		}
-		this->DeleteGraph();
-		this->CreateGraph();
-		this->ApplySeriesSetting("мБОКЗ-2В",
-											clBlue);
+		DeleteGraph();
+		CreateGraph();
+		ApplySeriesSetting("мБОКЗ-2В",	clBlue);
 
 		if(checkLocFile(in))
 		{
@@ -2127,9 +2135,9 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 		{
 			readBOKZ60Protocol(in,vCadrInfo);
 		}
-		ShowMessage(vCadrInfo.size());
-		this->EditNumCadr->Text=0;
-		this->UpDown1->Max=vCadrInfo.size();
+
+		EditNumCadr->Text = 0;
+		UpDown1->Max = vCadrInfo.size();
 
 	}
 	}
@@ -2146,7 +2154,223 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 }
 
 
+void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
+{
+    std::string line;
+	string errorMessage = string("Cчитывание протокола завершено необычным образом. "
+				"Возможно работа прибора была остановлена.");
+	while(std::getline(in,line))
+	{
 
+		if(line.find("2 Число принятых пикселей на первом кадре") != std::string::npos)
+		{
+
+			// если нашли строку с числом принятых пикселей, проверяем, что их число не ноль
+			// если ноль, пропускаем такт
+			if(split(line, "\t").back() == "0")
+			{
+				continue;
+			}
+		   CadrInfo cadrInfo;
+
+			// ищем начало массива лок и фрагментов
+		   if(findLine(in,"18, 19	Массив локализованных объектов на 1-ом кадре") != -1)
+		   {
+				vector <string> splittedStr;
+				const int maxCountLocObj = 15;
+				ObjectsInfo objInfo;
+				WindowsInfo winInfo;
+
+				for(int i = 0 ; i < maxCountLocObj; i ++)
+				{
+						std::getline(in,line);
+						splittedStr = split(line,"\t");
+
+						// если всё-таки объектов меньше
+						if(std::atof (splittedStr[0].c_str()) == 0)
+						{
+							  cadrInfo.CountWindows = i+1;
+							  break;
+						}
+						// заполняем все о лок
+						objInfo.X = std::atof (splittedStr[0].c_str());
+						objInfo.Y = std::atof (splittedStr[1].c_str());
+						objInfo.Bright = std::atof(splittedStr[2].c_str());
+						objInfo.Square = std::atoi (splittedStr[3].c_str());
+						objInfo.StarID = 0;
+						objInfo.Mv = 0;
+						objInfo.Sp[0]='_';
+						objInfo.Sp[1]='_';
+						objInfo.Dx = 0;
+						objInfo.Dy = 0;
+						cadrInfo.ObjectsList.push_back(objInfo);
+
+						// заполняем всё о фрагментах
+						winInfo.Xstart = (std::atof(splittedStr[4].c_str()));
+						winInfo.Ystart = (std::atof(splittedStr[5].c_str()));
+						winInfo.Mean = (std::atof(splittedStr[6].c_str()));
+						winInfo.Sigma = (std::atof(splittedStr[7].c_str()));
+						winInfo.Level = (std::atof(splittedStr[8].c_str()));
+						winInfo.CountObj = std::atoi(splittedStr[9].c_str());
+						cadrInfo.WindowsList.push_back(winInfo);
+				}
+
+			if(findLine(in,"18, 19	Массив локализованных объектов на 2-ом кадре") != -1)
+		   {
+                for(int i = 0 ; i < maxCountLocObj; i ++)
+				{
+					std::getline(in,line);
+					splittedStr = split(line,"\t");
+
+					// если всё-таки объектов меньше
+					if(std::atof (splittedStr[0].c_str()) == 0)
+					{
+							  break;
+					}
+						// заполняем все о лок
+					objInfo.X = std::atof (splittedStr[0].c_str());
+					objInfo.Y = std::atof (splittedStr[1].c_str());
+					objInfo.Bright = std::atof(splittedStr[2].c_str());
+					objInfo.Square = std::atoi (splittedStr[3].c_str());
+					objInfo.StarID = 0;
+					objInfo.Mv = 0;
+					objInfo.Sp[0]='_';
+					objInfo.Sp[1]='_';
+					objInfo.Dx = 0;
+					objInfo.Dy = 0;
+					cadrInfo.ObjectsList.push_back(objInfo);
+				}
+           }
+			else throw (errorMessage);
+
+		   }
+			else throw (errorMessage);
+
+		   // ищем время привязки в секундах
+			if(findWord(in, "информации") != std::string::npos)
+			{
+				int secs = 0;
+				in >> secs;
+				// ищем миллисекунды
+				findLine(in, "информации");
+				int msecs = 0;
+				in >> msecs;
+				cadrInfo.Time =  static_cast <double> (secs) + static_cast <double> (msecs / 1000);
+			}
+		   else throw (errorMessage);
+
+
+		   if(findLine(in,"6) Кватернион ориентации, Qо") != std::string::npos)
+		   {
+
+				for(int i = 0; i < 4; i++)
+				{
+					std::getline(in,line);
+					vector<string> splittedStr = split(line,"\t\t\t\t\t");
+					cadrInfo.QuatOrient[i] = std::atof(splittedStr[1].c_str());
+				}
+
+
+
+		   }
+		   else throw (errorMessage);
+
+		   if(findLine(in,"Угловая скорость по оптическим измерениям в проекциях на оси ПСК") != std::string::npos)
+		   {
+				for(int i = 0; i < 3; i++)
+				{
+					std::getline(in,line);
+					vector<string> splittedStr = split(line,"\t");
+					cadrInfo.OmegaOrient[i] = std::atof(splittedStr[1].c_str());
+				}
+				LineSeries[3]->AddXY(cadrInfo.Time,cadrInfo.OmegaOrient[0] * RTS);
+				LineSeries[4]->AddXY(cadrInfo.Time,cadrInfo.OmegaOrient[1] * RTS);
+				LineSeries[5]->AddXY(cadrInfo.Time,cadrInfo.OmegaOrient[2] * RTS);
+
+		   }
+		   else throw (errorMessage);
+
+		   // ищем число фрагментов
+		   if(findWord(in,"NumFrag") != std::string::npos)
+		   {
+				in >> cadrInfo.CountWindows;
+				LineSeries[9]->AddXY(cadrInfo.Time, cadrInfo.CountWindows);
+
+
+		   }
+		   else throw (errorMessage);
+
+		   // число локализ. объектов
+		   if(findWord(in,"NumLoc[0]") != std::string::npos)
+		   {
+				in >> cadrInfo.CountLocalObj;
+				LineSeries[10]->AddXY(cadrInfo.Time,cadrInfo.CountLocalObj);
+
+		   }
+		   else throw (errorMessage);
+
+
+		   //ищем число распознанных объектов
+		   if(findWord(in,"NumDet") != std::string::npos)
+		   {
+				in >> cadrInfo.CountDeterObj;
+				LineSeries[11]->AddXY(cadrInfo.Time,cadrInfo.CountDeterObj);
+		   }
+		   else throw (errorMessage);
+
+
+		   cadrInfo.CountBlock = 0;
+		   cadrInfo.CountStars = 0;
+		   cadrInfoVec.push_back(cadrInfo);
+		}
+
+	}
+}
 
 //---------------------------------------------------------------------------
+
+
+void __fastcall TFormGraphOrient::BOKZM2VParseProtocolClick(TObject *Sender)
+{
+	try
+	{
+	 OpenDialog1->Filter="txt|*.txt";
+	 if (OpenDialog1->Execute()) {
+		vCadrInfo.clear();
+		FileName = OpenDialog1->FileName;
+		SetCurrentDir(ExtractFileDir(FileName));
+		GetFileTitles(FileName,&FileTitle);
+
+		ifstream in(FileName.c_str());
+
+		if (!in.is_open()) {
+			ShowMessage("Не удалось открыть файл");
+			return;
+		}
+
+		DeleteGraph();
+		CreateGraph();
+
+		ApplySeriesSetting("мБОКЗ-2В", clBlue);
+
+		readmBOKZ2VProtocol(in,vCadrInfo);
+
+		EditNumCadr->Text=0;
+		UpDown1->Max=vCadrInfo.size();
+
+	}
+	}
+
+	catch(std::string &s)
+	{
+		ShowMessage(s.c_str());
+	}
+
+	catch(std::exception &e)
+	{
+		ShowMessage(e.what());
+	}
+}
+//---------------------------------------------------------------------------
+
 

@@ -154,6 +154,7 @@
 	TLabel *LabelFrameError;
 	TMenuItem *N1;
 	TMenuItem *BOKZ60ParseProtocol;
+	TMenuItem *BOKZM2VParseProtocol;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -173,6 +174,7 @@
 		void __fastcall MenuOpenTMIClick(TObject *Sender);
 		void __fastcall EditNumCadrChange(TObject *Sender);
 		void __fastcall BOKZ60ParseProtocolClick(TObject *Sender);
+	void __fastcall BOKZM2VParseProtocolClick(TObject *Sender);
 
 
 
@@ -197,6 +199,7 @@
 		TMouseButton Button, TShiftState Shift, int X, int Y);
 		void readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
 		void readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
+		void readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
 
 
 

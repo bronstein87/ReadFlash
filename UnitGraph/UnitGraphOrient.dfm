@@ -982,6 +982,10 @@ object FormGraphOrient: TFormGraphOrient
           Caption = #1041#1054#1050#1047'-'#1052'60'
           OnClick = BOKZ60ParseProtocolClick
         end
+        object BOKZM2VParseProtocol: TMenuItem
+          Caption = #1084#1041#1054#1050#1047'-2'#1042
+          OnClick = BOKZM2VParseProtocolClick
+        end
       end
     end
     object MenuSave: TMenuItem
