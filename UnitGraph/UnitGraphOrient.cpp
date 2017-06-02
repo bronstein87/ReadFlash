@@ -250,10 +250,12 @@ void TFormGraphOrient::InitTableWindows(void)
 }
 void TFormGraphOrient::PrintTableWindows(const struct CadrInfo &mCadr)
 {
+	ShowMessage(mCadr.CountWindows);
 	if (mCadr.CountWindows) {
 		TableWindowsInfo->RowCount=mCadr.CountWindows+TableWindowsInfo->FixedRows;
 		/**/
-		for (int i=0; i<mCadr.CountWindows; i++) {
+
+		for (int i=0; i < mCadr.CountWindows; i++) {
 			int k=0;
 			TableWindowsInfo->Cells[k++][i+1]=String(i+1);
 			TableWindowsInfo->Cells[k++][i+1]=FloatToStrF(mCadr.WindowsList[i].Mv, ffFixed,6,2);
@@ -300,6 +302,7 @@ void TFormGraphOrient::InitTableObjects(void)
 
 void TFormGraphOrient::PrintTableObjects(const struct CadrInfo &mCadr)
 {
+
 	if (mCadr.CountLocalObj) {
 		TableObjectsInfo->RowCount=mCadr.CountLocalObj+TableWindowsInfo->FixedRows;
 
@@ -396,6 +399,7 @@ unsigned short Border=10;
 	}
 
 //DrawWindows()
+    ShowMessage(mCadr.CountWindows);
 	for (int i=0; i < mCadr.CountWindows; i++)
 	{
 		FrameSeries[i]->X0=mCadr.WindowsList[i].Xstart;
@@ -1203,7 +1207,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 				}
 				}
 /**/
-			  double Tpr=mDataSLEZH.Tpr_sec+mDataSLEZH.Tpr_msec/1000.;
+			  double Tpr = mDataSLEZH.Tpr_sec+mDataSLEZH.Tpr_msec/1000.;
 			  if (mDataSLEZH.NumDet>=3) {
 
 				LineSeries[0]->AddXY(Tpr,al);
@@ -2190,6 +2194,7 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 						if(std::atof (splittedStr[0].c_str()) == 0)
 						{
 							  cadrInfo.CountWindows = i+1;
+							  cadrInfo.CountLocalObj = i+1;
 							  break;
 						}
 						// заполняем все о лок
@@ -2225,7 +2230,8 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 					// если всё-таки объектов меньше
 					if(std::atof (splittedStr[0].c_str()) == 0)
 					{
-							  break;
+						cadrInfo.CountLocalObj  += i+1;
+						break;
 					}
 						// заполняем все о лок
 					objInfo.X = std::atof (splittedStr[0].c_str());
@@ -2252,10 +2258,10 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 				int secs = 0;
 				in >> secs;
 				// ищем миллисекунды
-				findLine(in, "информации");
+				findWord(in, "информации");
 				int msecs = 0;
 				in >> msecs;
-				cadrInfo.Time =  static_cast <double> (secs) + static_cast <double> (msecs / 1000);
+				cadrInfo.Time =  static_cast <double> (secs) + static_cast <double> (msecs) / 1000;
 			}
 		   else throw (errorMessage);
 
@@ -2319,6 +2325,7 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 		   else throw (errorMessage);
 
 
+
 		   cadrInfo.CountBlock = 0;
 		   cadrInfo.CountStars = 0;
 		   cadrInfoVec.push_back(cadrInfo);
@@ -2353,10 +2360,10 @@ void __fastcall TFormGraphOrient::BOKZM2VParseProtocolClick(TObject *Sender)
 
 		ApplySeriesSetting("мБОКЗ-2В", clBlue);
 
-		readmBOKZ2VProtocol(in,vCadrInfo);
+		readmBOKZ2VProtocol(in, vCadrInfo);
 
-		EditNumCadr->Text=0;
-		UpDown1->Max=vCadrInfo.size();
+		EditNumCadr->Text = 0;
+		UpDown1->Max = vCadrInfo.size();
 
 	}
 	}
