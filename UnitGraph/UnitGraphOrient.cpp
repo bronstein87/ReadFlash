@@ -1977,6 +1977,10 @@ void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrIn
 				al=atan2m(matrixOfOrientation[2][1],matrixOfOrientation[2][0])*RTD;   if (al<0)  al+=360.;
 				Az=atan2m(matrixOfOrientation[0][2],matrixOfOrientation[1][2])*RTD;   if (Az<0)  Az+=360.;
 
+				LineSeries[0]->AddXY(cadrInfo.Time,al);
+				LineSeries[1]->AddXY(cadrInfo.Time,dl);
+				LineSeries[2]->AddXY(cadrInfo.Time,Az);
+
 		   }
 		   else throw (errorMessage);
 
@@ -2287,6 +2291,21 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 					vector<string> splittedStr = split(line,"\t\t\t\t\t");
 					cadrInfo.QuatOrient[i] = std::atof(splittedStr[1].c_str());
 				}
+
+				double matrixOfOrientation [3][3];
+				quatToMatr(cadrInfo.QuatOrient, matrixOfOrientation);
+				double al=0;
+				double dl=0;
+				double Az=0;
+
+				dl=asinm(matrixOfOrientation[2][2])*RTD;
+				al=atan2m(matrixOfOrientation[2][1],matrixOfOrientation[2][0])*RTD;   if (al<0)  al+=360.;
+				Az=atan2m(matrixOfOrientation[0][2],matrixOfOrientation[1][2])*RTD;   if (Az<0)  Az+=360.;
+
+				LineSeries[0]->AddXY(cadrInfo.Time,al);
+				LineSeries[1]->AddXY(cadrInfo.Time,dl);
+				LineSeries[2]->AddXY(cadrInfo.Time,Az);
+
 
 		   }
 		   else throw (errorMessage);

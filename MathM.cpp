@@ -35,3 +35,16 @@ double atan2m(double yf, double xf)
   }
   return ang;
 }
+
+void quatToMatr(const double Quat[], double M_ornt[3][3])
+{
+    M_ornt[0][0]=Quat[0]*Quat[0]+Quat[1]*Quat[1]-Quat[2]*Quat[2]-Quat[3]*Quat[3];
+    M_ornt[0][1]=2.0*(Quat[1]*Quat[2]+Quat[0]*Quat[3]);
+    M_ornt[0][2]=2.0*(Quat[1]*Quat[3]-Quat[0]*Quat[2]);
+    M_ornt[1][0]=2.0*(Quat[1]*Quat[2]-Quat[0]*Quat[3]);
+    M_ornt[1][1]=Quat[0]*Quat[0]-Quat[1]*Quat[1]+Quat[2]*Quat[2]-Quat[3]*Quat[3];
+    M_ornt[1][2]=2.0*(Quat[2]*Quat[3]+Quat[0]*Quat[1]);
+    M_ornt[2][0]=2.0*(Quat[1]*Quat[3]+Quat[0]*Quat[2]);
+    M_ornt[2][1]=2.0*(Quat[2]*Quat[3]-Quat[0]*Quat[1]);
+    M_ornt[2][2]=Quat[0]*Quat[0]-Quat[1]*Quat[1]-Quat[2]*Quat[2]+Quat[3]*Quat[3];
+}

@@ -9,3 +9,4 @@ double sqrtm(double xf);
 double acosm(double xf);
 double asinm(double xf);
 double atan2m(double yf, double xf);
+void quatToMatr(const double Quat[], double M_ornt[3][3]);
