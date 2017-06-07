@@ -68,7 +68,7 @@
         <Multithreaded>true</Multithreaded>
         <ProjectType>CppVCLApplication</ProjectType>
         <IncludePath>UnitGraph\;C:\IKI\PROGRAMS_CB6\ReadFlashEMKA\;$(IncludePath)</IncludePath>
-        <AllPackageLibs>rtl.lib;vcl.lib;vclimg.lib;Tee924.lib;vclwinx.lib</AllPackageLibs>
+        <AllPackageLibs>rtl.lib;vcl.lib;vclimg.lib;vclwinx.lib;Tee924.lib</AllPackageLibs>
         <_TCHARMapping>wchar_t</_TCHARMapping>
         <DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
         <DynamicRTL>true</DynamicRTL>
@@ -126,7 +126,7 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
-        <LinkPackageStatics>rtl.lib;vcl.lib;vclimg.lib;Tee924.lib;vclwinx.lib</LinkPackageStatics>
+        <LinkPackageStatics>rtl.lib;vcl.lib;vclimg.lib;vclwinx.lib;Tee924.lib</LinkPackageStatics>
         <BT_BuildType>Debug</BT_BuildType>
         <Defines>_DEBUG;$(Defines)</Defines>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>

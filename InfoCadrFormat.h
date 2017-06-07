@@ -23,7 +23,7 @@ struct ObjectsInfo
 struct WindowsInfo
 {
 	unsigned short Xstart, Ystart;
-	unsigned short Width, Height, CountObj;
+	unsigned short Width, Height, CountObj, zipX, zipY;
 	float Mean, Sigma, Level;
 	unsigned long StarID;
 	float Mv;  //temporary
@@ -47,6 +47,7 @@ struct CadrInfo
 	unsigned short CountLocalObj, CountDeterObj;    //число локализованных и распознанных объектов
 	std::vector <ObjectsInfo> ObjectsList;    //список локализованных объектов
 	unsigned short CountWindows;  //число прогнозируемых окон
+    unsigned short InfoCountWindows;  //общее число окон, часть из которых не попала в ДТМИ
 	std::vector <WindowsInfo> WindowsList; //список прогнозируемых окон
 	unsigned short CountLines, CountBlock;  //число считываемых строк и блоков с матрицы
 	std::vector <LinesInfo> LinesList;  //список блоков

@@ -63,7 +63,6 @@
 
 	#define MaxSeries 6
 	#define NumGraph 15
-
 	#define MaxBlockSeries 8
 	#define MaxFrameSeries 30
 
@@ -155,6 +154,7 @@
 	TMenuItem *N1;
 	TMenuItem *BOKZ60ParseProtocol;
 	TMenuItem *BOKZM2VParseProtocol;
+	TMenuItem *N2;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -171,10 +171,11 @@
 		void __fastcall FormMouseWheelUp(TObject *Sender, TShiftState Shift,const TPoint& MousePos,
 		  bool &Handled);
 		void __fastcall MenuOpenFlashClick(TObject *Sender);
-		void __fastcall MenuOpenTMIClick(TObject *Sender);
+		void __fastcall MenuOpenProgressTMIClick(TObject *Sender);
 		void __fastcall EditNumCadrChange(TObject *Sender);
 		void __fastcall BOKZ60ParseProtocolClick(TObject *Sender);
 	void __fastcall BOKZM2VParseProtocolClick(TObject *Sender);
+	void __fastcall MenuOpenEnergyTMIClick(TObject *Sender);
 
 
 
