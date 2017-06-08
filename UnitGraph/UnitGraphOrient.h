@@ -56,7 +56,8 @@
 	#include <unordered_map>
 	#include <limits>
 	#include <sstream>
-    #include <iterator>
+	#include <iterator>
+	#include <algorithm>
 
 
 
@@ -70,10 +71,12 @@
 
 	struct RawFileInfo
 	{
-	long int Pos;
-	int Size;
-	int SecuenceCounter;
-	}  ;
+		long int Pos;
+		int Size;
+		int SecuenceCounter;
+	};
+
+
 
 	class TFormAnimateSetting;
 
@@ -155,6 +158,7 @@
 	TMenuItem *BOKZ60ParseProtocol;
 	TMenuItem *BOKZM2VParseProtocol;
 	TMenuItem *N2;
+	TRadioButton *ContrastRadioButton;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -176,6 +180,8 @@
 		void __fastcall BOKZ60ParseProtocolClick(TObject *Sender);
 	void __fastcall BOKZM2VParseProtocolClick(TObject *Sender);
 	void __fastcall MenuOpenEnergyTMIClick(TObject *Sender);
+	void __fastcall ContrastRadioButtonClick(TObject *Sender);
+
 
 
 
@@ -198,6 +204,8 @@
 		AnsiString SortRawFlashFile(const AnsiString &RawFileName);
 		void __fastcall ImageOnClick(TObject *Sender,
 		TMouseButton Button, TShiftState Shift, int X, int Y);
+		void ApplyContrastStory();
+
 		void readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
 		void readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
 		void readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
@@ -209,7 +217,8 @@
 		TChartShape *BlockSeries[MaxBlockSeries];
 		TChartShape *FrameSeries[MaxFrameSeries];
 
-		int FragID;
+
+
 
 		AnsiString FileName;
 		AnsiString FileTitle;
@@ -217,7 +226,11 @@
 		AnsiString FragDir;
 		AnsiString LocDir;
 
+		float ScaleFactorForScrollBox;
+		int ScaleFactorForImage;
+		int FragID;
 
+		vector <int> ContrastStory;
 		vector <CadrInfo> vCadrInfo;
 		vector <TImage*> ImageVector;
 		vector <TScrollBox*> ImageScrollBoxVector;

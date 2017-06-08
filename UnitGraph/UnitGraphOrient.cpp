@@ -21,7 +21,8 @@ void SwapShort(short *word1, short *word2)
 __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 		: TForm(Owner),FragID(0),FormAnimateSetting(new TFormAnimateSetting(this))
 {
-
+		ScaleFactorForScrollBox = 6.5;
+		ScaleFactorForImage = 6;
 
 }
 //рисование сводных графиков по серии
@@ -610,13 +611,13 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 		return;
    }
 
-	for(int CurrentFragment = 0;CurrentFragment < mCadr.CountWindows;CurrentFragment++)
-	{
+	for(int CurrentFragment = 0;CurrentFragment < mCadr.CountWindows; CurrentFragment++)
+	{               //mCadr.CountWindows
 		int FragmentWidth = mCadr.WindowsList [CurrentFragment].Width;
 		int FragmentHeight = mCadr.WindowsList [CurrentFragment].Height;
 		int FragmentSize = FragmentWidth * FragmentHeight;
 		unique_ptr<unsigned short[]> RawFragment(new unsigned short [FragmentSize]);
-		fread(RawFragment.get(),sizeof(unsigned short),FragmentSize,FragmentFile);
+		fread(RawFragment.get(), sizeof(unsigned short), FragmentSize, FragmentFile);
 		std::unique_ptr<TBitmap> Fragment (new TBitmap());
 		Fragment->PixelFormat = pf24bit;
 		Fragment->Width = FragmentWidth;
@@ -624,7 +625,7 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 
 
 		TRGBTriple *BitmapLine; // структура, хранящая RBG
-	for (int currentColumn = 0; currentColumn < FragmentWidth; currentColumn++)
+	for (int currentColumn = 0; currentColumn < FragmentHeight; currentColumn++)
 	{
 		// указатель на currentColumn строку Bitmap
 		BitmapLine = (TRGBTriple*) Fragment->ScanLine[currentColumn];
@@ -636,9 +637,11 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 		}
 	}
 
-	const float ScaleFactorForScrollBox=6.5;
+
 
 	ImageScrollBoxVector.push_back(new TScrollBox(FragmentShowScrollBox));
+	FragmentShowScrollBox->Color = clBlack;
+	ImageScrollBoxVector.back()->Color = clBlack;
 	ImageScrollBoxVector.back()->Width=Fragment->Width*ScaleFactorForScrollBox;
 	ImageScrollBoxVector.back()->Height=Fragment->Height*ScaleFactorForScrollBox;
 	ImageScrollBoxVector.back()->OnMouseWheelUp= &FormMouseWheelUp;
@@ -646,7 +649,7 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 	ImageScrollBoxVector.back()->SetParentComponent(FragmentShowScrollBox);
 
 
-	const int ScaleFactorForImage=6;
+
 
 	ImageVector.push_back(new TImage(ImageScrollBoxVector.back()));
 	ImageVector.back()->Width=Fragment->Width*ScaleFactorForImage;
@@ -661,14 +664,28 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 
 	}
 
+	ApplyContrastStory();
 	PlaceImageFragments(ImageScrollBoxVector);
-
 	fclose(FragmentFile);
 
    }
 
 }
 
+
+void TFormGraphOrient::ApplyContrastStory()
+{
+	if (!ContrastStory.empty())
+	{
+		for(int currentFragment = 0;currentFragment < ImageVector.size();currentFragment ++)
+		{
+			for(int i = 0; i < ContrastStory.size(); i ++)
+			{
+				changeContrast(ContrastStory[i], ImageVector[currentFragment]);
+			}
+		}
+	}
+}
 
 void TFormGraphOrient::PlaceImageFragments (const vector<TScrollBox*>& FragmentImages)
 {
@@ -677,20 +694,26 @@ void TFormGraphOrient::PlaceImageFragments (const vector<TScrollBox*>& FragmentI
 		return;
 	}
 
-	int HeightOffset=0;
-	int WidthOffset=0;
-	const int OffsetStep=170;
+	int HeightOffset = 0;
+	int WidthOffset = 0;
 
-	for(unsigned int CurrentImage=0;CurrentImage<FragmentImages.size();CurrentImage++)
+
+
+	vector <int> heights;
+	for(unsigned int CurrentImage = 0;CurrentImage < FragmentImages.size();CurrentImage ++)
 	{
+		heights.push_back(FragmentImages[CurrentImage]->Height);
+		int OffsetStep = FragmentImages[CurrentImage]->Width;
 
 	// если координата правого края текущего фрагмента превосходит
 	// координату правого угла окна просмотра, сбрасываем смещение по ширине,
 	// увеличиваем смещение по высоте
 		if(OffsetStep * WidthOffset + FragmentImages[CurrentImage]->Width > FragmentShowScrollBox->Width)
 		{
+			int maxHeight = *max_element( heights.begin(), heights.end());
+			heights.clear();
 			WidthOffset = 0;
-			HeightOffset += 170;
+			HeightOffset += maxHeight;
 		}
 
 		FragmentImages[CurrentImage]->Left = OffsetStep*WidthOffset;
@@ -863,7 +886,7 @@ void GetFileTitles(AnsiString file_name, AnsiString *file_title)
 			   }
 
 			   // -1 т.к размер блока хранится  в следующем элементе
-			   for(unsigned int CurrentFlashStruct=0; CurrentFlashStruct< RawFileInfoVector.size()-1 ;CurrentFlashStruct++)
+			   for(unsigned int CurrentFlashStruct = 0; CurrentFlashStruct < RawFileInfoVector.size()-1 ;CurrentFlashStruct++)
 			   {
 					fseek(RawFlashFile,RawFileInfoVector[CurrentFlashStruct].Pos,SEEK_SET);
 					char* CurrentStructBuffer= new char [RawFileInfoVector[CurrentFlashStruct+1].Size];
@@ -1418,9 +1441,12 @@ void __fastcall TFormGraphOrient::FormMouseWheelUp(TObject *Sender, TShiftState 
 		return;
    }
 
-	for(int currentFragment = 0;currentFragment< ImageVector.size();currentFragment++)
+	if(ContrastRadioButton->Checked)  ContrastStory.push_back(20);
+
+	for(int currentFragment = 0;currentFragment< ImageVector.size();currentFragment ++)
 	{
 	   changeContrast(20, ImageVector[currentFragment]);
+
 	}
 
 }
@@ -1434,6 +1460,7 @@ bool &Handled)
 		return;
    }
 
+    if(ContrastRadioButton->Checked)  ContrastStory.push_back(-20);
 	for(int currentFragment = 0;currentFragment < ImageVector.size();currentFragment++)
 	{
 		changeContrast(-20, ImageVector[currentFragment]);
@@ -1459,8 +1486,8 @@ bool &Handled)
 		// определяем диапазоны ползунков ( ThumpSize всегда почему-то возвращает ноль, так что только таким способом )
 		ScrollBox->VertScrollBar->Position= INT_MAX;
 		ScrollBox->HorzScrollBar->Position= INT_MAX;
-		ScrollBox->VertScrollBar->Position=(((double)(ScrollBox->VertScrollBar->Position)/Image->Width) * Y) * 1.2;
-		ScrollBox->HorzScrollBar->Position=(((double)(ScrollBox->HorzScrollBar->Position)/Image->Height)* X) * 1.2;
+		ScrollBox->VertScrollBar->Position=(((double)(ScrollBox->VertScrollBar->Position)/Image->Height) * Y) * 1.2;
+		ScrollBox->HorzScrollBar->Position=(((double)(ScrollBox->HorzScrollBar->Position)/Image->Width)* X) * 1.2;
 	}
 	else if(Button==mbRight)
 	{
@@ -1468,310 +1495,14 @@ bool &Handled)
 		Image->Height= Image->Height / 1.2;
 		ScrollBox->VertScrollBar->Position= INT_MAX;
 		ScrollBox->HorzScrollBar->Position= INT_MAX;
-		ScrollBox->VertScrollBar->Position=(((double)(ScrollBox->VertScrollBar->Position)/Image->Width) * Y) / 1.2;
-		ScrollBox->HorzScrollBar->Position=(((double)(ScrollBox->HorzScrollBar->Position)/Image->Height)* X) / 1.2;
+		ScrollBox->VertScrollBar->Position=(((double)(ScrollBox->VertScrollBar->Position)/Image->Height) * Y) / 1.2;
+		ScrollBox->HorzScrollBar->Position=(((double)(ScrollBox->HorzScrollBar->Position)/Image->Width)* X) / 1.2;
 	}
 
 
 }
 
 
-
- //---------------------------------------------------------------------------
-//#define MAX_STAT 16
-//#define MAX_LOCAL 15
-//#define MAX_WINDOW 16
-//
-//struct SHTMI1
-//{
-//	std::string timeBOKZ, status1, status2, post;
-//	int serialNumber;
-//	float Foc, Xg, Yg;
-//	unsigned short timeExp, Mean, Sigma, countDefect;
-//} mSHTMI1;
-//
-//struct SHTMI2
-//{
-//	std::string timeBOKZ, status1, status2, post;
-//	int serialNumber, timeExp;
-//	int cntCommandWord, cntCallNO, cntNOtoSLEZH;
-//	int cntCallTO, cntTOtoSLEZH, cntSLEZH;
-//	int cntStatOrient[MAX_STAT];
-//} mSHTMI2;
-//
-//struct DTMI
-//{
-//	std::string timeBOKZ, status1, status2, post;
-//	int serialNumber, timeExp;
-//	int nLocalObj, nFixedObj, nWindows, epsillon;
-//	float dTimeBOKZ, LocalList[MAX_LOCAL][4];
-//	float quatBoard[4], omega[3], centrWindow[MAX_WINDOW][2];
-//	int levelWindow[MAX_WINDOW], nObjectWindow[MAX_WINDOW];
-//} mDTMI;
-//
-//std::string arrStatError[MAX_STAT]={{"EC1"},{"EC2"},{"EC3"},{"EC4"},
-//							{"EC5"},{"EC6"},{"EC7"},{"EC8"},
-//							{"EC9"},{"EC10"},{"EC11"},{"EC12"},
-//							{"EC13"},{"EC14"},{"EC15"},{"EC16"}};
-//
-//int TryReadSHTMI1(ifstream &finp, struct SHTMI1 &tmi)
-//{
-//		std::string line, word;
-//
-//		while (!finp.eof()){
-//			finp>>word;
-//			if (word=="KC1") finp>>tmi.status1;
-//			else if (word=="KC2") finp>>tmi.status2;
-//			else if ((word=="СЕР")||(word=="CEP")) {
-//				finp>>word;
-//				if ((word=="НОМ")||(word=="HOM")) {
-//					finp>>tmi.serialNumber;
-//				}
-//			}
-//			else if (word=="ПOCT") finp>>tmi.post;
-//			else if ((word=="T")||(word=="Т")) {
-//				finp>>word; if (word=="ЭКСП") finp>>tmi.timeExp;
-//			}
-//			else if (word=="Х0") finp>>tmi.Xg;
-//			else if (word=="У0") finp>>tmi.Yg;
-//			else if (word=="МТ") finp>>tmi.Mean;
-//			else if (word=="СТ") finp>>tmi.Sigma;
-//			else if (word=="НАМ") {
-//				finp>>word; if (word=="ДЕФ") finp>>tmi.countDefect;
-//			}
-//
-//			if (word=="ВЕРСИЯ") {
-//				return 1;
-//			}
-//        }
-//}
-//
-//int TryReadSHTMI2(ifstream &finp, struct SHTMI2 &tmi)
-//{
-//		std::string line, word;
-//
-//		while (!finp.eof()){
-//			finp>>word;
-//			if (word=="KC1") finp>>tmi.status1;
-//			else if (word=="KC2") finp>>tmi.status2;
-//			else if ((word=="СЕР")||(word=="CEP")) {
-//				finp>>word;
-//				if ((word=="НОМ")||(word=="HOM")) {
-//					finp>>tmi.serialNumber;
-//				}
-//			}
-//			else if (word=="ПOCT") finp>>tmi.post;
-//			else if ((word=="T")||(word=="Т")) {
-//				finp>>word; if (word=="ЭКСП") finp>>tmi.timeExp;
-//			}
-//			else
-//			{
-//				int i=0, fl_find=0;
-//				while ((i < MAX_STAT)&&(!fl_find))
-//				{
-//					if (word==arrStatError[i]) {
-//						finp>>tmi.cntStatOrient[i];
-//						fl_find=1;
-//					}
-//					i++;
-//				}
-//			}
-//			if (word==arrStatError[MAX_STAT-1]) {
-//				return 1;
-//			}
-//			getline(finp, line, '\n' );
-//		}
-//		return 0;
-//}
-//
-//int TryReadDTMI(ifstream &finp, struct DTMI &tmi)
-//{
-//		std::string line, word;
-//
-//		int indexObject=0,indexParam=0, intVal, flLow=1;
-//
-//		while (!finp.eof()){
-//		   	finp>>word;
-//			if (word=="KC1") finp>>tmi.status1;
-//			else if (word=="KC2") finp>>tmi.status2;
-//			else if ((word=="СЕР")||(word=="CEP")) {
-//				finp>>word;
-//				if ((word=="НОМ")||(word=="HOM")) {
-//					finp>>tmi.serialNumber;
-//				}
-//			}
-//			else if (word=="ПOCT") finp>>tmi.post;
-//			else if ((word=="T")||(word=="Т")) {
-//				finp>>word; if (word=="ЭКСП") finp>>tmi.timeExp;
-//			}
-//			else
-//			{
-//				if (word=="ЛОК") {
-//					if (flLow) {
-//						finp>>intVal;
-//						indexObject=(int)intVal/10;
-//						indexParam=intVal%10;
-//						finp>>tmi.LocalList[indexObject][indexParam];
-//						if ((indexObject==9)&&(indexParam==3)) flLow=0;
-//					}
-//					else
-//					{
-//						finp>>indexObject>>indexParam;
-//						finp>>tmi.LocalList[indexObject][indexParam];
-//
-//					}
-//					if ((indexObject==15)&&(indexParam==3)) {
-//						return 1;
-//					}
-//				}
-//			}
-//			getline(finp, line, '\n' );
-//		}
-//		return 0;
-//}
-//
-//void PrintSHTMI1(ofstream &file, struct SHTMI1 tmi)
-//{
-//	file<<"____________________________________"<<"\n";
-//	file<<"Массив ШТМИ1"<<"\n";
-//	file<<"КС1:\t"<<tmi.status1<<"\n";
-//	file<<"КС2:\t"<<tmi.status2<<"\n";
-//	file<<"POST:\t"<<tmi.post<<"\n";
-//	file<<"Зав. №\t"<<tmi.serialNumber<<"\n";
-//	file<<"Texp, мс:\t"<<tmi.timeExp<<"\n";
-//	file<<"____________________________________"<<"\n";
-//}
-//
-//void PrintSHTMI2(ofstream &file, struct SHTMI2 tmi)
-//{
-//	file<<"____________________________________"<<"\n";
-//	file<<"Массив ШТМИ2"<<"\n";
-//	file<<"КС1:\t"<<tmi.status1<<"\n";
-//	file<<"КС2:\t"<<tmi.status2<<"\n";
-//	file<<"POST:\t"<<tmi.post<<"\n";
-//	file<<"Зав. №\t"<<tmi.serialNumber<<"\n";
-//	file<<"Texp, мс:\t"<<tmi.timeExp<<"\n";
-//	for (int i = 0; i < MAX_STAT; i++) {
-//		file<<"Счетчик № "<<(i+1)<<":\t"<<tmi.cntStatOrient[i]<<"\n";
-//	}
-//	file<<"____________________________________"<<"\n";
-//}
-//
-//void PrintDTMI(ofstream &file, struct DTMI tmi)
-//{
-//	file<<"____________________________________"<<"\n";
-//	file<<"Массив ДТМИ"<<"\n";
-//	file<<"КС1\t"<<tmi.status1<<"\n";
-//	file<<"КС2\t"<<tmi.status2<<"\n";
-//	file<<"POST\t"<<tmi.post<<"\n";
-//	file<<"Зав. №\t"<<tmi.serialNumber<<"\n";
-//	file<<"Texp, мс:\t"<<tmi.timeExp<<"\n";
-//	for (int i = 0; i < MAX_LOCAL; i++) {
-//		file<<std::setw(6)<<(i+1)<<"\t";
-//		file<<tmi.LocalList[i][0]<<"\t"<<tmi.LocalList[i][1]<<"\t";
-//		file<<tmi.LocalList[i][2]<<"\t"<<tmi.LocalList[i][3]<<"\n";
-//	}
-//	file<<"____________________________________"<<"\n";
-//}
-//
-//void ConvertDataDTMI(struct DTMI tmi, struct CadrInfo &mCadr)
-//{
-//	mCadr.IsBinary=true;
-////	mCadr.IsReverse=true;
-//	mCadr.ImageHeight=256;
-//	mCadr.ImageWidth=256;
-////	mCadr.Time=data.Tpr_sec+data.Tpr_msec/1000.;
-//	mCadr.CountLocalObj=32;//tmi.nFixedObj;
-////	mCadr.CountDeterObj=tmi.NumDet;
-//
-//	ObjectsInfo objInfo;
-//	for (int i=0; i< mCadr.CountLocalObj; i++) {
-//		objInfo.X=tmi.LocalList[i][0];
-//		objInfo.Y=tmi.LocalList[i][1];
-//		objInfo.Bright=tmi.LocalList[i][2];
-//		objInfo.Square  =abs(tmi.LocalList[i][3]);
-//		objInfo.Dx=0;
-//		objInfo.Dy=0;
-//		objInfo.StarID=0;
-//		objInfo.Mv=0;
-//		objInfo.Sp[0]='_';
-//		objInfo.Sp[1]='_';
-//		mCadr.ObjectsList.push_back(objInfo);
-//	}
-//	mCadr.CountBlock=0;
-//	mCadr.CountWindows=0;
-//	mCadr.CountDeterObj=0;
-//	mCadr.CountStars=0;
-//}
-//
-//void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
-//{
-//	OpenDialog1->Filter="txt|*.txt";
-//	if (OpenDialog1->Execute()) {
-//
-//		vCadrInfo.clear();
-//		FileName = OpenDialog1->FileName;
-//		SetCurrentDir(ExtractFileDir(FileName));
-//		GetFileTitles(FileName,&FileTitle);
-//
-//		ifstream finp(FileName.c_str());
-//		if (!finp.is_open()) {
-//			ShowMessage("Файл не может быть открыт!");
-//			return;
-//		}
-//
-//		ofstream fout((FileTitle+"_decode.txt").c_str());
-//		ofstream fshtmi2((FileTitle+"_shtmi2.txt").c_str());
-//
-//		fshtmi2<<std::setw(16)<<"KC1"<<std::setw(18)<<"KC2"<<std::setw(18)<<"POST";
-//		fshtmi2<<std::setw(6)<<"№"<<std::setw(6)<<"Texp";
-//		for (int i = 0; i < MAX_STAT; i++) {
-//			std::string str="EC"+(i+1);
-//			fshtmi2<<std::setw(6)<<str;
-//		}
-//		fshtmi2<<"\n";
-//
-//		std::string line;
-//		int cntRecDTMI=0;
-//		while (!finp.eof())
-//		{
-//			getline(finp, line, '\n' );
-//			if (line.find("ШТМИ1")!=std::string::npos) {
-//				if(TryReadSHTMI1(finp,mSHTMI1)) {
-//					PrintSHTMI1(fout,mSHTMI1);
-//				}
-//			}
-//			else if (line.find("ШТМИ2")!=std::string::npos) {
-//				if(TryReadSHTMI2(finp,mSHTMI2)) {
-//					PrintSHTMI2(fout,mSHTMI2);
-//					fshtmi2<<std::setw(16)<<mSHTMI2.status1<<std::setw(18)<<mSHTMI2.status2;
-//					fshtmi2<<std::setw(18)<<mSHTMI2.post;
-//					fshtmi2<<std::setw(6)<<mSHTMI2.serialNumber;
-//					fshtmi2<<std::setw(6)<<mSHTMI2.timeExp;
-//					for (int i = 0; i < MAX_STAT; i++) {
-//						fshtmi2<<std::setw(8)<<mSHTMI2.cntStatOrient[i];
-//	}               fshtmi2<<"\n";
-//				}
-//			}
-//			else if (line.find("ДТМИ1")!=std::string::npos) {
-//
-//				if (TryReadDTMI(finp,mDTMI)) {
-//					struct CadrInfo mCadr;
-//					PrintDTMI(fout,mDTMI);
-//					ConvertDataDTMI(mDTMI, mCadr);
-//					mCadr.Time = cntRecDTMI++;
-//					vCadrInfo.push_back(mCadr);
-//				}
-//			}
-//		}
-//
-//		finp.close();
-//		fout.close();
-//		fshtmi2.close();
-//
-//		UpDown1->Max=vCadrInfo.size();
-//	}
-//}
  //---------------------------------------------------------------------------
 #define MAX_STAT 	   16
 #define MAX_OBJ_DTMI   15
@@ -3306,4 +3037,18 @@ void __fastcall TFormGraphOrient::BOKZM2VParseProtocolClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
+
+
+
+//---------------------------------------------------------------------------
+
+void __fastcall TFormGraphOrient::ContrastRadioButtonClick(TObject *Sender)
+{
+	if (!ContrastRadioButton->Checked)
+	{
+		ContrastStory.clear();
+	}
+
+}
+//---------------------------------------------------------------------------
 

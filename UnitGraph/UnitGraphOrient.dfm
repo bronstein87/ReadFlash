@@ -71,7 +71,7 @@ object FormGraphOrient: TFormGraphOrient
     Top = 8
     Width = 1160
     Height = 777
-    ActivePage = TabSheet2
+    ActivePage = ShowFragmentTab
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
     object TabSheet5: TTabSheet
@@ -891,12 +891,26 @@ object FormGraphOrient: TFormGraphOrient
       ImageIndex = 8
       object FragmentShowScrollBox: TScrollBox
         Left = 0
-        Top = 0
+        Top = 17
         Width = 1152
-        Height = 749
+        Height = 732
         Align = alClient
         TabOrder = 0
         OnResize = FragmentShowScrollBoxResize
+        ExplicitTop = 112
+        ExplicitWidth = 1095
+        ExplicitHeight = 637
+      end
+      object ContrastRadioButton: TRadioButton
+        Left = 0
+        Top = 0
+        Width = 1152
+        Height = 17
+        Align = alTop
+        Caption = #1057#1086#1093#1088#1072#1085#1103#1090#1100'  '#1082#1086#1085#1090#1088#1072#1089#1090
+        TabOrder = 1
+        OnClick = ContrastRadioButtonClick
+        ExplicitWidth = 749
       end
     end
   end
@@ -964,8 +978,8 @@ object FormGraphOrient: TFormGraphOrient
     Top = 792
   end
   object MainMenu1: TMainMenu
-    Left = 56
-    Top = 8
+    Left = 65528
+    Top = 65528
     object MenuOpen: TMenuItem
       Caption = #1042#1099#1073#1088#1072#1090#1100' '#1092#1072#1081#1083
       object MenuOpenFlash: TMenuItem
@@ -1006,7 +1020,6 @@ object FormGraphOrient: TFormGraphOrient
     end
   end
   object OpenDialog1: TOpenDialog
-    Left = 48
-    Top = 64
+    Left = 24
   end
 end
