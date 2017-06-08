@@ -118,15 +118,15 @@ unsigned int SaveHeigth, SaveWidth;
 //            Chart->Title->Visible=false;
 //        }
 		Chart->Legend->Alignment = laBottom;
-		SaveHeigth=Chart->Height;  // save visible size image
-		SaveWidth=Chart->Width;
-		Chart->Visible=false;      // paint user's size image
-		Chart->Height=StrToInt(this->EditSizeY->Text);
-		Chart->Width=StrToInt(EditSizeX->Text);
+		SaveHeigth = Chart->Height;  // save visible size image
+		SaveWidth = Chart->Width;
+		Chart->Visible = false;      // paint user's size image
+		Chart->Height = StrToInt(this->EditSizeY->Text);
+		Chart->Width = StrToInt(EditSizeX->Text);
 		Chart->SaveToBitmapFile(suff+".bmp");   // save image
-		Chart->Visible=true;      // return souse size image
-		Chart->Height=SaveHeigth;
-		Chart->Width=SaveWidth;
+		Chart->Visible = true;      // return souse size image
+		Chart->Height = SaveHeigth;
+		Chart->Width = SaveWidth;
 		Chart->Legend->Alignment = laRight;
 
 //        if (FormSetting->CheckBoxLabelVisible->Checked)
@@ -206,22 +206,22 @@ void __fastcall TFormGraphOrient::FormCreate(TObject *Sender)
 		BlockSeries[i]->X1=1024;
 		BlockSeries[i]->Y0=0;
 		BlockSeries[i]->Y1=0;
-		BlockSeries[i]->Color=clYellow;
-		BlockSeries[i]->Transparency=70;
+		BlockSeries[i]->Color = clYellow;
+		BlockSeries[i]->Transparency = 70;
 	}
 
 //InitFrameSeries
 	for (int i=0; i < MaxFrameSeries; i++) {
-		FrameSeries[i]= new TChartShape(Chart1);
+		FrameSeries[i] = new TChartShape(Chart1);
 		FrameSeries[i]->Selected->Hover->Hide();
 		Chart1->AddSeries(FrameSeries[i]);
-		FrameSeries[i]->Style=chasRectangle;
-		FrameSeries[i]->X0=0;
-		FrameSeries[i]->X1=0;
-		FrameSeries[i]->Y0=0;
-		FrameSeries[i]->Y1=0;
-		FrameSeries[i]->Color=clGreen;
-		FrameSeries[i]->Transparency=70;
+		FrameSeries[i]->Style = chasRectangle;
+		FrameSeries[i]->X0 = 0;
+		FrameSeries[i]->X1 = 0;
+		FrameSeries[i]->Y0 = 0;
+		FrameSeries[i]->Y1 = 0;
+		FrameSeries[i]->Color = clGreen;
+		FrameSeries[i]->Transparency = 70;
 	}
 
 	InitTableWindows();
@@ -337,7 +337,7 @@ void TFormGraphOrient::PrintTableObjects(const struct CadrInfo &mCadr)
 		for (int k=0; k<TableObjectsInfo->ColCount; k++) {
 			TableObjectsInfo->Cells[k][1]="-";
         }
-    }
+	}
 }
 
 void TFormGraphOrient::ClearAnimate(void)
@@ -385,9 +385,9 @@ void TFormGraphOrient::DrawBlock(const struct CadrInfo &mCadr)
 //DrawBlocks()
 	CountLines = 0;
 	CountBlock = mCadr.CountBlock;
-	if (CountBlock>MaxBlockSeries) {
+	if (CountBlock > MaxBlockSeries) {
 		ShowMessage("Превышено число допустимых блоков!");
-		CountBlock=MaxBlockSeries;
+		CountBlock = MaxBlockSeries;
 	}
 
 	for (int i=0; i<CountBlock; i++)
@@ -418,10 +418,10 @@ void TFormGraphOrient::DrawBlock(const struct CadrInfo &mCadr)
 
 //ShowLabelWindows()
 	AnsiString LabelWindow;
-	for (int i=0; i<mCadr.CountWindows; i++)
+	for (int i = 0; i < mCadr.CountWindows; i++)
 	{
-		FrameSeries[i]->Marks->Item[0]->Visible=false;
-		FrameSeries[i]->Marks->Item[1]->Visible=true;
+		FrameSeries[i]->Marks->Item[0]->Visible = false;
+		FrameSeries[i]->Marks->Item[1]->Visible = true;
 		FrameSeries[i]->Marks->Item[1]->Text->Clear();
 
 		LabelWindow.sprintf("%d) Mv = %.2f,\r\n № CAT = %ld", i+1,
@@ -431,7 +431,7 @@ void TFormGraphOrient::DrawBlock(const struct CadrInfo &mCadr)
 	}
 
 //DrawBarWindows()
-	for (int i = 0; i<mCadr.CountWindows; i++)
+	for (int i = 0; i < mCadr.CountWindows; i ++)
 	{
 		Series4->AddXY(i+1,mCadr.WindowsList[i].Mean);
 		Series5->AddXY(i+1,mCadr.WindowsList[i].Sigma);
@@ -490,7 +490,7 @@ void TFormGraphOrient::DrawBlock(const struct CadrInfo &mCadr)
 	}
 	else
 	{
-		for (int i=0; i<mCadr.CountLocalObj; i++)
+		for (int i = 0; i < mCadr.CountLocalObj; i++)
 		{
 			Series7->AddXY(i+1,mCadr.ObjectsList[i].Bright);
 			Series8->AddXY(i+1,mCadr.ObjectsList[i].Square);
@@ -531,14 +531,15 @@ double X0, Y0, X1, Y1, Dx, Dy, Ist, Nel;
 	   Nel=mCadr.ObjectsList[i].Square;
 	   Dx=mCadr.ObjectsList[i].Dx;
 	   Dy=mCadr.ObjectsList[i].Dy;
-	   if ((!mCadr.ObjectsList[i].StarID)&&(!Dx)&&(!Dy)) {
+
+	   if ((!mCadr.ObjectsList[i].StarID) && (!Dx)&&(!Dy)) {
 //		   Series2->AddXY(X0, Y0, "", clBlue);
 		   Series9->AddBubble(X0, Y0,(int)(3*sqrtm(Nel)+0.5),"",clBlue);
 	   }
 	   else
 	   {
-		   X1=X0-mCadr.ObjectsList[i].Dx*10000.;
-		   Y1=Y0-mCadr.ObjectsList[i].Dy*10000.;
+		   X1=X0 - mCadr.ObjectsList[i].Dx*10000.;
+		   Y1=Y0 - mCadr.ObjectsList[i].Dy*10000.;
 //		   Series2->AddXY(X0, Y0, "", clGreen);
 		   Series9->AddBubble(X0, Y0,(int)(3*sqrtm(Nel)+0.5),"",clGreen);
 		   Series3->AddArrow(X0, Y0, X1, Y1, "", clRed);
@@ -2028,8 +2029,8 @@ void ConvertDataDTMI(struct DTMI tmi, struct CadrInfo &mCadr)
 	mCadr.ImageWidth=256;
 //	mCadr.Time=data.Tpr_sec+data.Tpr_msec/1000.;
 
-	mCadr.CountDeterObj=tmi.nDeterObj;
-	mCadr.CountWindows=tmi.nWindows;
+	mCadr.CountDeterObj = tmi.nDeterObj;
+	mCadr.CountWindows = tmi.nWindows;
 
 	int cntLocal;
 	if (tmi.nLocalObj<MAX_OBJ_DTMI) cntLocal=tmi.nLocalObj;
@@ -2065,7 +2066,7 @@ void ConvertDataDTMI(struct DTMI tmi, struct CadrInfo &mCadr)
 		winInfo.Width = 17;
 		winInfo.Height = 17;
 		winInfo.Xstart = tmi.centrWindow[i][0]-(mCadr.WindowsList[i].Width>>1);
-		winInfo.Ystart = tmi.centrWindow[i][0]-(mCadr.WindowsList[i].Height>>1);
+		winInfo.Ystart = tmi.centrWindow[i][1]-(mCadr.WindowsList[i].Height>>1);
 		mCadr.WindowsList.push_back(winInfo);
 	}
 
@@ -2075,10 +2076,10 @@ void ConvertDataDTMI(struct DTMI tmi, struct CadrInfo &mCadr)
 
 void ConvertDataLOC(struct LOC tmi, struct CadrInfo &mCadr)
 {
-	mCadr.IsBinary=true;
+	mCadr.IsBinary = true;
 //	mCadr.IsReverse=true;
-	mCadr.ImageHeight=256;
-	mCadr.ImageWidth=256;
+	mCadr.ImageHeight = 256;
+	mCadr.ImageWidth = 256;
 //	mCadr.Time=data.Tpr_sec+data.Tpr_msec/1000.;
 	mCadr.CountLocalObj=tmi.nFixedObj; //nLocalObj
 
@@ -2788,6 +2789,8 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 				continue;
 			}
 		   CadrInfo cadrInfo;
+		   cadrInfo.ImageHeight = 1000;
+		   cadrInfo.ImageWidth = 1000;
 
 			// ищем начало массива лок и фрагментов
 		   if(findLine(in,"18, 19	Массив локализованных объектов на 1-ом кадре") != std::string::npos)
@@ -2796,6 +2799,7 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 				const int maxCountLocObj = 15;
 				ObjectsInfo objInfo;
 				WindowsInfo winInfo;
+				StarsInfo starsInfo;
 
 				for(int i = 0 ; i < maxCountLocObj; i ++)
 				{
@@ -2824,8 +2828,6 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 
 						// заполняем всё о фрагментах
 						winInfo.Mv = 0;
-						winInfo.Xstart = (std::atof(splittedStr[4].c_str()));
-						winInfo.Ystart = (std::atof(splittedStr[5].c_str()));
 						winInfo.Mean = (std::atof(splittedStr[6].c_str()));
 						winInfo.Sigma = (std::atof(splittedStr[7].c_str()));
 						winInfo.Level = (std::atof(splittedStr[8].c_str()));
@@ -2847,8 +2849,13 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 							winInfo.Width = 48;
 							winInfo.Height = 48;
 						}
-
+						winInfo.Xstart = (std::atof(splittedStr[4].c_str())) - winInfo.Width/2;
+						winInfo.Ystart = (std::atof(splittedStr[5].c_str())) - winInfo.Height/2;
 						cadrInfo.WindowsList.push_back(winInfo);
+
+						starsInfo.X = (std::atof(splittedStr[4].c_str()));
+						starsInfo.Y = (std::atof(splittedStr[5].c_str()));
+						cadrInfo.StarsList.push_back(starsInfo);
 				}
 
 			if(findLine(in,"18, 19	Массив локализованных объектов на 2-ом кадре") != std::string::npos)
@@ -2871,8 +2878,8 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 					objInfo.Square = std::atoi (splittedStr[3].c_str());
 					objInfo.StarID = 0;
 					objInfo.Mv = 0;
-					objInfo.Sp[0]='_';
-					objInfo.Sp[1]='_';
+					objInfo.Sp[0] = '_';
+					objInfo.Sp[1] = '_';
 					objInfo.Dx = 0;
 					objInfo.Dy = 0;
 					cadrInfo.ObjectsList.push_back(objInfo);
@@ -2916,9 +2923,9 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 				double dl = 0;
 				double Az = 0;
 
-				dl=asinm(matrixOfOrientation[2][2])*RTD;
-				al=atan2m(matrixOfOrientation[2][1],matrixOfOrientation[2][0])*RTD;   if (al<0)  al+=360.;
-				Az=atan2m(matrixOfOrientation[0][2],matrixOfOrientation[1][2])*RTD;   if (Az<0)  Az+=360.;
+				dl = asinm(matrixOfOrientation[2][2]) * RTD;
+				al = atan2m(matrixOfOrientation[2][1], matrixOfOrientation[2][0]) * RTD;   if (al<0)  al += 360.;
+				Az = atan2m(matrixOfOrientation[0][2], matrixOfOrientation[1][2]) * RTD;   if (Az<0)  Az += 360.;
 
 				LineSeries[0]->AddXY(cadrInfo.Time,al);
 				LineSeries[1]->AddXY(cadrInfo.Time,dl);
@@ -2960,6 +2967,8 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 		   {
 				// выяснить
 				in >> cadrInfo.InfoCountWindows;
+				// если numFrag <= 0, значит так полубитый, пропускаем
+				if(cadrInfo.InfoCountWindows <= 0) continue;
 				cadrInfo.CountWindows =  cadrInfo.WindowsList.size();
 				LineSeries[9]->AddXY(cadrInfo.Time, cadrInfo.CountWindows);
 		   }
@@ -2970,6 +2979,9 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 		   if(findWord(in,"NumLoc[0]") != std::string::npos)
 		   {
 				in >> cadrInfo.CountLocalObj;
+				// если NumLoc[0] <= 0, значит так полубитый, пропускаем
+				if(cadrInfo.CountLocalObj <= 0) continue;
+				
 				LineSeries[10]->AddXY(cadrInfo.Time,cadrInfo.CountLocalObj);
 		   }
 		   else throw (errorMessage);
@@ -2979,6 +2991,8 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 		   if(findWord(in,"NumDet") != std::string::npos)
 		   {
 				in >> cadrInfo.CountDeterObj;
+				// если NumDet <= 0, значит так полубитый, пропускаем
+				if(cadrInfo.CountDeterObj <= 0) continue;
 				LineSeries[11]->AddXY(cadrInfo.Time,cadrInfo.CountDeterObj);
 		   }
 		   else throw (errorMessage);
@@ -2992,9 +3006,8 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 		   else throw (errorMessage);
 
 
-
+		   cadrInfo.CountStars = cadrInfo.CountWindows;
 		   cadrInfo.CountBlock = 0;
-		   cadrInfo.CountStars = 0;
 		   cadrInfoVec.push_back(cadrInfo);
 		}
 
