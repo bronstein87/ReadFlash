@@ -2397,9 +2397,8 @@ template <typename Stream>
 size_t findWord(Stream& in,const std::string& word)
 {
   std::string lineToWrite;
-  while(in >> lineToWrite )
+  while(in >> lineToWrite)
   {
-
 	if (lineToWrite.find(word) != std::string::npos )
 	{
 		return  in.tellg() - lineToWrite.size();
@@ -2769,6 +2768,8 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 }
 
 
+
+
 void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
 {
     std::string line;
@@ -2852,10 +2853,10 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 						winInfo.Xstart = (std::atof(splittedStr[4].c_str())) - winInfo.Width/2;
 						winInfo.Ystart = (std::atof(splittedStr[5].c_str())) - winInfo.Height/2;
 						cadrInfo.WindowsList.push_back(winInfo);
-
 						starsInfo.X = (std::atof(splittedStr[4].c_str()));
 						starsInfo.Y = (std::atof(splittedStr[5].c_str()));
 						cadrInfo.StarsList.push_back(starsInfo);
+
 				}
 
 			if(findLine(in,"18, 19	Массив локализованных объектов на 2-ом кадре") != std::string::npos)
@@ -2896,11 +2897,31 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 			if(findWord(in, "информации") != std::string::npos)
 			{
 				int secs = 0;
-				in >> secs;
-				// ищем миллисекунды
-				findWord(in, "информации");
 				int msecs = 0;
-				in >> msecs;
+				int prevPos = in.tellg();
+
+				in>>line;
+				if(line== "с")
+				{
+					in >> secs;
+
+					std::getline(in, line);
+					std::getline(in, line);
+
+					vector <string> splittedStr = split(line, "\t");
+					msecs =  std::atoi (splittedStr[1].c_str());
+				}
+
+				else
+				{
+					// если там не "c", возвращаемся назад
+					in.seekg(prevPos);
+					in >> secs;
+					// ищем миллисекунды
+					findWord(in, "информации");
+					in >> msecs;
+
+				}
 				cadrInfo.Time =  static_cast <double> (secs) + static_cast <double> (msecs) / 1000;
 			}
 		   else throw (errorMessage);
@@ -2927,9 +2948,9 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 				al = atan2m(matrixOfOrientation[2][1], matrixOfOrientation[2][0]) * RTD;   if (al<0)  al += 360.;
 				Az = atan2m(matrixOfOrientation[0][2], matrixOfOrientation[1][2]) * RTD;   if (Az<0)  Az += 360.;
 
-				LineSeries[0]->AddXY(cadrInfo.Time,al);
-				LineSeries[1]->AddXY(cadrInfo.Time,dl);
-				LineSeries[2]->AddXY(cadrInfo.Time,Az);
+				LineSeries[0]->AddXY(cadrInfo.Time, al);
+				LineSeries[1]->AddXY(cadrInfo.Time, dl);
+				LineSeries[2]->AddXY(cadrInfo.Time, Az);
 
 
 		   }
@@ -2997,6 +3018,8 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 		   }
 		   else throw (errorMessage);
 
+
+
 			if(findWord(in,"m_cur") != std::string::npos)
 		   {
 				double m_cur = 0;
@@ -3014,6 +3037,8 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 	}
 
 }
+
+
 
 //---------------------------------------------------------------------------
 
