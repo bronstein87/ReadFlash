@@ -3,11 +3,11 @@
   void changeContrast(int ConstrastCoefficient,TImage* ImageToCorrect)
   {
 		ImageToCorrect->Picture->Bitmap->PixelFormat= pf24bit;
-		int AverageBrightness=0;
-		int Width= ImageToCorrect->Picture->Bitmap->Width;
-		int Height= ImageToCorrect->Picture->Bitmap->Height;
+		int AverageBrightness = 0;
+		int Width = ImageToCorrect->Picture->Bitmap->Width;
+		int Height = ImageToCorrect->Picture->Bitmap->Height;
 		TRGBTriple* BitmapLine;
-		for(int i = 0;i < Height;i++)
+		for(int i = 0;i < Height;i ++)
 		{
 			BitmapLine = (TRGBTriple*)ImageToCorrect->Picture->Bitmap->ScanLine[i];
 

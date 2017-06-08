@@ -2913,7 +2913,7 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 				for(int i = 0; i < 4; i++)
 				{
 					std::getline(in,line);
-					vector<string> splittedStr = split(line,"\t\t\t\t\t");
+					vector<string> splittedStr = split(line,"\t\t\t\t");
 					cadrInfo.QuatOrient[i] = std::atof(splittedStr[1].c_str());
 				}
 
@@ -2942,7 +2942,7 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 				for(int i = 0; i < 3; i++)
 				{
 					std::getline(in,line);
-					vector<string> splittedStr = split(line,"\t");
+					vector<string> splittedStr = split(line,"\t\t\t\t");
 					cadrInfo.OmegaOrient[i] = std::atof(splittedStr[1].c_str());
 				}
 				LineSeries[3]->AddXY(cadrInfo.Time,cadrInfo.OmegaOrient[0] * RTS);
