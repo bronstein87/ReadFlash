@@ -158,7 +158,7 @@
 	TMenuItem *BOKZ60ParseProtocol;
 	TMenuItem *BOKZM2VParseProtocol;
 	TMenuItem *N2;
-	TRadioButton *ContrastRadioButton;
+	TCheckBox *ContrastCheckBox;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -180,7 +180,7 @@
 		void __fastcall BOKZ60ParseProtocolClick(TObject *Sender);
 	void __fastcall BOKZM2VParseProtocolClick(TObject *Sender);
 	void __fastcall MenuOpenEnergyTMIClick(TObject *Sender);
-	void __fastcall ContrastRadioButtonClick(TObject *Sender);
+	void __fastcall ContrastCheckBoxClick(TObject *Sender);
 
 
 

@@ -901,16 +901,18 @@ object FormGraphOrient: TFormGraphOrient
         ExplicitWidth = 1095
         ExplicitHeight = 637
       end
-      object ContrastRadioButton: TRadioButton
+      object ContrastCheckBox: TCheckBox
         Left = 0
         Top = 0
         Width = 1152
         Height = 17
         Align = alTop
-        Caption = #1057#1086#1093#1088#1072#1085#1103#1090#1100'  '#1082#1086#1085#1090#1088#1072#1089#1090
+        Caption = #1057#1086#1093#1088#1072#1085#1103#1090#1100' '#1082#1086#1085#1090#1088#1072#1089#1090
         TabOrder = 1
-        OnClick = ContrastRadioButtonClick
-        ExplicitWidth = 749
+        OnClick = ContrastCheckBoxClick
+        ExplicitLeft = 139
+        ExplicitTop = 200
+        ExplicitWidth = 97
       end
     end
   end

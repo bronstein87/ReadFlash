@@ -664,7 +664,7 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 
 	}
 
-	ApplyContrastStory();
+	if(ContrastCheckBox->Checked) ApplyContrastStory();
 	PlaceImageFragments(ImageScrollBoxVector);
 	fclose(FragmentFile);
 
@@ -1441,7 +1441,7 @@ void __fastcall TFormGraphOrient::FormMouseWheelUp(TObject *Sender, TShiftState 
 		return;
    }
 
-	if(ContrastRadioButton->Checked)  ContrastStory.push_back(20);
+	if(ContrastCheckBox->Checked)  ContrastStory.push_back(20);
 
 	for(int currentFragment = 0;currentFragment< ImageVector.size();currentFragment ++)
 	{
@@ -1460,7 +1460,7 @@ bool &Handled)
 		return;
    }
 
-    if(ContrastRadioButton->Checked)  ContrastStory.push_back(-20);
+	if(ContrastCheckBox->Checked)  ContrastStory.push_back(-20);
 	for(int currentFragment = 0;currentFragment < ImageVector.size();currentFragment++)
 	{
 		changeContrast(-20, ImageVector[currentFragment]);
@@ -1501,6 +1501,17 @@ bool &Handled)
 
 
 }
+
+//-------------------------------------------------------------------------
+
+void __fastcall TFormGraphOrient::ContrastCheckBoxClick(TObject *Sender)
+{
+	if (!ContrastCheckBox->Checked)
+	{
+		ContrastStory.clear();
+	}
+}
+//---------------------------------------------------------------------------
 
 
  //---------------------------------------------------------------------------
@@ -3040,15 +3051,4 @@ void __fastcall TFormGraphOrient::BOKZM2VParseProtocolClick(TObject *Sender)
 
 
 
-//---------------------------------------------------------------------------
-
-void __fastcall TFormGraphOrient::ContrastRadioButtonClick(TObject *Sender)
-{
-	if (!ContrastRadioButton->Checked)
-	{
-		ContrastStory.clear();
-	}
-
-}
-//---------------------------------------------------------------------------
 
