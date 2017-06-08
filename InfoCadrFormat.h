@@ -23,7 +23,7 @@ struct ObjectsInfo
 struct WindowsInfo
 {
 	unsigned short Xstart, Ystart;
-	unsigned short Width, Height, CountObj, zipX, zipY;
+	unsigned short Width, Height, CountObj, ZipX, ZipY;
 	float Mean, Sigma, Level;
 	unsigned long StarID;
 	float Mv;  //temporary

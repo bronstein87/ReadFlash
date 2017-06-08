@@ -238,29 +238,27 @@ void TFormGraphOrient::InitTableWindows(void)
 	int k=0;
 
 	TableWindowsInfo->RowCount=2;
-	TableWindowsInfo->ColCount=8;
+	TableWindowsInfo->ColCount=10;
 	TableWindowsInfo->FixedCols=0;
 	TableWindowsInfo->FixedRows=1;
-/**/
+
 	TableWindowsInfo->Cells[k++][0]="№";
 	TableWindowsInfo->Cells[k++][0]="Mv";
 	TableWindowsInfo->Cells[k++][0]="Xstart";
 	TableWindowsInfo->Cells[k++][0]="Ystart";
-//	TableWindowsInfo->Cells[k++][0]="Width";
-//	TableWindowsInfo->Cells[k++][0]="Height";
 //	TableWindowsInfo->Cells[k++][0]="№ CAT";
 	TableWindowsInfo->Cells[k++][0]="Mean";
 	TableWindowsInfo->Cells[k++][0]="Sigma";
 	TableWindowsInfo->Cells[k++][0]="Level";
 	TableWindowsInfo->Cells[k++][0]="CountObj";
-/**/
+	TableWindowsInfo->Cells[k++][0]="Size";
+	TableWindowsInfo->Cells[k++][0]="Zip";
 }
 void TFormGraphOrient::PrintTableWindows(const struct CadrInfo &mCadr)
 {
 
 	if (mCadr.CountWindows) {
 		TableWindowsInfo->RowCount=mCadr.CountWindows+TableWindowsInfo->FixedRows;
-		/**/
 
 		for (int i=0; i < mCadr.CountWindows; i++) {
 			int k=0;
@@ -272,10 +270,12 @@ void TFormGraphOrient::PrintTableWindows(const struct CadrInfo &mCadr)
 			TableWindowsInfo->Cells[k++][i+1]=FloatToStrF(mCadr.WindowsList[i].Sigma, ffFixed,6,2);
 			TableWindowsInfo->Cells[k++][i+1]=String(mCadr.WindowsList[i].Level);
 			TableWindowsInfo->Cells[k++][i+1]=String(mCadr.WindowsList[i].CountObj);
-	//		TableWindowsInfo->Cells[3][i]=String(mCadr.WindowsList[i].Width);
-	//		TableWindowsInfo->Cells[4][i]=String(mCadr.WindowsList[i].Height);
+			TableWindowsInfo->Cells[k++][i+1]=String(mCadr.WindowsList[i].Width)+"x"
+											 +String(mCadr.WindowsList[i].Height);
+			TableWindowsInfo->Cells[k++][i+1]=String(mCadr.WindowsList[i].ZipX)+"x"
+											 +String(mCadr.WindowsList[i].ZipY);
 	//		TableWindowsInfo->Cells[4][i]=String(mCadr.WindowsList[i].StarID);
-		}  /**/
+		}
 	}
 	else
 	{

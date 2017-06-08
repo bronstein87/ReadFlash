@@ -16,8 +16,7 @@ __fastcall TFormAnimateSetting::TFormAnimateSetting(TComponent* Owner)
 	: TForm(Owner)
 {
 }
-
-
+//---------------------------------------------------------------------------
 void __fastcall TFormAnimateSetting::FormCreate(TObject *Sender)
 {
 	AnsiString SourceDir;
@@ -26,7 +25,6 @@ void __fastcall TFormAnimateSetting::FormCreate(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 void __fastcall TFormAnimateSetting::FormClose(TObject *Sender, TCloseAction &Action)
-
 {
 	AnsiString SourceDir;
 	SourceDir=GetCurrentDir();

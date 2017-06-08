@@ -71,7 +71,7 @@ object FormGraphOrient: TFormGraphOrient
     Top = 8
     Width = 1160
     Height = 777
-    ActivePage = TabSheet10
+    ActivePage = TabSheet8
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
     object TabSheet5: TTabSheet
@@ -542,7 +542,7 @@ object FormGraphOrient: TFormGraphOrient
           Pointer.Gradient.MidColor = 16059031
           Pointer.Gradient.StartColor = 14540754
           Pointer.Gradient.Visible = True
-          Pointer.HorizSize = 45
+          Pointer.HorizSize = 41
           Pointer.InflateMargins = False
           Pointer.Pen.Color = 1358954496
           Pointer.Pen.Width = 0
@@ -555,7 +555,7 @@ object FormGraphOrient: TFormGraphOrient
           Pointer.Shadow.VertSize = 19
           Pointer.Shadow.Visible = True
           Pointer.Style = psCircle
-          Pointer.VertSize = 45
+          Pointer.VertSize = 41
           XValues.Name = 'X'
           XValues.Order = loAscending
           YValues.Name = 'Y'
@@ -897,9 +897,6 @@ object FormGraphOrient: TFormGraphOrient
         Align = alClient
         TabOrder = 0
         OnResize = FragmentShowScrollBoxResize
-        ExplicitTop = 112
-        ExplicitWidth = 1095
-        ExplicitHeight = 637
       end
       object ContrastCheckBox: TCheckBox
         Left = 0
@@ -910,9 +907,7 @@ object FormGraphOrient: TFormGraphOrient
         Caption = #1057#1086#1093#1088#1072#1085#1103#1090#1100' '#1082#1086#1085#1090#1088#1072#1089#1090
         TabOrder = 1
         OnClick = ContrastCheckBoxClick
-        ExplicitLeft = 139
-        ExplicitTop = 200
-        ExplicitWidth = 97
+        ExplicitWidth = 745
       end
     end
   end

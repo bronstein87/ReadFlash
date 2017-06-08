@@ -207,6 +207,8 @@ void ConvertDataSLEZH(struct DataSLEZH data, struct CadrInfo &mCadr)
 		winInfo.Ystart = data.YendLoc[i]-data.PfragXY0[i][1]+1;
 		winInfo.Width = data.PfragXY0[i][0];
 		winInfo.Height = data.PfragXY0[i][1];
+		winInfo.ZipX = data.ZipXY[i][0];
+		winInfo.ZipY = data.ZipXY[i][1];
 		winInfo.Mean = data.MeanFrag[i][0];
 		winInfo.Sigma = data.MeanFrag[i][1];
 		winInfo.Level = data.ThFrag[i];
