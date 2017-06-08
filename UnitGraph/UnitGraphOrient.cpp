@@ -9,7 +9,13 @@
 
 #pragma resource "*.dfm"
 
-
+void SwapShort(short *word1, short *word2)
+{
+	short buf;
+	buf = *word1;
+	*word1 = *word2;
+	*word2 = buf;
+}
 
 //---------------------------------------------------------------------------
 __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
@@ -578,7 +584,8 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
    int IndexOfZeroStart = 3;
 	UnicodeString TimePrWithOutNulls = TimePrTwoParts[1].SubString(0, IndexOfZeroStart);
    // и добавляем их в конце, чтобы было как в названии файла фрагментов
-   TimePrTwoParts[1]= "00000" + TimePrWithOutNulls;
+//   TimePrTwoParts[1]= "00000" + TimePrWithOutNulls;
+   TimePrTwoParts[1]=TimePrWithOutNulls; //убраны лишние нули в дробной части времени
 
    AnsiString FragmentFileStr;
    for(int CurrentFileName = 0;CurrentFileName < FileNameList.Length;CurrentFileName ++)
@@ -1076,7 +1083,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 			  ChangeWordNO(mDataNO);
 			  PrintDataNO(ftxt, mDataNO);
 
-			  CadrInfo mCadrInfo;
+			  CadrInfo mCadrInfo;//1, mCadrInfo2;
 			  ConvertDataNO(mDataNO, mCadrInfo,0);
 			  vCadrInfo.push_back(mCadrInfo);
 			  ConvertDataNO(mDataNO, mCadrInfo,1);
@@ -1337,8 +1344,12 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 			  unsigned short buf_frag[MaxPix];
 			  fread(buf_frag, sizeof(short),NumPixF, fflesh);
 
+			  for (int nPix = 0; nPix < NumPixF; nPix+=2) {
+				SwapShort((short*)&buf_frag[nPix],(short*)&buf_frag[nPix+1]);
+			  }
+
 			  char frag_name[300];
-			  sprintf(frag_name,"%s\\Frag_%06d.%08d_%03d.bin",FragDir.c_str(),
+			  sprintf(frag_name,"%s\\Frag_%06d.%03d_%03d.bin",FragDir.c_str(),
 					 mDataFragHdr.Tpr_sec,mDataFragHdr.Tpr_msec,FragID);
 			  ffrag=fopen(frag_name,"wb");
 			  fwrite(buf_frag,sizeof(short),NumPixF,ffrag);
@@ -2355,14 +2366,6 @@ void ConvertDataLOC(struct LOC tmi, struct CadrInfo &mCadr)
 	mCadr.CountStars = 0;
 }
 
-void SwapShort(short *word1, short *word2)
-{
-	short buf;
-	buf = *word1;
-	*word1 = *word2;
-	*word2 = buf;
-}
-
 void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 {
 	OpenDialog1->Filter="txt|*.txt";
@@ -2457,7 +2460,7 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 						}
 						SwapShort((short*)&mDTMI.nLocal[0], (short*)&mDTMI.nLocal[1]);
 						SwapShort((short*)&mDTMI.maxHist, (short*)&mDTMI.maxHistX);
-                        SwapShort((short*)&mDTMI.maxHistY, (short*)&mDTMI.test_short);
+						SwapShort((short*)&mDTMI.maxHistY, (short*)&mDTMI.test_short);
 
 						memcpy(&mLOC, &mDTMI, sizeof(mDTMI));
 						PrintLOC(fout,mLOC);

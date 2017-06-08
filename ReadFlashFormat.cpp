@@ -203,10 +203,10 @@ void ConvertDataSLEZH(struct DataSLEZH data, struct CadrInfo &mCadr)
 
 	WindowsInfo winInfo;
 	for (int i = 0; i < mCadr.CountWindows; i++) {
-		winInfo.Xstart = data.FragYX[i][1]-data.PfragXY[i][0]+1;
-		winInfo.Ystart = data.YendLoc[i]-data.PfragXY[i][1]+1;
-		winInfo.Width = data.PfragXY[i][0];
-		winInfo.Height = data.PfragXY[i][1];
+		winInfo.Xstart = data.FragYX[i][1]-data.PfragXY0[i][0]+1;
+		winInfo.Ystart = data.YendLoc[i]-data.PfragXY0[i][1]+1;
+		winInfo.Width = data.PfragXY0[i][0];
+		winInfo.Height = data.PfragXY0[i][1];
 		winInfo.Mean = data.MeanFrag[i][0];
 		winInfo.Sigma = data.MeanFrag[i][1];
 		winInfo.Level = data.ThFrag[i];
@@ -228,6 +228,8 @@ void ConvertDataNO(struct DataNO data, struct CadrInfo &mCadr, int NC)
 	mCadr.CountDeterObj=data.NumDet;
 
 	ObjectsInfo objInfo;
+
+	mCadr.ObjectsList.clear();      //!!!!!!!!!!!!!!!!
 
 	for (int i=0; i<mCadr.CountLocalObj; i++) {
 		objInfo.X=data.RsLocT[NC][i][0];
@@ -277,7 +279,8 @@ void PrintReg(FILE *ftxt, unsigned char *mas)
 void PrintSingleReg(FILE *ftxt, struct DataSingleReg data)
 {
   fprintf(ftxt,"\n\n//---------------Ошибка чтения регистра-----------------------//\n");
-  fprintf(ftxt,"Заводской номер: %02d\n",data.SerNum);
+  fprintf(ftxt,"Полукомплект №:  %02d\n",(data.SerNum&0x8000+1)>>15);
+  fprintf(ftxt,"Заводской номер: %02d\n",data.SerNum&0x7FFF);
   fprintf(ftxt,"Запись регистров № %d\n",data.CntRecord);
   fprintf(ftxt,"Время привязки: Tep=%ld, Tbshv=%ld\n",data.T,data.Tbshv);
   fprintf(ftxt,"Время привязки: Ts=%ld, Tms=%ld\n",data.Tpr_sec,data.Tpr_msec);
@@ -291,7 +294,8 @@ void PrintDataPix(FILE *ftxt, struct DataPixHeader data, int NumCadr)
 {
 fprintf(ftxt,"\n\n//----Пиксели выше порога на %d-м кадре---------//\n",NumCadr);
 if (NumCadr==1) {
-  fprintf(ftxt,"Заводской номер: %02d\n",data.SerNum);
+  fprintf(ftxt,"Полукомплект №:  %02d\n",(data.SerNum&0x8000+1)>>15);
+  fprintf(ftxt,"Заводской номер: %02d\n",data.SerNum&0x7FFF);
   fprintf(ftxt,"Запись пикселей № %d\n",data.CntRecord);
 }
 fprintf(ftxt,"Время привязки: Tep=%ld, Tbshv=%ld\n",data.T,data.Tbshv);
@@ -304,7 +308,8 @@ fprintf(ftxt,"//----------------------------------------------//\n");
 void PrintDataFrag(FILE *ftxt, struct DataFragHeader data)
 {
 fprintf(ftxt,"\n\n//-----------Массив фрагментов--------------//\n");
-fprintf(ftxt,"Заводской номер: %02d\n",data.SerNum);
+fprintf(ftxt,"Полукомплект №:  %02d\n",(data.SerNum&0x8000+1)>>15);
+fprintf(ftxt,"Заводской номер: %02d\n",data.SerNum&0x7FFF);
 fprintf(ftxt,"Запись фрагментов № %d\n",data.CntRecord);
 fprintf(ftxt,"Время привязки: Ts=%ld, Tms=%ld\n",data.Tpr_sec,data.Tpr_msec);
 fprintf(ftxt,"Число пикселей: %ld\n",data.NumPix);
@@ -314,7 +319,8 @@ fprintf(ftxt,"//----------------------------------------------//\n");
 void PrintDataNO(FILE *ftxt, struct DataNO data)
 {
 fprintf(ftxt,"\n\n//---------------Режим НО/ТО--------------------//\n");
-fprintf(ftxt,"Заводской номер: %02d\n",data.SerNum);
+fprintf(ftxt,"Полукомплект №:  %02d\n",(data.SerNum&0x8000+1)>>15);
+fprintf(ftxt,"Заводской номер: %02d\n",data.SerNum&(0x7FFF));
 fprintf(ftxt,"Запись в режиме НО/ТО № %d\n",data.CntRecord);
 fprintf(ftxt,"Время привязки: Tep=%ld, Tbshv=%ld\n",data.T,data.Tbshv);
 fprintf(ftxt,"Время привязки: Ts=%ld, Tms=%ld\n",data.Tpr_sec,data.Tpr_msec);
@@ -409,7 +415,8 @@ fprintf(ftxt,"//----------------------------------------------//\n");
 void PrintDataSLEZH(FILE *ftxt,  struct DataSLEZH data)
 {
 fprintf(ftxt,"\n\n//---------------Режим СЛЕЖЕНИЕ--------------------//\n");
-fprintf(ftxt,"Заводской номер: %02d\n",data.SerNum);
+fprintf(ftxt,"Полукомплект №:  %02d\n",(data.SerNum&0x8000+1)>>15);
+fprintf(ftxt,"Заводской номер: %02d\n",data.SerNum&0x7FFF);
 fprintf(ftxt,"Запись в режиме слежения № %d\n",data.CntRecord);
 fprintf(ftxt,"Время привязки: Tep=%ld, Tbshv=%ld\n",data.T,data.Tbshv);
 fprintf(ftxt,"Время привязки: Ts=%ld, Tms=%ld\n",data.Tpr_sec,data.Tpr_msec);
