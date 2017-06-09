@@ -630,7 +630,7 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 	{
 		// указатель на currentColumn строку Bitmap
 		BitmapLine = (TRGBTriple*) Fragment->ScanLine[currentColumn];
-		for (unsigned int currentRow = 0, adress = 0; currentRow < FragmentHeight; currentRow++, adress = currentColumn * 24 + currentRow)
+		for (unsigned int currentRow = 0, adress = 0; currentRow < FragmentWidth; currentRow++, adress = currentColumn * FragmentWidth + currentRow)
 		{           // снижаем градацию 255=4095/16
 					BitmapLine[currentRow].rgbtBlue = RawFragment[adress]/8;
 					BitmapLine[currentRow].rgbtGreen = RawFragment[adress]/8;
