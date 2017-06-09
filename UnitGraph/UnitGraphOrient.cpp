@@ -1625,7 +1625,7 @@ std::string line, word;
 			else if ((word=="T")||(word=="Т")) {
 				finp>>word;
 				if (word=="ЭКСП") finp>>tmi.timeExp;
-                else finp>>tmi.timeBOKZ;
+				else tmi.timeBOKZ=word;//finp>>tmi.timeBOKZ;
 			}
 			else if (word=="ФOK") finp>>tmi.Foc;
 			else if (word=="Х0") finp>>tmi.Xg;
@@ -1674,7 +1674,7 @@ std::string line, word;
 			else if ((word=="T")||(word=="Т")) {
 				finp>>word;
 				if (word=="ЭКСП") finp>>tmi.timeExp;
-				else finp>>tmi.timeBOKZ;
+				else finp>>tmi.timeBOKZ;    //ReadTimeBOKZ(word)
 			}
 			else if (word=="НАМ") {
             	finp>>word;
@@ -1872,6 +1872,9 @@ void PrintSHTMI1(ofstream &file, struct SHTMI1 tmi)
 	file<<"Среднее, е.м.р.:\t"<<tmi.Mean<<"\n";
 	file<<"СКО, е.м.р.:\t"<<tmi.Sigma<<"\n";
 	file<<"Число дефектов:\t"<<tmi.countDefect<<"\n";
+	file<<"Идентификатор:\t"<<tmi.CRC<<"\n";
+	file<<"Дата:\t"<<tmi.Date<<"\n";
+	file<<"Версия:\t"<<tmi.Version<<"\n";
 	file<<"____________________________________"<<"\n";
 	file<<flush;
 }
@@ -1894,7 +1897,6 @@ void PrintSHTMI2(ofstream &file, struct SHTMI2 tmi)
 	file<<"Число TО:\t"<<tmi.cntCallTO<<"\n";
 	file<<"TО->СЛЕЖ:\t"<<tmi.cntTOtoSLEZH<<"\n";
 	file<<"Число СЛЕЖ:\t"<<tmi.cntSLEZH<<"\n";
-
 
 	for (int i = 0; i < MAX_STAT; i++) {
 		file<<"Счетчик № "<<(i+1)<<":\t"<<tmi.cntStatOrient[i]<<"\n";
@@ -2140,13 +2142,18 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 		ofstream fshtmi1((FileTitle+"_shtmi1.txt").c_str());
 		ofstream fshtmi2((FileTitle+"_shtmi2.txt").c_str());
 
-		fshtmi2<<std::setw(16)<<"KC1"<<std::setw(18)<<"KC2"<<std::setw(18)<<"POST";
-		fshtmi2<<std::setw(6)<<"№"<<std::setw(6)<<"Texp";
-		fshtmi2<<std::setw(8)<<"УСД"<<std::setw(8)<<"НО"<<std::setw(8)<<"НОСЛ";
-		fshtmi2<<std::setw(8)<<"TО"<<std::setw(8)<<"TОСЛ"<<std::setw(12)<<"СЛЕЖ";
+		fshtmi1<<"KC1\t"<<"KC2\t"<<"POST\t"<<"№\t"<<"Texp\t";
+		fshtmi1<<"Foc\t"<<"Xg\t"<<"Yg\t";
+		fshtmi1<<"Mean\t"<<"Sigma\t";
+		fshtmi1<<"Ndef\t"<<"CRC\t";
+		fshtmi1<<"Date\t"<<"Version\t";
+		fshtmi1<<"\n";
+
+		fshtmi2<<"KC1\t"<<"KC2\t"<<"POST\t"<<"№\t"<<"Texp\t";
+		fshtmi2<<"УСД\t"<<"НО\t"<<"НОСЛ\t";
+		fshtmi2<<"TО\t"<<"TОСЛ\t"<<"СЛЕЖ\t";
 		for (int i = 0; i < MAX_STAT; i++) {
-			if (i<10) fshtmi2<<std::setw(7)<<"EC"<<(i+1);
-			else fshtmi2<<std::setw(6)<<"EC"<<(i+1);
+			fshtmi2<<"EC"<<(i+1)<<"\t";
 		}
 		fshtmi2<<"\n";
 
@@ -2158,27 +2165,34 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 			if (line.find("ШТМИ1")!=std::string::npos) {
 				if(TryReadSHTMI1(finp,mSHTMI1)) {
 					PrintSHTMI1(fout,mSHTMI1);
-					fshtmi1<<std::setw(16)<<mSHTMI1.status1<<std::setw(18)<<mSHTMI1.status2;
-					fshtmi1<<std::setw(18)<<mSHTMI1.post;
-					fshtmi1<<std::setw(6)<<mSHTMI1.serialNumber;
-					fshtmi1<<std::setw(6)<<mSHTMI1.timeExp;
-					fshtmi1<<std::setw(8)<<mSHTMI1.Foc;
-					fshtmi1<<std::setw(8)<<mSHTMI1.Xg;
-					fshtmi1<<std::setw(8)<<mSHTMI1.Yg;
-					fshtmi1<<std::setw(8)<<mSHTMI1.Mean;
-					fshtmi1<<std::setw(8)<<mSHTMI1.Sigma;
-					fshtmi1<<std::setw(8)<<mSHTMI1.countDefect;
-					fshtmi1<<std::setw(8)<<mSHTMI1.CRC;
-					fshtmi1<<std::setw(8)<<mSHTMI1.Date;
-					fshtmi1<<std::setw(8)<<mSHTMI1.Version;
+
+					fshtmi1<<uppercase<<hex<<setfill('0');
+					fshtmi1<<"0x"<<std::setw(4)<<mSHTMI1.status1<<"\t";
+					fshtmi1<<"0x"<<std::setw(4)<<mSHTMI1.status2<<"\t";
+					fshtmi1<<"0x"<<std::setw(4)<<mSHTMI1.post<<"\t";
+					fshtmi1<<dec<<setfill(' ');
+					fshtmi1<<mSHTMI1.serialNumber<<"\t";
+					fshtmi1<<mSHTMI1.timeExp<<"\t";
+					fshtmi1<<mSHTMI1.Foc<<"\t";
+					fshtmi1<<mSHTMI1.Xg<<"\t";
+					fshtmi1<<mSHTMI1.Yg<<"\t";
+					fshtmi1<<mSHTMI1.Mean<<"\t";
+					fshtmi1<<mSHTMI1.Sigma<<"\t";
+					fshtmi1<<mSHTMI1.countDefect<<"\t";
+					fshtmi1<<mSHTMI1.CRC<<"\t";
+					fshtmi1<<mSHTMI1.Date<<"\t";
+					fshtmi1<<mSHTMI1.Version<<"\t";
 					fshtmi1<<"\n";
 				}
 			}
 			else if (line.find("ШТМИ2")!=std::string::npos) {
 				if(TryReadSHTMI2(finp,mSHTMI2)) {
 					PrintSHTMI2(fout,mSHTMI2);
-					fshtmi2<<std::setw(16)<<mSHTMI2.status1<<std::setw(18)<<mSHTMI2.status2;
-					fshtmi2<<std::setw(18)<<mSHTMI2.post;
+					fshtmi2<<uppercase<<hex<<setfill('0');
+					fshtmi2<<"0x"<<std::setw(4)<<mSHTMI2.status1<<"\t";
+					fshtmi2<<"0x"<<std::setw(4)<<mSHTMI2.status2<<"\t";
+					fshtmi2<<"0x"<<std::setw(4)<<mSHTMI2.post<<"\t";
+					fshtmi2<<dec<<setfill(' ');
 					fshtmi2<<std::setw(6)<<mSHTMI2.serialNumber;
 					fshtmi2<<std::setw(6)<<mSHTMI2.timeExp;
 					fshtmi2<<std::setw(8)<<mSHTMI2.cntCommandWord;
