@@ -21,7 +21,7 @@ void SwapShort(short *word1, short *word2)
 __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 		: TForm(Owner),FragID(0),FormAnimateSetting(new TFormAnimateSetting(this))
 {
-		ScaleFactorForScrollBox = 6.5;
+		ScaleFactorForScrollBox = 6.2;
 		ScaleFactorForImage = 6;
 
 }
@@ -567,6 +567,7 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 	}
 
 	ImageVector.clear();
+	FragmentsNumbers.clear();
 	ImageScrollBoxVector.clear();
 	AnsiString NeededDirectory=GetCurrentDir()+"\\Frag_"+FileTitle;
 
@@ -576,7 +577,7 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 		LabelFrameError->Caption="Указан неверный путь к директории фрагментов";
 		return;
 	}
-    else 		LabelFrameError->Visible=false;
+	else 		LabelFrameError->Visible=false;
    TStringDynArray FileNameList;
    FileNameList=TDirectory::GetFiles(NeededDirectory);
    AnsiString TimePrStr=FloatToStrF(mCadr.Time,ffFixed,10,10);
@@ -643,8 +644,8 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 	ImageScrollBoxVector.push_back(new TScrollBox(FragmentShowScrollBox));
 	FragmentShowScrollBox->Color = clBlack;
 	ImageScrollBoxVector.back()->Color = clBlack;
-	ImageScrollBoxVector.back()->Width=Fragment->Width*ScaleFactorForScrollBox;
-	ImageScrollBoxVector.back()->Height=Fragment->Height*ScaleFactorForScrollBox;
+	ImageScrollBoxVector.back()->Width=Fragment->Width * ScaleFactorForScrollBox;
+	ImageScrollBoxVector.back()->Height=Fragment->Height * ScaleFactorForScrollBox;
 	ImageScrollBoxVector.back()->OnMouseWheelUp= &FormMouseWheelUp;
 	ImageScrollBoxVector.back()->OnMouseWheelDown= &FormMouseWheelDown;
 	ImageScrollBoxVector.back()->SetParentComponent(FragmentShowScrollBox);
@@ -652,16 +653,28 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 
 
 
+
 	ImageVector.push_back(new TImage(ImageScrollBoxVector.back()));
-	ImageVector.back()->Width=Fragment->Width*ScaleFactorForImage;
-	ImageVector.back()->Height=Fragment->Height*ScaleFactorForImage;
-	ImageVector.back()->Left=0;
-	ImageVector.back()->Top=0;
-	ImageVector.back()->OnMouseDown=&ImageOnClick;
-	ImageVector.back()->Stretch=true;
+	ImageVector.back()->Width = Fragment->Width*ScaleFactorForImage;
+	ImageVector.back()->Height = Fragment->Height*ScaleFactorForImage;
+	ImageVector.back()->Left = 0;
+	ImageVector.back()->Top = 0;
+	ImageVector.back()->OnMouseDown = &ImageOnClick;
+	ImageVector.back()->Stretch = true;
 	ImageVector.back()->Canvas->
 	StretchDraw(Rect(0, 0, ImageVector.back()->Width, ImageVector.back()->Height),Fragment.get());
 	ImageVector.back()->SetParentComponent(ImageScrollBoxVector.back());
+
+
+
+	TImage* FragmentNumber = new TImage(ImageScrollBoxVector.back());
+	FragmentNumber->Height = 15;
+	FragmentNumber->Width = 15;
+	FragmentNumber->Canvas->Brush->Color = clWhite;
+	TRect TheRect = Rect(0,0,15,15);
+	FragmentNumber->Canvas->TextRect(TheRect, 0, 0, IntToStr(CurrentFragment));
+	FragmentNumber->SetParentComponent(ImageScrollBoxVector.back());
+	FragmentsNumbers.push_back(FragmentNumber);
 
 	}
 
@@ -724,6 +737,106 @@ void TFormGraphOrient::PlaceImageFragments (const vector<TScrollBox*>& FragmentI
 
 
 }
+
+
+void __fastcall TFormGraphOrient::FragmentShowScrollBoxResize(TObject *Sender)
+{
+	PlaceImageFragments(ImageScrollBoxVector);
+}
+//---------------------------------------------------------------------------
+
+
+
+
+void __fastcall TFormGraphOrient::FormMouseWheelUp(TObject *Sender, TShiftState Shift,
+		 const TPoint& MousePos, bool &Handled)
+{
+
+	if(!(FindVCLWindow(MousePos)->Name=="FragmentShowScrollBox") &&
+	!(FindVCLWindow(MousePos)->ClassName()=="TScrollBox"))
+   {
+		return;
+   }
+
+	if(ContrastCheckBox->Checked)  ContrastStory.push_back(20);
+
+	for(int currentFragment = 0;currentFragment< ImageVector.size();currentFragment ++)
+	{
+	   changeContrast(20, ImageVector[currentFragment]);
+
+	}
+
+}
+
+void __fastcall TFormGraphOrient::FormMouseWheelDown(TObject *Sender, TShiftState Shift, const TPoint& MousePos,
+bool &Handled)
+{
+	if(!(FindVCLWindow(MousePos)->Name=="FragmentShowScrollBox") &&
+	!(FindVCLWindow(MousePos)->ClassName()=="TScrollBox"))
+   {
+		return;
+   }
+
+	if(ContrastCheckBox->Checked)  ContrastStory.push_back(-20);
+	for(int currentFragment = 0;currentFragment < ImageVector.size();currentFragment++)
+	{
+		changeContrast(-20, ImageVector[currentFragment]);
+	}
+
+}
+
+
+
+
+
+
+ void __fastcall TFormGraphOrient::ImageOnClick(TObject *Sender,
+		  TMouseButton Button, TShiftState Shift, int X, int Y)
+{
+	TImage* Image = dynamic_cast<TImage*> (Sender);
+	TScrollBox* ScrollBox= dynamic_cast<TScrollBox*>(Image->Parent);
+
+	if(Button==mbLeft)
+	{
+		Image->Width= Image->Width * 1.5;
+		Image->Height= Image->Height * 1.5;
+		// определяем диапазоны ползунков ( ThumpSize всегда почему-то возвращает ноль, так что только таким способом )
+		ScrollBox->VertScrollBar->Position= INT_MAX;
+		ScrollBox->HorzScrollBar->Position= INT_MAX;
+		ScrollBox->VertScrollBar->Position=(((double)(ScrollBox->VertScrollBar->Position)/Image->Height) * Y) * 1.5;
+		ScrollBox->HorzScrollBar->Position=(((double)(ScrollBox->HorzScrollBar->Position)/Image->Width)* X) * 1.5;
+	}
+	else if(Button==mbRight)
+	{
+		Image->Width= Image->Width / 1.5;
+		Image->Height= Image->Height / 1.5;
+		ScrollBox->VertScrollBar->Position= INT_MAX;
+		ScrollBox->HorzScrollBar->Position= INT_MAX;
+		ScrollBox->VertScrollBar->Position=(((double)(ScrollBox->VertScrollBar->Position)/Image->Height) * Y) / 1.5;
+		ScrollBox->HorzScrollBar->Position=(((double)(ScrollBox->HorzScrollBar->Position)/Image->Width)* X) / 1.5;
+	}
+
+	TImage* FragmentNumber = dynamic_cast<TImage*>(ScrollBox->Components[1]);
+	FragmentNumber->Top = 0;
+	FragmentNumber->Left = 0;
+
+   //	TRect
+
+
+}
+
+//-------------------------------------------------------------------------
+
+void __fastcall TFormGraphOrient::ContrastCheckBoxClick(TObject *Sender)
+{
+	if (!ContrastCheckBox->Checked)
+	{
+		ContrastStory.clear();
+	}
+}
+//---------------------------------------------------------------------------
+
+
 
 void __fastcall TFormGraphOrient::EditNumCadrChange(TObject *Sender)
 {
@@ -1026,22 +1139,6 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 		{
 		  fread(&Marker,sizeof(int),1,fflesh);
 		  int NumPixH, PixMas[3];
-
-		// хэш мэп для с соответствиями перечислений
-//		std::unordered_map<unsigned int ,unsigned int> MarkerMap
-//		({
-//			{SECTOR_MARKER,SECTOR_MARKER_ACCORDANCE},
-//			{HO_MARKER,HO_MARKER_ACCORDANCE},
-//			{SL_MARKER,SL_MARKER_ACCORDANCE},
-//			{PIX_0_MARKER,PIX_0_MARKER_ACCORDANCE},
-//			{PIX_1_MARKER,PIX_1_MARKER_ACCORDANCE},
-//			{ALL_REG_MARKER,ALL_REG_MARKER_ACCORDANCE},
-//			{SINGLE_REG_MARKER,SINGLE_REG_MARKER_ACCORDANCE},
-//			{FRAG_MARKER,FRAG_MARKER_ACCORDANCE}
-//		});
-
-//		  MARKER_ACCORDANCE MarkerAccordance=
-//		  static_cast<MARKER_ACCORDANCE>(MarkerMap.at(GetInt(Marker)));
 
 		  switch (GetInt(Marker))
 		  {
@@ -1408,7 +1505,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 
 	 }
   }
-  	catch(std::string &s)
+	catch(std::string &s)
 	{
 		ShowMessage(s.c_str());
 	}
@@ -1423,96 +1520,6 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 
 
 
-void __fastcall TFormGraphOrient::FragmentShowScrollBoxResize(TObject *Sender)
-{
-	PlaceImageFragments(ImageScrollBoxVector);
-}
-//---------------------------------------------------------------------------
-
-
-
-
-void __fastcall TFormGraphOrient::FormMouseWheelUp(TObject *Sender, TShiftState Shift,
-		 const TPoint& MousePos, bool &Handled)
-{
-
-	if(!(FindVCLWindow(MousePos)->Name=="FragmentShowScrollBox") &&
-	!(FindVCLWindow(MousePos)->ClassName()=="TScrollBox"))
-   {
-		return;
-   }
-
-	if(ContrastCheckBox->Checked)  ContrastStory.push_back(20);
-
-	for(int currentFragment = 0;currentFragment< ImageVector.size();currentFragment ++)
-	{
-	   changeContrast(20, ImageVector[currentFragment]);
-
-	}
-
-}
-
-void __fastcall TFormGraphOrient::FormMouseWheelDown(TObject *Sender, TShiftState Shift, const TPoint& MousePos,
-bool &Handled)
-{
-	if(!(FindVCLWindow(MousePos)->Name=="FragmentShowScrollBox") &&
-	!(FindVCLWindow(MousePos)->ClassName()=="TScrollBox"))
-   {
-		return;
-   }
-
-	if(ContrastCheckBox->Checked)  ContrastStory.push_back(-20);
-	for(int currentFragment = 0;currentFragment < ImageVector.size();currentFragment++)
-	{
-		changeContrast(-20, ImageVector[currentFragment]);
-	}
-
-}
-
-
-
-
-
-
- void __fastcall TFormGraphOrient::ImageOnClick(TObject *Sender,
-		  TMouseButton Button, TShiftState Shift, int X, int Y)
-{
-	TImage* Image = dynamic_cast<TImage*> (Sender);
-	TScrollBox* ScrollBox= dynamic_cast<TScrollBox*>(Image->Parent);
-
-	if(Button==mbLeft)
-	{
-		Image->Width= Image->Width * 1.2;
-		Image->Height= Image->Height * 1.2;
-		// определяем диапазоны ползунков ( ThumpSize всегда почему-то возвращает ноль, так что только таким способом )
-		ScrollBox->VertScrollBar->Position= INT_MAX;
-		ScrollBox->HorzScrollBar->Position= INT_MAX;
-		ScrollBox->VertScrollBar->Position=(((double)(ScrollBox->VertScrollBar->Position)/Image->Height) * Y) * 1.2;
-		ScrollBox->HorzScrollBar->Position=(((double)(ScrollBox->HorzScrollBar->Position)/Image->Width)* X) * 1.2;
-	}
-	else if(Button==mbRight)
-	{
-		Image->Width= Image->Width / 1.2;
-		Image->Height= Image->Height / 1.2;
-		ScrollBox->VertScrollBar->Position= INT_MAX;
-		ScrollBox->HorzScrollBar->Position= INT_MAX;
-		ScrollBox->VertScrollBar->Position=(((double)(ScrollBox->VertScrollBar->Position)/Image->Height) * Y) / 1.2;
-		ScrollBox->HorzScrollBar->Position=(((double)(ScrollBox->HorzScrollBar->Position)/Image->Width)* X) / 1.2;
-	}
-
-
-}
-
-//-------------------------------------------------------------------------
-
-void __fastcall TFormGraphOrient::ContrastCheckBoxClick(TObject *Sender)
-{
-	if (!ContrastCheckBox->Checked)
-	{
-		ContrastStory.clear();
-	}
-}
-//---------------------------------------------------------------------------
 
 
  //---------------------------------------------------------------------------

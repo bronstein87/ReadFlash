@@ -1,6 +1,6 @@
 	#include "ImageProcessingFcns.h"
 
-  void changeContrast(int ConstrastCoefficient,TImage* ImageToCorrect)
+  void changeContrast(int ConstrastCoefficient, TImage* ImageToCorrect)
   {
 		ImageToCorrect->Picture->Bitmap->PixelFormat= pf24bit;
 		int AverageBrightness = 0;

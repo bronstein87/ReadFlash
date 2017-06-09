@@ -234,6 +234,7 @@
 		vector <CadrInfo> vCadrInfo;
 		vector <TImage*> ImageVector;
 		vector <TScrollBox*> ImageScrollBoxVector;
+		vector <TImage*> FragmentsNumbers;
 
 	public:		// User declarations
 
