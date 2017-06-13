@@ -54,3 +54,101 @@
 
 
   }
+
+std::unique_ptr<TBitmap> changeContrast(int ContrastCoefficient, FragmentData& FData)
+  {
+	int FragmentSize = FData.SizeX * FData.SizeY;
+	if(FData.min == 0 && FData.max == 0 && FData.mean == 0)
+	{
+		FData.min = *std::min_element(FData.RawFragment, FData.RawFragment + FragmentSize - 1);
+		FData.max = *std::max_element(FData.RawFragment, FData.RawFragment + FragmentSize - 1);
+
+		int sum = 0;
+		for (int i = 0; i < FragmentSize; i++)
+		{
+				sum += FData.RawFragment[i];
+		}
+		FData.mean = sum / FragmentSize;
+	}
+
+	std::unique_ptr<TBitmap> Fragment (new TBitmap());
+	Fragment->PixelFormat = pf24bit;
+	Fragment->Width =  FData.SizeX;
+	Fragment->Height = FData.SizeY;
+
+
+	TRGBTriple *BitmapLine; // структура, хранящая RBG
+	for (int currentColumn = 0; currentColumn < FData.SizeY; currentColumn++)
+	{
+		// указатель на currentColumn строку Bitmap
+		BitmapLine = (TRGBTriple*) Fragment->ScanLine[currentColumn];
+		for (unsigned int currentRow = 0, adress = 0; currentRow < FData.SizeX; currentRow++, adress = currentColumn * FData.SizeX + currentRow)
+		{
+			int ContrastValue =
+			(((FData.RawFragment[adress] - FData.mean) * ContrastCoefficient + FData.mean - FData.min) * 256) / (FData.max - FData.min);
+			if (ContrastValue < 0) ContrastValue = 0;
+			if (ContrastValue > 255) ContrastValue = 255;
+
+			BitmapLine[currentRow].rgbtBlue = ContrastValue ;
+			BitmapLine[currentRow].rgbtGreen = ContrastValue ;
+			BitmapLine[currentRow].rgbtRed = ContrastValue ;
+		}
+	}
+
+	return std::move(Fragment);
+  }
+
+ std::unique_ptr<TBitmap> createFragmentBitmap(FragmentData& FData)
+  {
+	  return changeContrast(1,FData);
+  }
+
+
+  void resizeBitmap(unsigned int Width, unsigned int Height, TBitmap* BitmapToScale)
+  {
+		std::unique_ptr <TBitmap> TemporaryBitmap(new TBitmap());
+		TemporaryBitmap->Width = Width;
+		TemporaryBitmap->Height = Height;
+		TRect TheRect =  Rect(0 , 0 , Width, Height);
+		TemporaryBitmap->Canvas->StretchDraw(TheRect, BitmapToScale);
+		BitmapToScale->Assign(TemporaryBitmap.get());
+  }
+
+  void writePixelValue(FragmentData& FData,TBitmap* Bitmap, unsigned short PixelSize)
+  {
+	TRGBTriple *BitmapLine; // структура, хранящая RBG
+	unsigned int PixelX = 0;
+	unsigned int PixelY = 0;
+	for (int currentColumn = 0; currentColumn < FData.SizeY; currentColumn++)
+	{
+		if(currentColumn >= 1) PixelY += PixelSize;
+		PixelX = 0;
+		// указатель на currentColumn строку Bitmap
+		BitmapLine = (TRGBTriple*) Bitmap->ScanLine[currentColumn];
+		for (unsigned int currentRow = 0, adress = 0; currentRow < FData.SizeX; currentRow++, adress = currentColumn * FData.SizeX + currentRow)
+		{
+			int PixelValue =
+			((FData.RawFragment[adress] - FData.min) * 256) / (FData.max - FData.min);
+			if (PixelValue < 0) PixelValue = 0;
+			if (PixelValue > 255) PixelValue = 255;
+
+			Bitmap->Canvas->Font->Size = 5;
+			Bitmap->Canvas->Brush->Color = (TColor)RGB(PixelValue,PixelValue,PixelValue); //PixelValue;
+			if(PixelValue < 128) Bitmap->Canvas->Font->Color = clWhite;
+			else  Bitmap->Canvas->Font->Color = clBlack;
+
+
+			TRect TheRect = Rect(PixelX, PixelY, PixelX + PixelSize, PixelY + PixelSize);
+		  //	Bitmap->Canvas->Brush->Color = clGreen;
+			static unsigned short ToCenter = 2;
+			Bitmap->Canvas->TextRect(TheRect, PixelX, PixelY + ToCenter, IntToStr(FData.RawFragment[adress]));
+			PixelX += PixelSize;
+
+		}
+	}
+
+
+  }
+
+
+

@@ -41,12 +41,10 @@ object FormGraphOrient: TFormGraphOrient
     Caption = #8470' '#1082#1072#1076#1088#1072
   end
   object LabelFrameError: TLabel
-    Left = 610
-    Top = 799
-    Width = 77
+    Left = 872
+    Top = 800
+    Width = 3
     Height = 13
-    Caption = 'LabelFrameError'
-    Visible = False
   end
   object ButtonAdd: TButton
     Left = 1040
@@ -71,7 +69,7 @@ object FormGraphOrient: TFormGraphOrient
     Top = 8
     Width = 1160
     Height = 777
-    ActivePage = TabSheet8
+    ActivePage = ShowFragmentTab
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
     object TabSheet5: TTabSheet
@@ -542,7 +540,7 @@ object FormGraphOrient: TFormGraphOrient
           Pointer.Gradient.MidColor = 16059031
           Pointer.Gradient.StartColor = 14540754
           Pointer.Gradient.Visible = True
-          Pointer.HorizSize = 41
+          Pointer.HorizSize = 30
           Pointer.InflateMargins = False
           Pointer.Pen.Color = 1358954496
           Pointer.Pen.Width = 0
@@ -555,7 +553,7 @@ object FormGraphOrient: TFormGraphOrient
           Pointer.Shadow.VertSize = 19
           Pointer.Shadow.Visible = True
           Pointer.Style = psCircle
-          Pointer.VertSize = 41
+          Pointer.VertSize = 30
           XValues.Name = 'X'
           XValues.Order = loAscending
           YValues.Name = 'Y'
@@ -891,22 +889,92 @@ object FormGraphOrient: TFormGraphOrient
       ImageIndex = 8
       object FragmentShowScrollBox: TScrollBox
         Left = 0
-        Top = 17
+        Top = 25
         Width = 1152
-        Height = 732
+        Height = 724
         Align = alClient
         TabOrder = 0
         OnResize = FragmentShowScrollBoxResize
       end
-      object ContrastCheckBox: TCheckBox
+      object GroupBox1: TGroupBox
         Left = 0
         Top = 0
         Width = 1152
-        Height = 17
+        Height = 25
         Align = alTop
-        Caption = #1057#1086#1093#1088#1072#1085#1103#1090#1100' '#1082#1086#1085#1090#1088#1072#1089#1090
         TabOrder = 1
-        OnClick = ContrastCheckBoxClick
+        ExplicitTop = 2
+        object Label8: TLabel
+          Left = 263
+          Top = 6
+          Width = 120
+          Height = 13
+          Align = alCustom
+          Caption = #1059#1074#1077#1083#1080#1095#1077#1085#1080#1077' '#1092#1088#1072#1075#1084#1077#1085#1090#1072
+        end
+        object Label9: TLabel
+          Left = 487
+          Top = 6
+          Width = 84
+          Height = 13
+          Caption = #1056#1072#1079#1084#1077#1088' '#1087#1080#1082#1089#1077#1083#1103
+        end
+        object ContrastCheckBox: TCheckBox
+          Left = 3
+          Top = 3
+          Width = 142
+          Height = 17
+          Align = alCustom
+          Caption = #1057#1086#1093#1088#1072#1085#1103#1090#1100' '#1082#1086#1085#1090#1088#1072#1089#1090
+          TabOrder = 0
+        end
+        object ScaleEdit: TEdit
+          Left = 389
+          Top = 3
+          Width = 52
+          Height = 21
+          Align = alCustom
+          TabOrder = 1
+          Text = '10'
+          OnChange = ScaleEditChange
+        end
+        object UpDown2: TUpDown
+          Left = 441
+          Top = 3
+          Width = 16
+          Height = 21
+          Associate = ScaleEdit
+          Position = 10
+          TabOrder = 2
+        end
+        object PixelBrightCheckBox: TCheckBox
+          Left = 143
+          Top = 3
+          Width = 114
+          Height = 17
+          Align = alCustom
+          Caption = #1071#1088#1082#1086#1089#1090#1100' '#1087#1080#1082#1089#1077#1083#1103
+          TabOrder = 3
+          OnClick = PixelBrightCheckBoxClick
+        end
+        object PixelSizeEdit: TEdit
+          Left = 577
+          Top = 3
+          Width = 40
+          Height = 21
+          TabOrder = 4
+          Text = '16'
+          OnChange = PixelSizeEditChange
+        end
+        object UpDown3: TUpDown
+          Left = 615
+          Top = 3
+          Width = 16
+          Height = 21
+          Associate = PixelSizeEdit
+          Position = 16
+          TabOrder = 5
+        end
       end
     end
   end
@@ -974,8 +1042,8 @@ object FormGraphOrient: TFormGraphOrient
     Top = 792
   end
   object MainMenu1: TMainMenu
-    Left = 65528
-    Top = 65528
+    Left = 1160
+    Top = 176
     object MenuOpen: TMenuItem
       Caption = #1042#1099#1073#1088#1072#1090#1100' '#1092#1072#1081#1083
       object MenuOpenFlash: TMenuItem
@@ -1016,6 +1084,7 @@ object FormGraphOrient: TFormGraphOrient
     end
   end
   object OpenDialog1: TOpenDialog
-    Left = 24
+    Left = 1168
+    Top = 136
   end
 end

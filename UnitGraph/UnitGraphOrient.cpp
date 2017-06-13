@@ -21,8 +21,10 @@ void SwapShort(short *word1, short *word2)
 __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 		: TForm(Owner),FragID(0),FormAnimateSetting(new TFormAnimateSetting(this))
 {
-		ScaleFactorForScrollBox = 6.2;
-		ScaleFactorForImage = 6;
+		ScaleFactorForScrollBox = 10.2;
+		ScaleFactorForImage = 10;
+		Contrast = 1;
+		ResizeCoef = 16;
 
 }
 //рисование сводных графиков по серии
@@ -567,6 +569,7 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 	}
 
 	ImageVector.clear();
+	FragmentVector.clear();
 	FragmentsNumbers.clear();
 	ImageScrollBoxVector.clear();
 	AnsiString NeededDirectory=GetCurrentDir()+"\\Frag_"+FileTitle;
@@ -586,8 +589,9 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
    // отсекаем лишние нули с конца
    int IndexOfZeroStart = 3;
 	UnicodeString TimePrWithOutNulls = TimePrTwoParts[1].SubString(0, IndexOfZeroStart);
+
    // и добавляем их в конце, чтобы было как в названии файла фрагментов
-//   TimePrTwoParts[1]= "00000" + TimePrWithOutNulls;
+   //   TimePrTwoParts[1]= "00000" + TimePrWithOutNulls;
    TimePrTwoParts[1]=TimePrWithOutNulls; //убраны лишние нули в дробной части времени
 
    AnsiString FragmentFileStr;
@@ -597,12 +601,12 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 		if(System::Strutils::AnsiContainsStr(FileNameList[CurrentFileName],TimePrTwoParts[0]) &&
 		  System::Strutils::AnsiContainsStr(FileNameList[CurrentFileName],TimePrTwoParts[1]))
 		  {
-				 FragmentFileStr=FileNameList[CurrentFileName];
+				 FragmentFileStr = FileNameList[CurrentFileName];
 				 break;
 		  }
    }
 
-   if(FragmentFileStr!="")
+   if(!FragmentFileStr.IsEmpty())
    {
 
    FILE *FragmentFile;
@@ -614,92 +618,70 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
    }
 
 	for(int CurrentFragment = 0;CurrentFragment < mCadr.CountWindows; CurrentFragment++)
-	{               //mCadr.CountWindows
-		int FragmentWidth = mCadr.WindowsList [CurrentFragment].Width;
-		int FragmentHeight = mCadr.WindowsList [CurrentFragment].Height;
-		int FragmentSize = FragmentWidth * FragmentHeight;
-		unique_ptr<unsigned short[]> RawFragment(new unsigned short [FragmentSize]);
-		fread(RawFragment.get(), sizeof(unsigned short), FragmentSize, FragmentFile);
-		std::unique_ptr<TBitmap> Fragment (new TBitmap());
-		Fragment->PixelFormat = pf24bit;
-		Fragment->Width = FragmentWidth;
-		Fragment->Height = FragmentHeight;
-
-
-		TRGBTriple *BitmapLine; // структура, хранящая RBG
-	for (int currentColumn = 0; currentColumn < FragmentHeight; currentColumn++)
 	{
-		// указатель на currentColumn строку Bitmap
-		BitmapLine = (TRGBTriple*) Fragment->ScanLine[currentColumn];
-		for (unsigned int currentRow = 0, adress = 0; currentRow < FragmentWidth; currentRow++, adress = currentColumn * FragmentWidth + currentRow)
-		{           // снижаем градацию 255=4095/16
-					BitmapLine[currentRow].rgbtBlue = RawFragment[adress]/8;
-					BitmapLine[currentRow].rgbtGreen = RawFragment[adress]/8;
-					BitmapLine[currentRow].rgbtRed = RawFragment[adress]/8;
-		}
+		FragmentVector.push_back(FragmentData());
+		FragmentVector.back().SizeX = mCadr.WindowsList [CurrentFragment].Width;
+		FragmentVector.back().SizeY = mCadr.WindowsList [CurrentFragment].Height;
+		int FragmentSize =  FragmentVector.back().SizeX * FragmentVector.back().SizeY;
+		FragmentVector.back().RawFragment = new unsigned short [FragmentSize];
+		fread(FragmentVector.back().RawFragment, sizeof(unsigned short), FragmentSize, FragmentFile);
+		std::unique_ptr<TBitmap> Fragment(createFragmentBitmap(FragmentVector.back()));
+
+
+
+
+		ImageScrollBoxVector.push_back(new TScrollBox(FragmentShowScrollBox));
+		FragmentShowScrollBox->Color = clBlack;
+		ImageScrollBoxVector.back()->Color = clBlack;
+		ImageScrollBoxVector.back()->Width=Fragment->Width * ScaleFactorForScrollBox;
+		ImageScrollBoxVector.back()->Height=Fragment->Height * ScaleFactorForScrollBox;
+		ImageScrollBoxVector.back()->OnMouseWheelUp= &FormMouseWheelUp;
+		ImageScrollBoxVector.back()->OnMouseWheelDown= &FormMouseWheelDown;
+		ImageScrollBoxVector.back()->SetParentComponent(FragmentShowScrollBox);
+
+
+
+
+
+
+		ImageVector.push_back(new TImage(ImageScrollBoxVector.back()));
+		ImageVector.back()->Width = Fragment->Width* ScaleFactorForImage;
+		ImageVector.back()->Height = Fragment->Height* ScaleFactorForImage;
+		ImageVector.back()->Left = 0;
+		ImageVector.back()->Top = 0;
+		ImageVector.back()->OnMouseDown = &ImageOnClick;
+		ImageVector.back()->Stretch = true;
+		ImageVector.back()->Canvas->
+		StretchDraw(Rect(0, 0, ImageVector.back()->Width, ImageVector.back()->Height),Fragment.get());
+		ImageVector.back()->SetParentComponent(ImageScrollBoxVector.back());
+
+		resizeBitmap(FragmentVector.back().SizeX * ResizeCoef, FragmentVector.back().SizeY * ResizeCoef, ImageVector.back()->Picture->Bitmap);
+
+
+
+		TImage* FragmentNumber = new TImage(ImageScrollBoxVector.back());
+		FragmentNumber->Height = 15;
+		FragmentNumber->Width = 15;
+		FragmentNumber->Canvas->Brush->Color = clWhite;
+		TRect TheRect = Rect(0,0,15,15);
+		FragmentNumber->Canvas->TextRect(TheRect, 0, 0, IntToStr(CurrentFragment));
+		FragmentNumber->SetParentComponent(ImageScrollBoxVector.back());
+		FragmentsNumbers.push_back(FragmentNumber);
+
 	}
 
 
-
-	ImageScrollBoxVector.push_back(new TScrollBox(FragmentShowScrollBox));
-	FragmentShowScrollBox->Color = clBlack;
-	ImageScrollBoxVector.back()->Color = clBlack;
-	ImageScrollBoxVector.back()->Width=Fragment->Width * ScaleFactorForScrollBox;
-	ImageScrollBoxVector.back()->Height=Fragment->Height * ScaleFactorForScrollBox;
-	ImageScrollBoxVector.back()->OnMouseWheelUp= &FormMouseWheelUp;
-	ImageScrollBoxVector.back()->OnMouseWheelDown= &FormMouseWheelDown;
-	ImageScrollBoxVector.back()->SetParentComponent(FragmentShowScrollBox);
-
-
-
-
-
-	ImageVector.push_back(new TImage(ImageScrollBoxVector.back()));
-	ImageVector.back()->Width = Fragment->Width*ScaleFactorForImage;
-	ImageVector.back()->Height = Fragment->Height*ScaleFactorForImage;
-	ImageVector.back()->Left = 0;
-	ImageVector.back()->Top = 0;
-	ImageVector.back()->OnMouseDown = &ImageOnClick;
-	ImageVector.back()->Stretch = true;
-	ImageVector.back()->Canvas->
-	StretchDraw(Rect(0, 0, ImageVector.back()->Width, ImageVector.back()->Height),Fragment.get());
-	ImageVector.back()->SetParentComponent(ImageScrollBoxVector.back());
-
-
-
-	TImage* FragmentNumber = new TImage(ImageScrollBoxVector.back());
-	FragmentNumber->Height = 15;
-	FragmentNumber->Width = 15;
-	FragmentNumber->Canvas->Brush->Color = clWhite;
-	TRect TheRect = Rect(0,0,15,15);
-	FragmentNumber->Canvas->TextRect(TheRect, 0, 0, IntToStr(CurrentFragment));
-	FragmentNumber->SetParentComponent(ImageScrollBoxVector.back());
-	FragmentsNumbers.push_back(FragmentNumber);
-
-	}
-
-	if(ContrastCheckBox->Checked) ApplyContrastStory();
 	PlaceImageFragments(ImageScrollBoxVector);
 	fclose(FragmentFile);
 
    }
 
+	if(!ContrastCheckBox->Checked) Contrast = 1;
+	else SetContrast();
 }
 
 
-void TFormGraphOrient::ApplyContrastStory()
-{
-	if (!ContrastStory.empty())
-	{
-		for(int currentFragment = 0;currentFragment < ImageVector.size();currentFragment ++)
-		{
-			for(int i = 0; i < ContrastStory.size(); i ++)
-			{
-				changeContrast(ContrastStory[i], ImageVector[currentFragment]);
-			}
-		}
-	}
-}
+
 
 void TFormGraphOrient::PlaceImageFragments (const vector<TScrollBox*>& FragmentImages)
 {
@@ -730,7 +712,7 @@ void TFormGraphOrient::PlaceImageFragments (const vector<TScrollBox*>& FragmentI
 			HeightOffset += maxHeight;
 		}
 
-		FragmentImages[CurrentImage]->Left = OffsetStep*WidthOffset;
+		FragmentImages[CurrentImage]->Left = OffsetStep * WidthOffset;
 		FragmentImages[CurrentImage]->Top = HeightOffset;
 		++WidthOffset;
 	}
@@ -743,10 +725,25 @@ void __fastcall TFormGraphOrient::FragmentShowScrollBoxResize(TObject *Sender)
 {
 	PlaceImageFragments(ImageScrollBoxVector);
 }
+
 //---------------------------------------------------------------------------
 
 
 
+
+void TFormGraphOrient::SetContrast()
+{
+	for(int currentFragment = 0;currentFragment < ImageVector.size();currentFragment ++)
+	{
+	   std::unique_ptr<TBitmap> Fragment(changeContrast(Contrast, FragmentVector[currentFragment]));
+	   ImageVector[currentFragment]->Picture->Bitmap->FreeImage();
+	   ImageVector[currentFragment]->Picture->Bitmap = NULL;
+	   ImageVector[currentFragment]->Canvas->
+	   StretchDraw(Rect(0, 0, ImageVector[currentFragment]->Width, ImageVector[currentFragment]->Height),Fragment.get());
+	   resizeBitmap(FragmentVector[currentFragment].SizeX * ResizeCoef, FragmentVector[currentFragment].SizeY * ResizeCoef, ImageVector[currentFragment]->Picture->Bitmap);
+
+	}
+}
 
 void __fastcall TFormGraphOrient::FormMouseWheelUp(TObject *Sender, TShiftState Shift,
 		 const TPoint& MousePos, bool &Handled)
@@ -758,13 +755,10 @@ void __fastcall TFormGraphOrient::FormMouseWheelUp(TObject *Sender, TShiftState 
 		return;
    }
 
-	if(ContrastCheckBox->Checked)  ContrastStory.push_back(20);
+	if( Contrast == -1) Contrast = 1;
+	else ++Contrast;
 
-	for(int currentFragment = 0;currentFragment< ImageVector.size();currentFragment ++)
-	{
-	   changeContrast(20, ImageVector[currentFragment]);
-
-	}
+	SetContrast();
 
 }
 
@@ -777,11 +771,11 @@ bool &Handled)
 		return;
    }
 
-	if(ContrastCheckBox->Checked)  ContrastStory.push_back(-20);
-	for(int currentFragment = 0;currentFragment < ImageVector.size();currentFragment++)
-	{
-		changeContrast(-20, ImageVector[currentFragment]);
-	}
+
+	if( Contrast == 1) Contrast = -1;
+	else --Contrast;
+
+	SetContrast();
 
 }
 
@@ -796,45 +790,32 @@ bool &Handled)
 	TImage* Image = dynamic_cast<TImage*> (Sender);
 	TScrollBox* ScrollBox= dynamic_cast<TScrollBox*>(Image->Parent);
 
-	if(Button==mbLeft)
+	if(Button == mbLeft)
 	{
-		Image->Width= Image->Width * 1.5;
-		Image->Height= Image->Height * 1.5;
+		Image->Width= Image->Width * 2;
+		Image->Height= Image->Height * 2;
 		// определяем диапазоны ползунков ( ThumpSize всегда почему-то возвращает ноль, так что только таким способом )
 		ScrollBox->VertScrollBar->Position= INT_MAX;
 		ScrollBox->HorzScrollBar->Position= INT_MAX;
-		ScrollBox->VertScrollBar->Position=(((double)(ScrollBox->VertScrollBar->Position)/Image->Height) * Y) * 1.5;
-		ScrollBox->HorzScrollBar->Position=(((double)(ScrollBox->HorzScrollBar->Position)/Image->Width)* X) * 1.5;
+		ScrollBox->VertScrollBar->Position=(((double)(ScrollBox->VertScrollBar->Position)/Image->Height) * Y) * 2;
+		ScrollBox->HorzScrollBar->Position=(((double)(ScrollBox->HorzScrollBar->Position)/Image->Width)* X) * 2;
 	}
 	else if(Button==mbRight)
 	{
-		Image->Width= Image->Width / 1.5;
-		Image->Height= Image->Height / 1.5;
+		Image->Width= Image->Width / 2;
+		Image->Height= Image->Height / 2;
 		ScrollBox->VertScrollBar->Position= INT_MAX;
 		ScrollBox->HorzScrollBar->Position= INT_MAX;
-		ScrollBox->VertScrollBar->Position=(((double)(ScrollBox->VertScrollBar->Position)/Image->Height) * Y) / 1.5;
-		ScrollBox->HorzScrollBar->Position=(((double)(ScrollBox->HorzScrollBar->Position)/Image->Width)* X) / 1.5;
+		ScrollBox->VertScrollBar->Position=(((double)(ScrollBox->VertScrollBar->Position)/Image->Height) * Y) / 2;
+		ScrollBox->HorzScrollBar->Position=(((double)(ScrollBox->HorzScrollBar->Position)/Image->Width)* X) / 2;
 	}
 
 	TImage* FragmentNumber = dynamic_cast<TImage*>(ScrollBox->Components[1]);
 	FragmentNumber->Top = 0;
 	FragmentNumber->Left = 0;
 
-   //	TRect
-
-
 }
 
-//-------------------------------------------------------------------------
-
-void __fastcall TFormGraphOrient::ContrastCheckBoxClick(TObject *Sender)
-{
-	if (!ContrastCheckBox->Checked)
-	{
-		ContrastStory.clear();
-	}
-}
-//---------------------------------------------------------------------------
 
 
 
@@ -1049,14 +1030,14 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
   OpenDialog1->Filter="dat|*.dat";
   if (OpenDialog1->Execute()) {
 		vCadrInfo.clear();
-		FileName=OpenDialog1->FileName;
+		FileName = OpenDialog1->FileName;
 		SetCurrentDir(ExtractFileDir(FileName));
 		GetFileTitles(FileName,&FileTitle);
 
 		if(SortFileCheckBox->Checked)
 		{
 			FileName=SortRawFlashFile(FileName);
-			if(FileName=="")
+			if(FileName.IsEmpty())
 			{
 				ShowMessage("Не удалось отсортировать файл. Возможно, исходный файл не удалось открыть");
 				return;
@@ -3105,9 +3086,51 @@ void __fastcall TFormGraphOrient::BOKZM2VParseProtocolClick(TObject *Sender)
 		ShowMessage(e.what());
 	}
 }
+
+
+void __fastcall TFormGraphOrient::ScaleEditChange(TObject *Sender)
+{
+	int ScaleFactor = StrToInt(ScaleEdit->Text);
+	if(ScaleFactor <= 0)
+	{
+		 ShowMessage("Недопустимое значение.");
+		 ScaleEdit->Text = IntToStr(ScaleFactorForImage);
+	}
+	else
+	{
+		ScaleFactorForImage = ScaleFactor;
+		ScaleFactorForScrollBox = ScaleFactor + 0.2;
+	}
+}
+
+
+void __fastcall TFormGraphOrient::PixelBrightCheckBoxClick(TObject *Sender)
+{
+	if(PixelBrightCheckBox->Checked)
+	{
+		for(int i = 0; i < ImageVector.size(); i ++)
+		{
+			writePixelValue(FragmentVector[i], ImageVector[i]->Picture->Bitmap, 16);
+		}
+	}
+}
 //---------------------------------------------------------------------------
 
 
 
+void __fastcall TFormGraphOrient::PixelSizeEditChange(TObject *Sender)
+{
+	int PixelSize= StrToInt(PixelSizeEdit->Text);
+	if(PixelSize < 16)
+	{
+		 ShowMessage("Недопустимое значение.");
+		 ScaleEdit->Text = IntToStr(ResizeCoef);
+	}
+	else
+	{
+		ResizeCoef = PixelSize;
+	}
+}
 
+//---------------------------------------------------------------------------
 
