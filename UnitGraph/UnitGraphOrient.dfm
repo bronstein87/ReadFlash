@@ -895,6 +895,8 @@ object FormGraphOrient: TFormGraphOrient
         Align = alClient
         TabOrder = 0
         OnResize = FragmentShowScrollBoxResize
+        ExplicitLeft = -24
+        ExplicitTop = 22
       end
       object GroupBox1: TGroupBox
         Left = 0
@@ -903,7 +905,6 @@ object FormGraphOrient: TFormGraphOrient
         Height = 25
         Align = alTop
         TabOrder = 1
-        ExplicitTop = 2
         object Label8: TLabel
           Left = 263
           Top = 6
@@ -918,6 +919,13 @@ object FormGraphOrient: TFormGraphOrient
           Width = 84
           Height = 13
           Caption = #1056#1072#1079#1084#1077#1088' '#1087#1080#1082#1089#1077#1083#1103
+        end
+        object Label7: TLabel
+          Left = 647
+          Top = 6
+          Width = 81
+          Height = 13
+          Caption = #1056#1072#1079#1084#1077#1088' '#1096#1088#1080#1092#1090#1072
         end
         object ContrastCheckBox: TCheckBox
           Left = 3
@@ -963,17 +971,35 @@ object FormGraphOrient: TFormGraphOrient
           Width = 40
           Height = 21
           TabOrder = 4
-          Text = '16'
+          Text = '24'
           OnChange = PixelSizeEditChange
         end
         object UpDown3: TUpDown
-          Left = 615
+          Left = 617
           Top = 3
           Width = 16
           Height = 21
           Associate = PixelSizeEdit
-          Position = 16
+          Position = 24
           TabOrder = 5
+        end
+        object FontSizeEdit: TEdit
+          Left = 742
+          Top = 3
+          Width = 27
+          Height = 21
+          TabOrder = 6
+          Text = '7'
+          OnChange = FontSizeEditChange
+        end
+        object UpDown4: TUpDown
+          Left = 767
+          Top = 3
+          Width = 16
+          Height = 21
+          Associate = FontSizeEdit
+          Position = 7
+          TabOrder = 7
         end
       end
     end

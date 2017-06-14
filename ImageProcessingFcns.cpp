@@ -114,17 +114,15 @@ std::unique_ptr<TBitmap> changeContrast(int ContrastCoefficient, FragmentData& F
 		BitmapToScale->Assign(TemporaryBitmap.get());
   }
 
-  void writePixelValue(FragmentData& FData,TBitmap* Bitmap, unsigned short PixelSize)
+  void writePixelValue(FragmentData& FData,TBitmap* Bitmap, unsigned short PixelSize, unsigned short ToCenter, unsigned short FontSize)
   {
-	TRGBTriple *BitmapLine; // структура, хранящая RBG
 	unsigned int PixelX = 0;
 	unsigned int PixelY = 0;
 	for (int currentColumn = 0; currentColumn < FData.SizeY; currentColumn++)
 	{
-		if(currentColumn >= 1) PixelY += PixelSize;
 		PixelX = 0;
-		// указатель на currentColumn строку Bitmap
-		BitmapLine = (TRGBTriple*) Bitmap->ScanLine[currentColumn];
+		if(currentColumn >= 1) PixelY += PixelSize;
+
 		for (unsigned int currentRow = 0, adress = 0; currentRow < FData.SizeX; currentRow++, adress = currentColumn * FData.SizeX + currentRow)
 		{
 			int PixelValue =
@@ -132,16 +130,16 @@ std::unique_ptr<TBitmap> changeContrast(int ContrastCoefficient, FragmentData& F
 			if (PixelValue < 0) PixelValue = 0;
 			if (PixelValue > 255) PixelValue = 255;
 
-			Bitmap->Canvas->Font->Size = 5;
-			Bitmap->Canvas->Brush->Color = (TColor)RGB(PixelValue,PixelValue,PixelValue); //PixelValue;
+			Bitmap->Canvas->Font->Size = FontSize;
+			Bitmap->Canvas->Brush->Color = (TColor)RGB(PixelValue, PixelValue, PixelValue); //PixelValue;
 			if(PixelValue < 128) Bitmap->Canvas->Font->Color = clWhite;
 			else  Bitmap->Canvas->Font->Color = clBlack;
 
 
 			TRect TheRect = Rect(PixelX, PixelY, PixelX + PixelSize, PixelY + PixelSize);
 		  //	Bitmap->Canvas->Brush->Color = clGreen;
-			static unsigned short ToCenter = 2;
-			Bitmap->Canvas->TextRect(TheRect, PixelX, PixelY + ToCenter, IntToStr(FData.RawFragment[adress]));
+
+			Bitmap->Canvas->TextRect(TheRect, PixelX + ToCenter, PixelY + ToCenter, IntToStr(FData.RawFragment[adress]));
 			PixelX += PixelSize;
 
 		}

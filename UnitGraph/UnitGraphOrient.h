@@ -155,50 +155,48 @@
 		TScrollBox *FragmentShowScrollBox;
 		TMenuItem *MenuOpenFlash;
 		TMenuItem *MenuOpenTMI;
-	TMenuItem *N1;
-	TMenuItem *BOKZ60ParseProtocol;
-	TMenuItem *BOKZM2VParseProtocol;
-	TMenuItem *N2;
-	TCheckBox *ContrastCheckBox;
-	TEdit *ScaleEdit;
-	TGroupBox *GroupBox1;
-	TLabel *Label8;
-	TUpDown *UpDown2;
-	TLabel *LabelFrameError;
-	TCheckBox *PixelBrightCheckBox;
-	TEdit *PixelSizeEdit;
-	TLabel *Label9;
-	TUpDown *UpDown3;
+		TMenuItem *N1;
+		TMenuItem *BOKZ60ParseProtocol;
+		TMenuItem *BOKZM2VParseProtocol;
+		TMenuItem *N2;
+		TCheckBox *ContrastCheckBox;
+		TEdit *ScaleEdit;
+		TGroupBox *GroupBox1;
+		TLabel *Label8;
+		TUpDown *UpDown2;
+		TLabel *LabelFrameError;
+		TCheckBox *PixelBrightCheckBox;
+		TEdit *PixelSizeEdit;
+		TLabel *Label9;
+		TUpDown *UpDown3;
+	TLabel *Label7;
+	TEdit *FontSizeEdit;
+	TUpDown *UpDown4;
 
-	void __fastcall MenuSaveClick(TObject *Sender);
-	void __fastcall MenuClearClick(TObject *Sender);
-	void __fastcall FormCreate(TObject *Sender);
-	void __fastcall TableObjectsInfoDrawCell(TObject *Sender, int ACol, int ARow, TRect &Rect,
+		void __fastcall MenuSaveClick(TObject *Sender);
+		void __fastcall MenuClearClick(TObject *Sender);
+		void __fastcall FormCreate(TObject *Sender);
+		void __fastcall TableObjectsInfoDrawCell(TObject *Sender, int ACol, int ARow, TRect &Rect,
 			  TGridDrawState State);
-	void __fastcall TableWindowsInfoDrawCell(TObject *Sender, int ACol, int ARow, TRect &Rect,
+		void __fastcall TableWindowsInfoDrawCell(TObject *Sender, int ACol, int ARow, TRect &Rect,
 			  TGridDrawState State);
-	void __fastcall MenuOptionsClick(TObject *Sender);
-	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
-	void __fastcall FragmentShowScrollBoxResize(TObject *Sender);
-	void __fastcall FormMouseWheelDown(TObject *Sender, TShiftState Shift,const TPoint& MousePos,
+		void __fastcall MenuOptionsClick(TObject *Sender);
+		void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
+		void __fastcall FragmentShowScrollBoxResize(TObject *Sender);
+		void __fastcall FormMouseWheelDown(TObject *Sender, TShiftState Shift,const TPoint& MousePos,
 		  bool &Handled);
-	void __fastcall FormMouseWheelUp(TObject *Sender, TShiftState Shift,const TPoint& MousePos,
+		void __fastcall FormMouseWheelUp(TObject *Sender, TShiftState Shift,const TPoint& MousePos,
 		  bool &Handled);
-	void __fastcall MenuOpenFlashClick(TObject *Sender);
-	void __fastcall MenuOpenProgressTMIClick(TObject *Sender);
-	void __fastcall EditNumCadrChange(TObject *Sender);
-	void __fastcall BOKZ60ParseProtocolClick(TObject *Sender);
-	void __fastcall BOKZM2VParseProtocolClick(TObject *Sender);
-	void __fastcall MenuOpenEnergyTMIClick(TObject *Sender);
-	void __fastcall ScaleEditChange(TObject *Sender);
-	void __fastcall PixelBrightCheckBoxClick(TObject *Sender);
-	void __fastcall PixelSizeEditChange(TObject *Sender);
-
-
-
-
-
-
+		void __fastcall MenuOpenFlashClick(TObject *Sender);
+		void __fastcall MenuOpenProgressTMIClick(TObject *Sender);
+		void __fastcall EditNumCadrChange(TObject *Sender);
+		void __fastcall BOKZ60ParseProtocolClick(TObject *Sender);
+		void __fastcall BOKZM2VParseProtocolClick(TObject *Sender);
+		void __fastcall MenuOpenEnergyTMIClick(TObject *Sender);
+		void __fastcall ScaleEditChange(TObject *Sender);
+		void __fastcall PixelBrightCheckBoxClick(TObject *Sender);
+		void __fastcall PixelSizeEditChange(TObject *Sender);
+	void __fastcall FontSizeEditChange(TObject *Sender);
 
 
 
@@ -219,8 +217,7 @@
 		AnsiString SortRawFlashFile(const AnsiString &RawFileName);
 		void __fastcall ImageOnClick(TObject *Sender,
 		TMouseButton Button, TShiftState Shift, int X, int Y);
-
-
+		void resetFragmentShowScrollBox();
 		void readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
 		void readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
 		void readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
@@ -228,12 +225,11 @@
 
 
 
+
 		unique_ptr <TFormAnimateSetting> FormAnimateSetting;
 		TLineSeries *LineSeries[MaxSeries*NumGraph];
 		TChartShape *BlockSeries[MaxBlockSeries];
 		TChartShape *FrameSeries[MaxFrameSeries];
-
-
 
 
 		AnsiString FileName;
@@ -246,6 +242,7 @@
 		int ScaleFactorForImage;
 		int Contrast;
 		unsigned short ResizeCoef;
+        unsigned short FontSize;
 		int FragID;
 
 
@@ -257,15 +254,15 @@
 
 	public:		// User declarations
 
-			__fastcall TFormGraphOrient(TComponent* Owner);
-			void CreateGraph();
-			void DeleteGraph();
-			void SaveGraph(TChart *Chart, AnsiString suff);
-			void SetVisible(int CheckLine, bool tf);
-			void ApplySeriesSetting(AnsiString Title, TColor color);
-			void SetVisibleLabelFrame(bool isVisible);
-			int  GetCadrInfo(int NC, struct CadrInfo &mCadr);
-			void DrawAnimateHandler(void);
+		__fastcall TFormGraphOrient(TComponent* Owner);
+		void CreateGraph();
+		void DeleteGraph();
+		void SaveGraph(TChart *Chart, AnsiString suff);
+		void SetVisible(int CheckLine, bool tf);
+		void ApplySeriesSetting(AnsiString Title, TColor color);
+		void SetVisibleLabelFrame(bool isVisible);
+		int  GetCadrInfo(int NC, struct CadrInfo &mCadr);
+		void DrawAnimateHandler(void);
 	};
 	//---------------------------------------------------------------------------
 	extern PACKAGE TFormGraphOrient *FormGraphOrient;

@@ -69,6 +69,6 @@ void changeContrast(int ConstrastCoefficient,TImage * ImageToCorrect);
 std::unique_ptr<TBitmap> changeContrast(int ContrastCoefficient, FragmentData& FData);
 std::unique_ptr<TBitmap> createFragmentBitmap(FragmentData& FData);
 void resizeBitmap(unsigned int Width, unsigned int Height, TBitmap* BitmapToScale);
-void writePixelValue(FragmentData& FData,TBitmap* Bitmap, unsigned short PixelSize);
+void writePixelValue(FragmentData& FData,TBitmap* Bitmap, unsigned short PixelSize,unsigned short ToCenter, unsigned short FontSize);
 
 
