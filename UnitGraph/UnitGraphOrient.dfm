@@ -69,7 +69,7 @@ object FormGraphOrient: TFormGraphOrient
     Top = 8
     Width = 1160
     Height = 777
-    ActivePage = ShowFragmentTab
+    ActivePage = TabSheet10
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
     object TabSheet5: TTabSheet
@@ -501,9 +501,9 @@ object FormGraphOrient: TFormGraphOrient
       end
       object Chart1: TChart
         Left = 22
-        Top = 24
+        Top = 43
         Width = 1107
-        Height = 705
+        Height = 686
         Legend.Visible = False
         Title.Text.Strings = (
           'TChart')
@@ -540,7 +540,7 @@ object FormGraphOrient: TFormGraphOrient
           Pointer.Gradient.MidColor = 16059031
           Pointer.Gradient.StartColor = 14540754
           Pointer.Gradient.Visible = True
-          Pointer.HorizSize = 30
+          Pointer.HorizSize = 35
           Pointer.InflateMargins = False
           Pointer.Pen.Color = 1358954496
           Pointer.Pen.Width = 0
@@ -553,7 +553,7 @@ object FormGraphOrient: TFormGraphOrient
           Pointer.Shadow.VertSize = 19
           Pointer.Shadow.Visible = True
           Pointer.Style = psCircle
-          Pointer.VertSize = 30
+          Pointer.VertSize = 35
           XValues.Name = 'X'
           XValues.Order = loAscending
           YValues.Name = 'Y'
@@ -895,8 +895,6 @@ object FormGraphOrient: TFormGraphOrient
         Align = alClient
         TabOrder = 0
         OnResize = FragmentShowScrollBoxResize
-        ExplicitLeft = -24
-        ExplicitTop = 22
       end
       object GroupBox1: TGroupBox
         Left = 0
@@ -993,7 +991,7 @@ object FormGraphOrient: TFormGraphOrient
           OnChange = FontSizeEditChange
         end
         object UpDown4: TUpDown
-          Left = 767
+          Left = 769
           Top = 3
           Width = 16
           Height = 21

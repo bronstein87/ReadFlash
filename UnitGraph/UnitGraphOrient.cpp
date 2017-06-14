@@ -918,7 +918,7 @@ void __fastcall TFormGraphOrient::TableObjectsInfoDrawCell(TObject *Sender, int 
 
 	TStringGrid *thisGrid=(TStringGrid*)Sender;
 
-	if (FormAnimateSetting->CheckBoxFillTableWindows->Checked) {
+	if (FormAnimateSetting->CheckBoxFillTableObjects->Checked) {
 		if (ARow)
 		{
 			unsigned long StarID;
@@ -1684,9 +1684,9 @@ std::string line, word;
 			else if (word=="У0") finp>>tmi.Yg;
 			else if ((word=="МТ")||(word=="MT")) finp>>tmi.Mean;
 			else if ((word=="СТ")||(word=="CT")) finp>>tmi.Sigma;
-			else if (word=="НАМ") {
+			else if ((word=="НАМ")||(word=="HAM")) {
 				finp>>word;
-				if (word=="ДЕФ") finp>>tmi.countDefect;
+				if ((word=="ДЕФ")||(word=="ДEФ")) finp>>tmi.countDefect;
 			}
 			else if (word=="ХСФ") finp>>tmi.CRC;
 			else if (word=="ДАТА") finp>>tmi.Date;
