@@ -155,6 +155,10 @@
         <Defines>NDEBUG;$(Defines)</Defines>
     </PropertyGroup>
     <ItemGroup>
+        <CppCompile Include="FragmentScrollBox.cpp">
+            <DependentOn>FragmentScrollBox.h</DependentOn>
+            <BuildOrder>12</BuildOrder>
+        </CppCompile>
         <CppCompile Include="ImageProcessingFcns.cpp">
             <BuildOrder>12</BuildOrder>
         </CppCompile>
@@ -311,9 +315,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="UnitGraph\UnitGraphOrient.obj" Configuration="Debug" Class="ProjectFile">
+                <DeployFile LocalName=".\Debug\Win32\ReadFlash.tds" Configuration="Debug" Class="DebugSymbols">
                     <Platform Name="Win32">
-                        <RemoteDir>.\</RemoteDir>
+                        <RemoteName>ReadFlash.tds</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

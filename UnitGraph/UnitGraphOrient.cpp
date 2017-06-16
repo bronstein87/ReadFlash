@@ -632,10 +632,12 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 		std::unique_ptr<TBitmap> Fragment(createFragmentBitmap(FragmentVector.back()));
 
 
-		ImageScrollBoxVector.push_back(new TScrollBox(FragmentShowScrollBox));
+		ImageScrollBoxVector.push_back(new FragmentScrollBox(FragmentShowScrollBox));
 		FragmentShowScrollBox->Color = clBlack;
 		ImageScrollBoxVector.back()->Color = clBlack;
-		ImageScrollBoxVector.back()->Width=Fragment->Width * ScaleFactorForScrollBox;
+		ImageScrollBoxVector.back()->Width = Fragment->Width * ScaleFactorForScrollBox;
+		ImageScrollBoxVector.back()->OnVerticalScroll = &OnScroll;
+		ImageScrollBoxVector.back()->OnHorizontalScroll = &OnScroll;
 		ImageScrollBoxVector.back()->Height=Fragment->Height * ScaleFactorForScrollBox;
 		ImageScrollBoxVector.back()->OnMouseWheelUp= &FormMouseWheelUp;
 		ImageScrollBoxVector.back()->OnMouseWheelDown= &FormMouseWheelDown;
@@ -686,13 +688,22 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 	}
 }
 
+void __fastcall TFormGraphOrient::OnScroll(TObject* Sender)
+{
+	FragmentScrollBox* ScrollBox = dynamic_cast<FragmentScrollBox*> (Sender);
+	TImage* FragmentNumber = dynamic_cast<TImage*>(ScrollBox->Components[1]);
+	FragmentNumber->Top = 0;
+	FragmentNumber->Left = 0;
+
+}
+
 void TFormGraphOrient::resetFragmentShowScrollBox()
 {
    FragmentShowScrollBox->VertScrollBar->Position = 0;
    FragmentShowScrollBox->HorzScrollBar->Position = 0;
 }
 
-void TFormGraphOrient::PlaceImageFragments (const vector<TScrollBox*>& FragmentImages)
+void TFormGraphOrient::PlaceImageFragments (const vector<FragmentScrollBox*>& FragmentImages)
 {
 	if(FragmentImages.empty())
 	{
@@ -797,7 +808,7 @@ bool &Handled)
 		  TMouseButton Button, TShiftState Shift, int X, int Y)
 {
 	TImage* Image = dynamic_cast<TImage*> (Sender);
-	TScrollBox* ScrollBox = dynamic_cast <TScrollBox*> (Image->Parent);
+	FragmentScrollBox* ScrollBox = dynamic_cast <FragmentScrollBox*> (Image->Parent);
 
 	if(Button == mbLeft)
 	{
