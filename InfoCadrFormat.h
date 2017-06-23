@@ -13,7 +13,7 @@ struct StarsInfo
 struct ObjectsInfo
 {
 	float X, Y, Bright;
-	unsigned short Square;
+	short Square;
 	unsigned long StarID;
 	float Mv;
 	char Sp[2];
@@ -38,23 +38,33 @@ struct LinesInfo
 struct CadrInfo
 {
 	double Time;
-	bool IsBinary, IsReverse;   //признак бинирования
+	bool IsBinary, IsReverse;   //признак бинирования, признак реверса изображения
+	bool IsOrient; //признак определения ориентации
 	unsigned short CountPixFilter;       //число пикселей выше порога
 	unsigned short ImageWidth, ImageHeight;  //ширина и высота изображения
 	unsigned short StatOrient;  //статус решения задачи (0 - успешно)
+	double MeanBright, SigmaBright;
+
 	unsigned short CountStars;  //число спроектированных звезд
-	std::vector <StarsInfo>  StarsList;  //список спроектированных звезд
-	unsigned short CountLocalObj, CountDeterObj;    //число локализованных и распознанных объектов
-	std::vector <ObjectsInfo> ObjectsList;    //список локализованных объектов
 	unsigned short CountWindows;  //число прогнозируемых окон
-    unsigned short InfoCountWindows;  //общее число окон, часть из которых не попала в ДТМИ
+	unsigned short CountLocalObj, CountDeterObj;    //число локализованных и распознанных объектов
+
+	unsigned short SizeStarsList;
+	std::vector <StarsInfo>  StarsList;  //список спроектированных звезд
+
+	unsigned short SizeObjectsList;
+	std::vector <ObjectsInfo> ObjectsList;    //список локализованных объектов
+
+	unsigned short SizeWindowsList;
 	std::vector <WindowsInfo> WindowsList; //список прогнозируемых окон
+
 	unsigned short CountLines, CountBlock;  //число считываемых строк и блоков с матрицы
 	std::vector <LinesInfo> LinesList;  //список блоков
+
 	double QuatOrient[4], MatrixOrient[3][3], AnglesOrient[3];   //кватернион, матрица и углы ориентации
 	double OmegaOrient[3], MatrixProg[3][3]; //угловая скорость, прогнозируемая матрица ориентации
 	double MatrixTemp;     //температура КМОП-матрицы
-
+	double MeanErrorX, MeanErrorY, MeanErrorXY;
 };
 
 

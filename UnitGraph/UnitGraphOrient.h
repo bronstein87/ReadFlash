@@ -102,15 +102,15 @@
 		TTabSheet *TabSheet7;
 		TChart *ChartMx;
 		TChart *ChartMy;
-		TChart *ChartNst;
+	TChart *ChartMxy;
 		TTabSheet *TabSheet8;
-		TChart *ChartFoc;
-		TChart *ChartX0;
-		TChart *ChartY0;
+	TChart *ChartNumFrag;
+	TChart *ChartNumLoc;
+	TChart *ChartNumDet;
 		TTabSheet *TabSheet9;
 		TChart *ChartFone;
 		TChart *ChartNoise;
-		TChart *ChartNloc;
+	TChart *ChartTemp;
 		TMainMenu *MainMenu1;
 		TMenuItem *MenuSave;
 		TMenuItem *MenuClear;
@@ -199,10 +199,6 @@
 	void __fastcall FontSizeEditChange(TObject *Sender);
 
 
-
-
-
-
 	private:	// User declarations
 		void InitStartColorOptions();
 		void InitTableObjects(void);
@@ -222,8 +218,6 @@
 		void readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
 		void readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
 		void SetContrast();
-
-
 
 
 		unique_ptr <TFormAnimateSetting> FormAnimateSetting;
@@ -257,6 +251,7 @@
 		__fastcall TFormGraphOrient(TComponent* Owner);
 		void CreateGraph();
 		void DeleteGraph();
+        void DrawLineSeries(vector <CadrInfo> _vCadrInfo);
 		void SaveGraph(TChart *Chart, AnsiString suff);
 		void SetVisible(int CheckLine, bool tf);
 		void ApplySeriesSetting(AnsiString Title, TColor color);

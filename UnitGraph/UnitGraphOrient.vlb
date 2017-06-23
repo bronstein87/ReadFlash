@@ -49,9 +49,6 @@ Coordinates=84,78,60,58
 [Chart5]
 Coordinates=315,10,53,58
 
-[ChartY0]
-Coordinates=390,146,62,58
-
 [ChartFone]
 Coordinates=534,146,75,58
 
@@ -91,9 +88,6 @@ Coordinates=178,10,64,58
 [ChartWz]
 Coordinates=253,146,64,58
 
-[ChartNst]
-Coordinates=154,78,65,58
-
 [Series9]
 Coordinates=715,441,58,36
 
@@ -115,17 +109,11 @@ Coordinates=186,146,57,58
 [EditTimeDev]
 Coordinates=218,214,88,58
 
-[ChartX0]
-Coordinates=462,146,62,58
-
 [Chart3]
 Coordinates=252,10,53,58
 
 [TabSheet5]
 Coordinates=191,350,77,36
-
-[ChartFoc]
-Coordinates=73,214,67,58
 
 [ChartWy]
 Coordinates=10,78,64,58
@@ -138,9 +126,6 @@ Coordinates=597,557,58,36
 
 [Chart6]
 Coordinates=229,78,53,58
-
-[ChartNloc]
-Coordinates=418,78,72,58
 
 [TabSheet10]
 Coordinates=97,350,84,36
@@ -224,4 +209,19 @@ Coordinates=845,1,117,58
 [ContrastCheckBox]
 Coordinates=814,298,114,58
 Visible=True
+
+[ChartMxy]
+Coordinates=154,78,65,58
+
+[ChartTemp]
+Coordinates=418,78,72,58
+
+[ChartNumDet]
+Coordinates=390,146,62,58
+
+[ChartNumLoc]
+Coordinates=462,146,62,58
+
+[ChartNumFrag]
+Coordinates=73,214,67,58
 

@@ -48,3 +48,10 @@ void quatToMatr(const double Quat[], double M_ornt[3][3])
 	M_ornt[2][1] = 2.0*(Quat[2]*Quat[3]-Quat[0]*Quat[1]);
 	M_ornt[2][2] = Quat[0]*Quat[0]-Quat[1]*Quat[1]-Quat[2]*Quat[2]+Quat[3]*Quat[3];
 }
+
+void MatrixToEkvAngles(const double Matrix[3][3], double Angles[3])
+{
+	Angles[1]=asinm(Matrix[2][2]); //delta
+	Angles[0]=atan2m(Matrix[2][1],Matrix[2][0]);   if (Angles[0]<0)  Angles[0]+=2*PI;
+	Angles[2]=atan2m(Matrix[0][2],Matrix[1][2]);   if (Angles[2]<0)  Angles[2]+=2*PI;
+}

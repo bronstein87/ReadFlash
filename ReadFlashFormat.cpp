@@ -1,6 +1,15 @@
 
 #include "ReadFlashFormat.h"
 
+double SumSquare(float *vect, int num)
+{
+	double res=0;
+	for (int i = 0; i < num; i++) {
+		res+=vect[i]*vect[i];
+	}
+
+	return res;
+}
 
 float GetFloat(float ptr)
 {
@@ -146,14 +155,20 @@ void ConvertDataSLEZH(struct DataSLEZH data, struct CadrInfo &mCadr)
 {
 	mCadr.IsBinary=true;
 //	mCadr.IsReverse=true;
+
 	mCadr.ImageHeight=1024;
 	mCadr.ImageWidth=1024;
+	mCadr.MatrixTemp=data.Temp;
 	mCadr.Time=data.Tpr_sec+data.Tpr_msec/1000.;
+
 	mCadr.CountLocalObj=data.NumLoc;
 	mCadr.CountDeterObj=data.NumDet;
+	mCadr.CountStars=data.NumProgFrag;
+	mCadr.CountWindows=data.NumFrag;
 
 	ObjectsInfo objInfo;
-	for (int i=0; i<mCadr.CountLocalObj; i++) {
+	mCadr.SizeObjectsList=mCadr.CountLocalObj;
+	for (int i=0; i<mCadr.SizeObjectsList; i++) {
 		objInfo.X=data.RsLocT[i][0];
 		objInfo.Y=data.RsLocT[i][1];
 		objInfo.Bright=data.RsLocT[i][2];
@@ -167,7 +182,7 @@ void ConvertDataSLEZH(struct DataSLEZH data, struct CadrInfo &mCadr)
 		mCadr.ObjectsList.push_back(objInfo) ;
 	}
 
-	if (!data.res_stat)
+	if ((!data.res_stat)&&(data.NumDet))
 	{
 		for (int i=0; i<mCadr.CountDeterObj; i++) {
 			int iloc=data.MasRes[i][0];
@@ -177,6 +192,13 @@ void ConvertDataSLEZH(struct DataSLEZH data, struct CadrInfo &mCadr)
 			mCadr.ObjectsList[iloc].Dx=data.Dx[i];
 			mCadr.ObjectsList[iloc].Dy=data.Dy[i];
 		}
+
+		double SumX, SumY;
+		SumX=SumSquare(data.Dx, data.NumDet);
+		SumY=SumSquare(data.Dy, data.NumDet);
+		mCadr.MeanErrorX=sqrtm(SumX/(double)(data.NumDet-1));
+		mCadr.MeanErrorY=sqrtm(SumY/(double)(data.NumDet-1));
+		mCadr.MeanErrorXY=data.m_cur;//sqrtm((SumX+SumY)/(double)(2*data.NumDet-1));
 	}
 
 	mCadr.CountBlock=data.CountBlock;
@@ -189,20 +211,19 @@ void ConvertDataSLEZH(struct DataSLEZH data, struct CadrInfo &mCadr)
 		mCadr.LinesList.push_back(linesInfo);
 	}
 
-	mCadr.CountStars=data.NumProgFrag;
-
 	StarsInfo starsInfo;
-	for (int i = 0; i < mCadr.CountStars; i++) {
+	mCadr.SizeStarsList=mCadr.CountStars;
+	for (int i = 0; i < mCadr.SizeStarsList; i++) {
 		starsInfo.X=data.XYcProg[i][0];
 		starsInfo.Y=data.XYcProg[i][1];
 		mCadr.StarsList.push_back(starsInfo);
 //		mCadr.StarsList[i].Mv=data.XYcProg[i][2];
 //		mCadr.StarsList[i].StarID=data.XYcProg[i][2];
 	}
-	mCadr.CountWindows=data.NumFrag;
 
 	WindowsInfo winInfo;
-	for (int i = 0; i < mCadr.CountWindows; i++) {
+	mCadr.SizeWindowsList=mCadr.CountWindows;
+	for (int i = 0; i < mCadr.SizeWindowsList; i++) {
 		winInfo.Xstart = data.FragYX[i][1]-data.PfragXY0[i][0]+1;
 		winInfo.Ystart = data.YendLoc[i]-data.PfragXY0[i][1]+1;
 		winInfo.Width = data.PfragXY0[i][0];
@@ -217,23 +238,42 @@ void ConvertDataSLEZH(struct DataSLEZH data, struct CadrInfo &mCadr)
 		winInfo.Mv = data.XYc[i][3];
 		mCadr.WindowsList.push_back(winInfo);
 	}
+
+	if (!data.res_stat) {
+		mCadr.IsOrient=true;
+		for (int i=0; i<3; i++) {
+			for (int j=0; j<3; j++) {
+				mCadr.MatrixOrient[i][j]=data.M_ornt[i][j];
+			}
+		}
+
+		for (int i=0; i<4; i++) {
+			mCadr.QuatOrient[i]=data.Quat[i];
+		}
+
+		for (int i=0; i<3; i++) {
+			mCadr.OmegaOrient[i]=data.Wop[i];
+		}
+	}
+	else mCadr.IsOrient=false;
 }
 
 void ConvertDataNO(struct DataNO data, struct CadrInfo &mCadr, int NC)
 {
 	mCadr.IsBinary=true;
 //	mCadr.IsReverse=true;
+
 	mCadr.ImageHeight=1024;
 	mCadr.ImageWidth=1024;
+	mCadr.MatrixTemp=data.Temp;
 	mCadr.Time=data.Tpr_sec+data.Tpr_msec/1000.;
 	mCadr.CountLocalObj=data.NumLoc[NC];
 	mCadr.CountDeterObj=data.NumDet;
 
 	ObjectsInfo objInfo;
-
 	mCadr.ObjectsList.clear();      //!!!!!!!!!!!!!!!!
-
-	for (int i=0; i<mCadr.CountLocalObj; i++) {
+	mCadr.SizeObjectsList=mCadr.CountLocalObj;
+	for (int i=0; i<mCadr.SizeObjectsList; i++) {
 		objInfo.X=data.RsLocT[NC][i][0];
 		objInfo.Y=data.RsLocT[NC][i][1];
 		objInfo.Bright=data.RsLocT[NC][i][2];
@@ -248,7 +288,7 @@ void ConvertDataNO(struct DataNO data, struct CadrInfo &mCadr, int NC)
 	}
 
 	if (NC) {
-		if (!data.res_stat)
+		if ((!data.res_stat)&&(data.NumDet))
 		{
 			for (int i=0; i<data.NumDet; i++) {
 				int iloc=data.MasRes[i][0];
@@ -257,15 +297,41 @@ void ConvertDataNO(struct DataNO data, struct CadrInfo &mCadr, int NC)
 					mCadr.ObjectsList[iloc].Dx=data.Dx[i];
 					mCadr.ObjectsList[iloc].Dy=data.Dy[i];
 			}
+
+			double SumX, SumY;
+			SumX=SumSquare(data.Dx, data.NumDet);
+			SumY=SumSquare(data.Dy, data.NumDet);
+			mCadr.MeanErrorX=sqrtm(SumX/(double)(data.NumDet-1));
+			mCadr.MeanErrorY=sqrtm(SumY/(double)(data.NumDet-1));
+			mCadr.MeanErrorXY=data.m_cur;//sqrtm((SumX+SumY)/(double)(2*data.NumDet-1));
 		}
 	}
 
+	if ((NC)&&(!data.res_stat)) {
+		mCadr.IsOrient=true;
+		for (int i=0; i<3; i++) {
+			for (int j=0; j<3; j++) {
+				mCadr.MatrixOrient[i][j]=data.M_ornt[i][j];
+			}
+		}
+
+		for (int i=0; i<4; i++) {
+			mCadr.QuatOrient[i]=data.Quat[i];
+		}
+
+		for (int i=0; i<3; i++) {
+			mCadr.OmegaOrient[i]=data.Wop[i];
+		}
+	}
+	else mCadr.IsOrient=false;
+
 	mCadr.CountStars=0;
+	mCadr.SizeStarsList=0;
 	mCadr.CountWindows=0;
+	mCadr.SizeWindowsList=0;
 	mCadr.CountLines=0;
 	mCadr.CountBlock=0;
 }
-
 
 void PrintReg(FILE *ftxt, unsigned char *mas)
 {

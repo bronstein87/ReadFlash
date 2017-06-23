@@ -69,7 +69,7 @@ object FormGraphOrient: TFormGraphOrient
     Top = 8
     Width = 1160
     Height = 777
-    ActivePage = TabSheet10
+    ActivePage = TabSheet9
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
     object TabSheet5: TTabSheet
@@ -275,7 +275,7 @@ object FormGraphOrient: TFormGraphOrient
         DefaultCanvas = 'TGDIPlusCanvas'
         ColorPaletteIndex = 13
       end
-      object ChartNst: TChart
+      object ChartMxy: TChart
         Left = 16
         Top = 497
         Width = 1117
@@ -305,9 +305,9 @@ object FormGraphOrient: TFormGraphOrient
       DesignSize = (
         1152
         749)
-      object ChartFoc: TChart
+      object ChartNumFrag: TChart
         Left = 16
-        Top = 9
+        Top = 3
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
@@ -328,9 +328,9 @@ object FormGraphOrient: TFormGraphOrient
         DefaultCanvas = 'TGDIPlusCanvas'
         ColorPaletteIndex = 13
       end
-      object ChartX0: TChart
+      object ChartNumLoc: TChart
         Left = 16
-        Top = 252
+        Top = 259
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
@@ -351,7 +351,7 @@ object FormGraphOrient: TFormGraphOrient
         DefaultCanvas = 'TGDIPlusCanvas'
         ColorPaletteIndex = 13
       end
-      object ChartY0: TChart
+      object ChartNumDet: TChart
         Left = 16
         Top = 497
         Width = 1117
@@ -427,7 +427,7 @@ object FormGraphOrient: TFormGraphOrient
         DefaultCanvas = 'TGDIPlusCanvas'
         ColorPaletteIndex = 13
       end
-      object ChartNloc: TChart
+      object ChartTemp: TChart
         Left = 16
         Top = 498
         Width = 1117
@@ -540,7 +540,7 @@ object FormGraphOrient: TFormGraphOrient
           Pointer.Gradient.MidColor = 16059031
           Pointer.Gradient.StartColor = 14540754
           Pointer.Gradient.Visible = True
-          Pointer.HorizSize = 35
+          Pointer.HorizSize = 36
           Pointer.InflateMargins = False
           Pointer.Pen.Color = 1358954496
           Pointer.Pen.Width = 0
@@ -553,7 +553,7 @@ object FormGraphOrient: TFormGraphOrient
           Pointer.Shadow.VertSize = 19
           Pointer.Shadow.Visible = True
           Pointer.Style = psCircle
-          Pointer.VertSize = 35
+          Pointer.VertSize = 36
           XValues.Name = 'X'
           XValues.Order = loAscending
           YValues.Name = 'Y'
