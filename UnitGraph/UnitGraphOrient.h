@@ -58,6 +58,7 @@
 	#include <sstream>
 	#include <iterator>
 	#include <algorithm>
+	#include "FragmentScrollBox.h"
 
 
 
@@ -79,10 +80,7 @@
 
 
 
-
 	class TFormAnimateSetting;
-
-
 
 	class TFormGraphOrient : public TForm
 	{
@@ -209,7 +207,7 @@
 		void DrawAnimate(const struct CadrInfo &mCadr);
 		void DrawBlock(const struct CadrInfo &mCadr);
 		void DrawFragment(const struct CadrInfo &mCadr);
-		void PlaceImageFragments (const vector<TScrollBox*>& FragmentImages);
+		void PlaceImageFragments (const vector <FragmentScrollBox*>& FragmentImages);
 		AnsiString SortRawFlashFile(const AnsiString &RawFileName);
 		void __fastcall ImageOnClick(TObject *Sender,
 		TMouseButton Button, TShiftState Shift, int X, int Y);
@@ -217,6 +215,7 @@
 		void readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
 		void readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
 		void readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
+		void __fastcall OnScroll(TObject* Sender);
 		void SetContrast();
 
 
@@ -243,7 +242,7 @@
 		vector <CadrInfo> vCadrInfo;
 		vector <TImage*> ImageVector;
 		vector <FragmentData> FragmentVector;
-		vector <TScrollBox*> ImageScrollBoxVector;
+		vector <FragmentScrollBox*> ImageScrollBoxVector;
 		vector <TImage*> FragmentsNumbers;
 
 	public:		// User declarations

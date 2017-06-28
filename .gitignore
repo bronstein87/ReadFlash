@@ -93,3 +93,5 @@ ReadFlash.cbproj.local
 *.stat
 ReadFlash.cbproj.local
 *.vlb
+*.local
+*.stat
