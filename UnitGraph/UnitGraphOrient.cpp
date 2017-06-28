@@ -2643,7 +2643,6 @@ void TFormGraphOrient::readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cad
 
 				else throw (errorMessage);
 
-
 				  //ищем число распознанных объектов
 				if(findWord(in,"объектов") != std::string::npos)
 				{
@@ -2687,6 +2686,9 @@ void TFormGraphOrient::readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cad
 				cadrInfo.CountBlock = 0;
 				cadrInfo.CountWindows = 0;
 				cadrInfo.CountStars = 0;
+				cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
+                cadrInfo.SizeStarsList = 0;
+
 				cadrInfoVec.push_back(cadrInfo);
 		   }
 
@@ -2839,6 +2841,7 @@ void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrIn
 		   }
 		  else throw (errorMessage);
 
+
 		   if(findLine(in,"16) Значение порогов во фрагментах") != std::string::npos)
 		   {
 				for(int i = 0; i < cadrInfo.CountWindows; i++)
@@ -2866,6 +2869,10 @@ void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrIn
 
 		   cadrInfo.CountBlock = 0;
 		   cadrInfo.CountStars = 0;
+		   cadrInfo.SizeStarsList = 0;
+		   cadrInfo.SizeWindowsList = cadrInfo.WindowsList.size();
+		   cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
+
 		   cadrInfoVec.push_back(cadrInfo);
 		}
 
@@ -2896,11 +2903,11 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 			}
 			DeleteGraph();
 			CreateGraph();
-			ApplySeriesSetting("мБОКЗ-2В",	clBlue);
+			ApplySeriesSetting("БОКЗ-М60",	clBlue);
 
 			if(checkLocFile(in))
 			{
-			readBOKZ60LocProtocol(in,vCadrInfo);
+				readBOKZ60LocProtocol(in,vCadrInfo);
 			}
 
 			else
@@ -2968,9 +2975,6 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 						// если всё-таки объектов меньше
 						if(std::atof (splittedStr[0].c_str()) == 0)
 						{
-//							  cadrInfo.SizeWindowsList = i+1;
-//							  cadrInfo.SizeObjectsList = i+1;
-//							  cadrInfo.SizeStarsList = i+1;
 							  break;
 						}
 						// заполняем все о лок
@@ -3016,6 +3020,7 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 						winInfo.Xstart = (std::atof(splittedStr[4].c_str())) - winInfo.Width/2;
 						winInfo.Ystart = (std::atof(splittedStr[5].c_str())) - winInfo.Height/2;
 						cadrInfo.WindowsList.push_back(winInfo);
+
 						starsInfo.X = (std::atof(splittedStr[4].c_str()));
 						starsInfo.Y = (std::atof(splittedStr[5].c_str()));
 						cadrInfo.StarsList.push_back(starsInfo);
@@ -3032,7 +3037,6 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 					// если всё-таки объектов меньше
 					if(std::atof (splittedStr[0].c_str()) == 0)
 					{
-//						cadrInfo.SizeObjectsList  += i+1;
 						break;
 					}
 						// заполняем все о лок
@@ -3054,10 +3058,10 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 		   }
 			else throw (errorMessage);
 
-			cadrInfo.SizeWindowsList=cadrInfo.WindowsList.size();
-			cadrInfo.SizeObjectsList=cadrInfo.ObjectsList.size();
-			cadrInfo.SizeStarsList=cadrInfo.StarsList.size();
-            GetImageBright(cadrInfo);
+			cadrInfo.SizeWindowsList = cadrInfo.WindowsList.size();
+			cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
+			cadrInfo.SizeStarsList = cadrInfo.StarsList.size();
+			GetImageBright(cadrInfo);
 
 		   // ищем время привязки в секундах
 			if(findWord(in, "информации") != std::string::npos)
@@ -3160,10 +3164,7 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 				// выяснить
 				// общее число фрагментов
 				in >> cadrInfo.CountWindows;
-				// если numFrag <= 0, значит так полубитый, пропускаем
 				if(cadrInfo.CountWindows <= 0) continue;
-//				cadrInfo.CountWindows =  cadrInfo.WindowsList.size();
-				//его и выводим на график
 				LineSeries[9]->AddXY(cadrInfo.Time, cadrInfo.CountWindows);
 		   }
 		   else throw (errorMessage);
@@ -3173,7 +3174,6 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 		   if(findWord(in,"NumLoc[0]") != std::string::npos)
 		   {
 				in >> cadrInfo.CountLocalObj;
-				// если NumLoc[0] <= 0, значит так полубитый, пропускаем
 				if(cadrInfo.CountLocalObj <= 0) continue;
 
 				LineSeries[10]->AddXY(cadrInfo.Time,cadrInfo.CountLocalObj);
@@ -3185,7 +3185,6 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 		   if(findWord(in,"NumDet") != std::string::npos)
 		   {
 				in >> cadrInfo.CountDeterObj;
-				// если NumDet <= 0, значит так полубитый, пропускаем
 				if(cadrInfo.CountDeterObj <= 0) continue;
 				LineSeries[11]->AddXY(cadrInfo.Time,cadrInfo.CountDeterObj);
 		   }
