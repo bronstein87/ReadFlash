@@ -2,7 +2,7 @@ object FormAnimateSetting: TFormAnimateSetting
   Left = 0
   Top = 0
   Caption = #1053#1072#1089#1090#1088#1086#1081#1082#1080' '#1072#1085#1080#1084#1072#1094#1080#1080
-  ClientHeight = 422
+  ClientHeight = 452
   ClientWidth = 368
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -155,7 +155,7 @@ object FormAnimateSetting: TFormAnimateSetting
     Left = 8
     Top = 255
     Width = 352
-    Height = 162
+    Height = 98
     Caption = #1044#1074#1080#1078#1077#1085#1080#1077' '#1079#1074#1077#1079#1076
     TabOrder = 2
     object CheckBoxLabelFrame: TCheckBox
@@ -198,6 +198,38 @@ object FormAnimateSetting: TFormAnimateSetting
       Height = 17
       Caption = #1053#1086#1084#1077#1088' '#1092#1088#1072#1075#1084#1077#1085#1090#1072
       TabOrder = 4
+    end
+  end
+  object GroupBox4: TGroupBox
+    Left = 8
+    Top = 359
+    Width = 352
+    Height = 82
+    Caption = #1057#1074#1086#1076#1085#1099#1077' '#1075#1088#1072#1092#1080#1082#1080
+    TabOrder = 3
+    object CheckBoxCurrentTime: TCheckBox
+      Left = 18
+      Top = 24
+      Width = 191
+      Height = 17
+      Caption = #1054#1090#1086#1073#1088#1072#1078#1072#1090#1100' '#1090#1077#1082#1091#1097#1077#1077' '#1080#1079#1084#1077#1088#1077#1085#1080#1077
+      TabOrder = 0
+    end
+    object RadioButton1: TRadioButton
+      Left = 40
+      Top = 47
+      Width = 113
+      Height = 17
+      Caption = #1083#1080#1085#1080#1103
+      TabOrder = 1
+    end
+    object RadioButton2: TRadioButton
+      Left = 180
+      Top = 47
+      Width = 113
+      Height = 17
+      Caption = #1090#1086#1095#1082#1072
+      TabOrder = 2
     end
   end
   object ColorDialog1: TColorDialog

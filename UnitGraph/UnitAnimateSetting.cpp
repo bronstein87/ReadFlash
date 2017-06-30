@@ -47,6 +47,7 @@ void TFormAnimateSetting::ReadINI(const AnsiString& fileName)
 	ShapeColorTwoObjTable->Brush->Color=TColor(StrToInt(Ini->ReadString("Colors", "TwoObjTable", clWhite)));
 	ShapeColorThreeObjTable->Brush->Color=TColor(StrToInt(Ini->ReadString("Colors", "ThreeObjTable", clWhite)));
 
+	CheckBoxCurrentTime->Checked=TColor(StrToInt(Ini->ReadString("CheckBox","CheckCurrentTime","1")));
 }
 //---------------------------------------------------------------------------
 void TFormAnimateSetting::WriteINI(const AnsiString& fileName)
@@ -65,6 +66,7 @@ void TFormAnimateSetting::WriteINI(const AnsiString& fileName)
 	Ini->WriteString("Colors", "TwoObjTable", IntToStr(ShapeColorTwoObjTable->Brush->Color));
 	Ini->WriteString("Colors", "ThreeObjTable", IntToStr(ShapeColorThreeObjTable->Brush->Color));
 
+	Ini->WriteString("CheckBox", "CheckCurrentTime",   IntToStr((int)CheckBoxCurrentTime->Checked));
 }
 //---------------------------------------------------------------------------
 void __fastcall TFormAnimateSetting::ShapeColorLocObjTableMouseDown(TObject *Sender, TMouseButton Button,
@@ -73,7 +75,8 @@ void __fastcall TFormAnimateSetting::ShapeColorLocObjTableMouseDown(TObject *Sen
 	if (ColorDialog1->Execute()) {
 		ShapeColorLocObjTable->Brush->Color=ColorDialog1->Color;
 		TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
-		FormGraphOrient->DrawAnimateHandler();
+//		FormGraphOrient->DrawAnimateHandler();
+		FormGraphOrient->PrintTableObjectsHandler();
 	}
 }
 //---------------------------------------------------------------------------
@@ -83,7 +86,8 @@ void __fastcall TFormAnimateSetting::ShapeColorDetObjTableMouseDown(TObject *Sen
 	if (ColorDialog1->Execute()) {
 		ShapeColorDetObjTable->Brush->Color=ColorDialog1->Color;
 		TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
-		FormGraphOrient->DrawAnimateHandler();
+//		FormGraphOrient->DrawAnimateHandler();
+		FormGraphOrient->PrintTableObjectsHandler();
 	}
 }
 //---------------------------------------------------------------------------
@@ -94,7 +98,8 @@ void __fastcall TFormAnimateSetting::ShapeColorZeroObjTableMouseDown(TObject *Se
 	if (ColorDialog1->Execute()) {
 		ShapeColorZeroObjTable->Brush->Color=ColorDialog1->Color;
 		TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
-		FormGraphOrient->DrawAnimateHandler();
+//		FormGraphOrient->DrawAnimateHandler();
+		FormGraphOrient->PrintTableWindowsHandler();
 	}
 }
 //---------------------------------------------------------------------------
@@ -105,7 +110,8 @@ void __fastcall TFormAnimateSetting::ShapeColorOneObjTableMouseDown(TObject *Sen
 	if (ColorDialog1->Execute()) {
 		ShapeColorOneObjTable->Brush->Color=ColorDialog1->Color;
 		TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
-		FormGraphOrient->DrawAnimateHandler();
+//		FormGraphOrient->DrawAnimateHandler();
+		FormGraphOrient->PrintTableWindowsHandler();
 	}
 }
 //---------------------------------------------------------------------------
@@ -116,7 +122,8 @@ void __fastcall TFormAnimateSetting::ShapeColorTwoObjTableMouseDown(TObject *Sen
 	if (ColorDialog1->Execute()) {
 		ShapeColorTwoObjTable->Brush->Color=ColorDialog1->Color;
 		TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
-		FormGraphOrient->DrawAnimateHandler();
+//		FormGraphOrient->DrawAnimateHandler();
+		FormGraphOrient->PrintTableWindowsHandler();
 	}
 }
 //---------------------------------------------------------------------------
@@ -127,36 +134,25 @@ void __fastcall TFormAnimateSetting::ShapeColorThreeObjTableMouseDown(TObject *S
 	if (ColorDialog1->Execute()) {
 		ShapeColorThreeObjTable->Brush->Color=ColorDialog1->Color;
 		TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
-		FormGraphOrient->DrawAnimateHandler();
+//		FormGraphOrient->DrawAnimateHandler();
+		FormGraphOrient->PrintTableWindowsHandler();
 	}
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TFormAnimateSetting::CheckBoxApplyObjectsSeriesClick(TObject *Sender)
-{
-	TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
-	FormGraphOrient->DrawAnimateHandler();
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TFormAnimateSetting::CheckBoxApplyWindowsSeriesClick(TObject *Sender)
-{
-	TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
-	FormGraphOrient->DrawAnimateHandler();
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TFormAnimateSetting::CheckBoxFillTableObjectsClick(TObject *Sender)
 {
 	TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
-	FormGraphOrient->DrawAnimateHandler();
+//	FormGraphOrient->DrawAnimateHandler();
+	FormGraphOrient->PrintTableObjectsHandler();
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TFormAnimateSetting::CheckBoxFillTableWindowsClick(TObject *Sender)
 {
 	TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
-	FormGraphOrient->DrawAnimateHandler();
+//	FormGraphOrient->DrawAnimateHandler();
+	FormGraphOrient->PrintTableWindowsHandler();
 }
 //---------------------------------------------------------------------------
 
@@ -164,7 +160,23 @@ void __fastcall TFormAnimateSetting::CheckBoxLabelFrameClick(TObject *Sender)
 {
 	TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
 	FormGraphOrient->SetVisibleLabelFrame(CheckBoxLabelFrame->Checked);
+	FormGraphOrient->DrawAnimateHandler();
+//	FormGraphOrient->DrawBlockHandler();
 }
 //---------------------------------------------------------------------------
 
+void __fastcall TFormAnimateSetting::CheckBoxApplyWindowsSeriesClick(TObject *Sender)
+{
+	TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
+	FormGraphOrient->DrawAnimateHandler();
+//	FormGraphOrient->DrawBlockHandler();
+}
+//---------------------------------------------------------------------------
 
+void __fastcall TFormAnimateSetting::CheckBoxApplyObjectsSeriesClick(TObject *Sender)
+{
+	TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
+	FormGraphOrient->DrawAnimateHandler();
+//	FormGraphOrient->DrawBlockHandler();
+}
+//---------------------------------------------------------------------------

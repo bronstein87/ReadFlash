@@ -65,7 +65,7 @@ __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 }
 //рисование сводных графиков по серии
 //---------------------------------------------------------------------------
-void TFormGraphOrient::CreateGraph()
+void TFormGraphOrient::CreateLineGraph()
 {
 	int numberOfSeries = 0;
 	LineSeries[numberOfSeries]= new TLineSeries(ChartAl);
@@ -114,7 +114,7 @@ void TFormGraphOrient::CreateGraph()
 	ChartTemp->AddSeries(LineSeries[numberOfSeries]);
 }
 
-void TFormGraphOrient::DeleteGraph()
+void TFormGraphOrient::DeleteLineGraph()
 {
 	if(LineSeries[0] != NULL)
 	{
@@ -127,10 +127,72 @@ void TFormGraphOrient::DeleteGraph()
 	}
 }
 
+void TFormGraphOrient::CreateScrollGraph()
+{
+	int numberOfSeries = 0;
+	ScrollSeries[numberOfSeries]= new TLineSeries(ChartAl);
+	ChartAl->AddSeries(ScrollSeries[numberOfSeries]);
+	numberOfSeries++;
+	ScrollSeries[numberOfSeries]= new TLineSeries(ChartDl);
+	ChartDl->AddSeries(ScrollSeries[numberOfSeries]);
+	numberOfSeries++;
+	ScrollSeries[numberOfSeries]= new TLineSeries(ChartAz);
+	ChartAz->AddSeries(ScrollSeries[numberOfSeries]);
+	numberOfSeries++;
+	ScrollSeries[numberOfSeries]= new TLineSeries(ChartWx);
+	ChartWx->AddSeries(ScrollSeries[numberOfSeries]);
+	numberOfSeries++;
+	ScrollSeries[numberOfSeries]= new TLineSeries(ChartWy);
+	ChartWy->AddSeries(ScrollSeries[numberOfSeries]);
+	numberOfSeries++;
+	ScrollSeries[numberOfSeries]= new TLineSeries(ChartWz);
+	ChartWz->AddSeries(ScrollSeries[numberOfSeries]);
+	numberOfSeries++;
+	ScrollSeries[numberOfSeries]= new TLineSeries(ChartMx);
+	ChartMx->AddSeries(ScrollSeries[numberOfSeries]);
+	numberOfSeries++;
+	ScrollSeries[numberOfSeries]= new TLineSeries(ChartMy);
+	ChartMy->AddSeries(ScrollSeries[numberOfSeries]);
+	numberOfSeries++;
+	ScrollSeries[numberOfSeries]= new TLineSeries(ChartMxy);
+	ChartMxy->AddSeries(ScrollSeries[numberOfSeries]);
+	numberOfSeries++;
+	ScrollSeries[numberOfSeries]= new TLineSeries(ChartNumFrag);
+	ChartNumFrag->AddSeries(ScrollSeries[numberOfSeries]);
+	numberOfSeries++;
+	ScrollSeries[numberOfSeries]= new TLineSeries(ChartNumLoc);
+	ChartNumLoc->AddSeries(ScrollSeries[numberOfSeries]);
+	numberOfSeries++;
+	ScrollSeries[numberOfSeries]= new TLineSeries(ChartNumDet);
+	ChartNumDet->AddSeries(ScrollSeries[numberOfSeries]);
+	numberOfSeries++;
+	ScrollSeries[numberOfSeries]= new TLineSeries(ChartFone);
+	ChartFone->AddSeries(ScrollSeries[numberOfSeries]);
+	numberOfSeries++;
+	ScrollSeries[numberOfSeries]= new TLineSeries(ChartNoise);
+	ChartNoise->AddSeries(ScrollSeries[numberOfSeries]);
+	numberOfSeries++;
+	ScrollSeries[numberOfSeries]= new TLineSeries(ChartTemp);
+	ChartTemp->AddSeries(ScrollSeries[numberOfSeries]);
+}
+
+void TFormGraphOrient::DeleteScrollGraph()
+{
+	if(ScrollSeries[0] != NULL)
+	{
+		for (int numberOfSeries = 0; numberOfSeries < NumGraph; numberOfSeries++)
+		{
+			ScrollSeries[numberOfSeries]->Clear();
+			delete ScrollSeries[numberOfSeries];
+			ScrollSeries[numberOfSeries] = NULL;
+		}
+	}
+}
+
 //---------------------------------------------------------------------------
 void __fastcall TFormGraphOrient::MenuClearClick(TObject *Sender)
 {
-	DeleteGraph();
+	DeleteLineGraph();
 //  for (int i=0; i<MaxSeries; i++) {
 //    ColorArr[i]=DefColors[i%NumColor];
 //	FreeIndex[i]=0;
@@ -295,6 +357,8 @@ void __fastcall TFormGraphOrient::FormCreate(TObject *Sender)
 	Series2->Selected->Hover->Hide();
 	Series3->Selected->Hover->Hide();
 	Series9->Selected->Hover->Hide();
+
+	CreateScrollGraph();
 }
 //---------------------------------------------------------------------------
 void TFormGraphOrient::InitTableWindows(void)
@@ -432,6 +496,39 @@ void TFormGraphOrient::SetVisibleLabelFrame(bool isVisible)
 	{
 		FrameSeries[i]->Marks->Visible=isVisible;
 	}
+}
+
+void DrawOneScroll(double _Time, TChart *_Chart, TLineSeries *_Series)
+{
+ 	double minLeftAxis, maxLeftAxis;
+
+	_Chart->LeftAxis->CalcMinMax(minLeftAxis, maxLeftAxis);
+	_Series->Clear();
+	_Series->AddXY(_Time, minLeftAxis, "", clRed);
+	_Series->AddXY(_Time, maxLeftAxis, "", clRed);
+}
+
+void TFormGraphOrient::DrawScrollSeries(const struct CadrInfo &mCadr)
+{
+	DrawOneScroll(mCadr.Time, ChartAl, ScrollSeries[0]);
+	DrawOneScroll(mCadr.Time, ChartDl, ScrollSeries[1]);
+	DrawOneScroll(mCadr.Time, ChartAz, ScrollSeries[2]);
+
+	DrawOneScroll(mCadr.Time, ChartWx, ScrollSeries[3]);
+	DrawOneScroll(mCadr.Time, ChartWy, ScrollSeries[4]);
+	DrawOneScroll(mCadr.Time, ChartWz, ScrollSeries[5]);
+
+	DrawOneScroll(mCadr.Time, ChartMx, ScrollSeries[6]);
+	DrawOneScroll(mCadr.Time, ChartMy, ScrollSeries[7]);
+	DrawOneScroll(mCadr.Time, ChartMxy, ScrollSeries[8]);
+
+	DrawOneScroll(mCadr.Time, ChartNumFrag, ScrollSeries[9]);
+	DrawOneScroll(mCadr.Time, ChartNumLoc,  ScrollSeries[10]);
+	DrawOneScroll(mCadr.Time, ChartNumDet,  ScrollSeries[11]);
+
+	DrawOneScroll(mCadr.Time, ChartFone,  ScrollSeries[12]);
+	DrawOneScroll(mCadr.Time, ChartNoise, ScrollSeries[13]);
+	DrawOneScroll(mCadr.Time, ChartTemp,  ScrollSeries[14]);
 }
 
 void TFormGraphOrient::DrawBlock(const struct CadrInfo &mCadr)
@@ -614,8 +711,14 @@ void TFormGraphOrient::DrawAnimate(const struct CadrInfo &mCadr)
 	}
 	DrawFragment(mCadr);
 	DrawBlock(mCadr);
+
 	PrintTableWindows(mCadr);
 	PrintTableObjects(mCadr);
+
+	if (FormAnimateSetting->CheckBoxCurrentTime) {
+		DrawScrollSeries(mCadr);
+	}
+
 }
 
 
@@ -981,28 +1084,83 @@ void  TFormGraphOrient::DrawAnimateHandler(void)
 		ShowMessage(e.what());
 	}
 }
+
+void  TFormGraphOrient::PrintTableWindowsHandler(void)
+{
+	try
+	{
+		CadrInfo CurCadr;
+		int cnt=StrToInt(EditNumCadr->Text);
+
+		if (!GetCadrInfo(cnt, CurCadr))
+		{
+			 PrintTableWindows(CurCadr);
+		}
+	}
+	catch(std::exception &e)
+	{
+		ShowMessage(e.what());
+	}
+}
+
+void  TFormGraphOrient::PrintTableObjectsHandler(void)
+{
+	try
+	{
+		CadrInfo CurCadr;
+		int cnt=StrToInt(EditNumCadr->Text);
+
+		if (!GetCadrInfo(cnt, CurCadr))
+		{
+			 PrintTableObjects(CurCadr);
+		}
+	}
+	catch(std::exception &e)
+	{
+		ShowMessage(e.what());
+	}
+}
+
+void  TFormGraphOrient::DrawBlockHandler(void)
+{
+	try
+	{
+		CadrInfo CurCadr;
+		int cnt=StrToInt(EditNumCadr->Text);
+
+		if (!GetCadrInfo(cnt, CurCadr))
+		{
+			 DrawBlock(CurCadr);
+		}
+	}
+	catch(std::exception &e)
+	{
+		ShowMessage(e.what());
+	}
+}
+
+
 void __fastcall TFormGraphOrient::TableObjectsInfoDrawCell(TObject *Sender, int ACol,
 		  int ARow, TRect &Rect, TGridDrawState State)
 {
+		TStringGrid *thisGrid=(TStringGrid*)Sender;
 
-	TStringGrid *thisGrid=(TStringGrid*)Sender;
+		if (FormAnimateSetting->CheckBoxFillTableObjects->Checked) {
+			if ((ARow)&&(thisGrid->Cells[5][ARow]!=""))
+			{
+				unsigned long StarID;
+				float Dx, Dy;
+				StarID=StrToInt(thisGrid->Cells[5][ARow]);
+				Dx=StrToFloat(thisGrid->Cells[8][ARow]);
+				Dy=StrToFloat(thisGrid->Cells[9][ARow]);
+				if ((!StarID)&&(!Dx)&&(!Dy))
+					thisGrid->Canvas->Brush->Color=FormAnimateSetting->ShapeColorLocObjTable->Brush->Color;
+				else thisGrid->Canvas->Brush->Color=FormAnimateSetting->ShapeColorDetObjTable->Brush->Color;
 
-	if (FormAnimateSetting->CheckBoxFillTableObjects->Checked) {
-		if (ARow)
-		{
-			unsigned long StarID;
-			float Dx, Dy;
-			StarID=StrToInt(thisGrid->Cells[5][ARow]);
-			Dx=StrToFloat(thisGrid->Cells[8][ARow]);
-			Dy=StrToFloat(thisGrid->Cells[9][ARow]);
-			if ((!StarID)&&(!Dx)&&(!Dy))
-				thisGrid->Canvas->Brush->Color=FormAnimateSetting->ShapeColorLocObjTable->Brush->Color;
-			else thisGrid->Canvas->Brush->Color=FormAnimateSetting->ShapeColorDetObjTable->Brush->Color;
-
-			thisGrid->Canvas->FillRect(Rect);
-			thisGrid->Canvas->TextOutW(Rect.Left, Rect.Top, thisGrid->Cells[ACol][ARow]);
+				thisGrid->Canvas->FillRect(Rect);
+				thisGrid->Canvas->TextOutW(Rect.Left, Rect.Top, thisGrid->Cells[ACol][ARow]);
+			}
 		}
-	}
 }
 //---------------------------------------------------------------------------
 
@@ -1016,7 +1174,6 @@ void __fastcall TFormGraphOrient::TableWindowsInfoDrawCell(TObject *Sender, int 
 	if (FormAnimateSetting->CheckBoxFillTableWindows->Checked) {
 		if ((ARow)&&(thisGrid->Cells[7][ARow]!=""))
 		{
-
 			if (thisGrid->Cells[7][ARow]=="0")
 				thisGrid->Canvas->Brush->Color=FormAnimateSetting->ShapeColorZeroObjTable->Brush->Color;
 			else if ((thisGrid->Cells[7][ARow]=="1"))
@@ -1251,8 +1408,8 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 						"mean_bf","sigma_bf","mean_fr","sigma_fr");
 
 
-        DeleteGraph();
-		CreateGraph();
+		DeleteLineGraph();
+		CreateLineGraph();
 		ApplySeriesSetting("мБОКЗ-2В",
 											clBlue);//ColorRes[FormGraphOrient->NumLine]);
 //		DataPixHeader mDataPixHdr;
@@ -2260,8 +2417,8 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 	if (OpenDialog1->Execute()) {
 
 		vCadrInfo.clear();
-		DeleteGraph();
-		CreateGraph();
+		DeleteLineGraph();
+		CreateLineGraph();
 		ApplySeriesSetting("мБОКЗ-2В",	clBlue);
 
 		FileName = OpenDialog1->FileName;
@@ -2470,8 +2627,8 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 	if (OpenDialog1->Execute()) {
 
 		vCadrInfo.clear();
-		DeleteGraph();
-		CreateGraph();
+		DeleteLineGraph();
+		CreateLineGraph();
 		ApplySeriesSetting("мБОКЗ-2В",	clBlue);
 
 		FileName = OpenDialog1->FileName;
@@ -2901,8 +3058,8 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 				ShowMessage("Не удалось открыть файл");
 				return;
 			}
-			DeleteGraph();
-			CreateGraph();
+			DeleteLineGraph();
+			CreateLineGraph();
 			ApplySeriesSetting("БОКЗ-М60",	clBlue);
 
 			if(checkLocFile(in))
@@ -3235,8 +3392,8 @@ void __fastcall TFormGraphOrient::BOKZM2VParseProtocolClick(TObject *Sender)
 				return;
 			}
 
-			DeleteGraph();
-			CreateGraph();
+			DeleteLineGraph();
+			CreateLineGraph();
 
 			ApplySeriesSetting("мБОКЗ-2В", clBlue);
 

@@ -170,6 +170,9 @@
 	TLabel *Label7;
 	TEdit *FontSizeEdit;
 	TUpDown *UpDown4;
+	TTabSheet *TabSheet3;
+	TChart *Chart7;
+	TChart *Chart8;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -218,12 +221,11 @@
 		void __fastcall OnScroll(TObject* Sender);
 		void SetContrast();
 
-
 		unique_ptr <TFormAnimateSetting> FormAnimateSetting;
 		TLineSeries *LineSeries[MaxSeries*NumGraph];
+		TLineSeries *ScrollSeries[NumGraph];
 		TChartShape *BlockSeries[MaxBlockSeries];
 		TChartShape *FrameSeries[MaxFrameSeries];
-
 
 		AnsiString FileName;
 		AnsiString FileTitle;
@@ -248,8 +250,11 @@
 	public:		// User declarations
 
 		__fastcall TFormGraphOrient(TComponent* Owner);
-		void CreateGraph();
-		void DeleteGraph();
+		void CreateLineGraph();
+		void DeleteLineGraph();
+		void CreateScrollGraph();
+		void DeleteScrollGraph();
+		void DrawScrollSeries(const struct CadrInfo &mCadr);
         void DrawLineSeries(vector <CadrInfo> _vCadrInfo);
 		void SaveGraph(TChart *Chart, AnsiString suff);
 		void SetVisible(int CheckLine, bool tf);
@@ -257,6 +262,9 @@
 		void SetVisibleLabelFrame(bool isVisible);
 		int  GetCadrInfo(int NC, struct CadrInfo &mCadr);
 		void DrawAnimateHandler(void);
+		void PrintTableWindowsHandler(void);
+		void PrintTableObjectsHandler(void);
+        void DrawBlockHandler(void);
 	};
 	//---------------------------------------------------------------------------
 	extern PACKAGE TFormGraphOrient *FormGraphOrient;
