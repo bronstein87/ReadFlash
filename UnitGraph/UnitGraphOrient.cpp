@@ -2644,7 +2644,7 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 		ofstream fout((FileTitle+"_decode.txt").c_str());
 
 		std::string line, word1, word2, word3;
-		unsigned short hex_val, dec_val;
+		unsigned int hex_val, dec_val;
 		int cntRecDTMI = 0, ind;
 		while (!finp.eof())
 		{
@@ -2653,28 +2653,42 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 				struct CadrInfo mCadr;
 
 				//sscanf(line, "ТМОС %d.%d.%d %d:%d:%d ", );
-				for (int i = 0; i < 290; i++) {
-					finp>>word1>>word2>>dec_val;
-					sscanf(word1.c_str(),"[%d]", &ind);
-					sscanf(word2.c_str(),"0X%x", &hex_val);
-					if ((i == ind)&&(hex_val == dec_val)) {
-						ArrayDTMI[i] = hex_val;
+				int fl_continue=1;
+				int i=0;
+				while ((i < 290)&&(fl_continue)) {
+					finp>>word1;
+					if (sscanf(word1.c_str(),"[%d]", &ind)==1) {
+						finp>>word2;
+						if (sscanf(word2.c_str(),"0X%lx", &hex_val)==1) {
+							finp>>word3;
+							if (sscanf(word3.c_str(),"%ld",   &dec_val)==1) {
+								if ((i == ind)&&(hex_val == dec_val)) {
+									ArrayDTMI[i] = (unsigned short) hex_val;
+									fl_continue=1;
+								}
+							}
+						}
 					}
+					else  fl_continue=0;
+					i++;
 				}
-				memcpy(&tmi.timeBOKZ, &ArrayDTMI[2], 30*sizeof(short));
-				memcpy(&tmi.LocalList[2][0], &ArrayDTMI[36], 28*sizeof(short));
-				memcpy(&tmi.LocalList[5][2], &ArrayDTMI[68], 28*sizeof(short));
-				memcpy(&tmi.LocalList[9][0], &ArrayDTMI[100],28*sizeof(short));
-				memcpy(&tmi.LocalList[12][2], &ArrayDTMI[132],28*sizeof(short));
-				memcpy(&tmi.LocalList[16][0], &ArrayDTMI[164],28*sizeof(short));
-				memcpy(&tmi.LocalList[19][2], &ArrayDTMI[196],28*sizeof(short));
-				memcpy(&tmi.LocalList[23][0], &ArrayDTMI[228],28*sizeof(short));
-				memcpy(&tmi.LocalList[26][2], &ArrayDTMI[260],28*sizeof(short));
-				fout<<"\n"<<line<<"\n";
+				if (i==290) {
+					memcpy(&tmi.timeBOKZ, &ArrayDTMI[2], 30*sizeof(short));
+					memcpy(&tmi.LocalList[2][0], &ArrayDTMI[36], 28*sizeof(short));
+					memcpy(&tmi.LocalList[5][2], &ArrayDTMI[68], 28*sizeof(short));
+					memcpy(&tmi.LocalList[9][0], &ArrayDTMI[100],28*sizeof(short));
+					memcpy(&tmi.LocalList[12][2], &ArrayDTMI[132],28*sizeof(short));
+					memcpy(&tmi.LocalList[16][0], &ArrayDTMI[164],28*sizeof(short));
+					memcpy(&tmi.LocalList[19][2], &ArrayDTMI[196],28*sizeof(short));
+					memcpy(&tmi.LocalList[23][0], &ArrayDTMI[228],28*sizeof(short));
+					memcpy(&tmi.LocalList[26][2], &ArrayDTMI[260],28*sizeof(short));
+					fout<<"\n"<<line<<"\n";
 
-				PrintDTMI_BOKZM(fout, tmi);
-				ConvertDataDTMI_BOKZM(tmi, mCadr);
-				vCadrInfo.push_back(mCadr);
+					PrintDTMI_BOKZM(fout, tmi);
+					ConvertDataDTMI_BOKZM(tmi, mCadr);
+					vCadrInfo.push_back(mCadr);
+				}
+
 			}
 		}
 		finp.close();
