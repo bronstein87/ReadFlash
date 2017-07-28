@@ -59,6 +59,7 @@
 	#include <iterator>
 	#include <algorithm>
 	#include "FragmentScrollBox.h"
+	#include "iki_img_class.cpp"
 
 
 
@@ -78,8 +79,6 @@
 	};
 
 
-
-
 	class TFormAnimateSetting;
 
 	class TFormGraphOrient : public TForm
@@ -87,7 +86,6 @@
 	__published:	// IDE-managed Components
 		TButton *ButtonAdd;
 		TButton *ButtonClear;
-		TOpenDialog *OpenDialogG;
 		TPageControl *PageControl2;
 		TTabSheet *TabSheet5;
 		TChart *ChartAl;
@@ -148,7 +146,7 @@
 		TBubbleSeries *Series9;
 		TTabSheet *ShowFragmentTab;
 		TMenuItem *MenuOpen;
-		TOpenDialog *OpenDialog1;
+	TOpenDialog *OpenDialog;
 		TCheckBox *SortFileCheckBox;
 		TScrollBox *FragmentShowScrollBox;
 		TMenuItem *MenuOpenFlash;
@@ -173,6 +171,7 @@
 	TTabSheet *TabSheet3;
 	TChart *Chart7;
 	TChart *Chart8;
+	TMenuItem *ReadIKIFormat;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -198,6 +197,7 @@
 		void __fastcall PixelBrightCheckBoxClick(TObject *Sender);
 		void __fastcall PixelSizeEditChange(TObject *Sender);
 	void __fastcall FontSizeEditChange(TObject *Sender);
+	void __fastcall ReadIKIFormatClick(TObject *Sender);
 
 
 	private:	// User declarations

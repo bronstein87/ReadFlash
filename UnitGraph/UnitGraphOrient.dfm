@@ -25,18 +25,20 @@ object FormGraphOrient: TFormGraphOrient
   PixelsPerInch = 96
   TextHeight = 13
   object Label10: TLabel
-    Left = 139
-    Top = 796
+    Left = 163
+    Top = 797
     Width = 96
     Height = 13
+    Margins.Bottom = 10
     Anchors = [akLeft, akBottom]
     Caption = #1042#1088#1077#1084#1103' '#1087#1088#1080#1074#1103#1079#1082#1080', '#1089
   end
   object Label11: TLabel
-    Left = 426
-    Top = 796
+    Left = 400
+    Top = 799
     Width = 44
     Height = 13
+    Margins.Bottom = 10
     Anchors = [akLeft, akBottom]
     Caption = #8470' '#1082#1072#1076#1088#1072
   end
@@ -69,7 +71,7 @@ object FormGraphOrient: TFormGraphOrient
     Top = 8
     Width = 1160
     Height = 777
-    ActivePage = TabSheet3
+    ActivePage = TabSheet1
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
     object TabSheet5: TTabSheet
@@ -540,7 +542,7 @@ object FormGraphOrient: TFormGraphOrient
           Pointer.Gradient.MidColor = 16059031
           Pointer.Gradient.StartColor = 14540754
           Pointer.Gradient.Visible = True
-          Pointer.HorizSize = 45
+          Pointer.HorizSize = 24
           Pointer.InflateMargins = False
           Pointer.Pen.Color = 1358954496
           Pointer.Pen.Width = 0
@@ -553,7 +555,7 @@ object FormGraphOrient: TFormGraphOrient
           Pointer.Shadow.VertSize = 19
           Pointer.Shadow.Visible = True
           Pointer.Style = psCircle
-          Pointer.VertSize = 45
+          Pointer.VertSize = 24
           XValues.Name = 'X'
           XValues.Order = loAscending
           YValues.Name = 'Y'
@@ -889,9 +891,9 @@ object FormGraphOrient: TFormGraphOrient
       ImageIndex = 8
       object FragmentShowScrollBox: TScrollBox
         Left = 0
-        Top = 25
+        Top = 33
         Width = 1152
-        Height = 724
+        Height = 716
         Align = alClient
         TabOrder = 0
         OnResize = FragmentShowScrollBoxResize
@@ -900,34 +902,38 @@ object FormGraphOrient: TFormGraphOrient
         Left = 0
         Top = 0
         Width = 1152
-        Height = 25
+        Height = 33
         Align = alTop
         TabOrder = 1
+        StyleElements = [seFont, seClient]
         object Label8: TLabel
           Left = 263
-          Top = 6
+          Top = 11
           Width = 120
           Height = 13
+          Margins.Bottom = 8
           Align = alCustom
           Caption = #1059#1074#1077#1083#1080#1095#1077#1085#1080#1077' '#1092#1088#1072#1075#1084#1077#1085#1090#1072
         end
         object Label9: TLabel
-          Left = 487
-          Top = 6
+          Left = 481
+          Top = 12
           Width = 84
           Height = 13
+          Margins.Bottom = 8
           Caption = #1056#1072#1079#1084#1077#1088' '#1087#1080#1082#1089#1077#1083#1103
         end
         object Label7: TLabel
-          Left = 647
-          Top = 6
+          Left = 631
+          Top = 12
           Width = 81
           Height = 13
+          Margins.Bottom = 8
           Caption = #1056#1072#1079#1084#1077#1088' '#1096#1088#1080#1092#1090#1072
         end
         object ContrastCheckBox: TCheckBox
           Left = 3
-          Top = 3
+          Top = 10
           Width = 142
           Height = 17
           Align = alCustom
@@ -936,9 +942,10 @@ object FormGraphOrient: TFormGraphOrient
         end
         object ScaleEdit: TEdit
           Left = 389
-          Top = 3
+          Top = 9
           Width = 52
           Height = 21
+          Margins.Bottom = 0
           Align = alCustom
           TabOrder = 1
           Text = '10'
@@ -946,16 +953,17 @@ object FormGraphOrient: TFormGraphOrient
         end
         object UpDown2: TUpDown
           Left = 441
-          Top = 3
+          Top = 9
           Width = 16
           Height = 21
+          Margins.Bottom = 0
           Associate = ScaleEdit
           Position = 10
           TabOrder = 2
         end
         object PixelBrightCheckBox: TCheckBox
           Left = 143
-          Top = 3
+          Top = 10
           Width = 114
           Height = 17
           Align = alCustom
@@ -964,37 +972,41 @@ object FormGraphOrient: TFormGraphOrient
           OnClick = PixelBrightCheckBoxClick
         end
         object PixelSizeEdit: TEdit
-          Left = 577
-          Top = 3
+          Left = 571
+          Top = 9
           Width = 40
           Height = 21
+          Margins.Bottom = 0
           TabOrder = 4
           Text = '24'
           OnChange = PixelSizeEditChange
         end
         object UpDown3: TUpDown
-          Left = 617
-          Top = 3
+          Left = 611
+          Top = 9
           Width = 16
           Height = 21
+          Margins.Bottom = 0
           Associate = PixelSizeEdit
           Position = 24
           TabOrder = 5
         end
         object FontSizeEdit: TEdit
-          Left = 742
-          Top = 3
+          Left = 718
+          Top = 9
           Width = 27
           Height = 21
+          Margins.Bottom = 0
           TabOrder = 6
           Text = '7'
           OnChange = FontSizeEditChange
         end
         object UpDown4: TUpDown
-          Left = 769
-          Top = 3
+          Left = 745
+          Top = 9
           Width = 16
           Height = 21
+          Margins.Bottom = 0
           Associate = FontSizeEdit
           Position = 7
           TabOrder = 7
@@ -1147,34 +1159,34 @@ object FormGraphOrient: TFormGraphOrient
   end
   object EditSizeX: TEdit
     Left = 931
-    Top = 793
+    Top = 796
     Width = 50
     Height = 21
-    Anchors = [akTop, akRight]
+    Anchors = [akRight, akBottom]
     TabOrder = 3
     Text = '620'
   end
   object EditSizeY: TEdit
     Left = 987
-    Top = 793
+    Top = 796
     Width = 53
     Height = 21
-    Anchors = [akTop, akRight]
+    Anchors = [akRight, akBottom]
     TabOrder = 4
     Text = '220'
   end
   object EditTimeDev: TEdit
-    Left = 275
+    Left = 265
     Top = 796
     Width = 121
     Height = 21
-    Anchors = [akLeft, akBottom]
+    Anchors = [akRight, akBottom]
     TabOrder = 5
     Text = '0'
   end
   object EditNumCadr: TEdit
-    Left = 476
-    Top = 794
+    Left = 450
+    Top = 796
     Width = 57
     Height = 21
     Anchors = [akLeft, akBottom]
@@ -1184,7 +1196,7 @@ object FormGraphOrient: TFormGraphOrient
     OnChange = EditNumCadrChange
   end
   object UpDown1: TUpDown
-    Left = 545
+    Left = 507
     Top = 796
     Width = 17
     Height = 21
@@ -1194,23 +1206,20 @@ object FormGraphOrient: TFormGraphOrient
     TabOrder = 7
   end
   object SortFileCheckBox: TCheckBox
-    Left = 808
-    Top = 796
+    Left = 789
+    Top = 797
     Width = 117
     Height = 20
     Alignment = taLeftJustify
+    Anchors = [akRight, akBottom]
     BiDiMode = bdLeftToRight
     Caption = #1057#1086#1088#1090#1080#1088#1086#1074#1072#1090#1100' '#1092#1072#1081#1083
     ParentBiDiMode = False
     TabOrder = 8
   end
-  object OpenDialogG: TOpenDialog
-    Left = 1060
-    Top = 792
-  end
   object MainMenu1: TMainMenu
-    Left = 1160
-    Top = 176
+    Left = 1112
+    Top = 192
     object MenuOpen: TMenuItem
       Caption = #1042#1099#1073#1088#1072#1090#1100' '#1092#1072#1081#1083
       object MenuOpenFlash: TMenuItem
@@ -1236,6 +1245,10 @@ object FormGraphOrient: TFormGraphOrient
           OnClick = BOKZM2VParseProtocolClick
         end
       end
+      object ReadIKIFormat: TMenuItem
+        Caption = #1044#1072#1085#1085#1099#1077' '#1080#1079' '#1092#1086#1088#1084#1072#1090#1072' '#1048#1050#1048
+        OnClick = ReadIKIFormatClick
+      end
     end
     object MenuSave: TMenuItem
       Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100
@@ -1250,8 +1263,8 @@ object FormGraphOrient: TFormGraphOrient
       OnClick = MenuClearClick
     end
   end
-  object OpenDialog1: TOpenDialog
-    Left = 1168
+  object OpenDialog: TOpenDialog
+    Left = 1112
     Top = 136
   end
 end

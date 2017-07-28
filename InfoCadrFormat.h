@@ -2,7 +2,7 @@
 #define InfoCadr
 #include <vector>
 
-struct StarsInfo
+struct StarsInfo // прогнозируемые
 {
 	float X, Y, Bright;
 	unsigned long StarID;
@@ -10,7 +10,7 @@ struct StarsInfo
 	char Sp[2];
 };
 
-struct ObjectsInfo
+struct ObjectsInfo  // фактические объекты
 {
 	float X, Y, Bright;
 	short Square;
