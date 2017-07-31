@@ -26,6 +26,7 @@
 	#include <VclTee.TeeGDIPlus.hpp>
 	#include <Vcl.ExtCtrls.hpp>
 	#include <Vcl.WinXCtrls.hpp>
+#include "VCLTee.TeeTools.hpp"
 	#include <vector>
 	#include <Classes.hpp>
 	#include <Controls.hpp>
@@ -260,7 +261,7 @@
 		void CreateScrollGraph();
 		void DeleteScrollGraph();
 		void DrawScrollSeries(const struct CadrInfo &mCadr);
-        void DrawLineSeries(vector <CadrInfo> _vCadrInfo);
+		void DrawLineSeries(const vector <CadrInfo>& _vCadrInfo);
 		void SaveGraph(TChart *Chart, AnsiString suff);
 		void SetVisible(int CheckLine, bool tf);
 		void ApplySeriesSetting(AnsiString Title, TColor color);

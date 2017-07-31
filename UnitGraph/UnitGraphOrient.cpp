@@ -2,6 +2,7 @@
 #include "UnitGraphOrient.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
+#pragma link "VCLTee.TeeTools"
 #pragma resource "*.dfm"
 
 
@@ -38,15 +39,6 @@ void TFormGraphOrient::CreateLineGraph()
 	LineSeries[numberOfSeries] = new TLineSeries(ChartAz);
 	ChartAz->AddSeries(LineSeries[numberOfSeries]);
 	numberOfSeries++;
-	LineSeries[numberOfSeries] = new TLineSeries(ChartAlError);
-	ChartAlError->AddSeries(LineSeries[numberOfSeries]);
-	numberOfSeries++;
-	LineSeries[numberOfSeries] = new TLineSeries(ChartDlError);
-	ChartDlError->AddSeries(LineSeries[numberOfSeries]);
-	numberOfSeries++;
-	LineSeries[numberOfSeries] = new TLineSeries(ChartAzError);
-	ChartAzError->AddSeries(LineSeries[numberOfSeries]);
-	numberOfSeries++;
 	LineSeries[numberOfSeries] = new TLineSeries(ChartWx);
 	ChartWx->AddSeries(LineSeries[numberOfSeries]);
 	numberOfSeries++;
@@ -82,6 +74,16 @@ void TFormGraphOrient::CreateLineGraph()
 	numberOfSeries++;
 	LineSeries[numberOfSeries] = new TLineSeries(ChartTemp);
 	ChartTemp->AddSeries(LineSeries[numberOfSeries]);
+	numberOfSeries++;
+	LineSeries[numberOfSeries] = new TLineSeries(ChartAlError);
+	ChartAlError->AddSeries(LineSeries[numberOfSeries]);
+	numberOfSeries++;
+	LineSeries[numberOfSeries] = new TLineSeries(ChartDlError);
+	ChartDlError->AddSeries(LineSeries[numberOfSeries]);
+	numberOfSeries++;
+	LineSeries[numberOfSeries] = new TLineSeries(ChartAzError);
+	ChartAzError->AddSeries(LineSeries[numberOfSeries]);
+
 
 }
 
@@ -109,15 +111,6 @@ void TFormGraphOrient::CreateScrollGraph()
 	numberOfSeries++;
 	ScrollSeries[numberOfSeries]= new TLineSeries(ChartAz);
 	ChartAz->AddSeries(ScrollSeries[numberOfSeries]);
-	numberOfSeries++;
-	ScrollSeries[numberOfSeries] = new TLineSeries(ChartAlError);
-	ChartAlError->AddSeries(ScrollSeries[numberOfSeries]);
-	numberOfSeries++;
-	ScrollSeries[numberOfSeries] = new TLineSeries(ChartDlError);
-	ChartDlError->AddSeries(ScrollSeries[numberOfSeries]);
-	numberOfSeries++;
-	ScrollSeries[numberOfSeries] = new TLineSeries(ChartAzError);
-	ChartAzError->AddSeries(ScrollSeries[numberOfSeries]);
 	numberOfSeries++;
 	ScrollSeries[numberOfSeries]= new TLineSeries(ChartWx);
 	ChartWx->AddSeries(ScrollSeries[numberOfSeries]);
@@ -154,6 +147,15 @@ void TFormGraphOrient::CreateScrollGraph()
 	numberOfSeries++;
 	ScrollSeries[numberOfSeries]= new TLineSeries(ChartTemp);
 	ChartTemp->AddSeries(ScrollSeries[numberOfSeries]);
+    numberOfSeries++;
+	ScrollSeries[numberOfSeries] = new TLineSeries(ChartAlError);
+	ChartAlError->AddSeries(ScrollSeries[numberOfSeries]);
+	numberOfSeries++;
+	ScrollSeries[numberOfSeries] = new TLineSeries(ChartDlError);
+	ChartDlError->AddSeries(ScrollSeries[numberOfSeries]);
+	numberOfSeries++;
+	ScrollSeries[numberOfSeries] = new TLineSeries(ChartAzError);
+	ChartAzError->AddSeries(ScrollSeries[numberOfSeries]);
 }
 
 void TFormGraphOrient::DeleteScrollGraph()
@@ -267,7 +269,7 @@ void TFormGraphOrient::SetVisible(int CheckLine, bool tf)
   }
 }
 
-void TFormGraphOrient::DrawLineSeries(vector <CadrInfo> _vCadrInfo)
+void TFormGraphOrient::DrawLineSeries(const vector <CadrInfo>& _vCadrInfo)
 {
 	for (int iCadr = 0; iCadr < _vCadrInfo.size(); iCadr++) {
 		if(_vCadrInfo[iCadr].IsOrient) {
@@ -369,22 +371,22 @@ void TFormGraphOrient::PrintTableWindows(const struct CadrInfo &mCadr)
 {
 
 	if (mCadr.SizeWindowsList) {
-		TableWindowsInfo->RowCount = mCadr.SizeWindowsList+TableWindowsInfo->FixedRows;
+		TableWindowsInfo->RowCount = mCadr.SizeWindowsList + TableWindowsInfo->FixedRows;
 
 		for (int i = 0; i < mCadr.SizeWindowsList; i++) {        //!!!
 			int k = 0;
-			TableWindowsInfo->Cells[k++][i+1]=String(i+1);
-			TableWindowsInfo->Cells[k++][i+1]=FloatToStrF(mCadr.WindowsList[i].Mv, ffFixed,6,2);
-			TableWindowsInfo->Cells[k++][i+1]=String(mCadr.WindowsList[i].Xstart);
-			TableWindowsInfo->Cells[k++][i+1]=String(mCadr.WindowsList[i].Ystart);
-			TableWindowsInfo->Cells[k++][i+1]=FloatToStrF(mCadr.WindowsList[i].Mean, ffFixed,6,2);
-			TableWindowsInfo->Cells[k++][i+1]=FloatToStrF(mCadr.WindowsList[i].Sigma, ffFixed,6,2);
-			TableWindowsInfo->Cells[k++][i+1]=String(mCadr.WindowsList[i].Level);
-			TableWindowsInfo->Cells[k++][i+1]=String(mCadr.WindowsList[i].CountObj);
-			TableWindowsInfo->Cells[k++][i+1]=String(mCadr.WindowsList[i].Width)+"x"
-											 +String(mCadr.WindowsList[i].Height);
-			TableWindowsInfo->Cells[k++][i+1]=String(mCadr.WindowsList[i].ZipX)+"x"
-											 +String(mCadr.WindowsList[i].ZipY);
+			TableWindowsInfo->Cells[k++][i+1] = String(i+1);
+			TableWindowsInfo->Cells[k++][i+1] = FloatToStrF(mCadr.WindowsList[i].Mv, ffFixed,6,2);
+			TableWindowsInfo->Cells[k++][i+1] = String(mCadr.WindowsList[i].Xstart);
+			TableWindowsInfo->Cells[k++][i+1] = String(mCadr.WindowsList[i].Ystart);
+			TableWindowsInfo->Cells[k++][i+1] = FloatToStrF(mCadr.WindowsList[i].Mean, ffFixed,6,2);
+			TableWindowsInfo->Cells[k++][i+1] = FloatToStrF(mCadr.WindowsList[i].Sigma, ffFixed,6,2);
+			TableWindowsInfo->Cells[k++][i+1] = String(mCadr.WindowsList[i].Level);
+			TableWindowsInfo->Cells[k++][i+1] = String(mCadr.WindowsList[i].CountObj);
+			TableWindowsInfo->Cells[k++][i+1] = String(mCadr.WindowsList[i].Width) + "x"
+											  + String(mCadr.WindowsList[i].Height);
+			TableWindowsInfo->Cells[k++][i+1] = String(mCadr.WindowsList[i].ZipX) + "x"
+											  + String(mCadr.WindowsList[i].ZipY);
 	//		TableWindowsInfo->Cells[4][i]=String(mCadr.WindowsList[i].StarID);
 		}
 	}
@@ -1499,7 +1501,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 					  mDataNO.SerNum, mDataNO.CntRecord, mDataNO.T, mDataNO.Tbshv,
 					  mDataNO.Tpr_sec, mDataNO.Tpr_msec, mDataNO.res_stat, 0);
 			  fprintf(flog_orient,"%8d %8d %8d %10.6f %10.6f %10.6f %10.6f %8.2f %8d %8.2f ",
-					  mDataNO.NumL[0], mDataNO.NumL[1], mDataNO.NumDet, al, dl, Az,
+					  mDataNO.NumL[0], mDataNO.NumL[1], mDataNO.NumDet, al, dl, az,
 					  mDataNO.m_cur, mDataNO.Temp, mDataNO.StarExp, mDataNO.TimeExp);
 			  fprintf(flog_orient,"%12.4f %12.4f %12.4f %8.2f %8.2f %8.2f %8.2f\n",
 			  mDataNO.Wop[0]*RTS,mDataNO.Wop[1]*RTS,mDataNO.Wop[2]*RTS, 0., 0., 0., 0.);
@@ -2620,7 +2622,7 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 		ofstream fout((FileTitle+"_decode.txt").c_str());
 
 		std::string line, word1, word2, word3;
-		unsigned int hex_val, dec_val;
+		unsigned short hex_val, dec_val;
 		int cntRecDTMI = 0, ind;
 		while (!finp.eof())
 		{
@@ -2629,42 +2631,28 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 				struct CadrInfo mCadr;
 
 				//sscanf(line, "ТМОС %d.%d.%d %d:%d:%d ", );
-				int fl_continue=1;
-				int i=0;
-				while ((i < 290)&&(fl_continue)) {
-					finp>>word1;
-					if (sscanf(word1.c_str(),"[%d]", &ind)==1) {
-						finp>>word2;
-						if (sscanf(word2.c_str(),"0X%lx", &hex_val)==1) {
-							finp>>word3;
-							if (sscanf(word3.c_str(),"%ld",   &dec_val)==1) {
-								if ((i == ind)&&(hex_val == dec_val)) {
-									ArrayDTMI[i] = (unsigned short) hex_val;
-									fl_continue=1;
-								}
-							}
-						}
+				for (int i = 0; i < 290; i++) {
+					finp>>word1>>word2>>dec_val;
+					sscanf(word1.c_str(),"[%d]", &ind);
+					sscanf(word2.c_str(),"0X%x", &hex_val);
+					if ((i == ind)&&(hex_val == dec_val)) {
+						ArrayDTMI[i] = hex_val;
 					}
-					else  fl_continue=0;
-					i++;
 				}
-				if (i==290) {
-					memcpy(&tmi.timeBOKZ, &ArrayDTMI[2], 30*sizeof(short));
-					memcpy(&tmi.LocalList[2][0], &ArrayDTMI[36], 28*sizeof(short));
-					memcpy(&tmi.LocalList[5][2], &ArrayDTMI[68], 28*sizeof(short));
-					memcpy(&tmi.LocalList[9][0], &ArrayDTMI[100],28*sizeof(short));
-					memcpy(&tmi.LocalList[12][2], &ArrayDTMI[132],28*sizeof(short));
-					memcpy(&tmi.LocalList[16][0], &ArrayDTMI[164],28*sizeof(short));
-					memcpy(&tmi.LocalList[19][2], &ArrayDTMI[196],28*sizeof(short));
-					memcpy(&tmi.LocalList[23][0], &ArrayDTMI[228],28*sizeof(short));
-					memcpy(&tmi.LocalList[26][2], &ArrayDTMI[260],28*sizeof(short));
-					fout<<"\n"<<line<<"\n";
+				memcpy(&tmi.timeBOKZ, &ArrayDTMI[2], 30*sizeof(short));
+				memcpy(&tmi.LocalList[2][0], &ArrayDTMI[36], 28*sizeof(short));
+				memcpy(&tmi.LocalList[5][2], &ArrayDTMI[68], 28*sizeof(short));
+				memcpy(&tmi.LocalList[9][0], &ArrayDTMI[100],28*sizeof(short));
+				memcpy(&tmi.LocalList[12][2], &ArrayDTMI[132],28*sizeof(short));
+				memcpy(&tmi.LocalList[16][0], &ArrayDTMI[164],28*sizeof(short));
+				memcpy(&tmi.LocalList[19][2], &ArrayDTMI[196],28*sizeof(short));
+				memcpy(&tmi.LocalList[23][0], &ArrayDTMI[228],28*sizeof(short));
+				memcpy(&tmi.LocalList[26][2], &ArrayDTMI[260],28*sizeof(short));
+				fout<<"\n"<<line<<"\n";
 
-					PrintDTMI_BOKZM(fout, tmi);
-					ConvertDataDTMI_BOKZM(tmi, mCadr);
-					vCadrInfo.push_back(mCadr);
-				}
-
+				PrintDTMI_BOKZM(fout, tmi);
+				ConvertDataDTMI_BOKZM(tmi, mCadr);
+				vCadrInfo.push_back(mCadr);
 			}
 		}
 		finp.close();
@@ -3374,7 +3362,6 @@ void __fastcall TFormGraphOrient::BOKZM2VParseProtocolClick(TObject *Sender)
 
 			DeleteLineGraph();
 			CreateLineGraph();
-
 			ApplySeriesSetting("мБОКЗ-2В", clBlue);
 			readmBOKZ2VProtocol(in, vCadrInfo);
 			PrepareStartDraw();
@@ -3539,13 +3526,13 @@ void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec
 	{
 	   for (int i = 0;  i  < 3; i ++)
 	   {
-			cadrInfo.AnglesDiff[i] = cadrInfo.AnglesOrient[i] - reader->Georeferencing.OrientationAngles[0];
+			cadrInfo.AnglesDiff[i] = cadrInfo.AnglesOrient[i] - reader->Georeferencing.OrientationAngles[i];
 	   }
 
 	}
 
 	GetImageBright(cadrInfo);
-	cadrInfoVec.push_back(cadrInfo);	
+	cadrInfoVec.push_back(cadrInfo);
 }
 
 void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
@@ -3556,6 +3543,8 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 		{
 			vCadrInfo.clear();
 			DeleteLineGraph();
+			CreateLineGraph();
+			ApplySeriesSetting("IKI", clBlue);
 			FileTitle = "IKI";
 			std::unique_ptr <TStringList> fileList (new TStringList());
 			fileList->Assign(OpenDialog->Files);
@@ -3582,7 +3571,6 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 					double Time =  vCadrInfo.back().Time;
 					if (vCadrInfo.back().AnglesOrient[0] != 0)
 					{
-						CreateLineGraph();
 						LineSeries[0]->AddXY(Time,  vCadrInfo.back().AnglesOrient[0] * RTD);
 						LineSeries[1]->AddXY(Time,  vCadrInfo.back().AnglesOrient[1] * RTD);
 						LineSeries[2]->AddXY(Time,  vCadrInfo.back().AnglesOrient[2] * RTD);
@@ -3598,10 +3586,12 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 						LineSeries[12]->AddXY(Time, vCadrInfo.back().MeanBright);
 						LineSeries[13]->AddXY(Time, vCadrInfo.back().SigmaBright);
 //						LineSeries[14]->AddXY(Time, mCadrInfo.MatrixTemp);
+						LineSeries[15]->AddXY(Time, vCadrInfo.back().AnglesDiff[0] * RTS);
+						LineSeries[16]->AddXY(Time, vCadrInfo.back().AnglesDiff[1] * RTS);
+						LineSeries[17]->AddXY(Time, vCadrInfo.back().AnglesDiff[2] * RTS);
 					}
 				}
 				else throw logic_error(string("Не удалось считать ") + AnsiString(fileList->Strings[i]).c_str());
-
 
 			}
 			PrepareStartDraw();
@@ -3618,4 +3608,5 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 //	}
 
 //---------------------------------------------------------------------------
+
 
