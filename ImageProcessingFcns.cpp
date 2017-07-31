@@ -55,7 +55,7 @@
 
   }
 
-std::unique_ptr<TBitmap> changeContrast(int ContrastCoefficient, FragmentData& FData)
+std::unique_ptr <TBitmap> changeContrast(int ContrastCoefficient, FragmentData& FData)
   {
 	int FragmentSize = FData.SizeX * FData.SizeY;
 	if(FData.min == 0 && FData.max == 0 && FData.mean == 0)
@@ -95,12 +95,12 @@ std::unique_ptr<TBitmap> changeContrast(int ContrastCoefficient, FragmentData& F
 		}
 	}
 
-	return std::move(Fragment);
+	return Fragment;
   }
 
  std::unique_ptr<TBitmap> createFragmentBitmap(FragmentData& FData)
   {
-	  return changeContrast(1,FData);
+	  return changeContrast(1, FData);
   }
 
 

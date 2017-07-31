@@ -70,9 +70,6 @@ Coordinates=10,214,53,58
 [Series8]
 Coordinates=0,425,58,36
 
-[OpenDialogG]
-Coordinates=715,221,92,36
-
 [Series1]
 Coordinates=715,276,58,36
 
@@ -167,14 +164,11 @@ Coordinates=500,78,61,58
 Coordinates=10,146,74,58
 
 []
-Coordinates=845,375,91,36
+Coordinates=715,221,92,36
 Visible=True
 
 [ShowFragmentTab]
 Coordinates=461,282,123,36
-
-[OpenDialog1]
-Coordinates=676,1,89,36
 
 [MenuOpenTMI]
 Coordinates=676,56,100,36
@@ -224,4 +218,7 @@ Coordinates=462,146,62,58
 
 [ChartNumFrag]
 Coordinates=73,214,67,58
+
+[OpenDialog]
+Coordinates=676,1,89,36
 

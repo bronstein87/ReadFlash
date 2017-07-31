@@ -59,12 +59,13 @@
 	#include <iterator>
 	#include <algorithm>
 	#include "FragmentScrollBox.h"
+	#include "iki_img_class.cpp"
 
 
 
 
 	#define MaxSeries 6
-	#define NumGraph 15
+	#define NumGraph 18
 	#define MaxBlockSeries 8
 	#define MaxFrameSeries 30
 
@@ -78,8 +79,6 @@
 	};
 
 
-
-
 	class TFormAnimateSetting;
 
 	class TFormGraphOrient : public TForm
@@ -87,7 +86,6 @@
 	__published:	// IDE-managed Components
 		TButton *ButtonAdd;
 		TButton *ButtonClear;
-		TOpenDialog *OpenDialogG;
 		TPageControl *PageControl2;
 		TTabSheet *TabSheet5;
 		TChart *ChartAl;
@@ -148,7 +146,7 @@
 		TBubbleSeries *Series9;
 		TTabSheet *ShowFragmentTab;
 		TMenuItem *MenuOpen;
-		TOpenDialog *OpenDialog1;
+	TOpenDialog *OpenDialog;
 		TCheckBox *SortFileCheckBox;
 		TScrollBox *FragmentShowScrollBox;
 		TMenuItem *MenuOpenFlash;
@@ -173,6 +171,11 @@
 	TTabSheet *TabSheet3;
 	TChart *Chart7;
 	TChart *Chart8;
+	TMenuItem *ReadIKIFormat;
+	TTabSheet *TabSheet4;
+	TChart *ChartAzError;
+	TChart *ChartDlError;
+	TChart *ChartAlError;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -198,10 +201,11 @@
 		void __fastcall PixelBrightCheckBoxClick(TObject *Sender);
 		void __fastcall PixelSizeEditChange(TObject *Sender);
 	void __fastcall FontSizeEditChange(TObject *Sender);
+	void __fastcall ReadIKIFormatClick(TObject *Sender);
 
 
 	private:	// User declarations
-		void InitStartColorOptions();
+		void PrepareStartDraw();
 		void InitTableObjects(void);
 		void PrintTableObjects(const struct CadrInfo &mCadr);
 		void InitTableWindows(void);
@@ -237,7 +241,8 @@
 		int ScaleFactorForImage;
 		int Contrast;
 		unsigned short ResizeCoef;
-        unsigned short FontSize;
+		unsigned short FontSize;
+		bool CompareIKIRes;
 		int FragID;
 
 
