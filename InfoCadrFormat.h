@@ -64,6 +64,7 @@ struct CadrInfo
 	std::vector <LinesInfo> LinesList;  //список блоков
 
 	double QuatOrient[4], MatrixOrient[3][3], AnglesOrient[3];   //кватернион, матрица и углы ориентации
+	double AnglesDiff[3];
 	double OmegaOrient[3], MatrixProg[3][3]; //угловая скорость, прогнозируемая матрица ориентации
 	double MatrixTemp;     //температура КМОП-матрицы
 	double MeanErrorX, MeanErrorY, MeanErrorXY;
