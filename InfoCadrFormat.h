@@ -43,6 +43,7 @@ struct CadrInfo
 	unsigned short CountPixFilter;       //число пикселей выше порога
 	unsigned short ImageWidth, ImageHeight;  //ширина и высота изображения
 	unsigned short StatOrient;  //статус решения задачи (0 - успешно)
+	unsigned int DataType; // признак типа 0-byte, 1-ushort, 2-float
 	double MeanBright, SigmaBright;
 
 	unsigned short CountStars;  //число спроектированных звезд
@@ -56,6 +57,7 @@ struct CadrInfo
 	std::vector <ObjectsInfo> ObjectsList;    //список локализованных объектов
 
 	unsigned short SizeWindowsList;
+
 	std::vector <WindowsInfo> WindowsList; //список прогнозируемых окон
 
 	unsigned short CountLines, CountBlock;  //число считываемых строк и блоков с матрицы
@@ -68,7 +70,46 @@ struct CadrInfo
 };
 
 
+ void GetMeanDeterError(struct CadrInfo &mCadr)
+{
+int countDxDy = 0;
 
+	mCadr.MeanErrorX = 0.;
+	mCadr.MeanErrorY = 0.;
+	mCadr.MeanErrorXY = 0.;
+
+	for (int iLocalObj = 0; iLocalObj < mCadr.SizeObjectsList; iLocalObj++) {
+		double Dx_2 = mCadr.ObjectsList[iLocalObj].Dx * mCadr.ObjectsList[iLocalObj].Dx;
+		double Dy_2 = mCadr.ObjectsList[iLocalObj].Dy * mCadr.ObjectsList[iLocalObj].Dy;
+		if ((Dx_2 > 1e-20) && (Dy_2 > 1e-20)) {
+			mCadr.MeanErrorX += Dx_2;
+			mCadr.MeanErrorY += Dy_2;
+			mCadr.MeanErrorXY += Dx_2 + Dy_2;
+			countDxDy++;
+		}
+	}
+
+	if (countDxDy==mCadr.CountDeterObj) {
+		mCadr.MeanErrorX=sqrtm(mCadr.MeanErrorX/(double)(mCadr.CountDeterObj-1));
+		mCadr.MeanErrorY=sqrtm(mCadr.MeanErrorY/(double)(mCadr.CountDeterObj-1));
+		mCadr.MeanErrorXY=sqrtm(mCadr.MeanErrorXY/(double)(2*mCadr.CountDeterObj-1));
+	}
+}
+
+void GetImageBright(struct CadrInfo &mCadr)
+{
+	mCadr.MeanBright = 0.;
+	mCadr.SigmaBright = 0.;
+	for (int iWindow = 0; iWindow < mCadr.SizeWindowsList; iWindow++) {
+		mCadr.MeanBright += mCadr.WindowsList[iWindow].Mean;
+		mCadr.SigmaBright += mCadr.WindowsList[iWindow].Sigma;
+	}
+
+	if (mCadr.SizeWindowsList) {
+		mCadr.MeanBright /= mCadr.SizeWindowsList;
+		mCadr.SigmaBright /= mCadr.SizeWindowsList;
+	}
+}
 
 
 #endif

@@ -4,46 +4,7 @@
 #pragma package(smart_init)
 #pragma resource "*.dfm"
 
-void GetMeanDeterError(struct CadrInfo &mCadr)
-{
-int countDxDy = 0;
 
-	mCadr.MeanErrorX = 0.;
-	mCadr.MeanErrorY = 0.;
-	mCadr.MeanErrorXY = 0.;
-
-	for (int iLocalObj = 0; iLocalObj < mCadr.SizeObjectsList; iLocalObj++) {
-		double Dx_2 = mCadr.ObjectsList[iLocalObj].Dx * mCadr.ObjectsList[iLocalObj].Dx;
-		double Dy_2 = mCadr.ObjectsList[iLocalObj].Dy * mCadr.ObjectsList[iLocalObj].Dy;
-		if ((Dx_2 > 1e-20) && (Dy_2 > 1e-20)) {
-			mCadr.MeanErrorX += Dx_2;
-			mCadr.MeanErrorY += Dy_2;
-			mCadr.MeanErrorXY += Dx_2 + Dy_2;
-			countDxDy++;
-		}
-	}
-
-	if (countDxDy==mCadr.CountDeterObj) {
-		mCadr.MeanErrorX=sqrtm(mCadr.MeanErrorX/(double)(mCadr.CountDeterObj-1));
-		mCadr.MeanErrorY=sqrtm(mCadr.MeanErrorY/(double)(mCadr.CountDeterObj-1));
-		mCadr.MeanErrorXY=sqrtm(mCadr.MeanErrorXY/(double)(2*mCadr.CountDeterObj-1));
-	}
-}
-
-void GetImageBright(struct CadrInfo &mCadr)
-{
-	mCadr.MeanBright = 0.;
-	mCadr.SigmaBright = 0.;
-	for (int iWindow = 0; iWindow < mCadr.SizeWindowsList; iWindow++) {
-		mCadr.MeanBright += mCadr.WindowsList[iWindow].Mean;
-		mCadr.SigmaBright += mCadr.WindowsList[iWindow].Sigma;
-	}
-
-	if (mCadr.SizeWindowsList) {
-		mCadr.MeanBright /= mCadr.SizeWindowsList;
-		mCadr.SigmaBright /= mCadr.SizeWindowsList;
-	}
-}
 
 void SwapShort(short *word1, short *word2)
 {
@@ -68,50 +29,60 @@ __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 void TFormGraphOrient::CreateLineGraph()
 {
 	int numberOfSeries = 0;
-	LineSeries[numberOfSeries]= new TLineSeries(ChartAl);
+	LineSeries[numberOfSeries] = new TLineSeries(ChartAl);
 	ChartAl->AddSeries(LineSeries[numberOfSeries]);
 	numberOfSeries++;
-	LineSeries[numberOfSeries]= new TLineSeries(ChartDl);
+	LineSeries[numberOfSeries] = new TLineSeries(ChartDl);
 	ChartDl->AddSeries(LineSeries[numberOfSeries]);
 	numberOfSeries++;
-	LineSeries[numberOfSeries]= new TLineSeries(ChartAz);
+	LineSeries[numberOfSeries] = new TLineSeries(ChartAz);
 	ChartAz->AddSeries(LineSeries[numberOfSeries]);
 	numberOfSeries++;
-	LineSeries[numberOfSeries]= new TLineSeries(ChartWx);
+	LineSeries[numberOfSeries] = new TLineSeries(ChartAlError);
+	ChartAlError->AddSeries(LineSeries[numberOfSeries]);
+	numberOfSeries++;
+	LineSeries[numberOfSeries] = new TLineSeries(ChartDlError);
+	ChartDlError->AddSeries(LineSeries[numberOfSeries]);
+	numberOfSeries++;
+	LineSeries[numberOfSeries] = new TLineSeries(ChartAzError);
+	ChartAzError->AddSeries(LineSeries[numberOfSeries]);
+	numberOfSeries++;
+	LineSeries[numberOfSeries] = new TLineSeries(ChartWx);
 	ChartWx->AddSeries(LineSeries[numberOfSeries]);
 	numberOfSeries++;
-	LineSeries[numberOfSeries]= new TLineSeries(ChartWy);
+	LineSeries[numberOfSeries] = new TLineSeries(ChartWy);
 	ChartWy->AddSeries(LineSeries[numberOfSeries]);
 	numberOfSeries++;
-	LineSeries[numberOfSeries]= new TLineSeries(ChartWz);
+	LineSeries[numberOfSeries] = new TLineSeries(ChartWz);
 	ChartWz->AddSeries(LineSeries[numberOfSeries]);
 	numberOfSeries++;
-	LineSeries[numberOfSeries]= new TLineSeries(ChartMx);
+	LineSeries[numberOfSeries] = new TLineSeries(ChartMx);
 	ChartMx->AddSeries(LineSeries[numberOfSeries]);
 	numberOfSeries++;
-	LineSeries[numberOfSeries]= new TLineSeries(ChartMy);
+	LineSeries[numberOfSeries] = new TLineSeries(ChartMy);
 	ChartMy->AddSeries(LineSeries[numberOfSeries]);
 	numberOfSeries++;
-	LineSeries[numberOfSeries]= new TLineSeries(ChartMxy);
+	LineSeries[numberOfSeries] = new TLineSeries(ChartMxy);
 	ChartMxy->AddSeries(LineSeries[numberOfSeries]);
 	numberOfSeries++;
-	LineSeries[numberOfSeries]= new TLineSeries(ChartNumFrag);
+	LineSeries[numberOfSeries] = new TLineSeries(ChartNumFrag);
 	ChartNumFrag->AddSeries(LineSeries[numberOfSeries]);
 	numberOfSeries++;
-	LineSeries[numberOfSeries]= new TLineSeries(ChartNumLoc);
+	LineSeries[numberOfSeries] = new TLineSeries(ChartNumLoc);
 	ChartNumLoc->AddSeries(LineSeries[numberOfSeries]);
 	numberOfSeries++;
-	LineSeries[numberOfSeries]= new TLineSeries(ChartNumDet);
+	LineSeries[numberOfSeries] = new TLineSeries(ChartNumDet);
 	ChartNumDet->AddSeries(LineSeries[numberOfSeries]);
 	numberOfSeries++;
-	LineSeries[numberOfSeries]= new TLineSeries(ChartFone);
+	LineSeries[numberOfSeries] = new TLineSeries(ChartFone);
 	ChartFone->AddSeries(LineSeries[numberOfSeries]);
 	numberOfSeries++;
-	LineSeries[numberOfSeries]= new TLineSeries(ChartNoise);
+	LineSeries[numberOfSeries] = new TLineSeries(ChartNoise);
 	ChartNoise->AddSeries(LineSeries[numberOfSeries]);
 	numberOfSeries++;
-	LineSeries[numberOfSeries]= new TLineSeries(ChartTemp);
+	LineSeries[numberOfSeries] = new TLineSeries(ChartTemp);
 	ChartTemp->AddSeries(LineSeries[numberOfSeries]);
+
 }
 
 void TFormGraphOrient::DeleteLineGraph()
@@ -138,6 +109,15 @@ void TFormGraphOrient::CreateScrollGraph()
 	numberOfSeries++;
 	ScrollSeries[numberOfSeries]= new TLineSeries(ChartAz);
 	ChartAz->AddSeries(ScrollSeries[numberOfSeries]);
+	numberOfSeries++;
+	ScrollSeries[numberOfSeries] = new TLineSeries(ChartAlError);
+	ChartAlError->AddSeries(ScrollSeries[numberOfSeries]);
+	numberOfSeries++;
+	ScrollSeries[numberOfSeries] = new TLineSeries(ChartDlError);
+	ChartDlError->AddSeries(ScrollSeries[numberOfSeries]);
+	numberOfSeries++;
+	ScrollSeries[numberOfSeries] = new TLineSeries(ChartAzError);
+	ChartAzError->AddSeries(ScrollSeries[numberOfSeries]);
 	numberOfSeries++;
 	ScrollSeries[numberOfSeries]= new TLineSeries(ChartWx);
 	ChartWx->AddSeries(ScrollSeries[numberOfSeries]);
@@ -236,6 +216,9 @@ void __fastcall TFormGraphOrient::MenuSaveClick(TObject *Sender)
    SaveGraph(ChartAl, "Alpha");
    SaveGraph(ChartDl, "Delta");
    SaveGraph(ChartAz, "Azimut");
+   SaveGraph(ChartAlError, "AlphaError");
+   SaveGraph(ChartDlError, "DeltaError");
+   SaveGraph(ChartAzError, "AzimutError");
    SaveGraph(ChartMx, "Mx");
    SaveGraph(ChartMy, "My");
    SaveGraph(ChartMxy, "Mxy");
@@ -358,7 +341,7 @@ void __fastcall TFormGraphOrient::FormCreate(TObject *Sender)
 	Series3->Selected->Hover->Hide();
 	Series9->Selected->Hover->Hide();
 
-	CreateScrollGraph();
+    CreateScrollGraph();
 }
 //---------------------------------------------------------------------------
 void TFormGraphOrient::InitTableWindows(void)
@@ -414,25 +397,32 @@ void TFormGraphOrient::PrintTableWindows(const struct CadrInfo &mCadr)
     }
 }
 
+void TFormGraphOrient::PrepareStartDraw()
+{
+	EditNumCadr->Text = 0;
+	UpDown1->Max = vCadrInfo.size() - 1;
+	DrawAnimateHandler();
+}
+
 void TFormGraphOrient::InitTableObjects(void)
 {
-	int k=0;
+	int k = 0;
 
-	TableObjectsInfo->RowCount=2;
-	TableObjectsInfo->ColCount=10;
-	TableObjectsInfo->FixedCols=0;
-	TableObjectsInfo->FixedRows=1;
+	TableObjectsInfo->RowCount = 2;
+	TableObjectsInfo->ColCount = 10;
+	TableObjectsInfo->FixedCols = 0;
+	TableObjectsInfo->FixedRows = 1;
 
-	TableObjectsInfo->Cells[k++][0]="№";
-	TableObjectsInfo->Cells[k++][0]="Xloc";
-	TableObjectsInfo->Cells[k++][0]="Yloc";
-	TableObjectsInfo->Cells[k++][0]="Bright";
-	TableObjectsInfo->Cells[k++][0]="CountPix";
-	TableObjectsInfo->Cells[k++][0]="Star №";
-	TableObjectsInfo->Cells[k++][0]="Mv";
-	TableObjectsInfo->Cells[k++][0]="Sp";
-	TableObjectsInfo->Cells[k++][0]="Dx, mkm";
-	TableObjectsInfo->Cells[k++][0]="Dy, mkm";
+	TableObjectsInfo->Cells[k++][0] = "№";
+	TableObjectsInfo->Cells[k++][0] = "Xloc";
+	TableObjectsInfo->Cells[k++][0] = "Yloc";
+	TableObjectsInfo->Cells[k++][0] = "Bright";
+	TableObjectsInfo->Cells[k++][0] = "CountPix";
+	TableObjectsInfo->Cells[k++][0] = "Star №";
+	TableObjectsInfo->Cells[k++][0] = "Mv";
+	TableObjectsInfo->Cells[k++][0] = "Sp";
+	TableObjectsInfo->Cells[k++][0] = "Dx, mkm";
+	TableObjectsInfo->Cells[k++][0] = "Dy, mkm";
 }
 
 void TFormGraphOrient::PrintTableObjects(const struct CadrInfo &mCadr)
@@ -676,7 +666,8 @@ void TFormGraphOrient::DrawBlock(const struct CadrInfo &mCadr)
 		Label6->Caption = "Общее число строк: "+IntToStr(mCadr.CountLines);
 	else
 		Label6->Caption = "ОШИБКА! Число строк: "+IntToStr(CountLines)
-						+" вместо "+IntToStr(mCadr.CountLines);
+						+ " вместо " + IntToStr(mCadr.CountLines);
+
 }
 
 void TFormGraphOrient::DrawAnimate(const struct CadrInfo &mCadr)
@@ -737,7 +728,6 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 	ImageScrollBoxVector.clear();
 
 
-
 	AnsiString NeededDirectory = GetCurrentDir() + "\\Frag_" + FileTitle;
 	if (!TDirectory::Exists(NeededDirectory))
 	{
@@ -756,8 +746,8 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
    for(int CurrentFileName = 0;CurrentFileName < FileNameList.Length;CurrentFileName ++)
    {
 
-		if(System::Strutils::AnsiContainsStr(FileNameList[CurrentFileName],TimePrTwoParts[0]) &&
-		  System::Strutils::AnsiContainsStr(FileNameList[CurrentFileName],TimePrTwoParts[1]))
+		if(AnsiContainsStr(FileNameList[CurrentFileName], TimePrTwoParts[0])
+		&&	AnsiContainsStr(FileNameList[CurrentFileName], TimePrTwoParts[1]))
 		  {
 				 FragmentFileStr = FileNameList[CurrentFileName];
 				 break;
@@ -863,8 +853,6 @@ void TFormGraphOrient::PlaceImageFragments (const vector<FragmentScrollBox*>& Fr
 	int HeightOffset = 0;
 	int WidthOffset = 0;
 
-
-
 	vector <int> heights;
 	for(unsigned int CurrentImage = 0;CurrentImage < FragmentImages.size();CurrentImage ++)
 	{
@@ -919,8 +907,8 @@ void __fastcall TFormGraphOrient::FormMouseWheelUp(TObject *Sender, TShiftState 
 		 const TPoint& MousePos, bool &Handled)
 {
 
-	if(!(FindVCLWindow(MousePos)->Name=="FragmentShowScrollBox") &&
-	!(FindVCLWindow(MousePos)->ClassName()=="TScrollBox"))
+	if(!(FindVCLWindow(MousePos)->Name == "FragmentShowScrollBox")
+	&& !(FindVCLWindow(MousePos)->ClassName() == "TScrollBox"))
    {
 		return;
    }
@@ -937,8 +925,8 @@ void __fastcall TFormGraphOrient::FormMouseWheelUp(TObject *Sender, TShiftState 
 void __fastcall TFormGraphOrient::FormMouseWheelDown(TObject *Sender, TShiftState Shift, const TPoint& MousePos,
 bool &Handled)
 {
-	if(!(FindVCLWindow(MousePos)->Name=="FragmentShowScrollBox") &&
-	!(FindVCLWindow(MousePos)->ClassName()=="TScrollBox"))
+	if (!(FindVCLWindow(MousePos)->Name=="FragmentShowScrollBox")
+	&& !(FindVCLWindow(MousePos)->ClassName()=="TScrollBox"))
    {
 		return;
    }
@@ -962,22 +950,22 @@ bool &Handled)
 
 	if(Button == mbLeft)
 	{
-		Image->Width= Image->Width * 1.2;
-		Image->Height= Image->Height * 1.2;
+		Image->Width = Image->Width * 1.2;
+		Image->Height = Image->Height * 1.2;
 		// определяем диапазоны ползунков ( ThumpSize всегда почему-то возвращает ноль, так что только таким способом )
-		ScrollBox->VertScrollBar->Position= INT_MAX;
-		ScrollBox->HorzScrollBar->Position= INT_MAX;
-		ScrollBox->VertScrollBar->Position=(((double)(ScrollBox->VertScrollBar->Position)/Image->Height) * Y) * 1.2;
-		ScrollBox->HorzScrollBar->Position=(((double)(ScrollBox->HorzScrollBar->Position)/Image->Width)* X) * 1.2;
+		ScrollBox->VertScrollBar->Position = INT_MAX;
+		ScrollBox->HorzScrollBar->Position = INT_MAX;
+		ScrollBox->VertScrollBar->Position = (((double)(ScrollBox->VertScrollBar->Position)/Image->Height) * Y) * 1.2;
+		ScrollBox->HorzScrollBar->Position = (((double)(ScrollBox->HorzScrollBar->Position)/Image->Width)* X) * 1.2;
 	}
-	else if(Button==mbRight)
+	else if(Button == mbRight)
 	{
-		Image->Width= Image->Width / 1.2;
-		Image->Height= Image->Height / 1.2;
-		ScrollBox->VertScrollBar->Position= INT_MAX;
-		ScrollBox->HorzScrollBar->Position= INT_MAX;
-		ScrollBox->VertScrollBar->Position=(((double)(ScrollBox->VertScrollBar->Position)/Image->Height) * Y) / 1.2;
-		ScrollBox->HorzScrollBar->Position=(((double)(ScrollBox->HorzScrollBar->Position)/Image->Width)* X) / 1.2;
+		Image->Width = Image->Width / 1.2;
+		Image->Height = Image->Height / 1.2;
+		ScrollBox->VertScrollBar->Position = INT_MAX;
+		ScrollBox->HorzScrollBar->Position = INT_MAX;
+		ScrollBox->VertScrollBar->Position =(((double)(ScrollBox->VertScrollBar->Position)/Image->Height) * Y) / 1.2;
+		ScrollBox->HorzScrollBar->Position =(((double)(ScrollBox->HorzScrollBar->Position)/Image->Width)* X) / 1.2;
 	}
 
 	TImage* FragmentNumber = dynamic_cast<TImage*>(ScrollBox->Components[1]);
@@ -1115,7 +1103,7 @@ void  TFormGraphOrient::DrawBlockHandler(void)
 	try
 	{
 		CadrInfo CurCadr;
-		int cnt=StrToInt(EditNumCadr->Text);
+		int cnt = StrToInt(EditNumCadr->Text);
 
 		if (!GetCadrInfo(cnt, CurCadr))
 		{
@@ -1132,17 +1120,17 @@ void  TFormGraphOrient::DrawBlockHandler(void)
 void __fastcall TFormGraphOrient::TableObjectsInfoDrawCell(TObject *Sender, int ACol,
 		  int ARow, TRect &Rect, TGridDrawState State)
 {
-		TStringGrid *thisGrid=(TStringGrid*)Sender;
+		TStringGrid *thisGrid = (TStringGrid*)Sender;
 
 		if (FormAnimateSetting->CheckBoxFillTableObjects->Checked) {
-			if ((ARow)&&(thisGrid->Cells[5][ARow]!=""))
+			if ( ARow && !thisGrid->Cells[5][ARow].IsEmpty())
 			{
 				unsigned long StarID;
 				float Dx, Dy;
-				StarID=StrToInt(thisGrid->Cells[5][ARow]);
-				Dx=StrToFloat(thisGrid->Cells[8][ARow]);
-				Dy=StrToFloat(thisGrid->Cells[9][ARow]);
-				if ((!StarID)&&(!Dx)&&(!Dy))
+				StarID = StrToInt(thisGrid->Cells[5][ARow]);
+				Dx = StrToFloat(thisGrid->Cells[8][ARow]);
+				Dy = StrToFloat(thisGrid->Cells[9][ARow]);
+				if ((!StarID) && (!Dx) && (!Dy))
 					thisGrid->Canvas->Brush->Color = FormAnimateSetting->ShapeColorLocObjTable->Brush->Color;
 				else thisGrid->Canvas->Brush->Color = FormAnimateSetting->ShapeColorDetObjTable->Brush->Color;
 
@@ -1161,16 +1149,16 @@ void __fastcall TFormGraphOrient::TableWindowsInfoDrawCell(TObject *Sender, int 
 	TStringGrid *thisGrid=(TStringGrid*)Sender;
 
 	if (FormAnimateSetting->CheckBoxFillTableWindows->Checked) {
-		if ((ARow)&&(thisGrid->Cells[7][ARow]!=""))
+		if (ARow && !thisGrid->Cells[7][ARow].IsEmpty())
 		{
-			if (thisGrid->Cells[7][ARow]=="0")
-				thisGrid->Canvas->Brush->Color=FormAnimateSetting->ShapeColorZeroObjTable->Brush->Color;
-			else if ((thisGrid->Cells[7][ARow]=="1"))
-				thisGrid->Canvas->Brush->Color=FormAnimateSetting->ShapeColorOneObjTable->Brush->Color;
-			else if ((thisGrid->Cells[7][ARow]=="2"))
-				thisGrid->Canvas->Brush->Color=FormAnimateSetting->ShapeColorTwoObjTable->Brush->Color;
+			if (thisGrid->Cells[7][ARow] == "0")
+				thisGrid->Canvas->Brush->Color = FormAnimateSetting->ShapeColorZeroObjTable->Brush->Color;
+			else if ((thisGrid->Cells[7][ARow] == "1"))
+				thisGrid->Canvas->Brush->Color = FormAnimateSetting->ShapeColorOneObjTable->Brush->Color;
+			else if ((thisGrid->Cells[7][ARow] == "2"))
+				thisGrid->Canvas->Brush->Color = FormAnimateSetting->ShapeColorTwoObjTable->Brush->Color;
 			else
-				thisGrid->Canvas->Brush->Color=FormAnimateSetting->ShapeColorThreeObjTable->Brush->Color;
+				thisGrid->Canvas->Brush->Color = FormAnimateSetting->ShapeColorThreeObjTable->Brush->Color;
 
 			thisGrid->Canvas->FillRect(Rect);
 			thisGrid->Canvas->TextOutW(Rect.Left, Rect.Top, thisGrid->Cells[ACol][ARow]);
@@ -1195,7 +1183,7 @@ void GetFileTitles(AnsiString file_name, AnsiString *file_title)
 			AnsiString TFormGraphOrient::SortRawFlashFile(const AnsiString &RawFileName)
 			{
 			   FILE* RawFlashFile;
-			   RawFlashFile=fopen(RawFileName.c_str(),"rb");
+			   RawFlashFile = fopen(RawFileName.c_str(),"rb");
 			   if(!RawFlashFile)
 			   {
 					return "";
@@ -1203,26 +1191,26 @@ void GetFileTitles(AnsiString file_name, AnsiString *file_title)
 
 			  std::vector<RawFileInfo>  RawFileInfoVector;
 			  int Marker;
-			   while(fread(&Marker,sizeof(int),1,RawFlashFile) == 1)
+			   while(fread(&Marker, sizeof(int), 1, RawFlashFile) == 1)
 			   {
-					if (GetInt(Marker)==0x55550000)
+					if (GetInt(Marker) == 0x55550000)
 					{
 							RawFileInfo CurrentInfo;
 
 							// текущая позиция на начале заголовочной структуры
-							CurrentInfo.Pos =  ftell(RawFlashFile)-4 ;
+							CurrentInfo.Pos =  ftell(RawFlashFile) - sizeof(int);
 
-							if(RawFileInfoVector.size()==0)
+							if(RawFileInfoVector.size() == 0)
 							{
 								CurrentInfo.Size = 0;
 							}
 							else
 							{
-								CurrentInfo.Size=CurrentInfo.Pos - RawFileInfoVector.back().Pos;
+								CurrentInfo.Size = CurrentInfo.Pos - RawFileInfoVector.back().Pos;
 							}
 
 							unsigned short SequenceCounterAndAdress [2];
-							fread(&SequenceCounterAndAdress,sizeof(short),2,RawFlashFile);
+							fread(&SequenceCounterAndAdress,sizeof(short), 2, RawFlashFile);
 							CurrentInfo.SecuenceCounter = SequenceCounterAndAdress[0];
 							RawFileInfoVector.push_back(CurrentInfo);
 
@@ -1255,11 +1243,10 @@ void GetFileTitles(AnsiString file_name, AnsiString *file_title)
 			} FlashCompare ;
 
 
-			   std::sort(RawFileInfoVector.begin(),RawFileInfoVector.end(),FlashCompare);
-
-			   FILE * SortedFile;
-			   AnsiString SortedFlashFileName= GetCurrentDir()+"\\flash_sorted.dat";
-			   SortedFile = fopen(SortedFlashFileName.c_str(),"wb");
+			   std::sort(RawFileInfoVector.begin(), RawFileInfoVector.end(), FlashCompare);
+			   FILE* SortedFile;
+			   AnsiString SortedFlashFileName = GetCurrentDir() + "\\flash_sorted.dat";
+			   SortedFile = fopen(SortedFlashFileName.c_str(), "wb");
 
 			   if(!SortedFile)
 			   {
@@ -1267,12 +1254,12 @@ void GetFileTitles(AnsiString file_name, AnsiString *file_title)
 			   }
 
 			   // -1 т.к размер блока хранится  в следующем элементе
-			   for(unsigned int CurrentFlashStruct = 0; CurrentFlashStruct < RawFileInfoVector.size()-1 ;CurrentFlashStruct++)
+			   for(unsigned int CurrentFlashStruct = 0; CurrentFlashStruct < RawFileInfoVector.size() - 1 ;CurrentFlashStruct++)
 			   {
-					fseek(RawFlashFile,RawFileInfoVector[CurrentFlashStruct].Pos,SEEK_SET);
-					char* CurrentStructBuffer= new char [RawFileInfoVector[CurrentFlashStruct+1].Size];
-					fread(CurrentStructBuffer,sizeof(char),RawFileInfoVector[CurrentFlashStruct+1].Size,RawFlashFile);
-					fwrite(CurrentStructBuffer,sizeof(char),RawFileInfoVector[CurrentFlashStruct+1].Size,SortedFile);
+					fseek(RawFlashFile, RawFileInfoVector[CurrentFlashStruct].Pos,SEEK_SET);
+					char* CurrentStructBuffer = new char [RawFileInfoVector[CurrentFlashStruct + 1].Size];
+					fread(CurrentStructBuffer,sizeof(char), RawFileInfoVector[CurrentFlashStruct + 1].Size,RawFlashFile);
+					fwrite(CurrentStructBuffer,sizeof(char), RawFileInfoVector[CurrentFlashStruct + 1].Size,SortedFile);
 					delete [] CurrentStructBuffer;
 			   }
 
@@ -1305,7 +1292,7 @@ void __fastcall TFormGraphOrient::FormClose(TObject *Sender, TCloseAction &Actio
 
 {
 		vCadrInfo.clear();
-		Action=caFree;
+		Action = caFree;
 }
 //---------------------------------------------------------------------------
 
@@ -1313,6 +1300,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 {
   try
   {
+  OpenDialog->Options.Clear();
   OpenDialog->Filter = "dat|*.dat";
   if (OpenDialog->Execute()) {
 		vCadrInfo.clear();
@@ -1347,7 +1335,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 		while(!feof(fflesh))
 		{
 			fread(&Marker,sizeof(int),1,fflesh);
-			if (GetInt(Marker)==0x55550000)
+			if (GetInt(Marker) == 0x55550000)
 			{
 				fread(&buf,sizeof(short),2,fflesh);
 				fprintf(ftxt,"%6d 0x%04x %10d\n",buf[0],buf[1], CntWord*sizeof(CntWord));
@@ -1367,7 +1355,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 
 
 
-		CurDir=GetCurrentDir();
+		CurDir = GetCurrentDir();
 		FragDir=CurDir+"\\Frag_"+FileTitle;
 	    LocDir=CurDir+"\\Loc_"+FileTitle;
 		CreateDir(FragDir);
@@ -1419,7 +1407,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 			  NumPixH=mDataPixHdr.NumPix;
 			  if (mDataPixHdr.NumPix%2) NumPixH++;
 
-			  for (int i=0; i<NumPixH; i=i+2)
+			  for (int i = 0; i < NumPixH; i = i+2)
 			  {
 				fread(PixMas, sizeof (int),3, fflesh);
 				fprintf(ftxt,"%6d %6d %6d %6d\n",i+1, PixMas[0]>>16,PixMas[0]&0x0000FFFF, PixMas[1]>>16);
@@ -1497,14 +1485,14 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 			  LineSeries[10]->AddXY(mCadrInfo.Time, mCadrInfo.CountLocalObj);
 			  LineSeries[14]->AddXY(mCadrInfo.Time, mCadrInfo.MatrixTemp);
 
-			  double al=0;
-			  double dl=0;
-			  double Az=0;
+			  double al = 0;
+			  double dl = 0;
+			  double az = 0;
 
 			  if (!mDataNO.res_stat) {
-				al=mCadrInfo.AnglesOrient[0]*RTD;
-				dl=mCadrInfo.AnglesOrient[1]*RTD;
-				Az=mCadrInfo.AnglesOrient[2]*RTD;
+				al = mCadrInfo.AnglesOrient[0] * RTD;
+				dl = mCadrInfo.AnglesOrient[1] * RTD;
+				az = mCadrInfo.AnglesOrient[2] * RTD;
 			  }
 
 			  fprintf(flog_orient,"    %02d NO %6d %10ld %10ld %6ld.%03ld 0x%04x %8d ",
@@ -1778,9 +1766,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 		fclose(flog_pix);
 		fclose(flog_orient);
 
-		EditNumCadr->Text=0;
-		UpDown1->Max=vCadrInfo.size();
-//		DrawLineSeries(vCadrInfo);
+        PrepareStartDraw();
 	 }
   }
 	catch(std::string &s)
@@ -1989,7 +1975,7 @@ std::string line, word;
 					i++;
 				}
 			}
-			if ((word==arrStatErrorRus[MAX_STAT-1])||(word==arrStatErrorEng[MAX_STAT-1])) {
+			if ((word == arrStatErrorRus[MAX_STAT-1]) || (word == arrStatErrorEng[MAX_STAT-1])) {
 				return 1;
 			}
 			getline(finp, line, '\n' );
@@ -2402,6 +2388,7 @@ void ConvertDataLOC(struct LOC tmi, struct CadrInfo &mCadr)
 
 void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 {
+    OpenDialog->Options.Clear();
 	OpenDialog->Filter = "txt|*.txt";
 	if (OpenDialog->Execute()) {
 
@@ -2529,8 +2516,7 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 		fout.close();
 		fshtmi1.close();
 		fshtmi2.close();
-		EditNumCadr->Text = 0;
-		UpDown1->Max = vCadrInfo.size();
+		PrepareStartDraw();
 	}
 }
 
@@ -2612,6 +2598,7 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 	struct DTMI_BOKZM tmi;
 //	short mDay, mMonth, mYear, mHour, mMin, mSec;
 
+    OpenDialog->Options.Clear();
 	OpenDialog->Filter = "txt|*.txt";
 	if (OpenDialog->Execute()) {
 
@@ -2668,8 +2655,7 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 		}
 		finp.close();
 		fout.close();
-		EditNumCadr->Text = 0;
-		UpDown1->Max = vCadrInfo.size();
+		PrepareStartDraw();
 	}
 }
 
@@ -2807,8 +2793,8 @@ void TFormGraphOrient::readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cad
 					{
 						std::getline(in,line);
 						// см. эту строку в протоколе, чтобы понять почему так
-						splittedLocData = split(line,")\t");
-						splittedLocData = split(splittedLocData[1],"\t");
+						splittedLocData = split(line, ")\t");
+						splittedLocData = split(splittedLocData[1], "\t");
 
 						objInfo.X = std::atof (splittedLocData[0].c_str());
 						objInfo.Y = std::atof (splittedLocData[1].c_str());
@@ -3035,6 +3021,7 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 
 	try
 	{
+        OpenDialog->Options.Clear();
 		OpenDialog->Filter = "txt|*.txt";
 		if (OpenDialog->Execute()) {
 			vCadrInfo.clear();
@@ -3060,9 +3047,7 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 				readBOKZ60Protocol(in,vCadrInfo);
 			}
 
-			EditNumCadr->Text = 0;
-			DrawAnimateHandler();
-			UpDown1->Max = vCadrInfo.size();
+			PrepareStartDraw();
 
 		}
 	}
@@ -3211,7 +3196,7 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 				int prevPos = in.tellg();
 
 				in>>line;
-				if(line== "с")
+				if(line == "с")
 				{
 					in >> secs;
 
@@ -3360,6 +3345,7 @@ void __fastcall TFormGraphOrient::BOKZM2VParseProtocolClick(TObject *Sender)
 {
 	try
 	{
+         OpenDialog->Options.Clear();
 		 OpenDialog->Filter = "txt|*.txt";
 		if (OpenDialog->Execute()) {
 			vCadrInfo.clear();
@@ -3377,9 +3363,7 @@ void __fastcall TFormGraphOrient::BOKZM2VParseProtocolClick(TObject *Sender)
 
 			ApplySeriesSetting("мБОКЗ-2В", clBlue);
 			readmBOKZ2VProtocol(in, vCadrInfo);
-			EditNumCadr->Text = 0;
-			DrawAnimateHandler();
-			UpDown1->Max = vCadrInfo.size();
+			PrepareStartDraw();
 
 		}
 	}
@@ -3391,7 +3375,7 @@ void __fastcall TFormGraphOrient::BOKZM2VParseProtocolClick(TObject *Sender)
 }
 
 
-void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec)
+void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec, bool CompareIKIRes = false)
 {
 	CadrInfo cadrInfo;
 	cadrInfo.Time = reader->Georeferencing.DateTime.Val;
@@ -3507,19 +3491,17 @@ void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec
 		}
 	}
 
-
 	cadrInfo.CountLines = reader->ImageData.LinesData.LinesHeight;
 	cadrInfo.CountBlock = reader->ImageData.LinesData.LinesCount;
 
 	for (int i = 0; i < cadrInfo.CountBlock; i ++)
 	{
-		  LinesInfo lineInfo;
-		  lineInfo.Start = reader->ImageData.LinesData.Info[i].Y_FirstString;
-		  lineInfo.Height = reader->ImageData.LinesData.Info[i].CountString;
-		  cadrInfo.LinesList.push_back(lineInfo);
+		LinesInfo lineInfo;
+		lineInfo.Start = reader->ImageData.LinesData.Info[i].Y_FirstString;
+		lineInfo.Height = reader->ImageData.LinesData.Info[i].CountString;
+		cadrInfo.LinesList.push_back(lineInfo);
 	}
 
-	   
 	cadrInfo.MeanErrorX = reader->StarsData.m_X;
 	cadrInfo.MeanErrorY = reader->StarsData.m_Y;
 	cadrInfo.MeanErrorXY = reader->StarsData.m_Cur;
@@ -3539,6 +3521,15 @@ void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec
 		}
 	}
 
+	if (CompareIKIRes)
+	{
+	   for (int i = 0;  i  < 3; i ++)
+	   {
+			cadrInfo.AnglesDiff[i] = cadrInfo.AnglesOrient[i] - reader->Georeferencing.OrientationAngles[0];
+	   }
+
+	}
+
 	GetImageBright(cadrInfo);
 	cadrInfoVec.push_back(cadrInfo);	
 }
@@ -3546,44 +3537,71 @@ void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec
 void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 {
 		OpenDialog->Filter = "iki|*.iki;*.res";
+		OpenDialog->Options << ofAllowMultiSelect;
 		if (OpenDialog->Execute())
 		{
 			vCadrInfo.clear();
 			DeleteLineGraph();
-			FileName = OpenDialog->FileName;
 			FileTitle = "IKI";
-			SetCurrentDir(ExtractFileDir(FileName));
-			std::unique_ptr <IKI_img> reader(new IKI_img());
-			if	(reader->ReadFormat(FileName))
-			{
-				convertIKIFormatToInfoCadr(reader.get(), vCadrInfo);
-				auto Time =  vCadrInfo.back().Time;
-				if (vCadrInfo.back().AnglesOrient[0] != 0)
-				{	
-					CreateLineGraph();
-					LineSeries[0]->AddXY(Time,  vCadrInfo.back().AnglesOrient[0] * RTD);
-					LineSeries[1]->AddXY(Time,  vCadrInfo.back().AnglesOrient[1] * RTD);
-					LineSeries[2]->AddXY(Time,  vCadrInfo.back().AnglesOrient[2] * RTD);
-					LineSeries[3]->AddXY(Time,  vCadrInfo.back().OmegaOrient[0] * RTM);
-					LineSeries[4]->AddXY(Time,  vCadrInfo.back().OmegaOrient[1] * RTM);
-					LineSeries[5]->AddXY(Time,  vCadrInfo.back().OmegaOrient[2] * RTM);
-					LineSeries[6]->AddXY(Time,  vCadrInfo.back().MeanErrorX * 1000.);
-					LineSeries[7]->AddXY(Time,  vCadrInfo.back().MeanErrorY * 1000.);
-					LineSeries[8]->AddXY(Time,  vCadrInfo.back().MeanErrorXY * 1000.);
-					LineSeries[9] ->AddXY(Time, vCadrInfo.back().CountWindows);
-					LineSeries[11]->AddXY(Time, vCadrInfo.back().CountDeterObj);
-					LineSeries[10]->AddXY(Time, vCadrInfo.back().CountLocalObj);
-					LineSeries[12]->AddXY(Time, vCadrInfo.back().MeanBright);
-					LineSeries[13]->AddXY(Time, vCadrInfo.back().SigmaBright);
-//					LineSeries[14]->AddXY(Time, mCadrInfo.MatrixTemp);
-				}
-				EditNumCadr->Text = 0;
-				DrawAnimateHandler();
-				UpDown1->Max = vCadrInfo.size();
-			}
+			std::unique_ptr <TStringList> fileList (new TStringList());
+			fileList->Assign(OpenDialog->Files);
+			fileList->Sort();
+			SetCurrentDir(ExtractFileDir(fileList->Strings[0]));
 
+			for (int i = 0; i < fileList->Count; i ++)
+			{
+				std::unique_ptr <IKI_img> reader(new IKI_img());
+				if	(reader->ReadFormat(fileList->Strings[i]))
+				{
+					if	(i != fileList->Count - 1
+					&& AnsiContainsStr(fileList->Strings[i + 1], ".res"))
+					{
+						if (reader->ReadFormat(fileList->Strings[i + 1]))
+						{
+							CompareIKIRes = true;
+							i = i + 1;
+						}
+						else throw logic_error(string("Не удалось считать ") + AnsiString(fileList->Strings[i + 1]).c_str());
+					}
+
+					convertIKIFormatToInfoCadr(reader.get(), vCadrInfo, CompareIKIRes);
+					double Time =  vCadrInfo.back().Time;
+					if (vCadrInfo.back().AnglesOrient[0] != 0)
+					{
+						CreateLineGraph();
+						LineSeries[0]->AddXY(Time,  vCadrInfo.back().AnglesOrient[0] * RTD);
+						LineSeries[1]->AddXY(Time,  vCadrInfo.back().AnglesOrient[1] * RTD);
+						LineSeries[2]->AddXY(Time,  vCadrInfo.back().AnglesOrient[2] * RTD);
+						LineSeries[3]->AddXY(Time,  vCadrInfo.back().OmegaOrient[0] * RTM);
+						LineSeries[4]->AddXY(Time,  vCadrInfo.back().OmegaOrient[1] * RTM);
+						LineSeries[5]->AddXY(Time,  vCadrInfo.back().OmegaOrient[2] * RTM);
+						LineSeries[6]->AddXY(Time,  vCadrInfo.back().MeanErrorX * 1000.);
+						LineSeries[7]->AddXY(Time,  vCadrInfo.back().MeanErrorY * 1000.);
+						LineSeries[8]->AddXY(Time,  vCadrInfo.back().MeanErrorXY * 1000.);
+						LineSeries[9] ->AddXY(Time, vCadrInfo.back().CountWindows);
+						LineSeries[11]->AddXY(Time, vCadrInfo.back().CountDeterObj);
+						LineSeries[10]->AddXY(Time, vCadrInfo.back().CountLocalObj);
+						LineSeries[12]->AddXY(Time, vCadrInfo.back().MeanBright);
+						LineSeries[13]->AddXY(Time, vCadrInfo.back().SigmaBright);
+//						LineSeries[14]->AddXY(Time, mCadrInfo.MatrixTemp);
+					}
+				}
+				else throw logic_error(string("Не удалось считать ") + AnsiString(fileList->Strings[i]).c_str());
+
+
+			}
+			PrepareStartDraw();
 		}
 }
 //---------------------------------------------------------------------------
 
+//       	if (CompareIKIRes)
+//	{
+//		Label12->Caption = "Разность углов ориентации: "
+//		+ FloatToStrF(mCadr.AnglesDiff[0], ffFixed, 7, 7) + " "
+//		+ FloatToStrF(mCadr.AnglesDiff[1], ffFixed, 7, 7) + " "
+//		+ FloatToStrF(mCadr.AnglesDiff[2], ffFixed, 7, 7);
+//	}
+
+//---------------------------------------------------------------------------
 

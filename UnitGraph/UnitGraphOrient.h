@@ -65,7 +65,7 @@
 
 
 	#define MaxSeries 6
-	#define NumGraph 15
+	#define NumGraph 18
 	#define MaxBlockSeries 8
 	#define MaxFrameSeries 30
 
@@ -172,6 +172,10 @@
 	TChart *Chart7;
 	TChart *Chart8;
 	TMenuItem *ReadIKIFormat;
+	TTabSheet *TabSheet4;
+	TChart *ChartAzError;
+	TChart *ChartDlError;
+	TChart *ChartAlError;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -201,7 +205,7 @@
 
 
 	private:	// User declarations
-		void InitStartColorOptions();
+		void PrepareStartDraw();
 		void InitTableObjects(void);
 		void PrintTableObjects(const struct CadrInfo &mCadr);
 		void InitTableWindows(void);
@@ -237,7 +241,8 @@
 		int ScaleFactorForImage;
 		int Contrast;
 		unsigned short ResizeCoef;
-        unsigned short FontSize;
+		unsigned short FontSize;
+		bool CompareIKIRes;
 		int FragID;
 
 
