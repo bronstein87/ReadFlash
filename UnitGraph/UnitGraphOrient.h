@@ -66,7 +66,7 @@
 
 
 	#define MaxSeries 6
-	#define NumGraph 18
+	#define NumGraph 20
 	#define MaxBlockSeries 8
 	#define MaxFrameSeries 30
 
@@ -99,15 +99,15 @@
 		TTabSheet *TabSheet7;
 		TChart *ChartMx;
 		TChart *ChartMy;
-	TChart *ChartMxy;
+		TChart *ChartMxy;
 		TTabSheet *TabSheet8;
-	TChart *ChartNumFrag;
-	TChart *ChartNumLoc;
-	TChart *ChartNumDet;
+		TChart *ChartNumFrag;
+		TChart *ChartNumLoc;
+		TChart *ChartNumDet;
 		TTabSheet *TabSheet9;
 		TChart *ChartFone;
 		TChart *ChartNoise;
-	TChart *ChartTemp;
+		TChart *ChartTemp;
 		TMainMenu *MainMenu1;
 		TMenuItem *MenuSave;
 		TMenuItem *MenuClear;
@@ -147,7 +147,7 @@
 		TBubbleSeries *Series9;
 		TTabSheet *ShowFragmentTab;
 		TMenuItem *MenuOpen;
-	TOpenDialog *OpenDialog;
+		TOpenDialog *OpenDialog;
 		TCheckBox *SortFileCheckBox;
 		TScrollBox *FragmentShowScrollBox;
 		TMenuItem *MenuOpenFlash;
@@ -166,17 +166,21 @@
 		TEdit *PixelSizeEdit;
 		TLabel *Label9;
 		TUpDown *UpDown3;
-	TLabel *Label7;
-	TEdit *FontSizeEdit;
-	TUpDown *UpDown4;
-	TTabSheet *TabSheet3;
-	TChart *Chart7;
-	TChart *Chart8;
-	TMenuItem *ReadIKIFormat;
-	TTabSheet *TabSheet4;
-	TChart *ChartAzError;
-	TChart *ChartDlError;
-	TChart *ChartAlError;
+		TLabel *Label7;
+		TEdit *FontSizeEdit;
+		TUpDown *UpDown4;
+		TTabSheet *TabSheet3;
+		TChart *Chart7;
+		TChart *Chart8;
+		TMenuItem *ReadIKIFormat;
+		TTabSheet *TabSheet4;
+		TChart *ChartAzError;
+		TChart *ChartDlError;
+		TChart *ChartAlError;
+		TTabSheet *TabSheet11;
+		TChart *ChartWxError;
+		TChart *ChartWyError;
+		TChart *ChartWzError;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -201,8 +205,8 @@
 		void __fastcall ScaleEditChange(TObject *Sender);
 		void __fastcall PixelBrightCheckBoxClick(TObject *Sender);
 		void __fastcall PixelSizeEditChange(TObject *Sender);
-	void __fastcall FontSizeEditChange(TObject *Sender);
-	void __fastcall ReadIKIFormatClick(TObject *Sender);
+		void __fastcall FontSizeEditChange(TObject *Sender);
+		void __fastcall ReadIKIFormatClick(TObject *Sender);
 
 
 	private:	// User declarations

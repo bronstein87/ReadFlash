@@ -45,8 +45,8 @@ object FormGraphOrient: TFormGraphOrient
   object LabelFrameError: TLabel
     Left = 588
     Top = 799
-    Width = 163
-    Height = 18
+    Width = 3
+    Height = 13
     Anchors = [akLeft, akBottom]
   end
   object ButtonAdd: TButton
@@ -72,7 +72,7 @@ object FormGraphOrient: TFormGraphOrient
     Top = 8
     Width = 1160
     Height = 777
-    ActivePage = TabSheet5
+    ActivePage = TabSheet11
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
     object TabSheet5: TTabSheet
@@ -296,6 +296,82 @@ object FormGraphOrient: TFormGraphOrient
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
           'Wz, '#39'/c')
+        BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
+        LeftAxis.AxisValuesFormat = '#,##0.#####'
+        View3D = False
+        BevelOuter = bvNone
+        Color = clWhite
+        TabOrder = 2
+        Anchors = [akLeft, akRight]
+        DefaultCanvas = 'TGDIPlusCanvas'
+        ColorPaletteIndex = 13
+      end
+    end
+    object TabSheet11: TTabSheet
+      Caption = #1054#1096#1080#1073#1082#1072' '#1091#1075#1083#1086#1074#1086#1081' '#1089#1082#1086#1088#1086#1089#1090#1080
+      ImageIndex = 11
+      DesignSize = (
+        1152
+        749)
+      object ChartWxError: TChart
+        Left = 3
+        Top = 0
+        Width = 1117
+        Height = 250
+        BackWall.Brush.Style = bsClear
+        Legend.LegendStyle = lsSeries
+        Legend.Shadow.HorizSize = 0
+        Legend.Shadow.VertSize = 0
+        Title.Font.Height = -13
+        Title.Font.Style = [fsBold]
+        Title.Text.Strings = (
+          ' '#1054#1096#1080#1073#1082#1072' Wx, '#39'/c')
+        BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
+        LeftAxis.AxisValuesFormat = '#,##0.#####'
+        View3D = False
+        BevelOuter = bvNone
+        Color = clWhite
+        TabOrder = 0
+        Anchors = [akLeft, akRight]
+        DefaultCanvas = 'TGDIPlusCanvas'
+        ColorPaletteIndex = 13
+      end
+      object ChartWyError: TChart
+        Left = 3
+        Top = 248
+        Width = 1117
+        Height = 250
+        BackWall.Brush.Style = bsClear
+        Legend.LegendStyle = lsSeries
+        Legend.Shadow.HorizSize = 0
+        Legend.Shadow.VertSize = 0
+        Title.Font.Height = -13
+        Title.Font.Style = [fsBold]
+        Title.Text.Strings = (
+          #1054#1096#1080#1073#1082#1072' Wy, '#39'/c')
+        BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
+        LeftAxis.AxisValuesFormat = '#,##0.#####'
+        View3D = False
+        BevelOuter = bvNone
+        Color = clWhite
+        TabOrder = 1
+        Anchors = [akLeft, akRight]
+        DefaultCanvas = 'TGDIPlusCanvas'
+        ColorPaletteIndex = 13
+      end
+      object ChartWzError: TChart
+        Left = 3
+        Top = 496
+        Width = 1117
+        Height = 250
+        BackWall.Brush.Style = bsClear
+        Legend.LegendStyle = lsSeries
+        Legend.Shadow.HorizSize = 0
+        Legend.Shadow.VertSize = 0
+        Title.Font.Height = -13
+        Title.Font.Style = [fsBold]
+        Title.Text.Strings = (
+          #1054#1096#1080#1073#1082#1072' Wz, '#39'/c')
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
         View3D = False

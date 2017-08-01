@@ -5,7 +5,7 @@
 #define RTD   57.29577951308232  /* RTD degries in 1 radian: 180/pi */
 #define RTM	  3437.746770784939  /* RTM minuts in 1 radian:  60*180/pi */
 #define RTS   206264.8062470964  /* RTS seconds in 1 radian: 3600*180/pi */
-
+#define DTR   0.0174532925
 double sqrtm(double xf);
 double acosm(double xf);
 double asinm(double xf);

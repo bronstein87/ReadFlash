@@ -83,6 +83,15 @@ void TFormGraphOrient::CreateLineGraph()
 	numberOfSeries++;
 	LineSeries[numberOfSeries] = new TLineSeries(ChartAzError);
 	ChartAzError->AddSeries(LineSeries[numberOfSeries]);
+	numberOfSeries++;
+	LineSeries[numberOfSeries] = new TLineSeries(ChartWxError);
+	ChartWxError->AddSeries(LineSeries[numberOfSeries]);
+	numberOfSeries++;
+	LineSeries[numberOfSeries] = new TLineSeries(ChartWyError);
+	ChartWyError->AddSeries(LineSeries[numberOfSeries]);
+	numberOfSeries++;
+	LineSeries[numberOfSeries] = new TLineSeries(ChartWzError);
+	ChartWzError->AddSeries(LineSeries[numberOfSeries]);
 
 
 }
@@ -156,6 +165,15 @@ void TFormGraphOrient::CreateScrollGraph()
 	numberOfSeries++;
 	ScrollSeries[numberOfSeries] = new TLineSeries(ChartAzError);
 	ChartAzError->AddSeries(ScrollSeries[numberOfSeries]);
+	numberOfSeries++;
+	ScrollSeries[numberOfSeries] = new TLineSeries(ChartWxError);
+	ChartWxError->AddSeries(ScrollSeries[numberOfSeries]);
+	numberOfSeries++;
+	ScrollSeries[numberOfSeries] = new TLineSeries(ChartWyError);
+	ChartWyError->AddSeries(ScrollSeries[numberOfSeries]);
+	numberOfSeries++;
+	ScrollSeries[numberOfSeries] = new TLineSeries(ChartWzError);
+	ChartWzError->AddSeries(ScrollSeries[numberOfSeries]);
 }
 
 void TFormGraphOrient::DeleteScrollGraph()
@@ -343,7 +361,7 @@ void __fastcall TFormGraphOrient::FormCreate(TObject *Sender)
 	Series3->Selected->Hover->Hide();
 	Series9->Selected->Hover->Hide();
 
-    CreateScrollGraph();
+	CreateScrollGraph();
 }
 //---------------------------------------------------------------------------
 void TFormGraphOrient::InitTableWindows(void)
@@ -3384,7 +3402,7 @@ void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec
 	cadrInfo.DataType = reader->ImageData.FrameData.DataType;
 	cadrInfo.IsReverse = false;
 	cadrInfo.IsOrient = !reader->StarsData.RezStat;
-	cadrInfo.CountPixFilter = 0;
+	cadrInfo.CountPixFilter = reader->FilterData.FilteredPixelsCount;
 	cadrInfo.ImageHeight = reader->ImageData.FrameData.FrameHeight;
 	cadrInfo.ImageWidth = reader->ImageData.FrameData.FrameWidth;
 	cadrInfo.StatOrient = reader->StarsData.RezStat;
@@ -3516,6 +3534,7 @@ void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec
 	{
 		cadrInfo.AnglesOrient[i] = reader->StarsData.RecognizedOrientationAngles[i];
 		cadrInfo.OmegaOrient[i] = reader->Georeferencing.DeviceAngularVelocity[i];
+
 		for (int j = 0; j < 3; j ++)
 		{
 			cadrInfo.MatrixOrient[i][j] = reader->StarsData.RecognizedOrientationMatrix[i][j];	
@@ -3526,7 +3545,15 @@ void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec
 	{
 	   for (int i = 0;  i  < 3; i ++)
 	   {
+			double diff = cadrInfo.AnglesOrient[i] - reader->Georeferencing.OrientationAngles[i];
+			if (abs(diff) > 5)        // потом убрать
+			{
+				diff = (cadrInfo.AnglesOrient[i] + reader->Georeferencing.OrientationAngles[i])
+				-	abs(cadrInfo.AnglesOrient[i] - reader->Georeferencing.OrientationAngles[i]);
+			}
 			cadrInfo.AnglesDiff[i] = cadrInfo.AnglesOrient[i] - reader->Georeferencing.OrientationAngles[i];
+			// здесь записываем уг.ск по смоделированным данным, далее запишем разность
+			cadrInfo.OmegaDiff[i] = cadrInfo.OmegaOrient[i];
 	   }
 
 	}
@@ -3569,7 +3596,7 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 
 					convertIKIFormatToInfoCadr(reader.get(), vCadrInfo, CompareIKIRes);
 					double Time =  vCadrInfo.back().Time;
-					if (vCadrInfo.back().AnglesOrient[0] != 0)
+					if (vCadrInfo.back().IsOrient)
 					{
 						LineSeries[0]->AddXY(Time,  vCadrInfo.back().AnglesOrient[0] * RTD);
 						LineSeries[1]->AddXY(Time,  vCadrInfo.back().AnglesOrient[1] * RTD);
@@ -3580,7 +3607,7 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 						LineSeries[6]->AddXY(Time,  vCadrInfo.back().MeanErrorX * 1000.);
 						LineSeries[7]->AddXY(Time,  vCadrInfo.back().MeanErrorY * 1000.);
 						LineSeries[8]->AddXY(Time,  vCadrInfo.back().MeanErrorXY * 1000.);
-						LineSeries[9] ->AddXY(Time, vCadrInfo.back().CountWindows);
+						LineSeries[9]->AddXY(Time, vCadrInfo.back().CountWindows);
 						LineSeries[11]->AddXY(Time, vCadrInfo.back().CountDeterObj);
 						LineSeries[10]->AddXY(Time, vCadrInfo.back().CountLocalObj);
 						LineSeries[12]->AddXY(Time, vCadrInfo.back().MeanBright);
@@ -3594,19 +3621,27 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 				else throw logic_error(string("Не удалось считать ") + AnsiString(fileList->Strings[i]).c_str());
 
 			}
+
+			struct {
+
+				bool operator()(const CadrInfo& a,const CadrInfo& b)
+				{
+					return a.Time < b.Time;
+				}
+
+			} CadrCompare ;
+
+			std::sort(vCadrInfo.begin(), vCadrInfo.end(), CadrCompare);
+			if (CompareIKIRes) calcOmegaDiff(vCadrInfo);
+
+			for (int i = 0; i < vCadrInfo.size(); i++)
+			{
+				LineSeries[18]->AddXY(vCadrInfo[i].Time, vCadrInfo[i].OmegaDiff[0] * RTM);
+				LineSeries[19]->AddXY(vCadrInfo[i].Time, vCadrInfo[i].OmegaDiff[1] * RTM);
+				LineSeries[20]->AddXY(vCadrInfo[i].Time, vCadrInfo[i].OmegaDiff[2] * RTM);
+			}
 			PrepareStartDraw();
 		}
 }
-//---------------------------------------------------------------------------
-
-//       	if (CompareIKIRes)
-//	{
-//		Label12->Caption = "Разность углов ориентации: "
-//		+ FloatToStrF(mCadr.AnglesDiff[0], ffFixed, 7, 7) + " "
-//		+ FloatToStrF(mCadr.AnglesDiff[1], ffFixed, 7, 7) + " "
-//		+ FloatToStrF(mCadr.AnglesDiff[2], ffFixed, 7, 7);
-//	}
-
-//---------------------------------------------------------------------------
 
 

@@ -66,6 +66,7 @@ struct CadrInfo
 	double QuatOrient[4], MatrixOrient[3][3], AnglesOrient[3];   //кватернион, матрица и углы ориентации
 	double AnglesDiff[3];
 	double OmegaOrient[3], MatrixProg[3][3]; //угловая скорость, прогнозируемая матрица ориентации
+	double OmegaDiff[3];
 	double MatrixTemp;     //температура КМОП-матрицы
 	double MeanErrorX, MeanErrorY, MeanErrorXY;
 };
@@ -90,10 +91,10 @@ int countDxDy = 0;
 		}
 	}
 
-	if (countDxDy==mCadr.CountDeterObj) {
-		mCadr.MeanErrorX=sqrtm(mCadr.MeanErrorX/(double)(mCadr.CountDeterObj-1));
-		mCadr.MeanErrorY=sqrtm(mCadr.MeanErrorY/(double)(mCadr.CountDeterObj-1));
-		mCadr.MeanErrorXY=sqrtm(mCadr.MeanErrorXY/(double)(2*mCadr.CountDeterObj-1));
+	if (countDxDy == mCadr.CountDeterObj) {
+		mCadr.MeanErrorX = sqrtm(mCadr.MeanErrorX / (double)(mCadr.CountDeterObj - 1));
+		mCadr.MeanErrorY = sqrtm(mCadr.MeanErrorY / (double)(mCadr.CountDeterObj - 1));
+		mCadr.MeanErrorXY = sqrtm(mCadr.MeanErrorXY / (double)(2 * mCadr.CountDeterObj - 1));
 	}
 }
 
@@ -110,6 +111,38 @@ void GetImageBright(struct CadrInfo &mCadr)
 		mCadr.MeanBright /= mCadr.SizeWindowsList;
 		mCadr.SigmaBright /= mCadr.SizeWindowsList;
 	}
+}
+
+
+void calcOmegaDiff(std::vector <CadrInfo>& cadrInfoVec)
+{
+	double MOrientFirst[3][3];
+	double MOrientSecond[3][3];
+	double Wop [3];
+	const unsigned short frequency = 8;
+	for (int i = 0; i < cadrInfoVec.size() - 1; i++)
+	{
+		if (cadrInfoVec[i].IsOrient && cadrInfoVec[i + 1].IsOrient
+		{
+			calcTransitionMatrix(cadrInfoVec[i].AnglesOrient[0]
+			, cadrInfoVec[i].AnglesOrient[1]
+			, cadrInfoVec[i].AnglesOrient[2]
+			, MOrientFirst);
+
+			calcTransitionMatrix(cadrInfoVec[i + 1].AnglesOrient[0]
+			, cadrInfoVec[i + 1].AnglesOrient[1]
+			, cadrInfoVec[i + 1].AnglesOrient[2]
+			, MOrientSecond);
+
+			getAngularDisplacementFromOrientMatr(MOrientFirst, MOrientSecond, Wop);
+
+			for (int j = 0; j < 3;j ++ )
+			{
+				cadrInfoVec[i + 1].OmegaDiff[j] -= (Wop[j] / frequency);
+			}
+		}
+	}
+
 }
 
 
