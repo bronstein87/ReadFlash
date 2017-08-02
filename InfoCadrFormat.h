@@ -119,10 +119,10 @@ void calcOmegaDiff(std::vector <CadrInfo>& cadrInfoVec)
 	double MOrientFirst[3][3];
 	double MOrientSecond[3][3];
 	double Wop [3];
-	const unsigned short frequency = 8;
+	double dTime = 1. / 8.;
 	for (int i = 0; i < cadrInfoVec.size() - 1; i++)
 	{
-		if (cadrInfoVec[i].IsOrient && cadrInfoVec[i + 1].IsOrient
+		if (cadrInfoVec[i].IsOrient && cadrInfoVec[i + 1].IsOrient)
 		{
 			calcTransitionMatrix(cadrInfoVec[i].AnglesOrient[0]
 			, cadrInfoVec[i].AnglesOrient[1]
@@ -134,11 +134,19 @@ void calcOmegaDiff(std::vector <CadrInfo>& cadrInfoVec)
 			, cadrInfoVec[i + 1].AnglesOrient[2]
 			, MOrientSecond);
 
+			double checkangle1[3];
+			double checkangle2[3];
+			MatrixToEkvAngles(MOrientFirst, checkangle1);
+			MatrixToEkvAngles(MOrientSecond, checkangle2);
 			getAngularDisplacementFromOrientMatr(MOrientFirst, MOrientSecond, Wop);
+
+			(cadrInfoVec[i + 1].AnglesOrient[0] - cadrInfoVec[i].AnglesOrient[0])/ dTime;
+			(cadrInfoVec[i + 1].AnglesOrient[1] - cadrInfoVec[i].AnglesOrient[1])/ dTime;
+			(cadrInfoVec[i + 1].AnglesOrient[2] - cadrInfoVec[i].AnglesOrient[2])/ dTime;
 
 			for (int j = 0; j < 3;j ++ )
 			{
-				cadrInfoVec[i + 1].OmegaDiff[j] -= (Wop[j] / frequency);
+				cadrInfoVec[i + 1].OmegaDiff[j] = cadrInfoVec[i + 1].OmegaDiff[j] - (Wop[j] / dTime);
 			}
 		}
 	}

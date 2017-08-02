@@ -26,7 +26,7 @@
 	#include <VclTee.TeeGDIPlus.hpp>
 	#include <Vcl.ExtCtrls.hpp>
 	#include <Vcl.WinXCtrls.hpp>
-#include "VCLTee.TeeTools.hpp"
+	#include "VCLTee.TeeTools.hpp"
 	#include <vector>
 	#include <Classes.hpp>
 	#include <Controls.hpp>
@@ -60,13 +60,13 @@
 	#include <iterator>
 	#include <algorithm>
 	#include "FragmentScrollBox.h"
-	#include "iki_img_class.cpp"
+	#include "iki_img.cpp"
 
 
 
 
 	#define MaxSeries 6
-	#define NumGraph 20
+	#define NumGraph 21
 	#define MaxBlockSeries 8
 	#define MaxFrameSeries 30
 

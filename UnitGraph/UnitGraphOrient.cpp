@@ -3543,6 +3543,13 @@ void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec
 
 	if (CompareIKIRes)
 	{
+		for (int i = 0; i < 3; i++)
+		{
+			cadrInfo.OmegaDiff[i] = reader->Georeferencing.DeviceAngularVelocity[i]
+			- reader->StarsData.RecognizedAngularVelocity[i];
+		}
+
+
 	   for (int i = 0;  i  < 3; i ++)
 	   {
 			double diff = cadrInfo.AnglesOrient[i] - reader->Georeferencing.OrientationAngles[i];
@@ -3551,9 +3558,7 @@ void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec
 				diff = (cadrInfo.AnglesOrient[i] + reader->Georeferencing.OrientationAngles[i])
 				-	abs(cadrInfo.AnglesOrient[i] - reader->Georeferencing.OrientationAngles[i]);
 			}
-			cadrInfo.AnglesDiff[i] = cadrInfo.AnglesOrient[i] - reader->Georeferencing.OrientationAngles[i];
-			// здесь записываем уг.ск по смоделированным данным, далее запишем разность
-			cadrInfo.OmegaDiff[i] = cadrInfo.OmegaOrient[i];
+			cadrInfo.AnglesDiff[i] = diff;
 	   }
 
 	}
@@ -3616,6 +3621,9 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 						LineSeries[15]->AddXY(Time, vCadrInfo.back().AnglesDiff[0] * RTS);
 						LineSeries[16]->AddXY(Time, vCadrInfo.back().AnglesDiff[1] * RTS);
 						LineSeries[17]->AddXY(Time, vCadrInfo.back().AnglesDiff[2] * RTS);
+						LineSeries[18]->AddXY(Time, vCadrInfo.back().OmegaDiff[0] * RTM);
+						LineSeries[19]->AddXY(Time, vCadrInfo.back().OmegaDiff[1] * RTM);
+						LineSeries[20]->AddXY(Time, vCadrInfo.back().OmegaDiff[2] * RTM);
 					}
 				}
 				else throw logic_error(string("Не удалось считать ") + AnsiString(fileList->Strings[i]).c_str());
@@ -3632,14 +3640,6 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 			} CadrCompare ;
 
 			std::sort(vCadrInfo.begin(), vCadrInfo.end(), CadrCompare);
-			if (CompareIKIRes) calcOmegaDiff(vCadrInfo);
-
-			for (int i = 0; i < vCadrInfo.size(); i++)
-			{
-				LineSeries[18]->AddXY(vCadrInfo[i].Time, vCadrInfo[i].OmegaDiff[0] * RTM);
-				LineSeries[19]->AddXY(vCadrInfo[i].Time, vCadrInfo[i].OmegaDiff[1] * RTM);
-				LineSeries[20]->AddXY(vCadrInfo[i].Time, vCadrInfo[i].OmegaDiff[2] * RTM);
-			}
 			PrepareStartDraw();
 		}
 }
