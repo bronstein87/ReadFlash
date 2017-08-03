@@ -25,26 +25,26 @@ object FormGraphOrient: TFormGraphOrient
   PixelsPerInch = 96
   TextHeight = 13
   object Label10: TLabel
-    Left = 163
+    Left = 411
     Top = 797
     Width = 96
     Height = 13
     Margins.Bottom = 10
-    Anchors = [akLeft, akBottom]
+    Anchors = [akRight, akBottom]
     Caption = #1042#1088#1077#1084#1103' '#1087#1088#1080#1074#1103#1079#1082#1080', '#1089
   end
   object Label11: TLabel
-    Left = 400
-    Top = 799
+    Left = 653
+    Top = 797
     Width = 44
     Height = 13
     Margins.Bottom = 10
-    Anchors = [akLeft, akBottom]
+    Anchors = [akRight, akBottom]
     Caption = #8470' '#1082#1072#1076#1088#1072
   end
   object LabelFrameError: TLabel
-    Left = 588
-    Top = 799
+    Left = 16
+    Top = 797
     Width = 3
     Height = 13
     Anchors = [akLeft, akBottom]
@@ -63,6 +63,7 @@ object FormGraphOrient: TFormGraphOrient
     Top = 792
     Width = 75
     Height = 25
+    Anchors = [akRight, akBottom]
     Caption = #1054#1095#1080#1089#1090#1080#1090#1100
     TabOrder = 1
     Visible = False
@@ -72,15 +73,11 @@ object FormGraphOrient: TFormGraphOrient
     Top = 8
     Width = 1160
     Height = 777
-    ActivePage = TabSheet11
+    ActivePage = TabSheet8
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
     object TabSheet5: TTabSheet
       Caption = #1059#1075#1083#1099' '#1086#1088#1080#1077#1085#1090#1072#1094#1080#1080
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
@@ -104,7 +101,7 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 0
         Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         PrintMargins = (
           15
           39
@@ -132,7 +129,7 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 1
         Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
       object ChartAz: TChart
@@ -155,17 +152,13 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 2
         Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
     end
     object TabSheet4: TTabSheet
       Caption = #1054#1096#1080#1073#1082#1072' '#1091#1075#1083#1086#1074' '#1086#1088#1080#1077#1085#1090#1072#1094#1080#1080
       ImageIndex = 10
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
@@ -189,7 +182,7 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 0
         Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
       object ChartDlError: TChart
@@ -212,7 +205,7 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 1
         Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
       object ChartAlError: TChart
@@ -235,17 +228,13 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 2
         Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
     end
     object TabSheet6: TTabSheet
       Caption = #1059#1075#1083#1086#1074#1072#1103' '#1089#1082#1086#1088#1086#1089#1090#1100
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
@@ -269,7 +258,7 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 0
         Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
       object ChartWy: TChart
@@ -292,7 +281,7 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 1
         Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
       object ChartWz: TChart
@@ -315,17 +304,13 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 2
         Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
     end
     object TabSheet11: TTabSheet
       Caption = #1054#1096#1080#1073#1082#1072' '#1091#1075#1083#1086#1074#1086#1081' '#1089#1082#1086#1088#1086#1089#1090#1080
       ImageIndex = 11
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
@@ -349,7 +334,7 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 0
         Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
       object ChartWyError: TChart
@@ -372,7 +357,7 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 1
         Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
       object ChartWzError: TChart
@@ -395,17 +380,13 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 2
         Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
     end
     object TabSheet7: TTabSheet
       Caption = #1056#1072#1089#1089#1086#1075#1083#1072#1089#1086#1074#1072#1085#1080#1103
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
@@ -429,7 +410,7 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 0
         Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
       object ChartMy: TChart
@@ -452,7 +433,7 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 1
         Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
       object ChartMxy: TChart
@@ -475,23 +456,19 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 2
         Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
     end
     object TabSheet8: TTabSheet
       Caption = #1063#1080#1089#1083#1086' '#1086#1073#1098#1077#1082#1090#1086#1074
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
       object ChartNumFrag: TChart
         Left = 16
-        Top = 3
+        Top = 0
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
@@ -509,12 +486,12 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 0
         Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
       object ChartNumLoc: TChart
         Left = 16
-        Top = 259
+        Top = 251
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
@@ -532,7 +509,7 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 1
         Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
       object ChartNumDet: TChart
@@ -555,17 +532,13 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 2
         Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
     end
     object TabSheet9: TTabSheet
       Caption = #1055#1072#1088#1072#1084#1077#1090#1088#1099' '#1080#1079#1086#1073#1088#1072#1078#1077#1085#1080#1103
       ImageIndex = 4
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
@@ -589,7 +562,7 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 0
         Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
       object ChartNoise: TChart
@@ -612,7 +585,7 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 1
         Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
       object ChartTemp: TChart
@@ -635,17 +608,13 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 2
         Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
     end
     object TabSheet10: TTabSheet
       Caption = #1044#1074#1080#1078#1077#1085#1080#1077' '#1079#1074#1077#1079#1076
       ImageIndex = 5
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
@@ -700,19 +669,38 @@ object FormGraphOrient: TFormGraphOrient
         Title.Text.Strings = (
           'TChart')
         BottomAxis.Automatic = False
+        BottomAxis.AutomaticMaximum = False
         BottomAxis.AutomaticMinimum = False
+        BottomAxis.Maximum = 24.036205327967800000
+        BottomAxis.Minimum = -11.975843154929570000
         Chart3DPercent = 1
         LeftAxis.Automatic = False
+        LeftAxis.AutomaticMaximum = False
         LeftAxis.AutomaticMinimum = False
         LeftAxis.Inverted = True
+        LeftAxis.Maximum = 4644.079226920634000000
+        LeftAxis.Minimum = -2337.544079528345000000
+        Panning.MouseWheel = pmwNone
+        RightAxis.Automatic = False
+        RightAxis.AutomaticMaximum = False
+        RightAxis.AutomaticMinimum = False
+        TopAxis.Automatic = False
+        TopAxis.AutomaticMaximum = False
+        TopAxis.AutomaticMinimum = False
         View3D = False
         View3DOptions.OrthoAngle = 0
         View3DOptions.Perspective = 0
+        Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 0
         Anchors = [akLeft, akTop, akRight, akBottom]
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
+        PrintMargins = (
+          15
+          19
+          15
+          19)
         ColorPaletteIndex = 13
         object Series9: TBubbleSeries
           Marks.Frame.Visible = False
@@ -732,7 +720,7 @@ object FormGraphOrient: TFormGraphOrient
           Pointer.Gradient.MidColor = 16059031
           Pointer.Gradient.StartColor = 14540754
           Pointer.Gradient.Visible = True
-          Pointer.HorizSize = 46
+          Pointer.HorizSize = 10
           Pointer.InflateMargins = False
           Pointer.Pen.Color = 1358954496
           Pointer.Pen.Width = 0
@@ -745,7 +733,7 @@ object FormGraphOrient: TFormGraphOrient
           Pointer.Shadow.VertSize = 19
           Pointer.Shadow.Visible = True
           Pointer.Style = psCircle
-          Pointer.VertSize = 46
+          Pointer.VertSize = 10
           XValues.Name = 'X'
           XValues.Order = loAscending
           YValues.Name = 'Y'
@@ -812,10 +800,6 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheet1: TTabSheet
       Caption = #1060#1088#1072#1075#1084#1077#1085#1090#1099
       ImageIndex = 6
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
@@ -835,7 +819,7 @@ object FormGraphOrient: TFormGraphOrient
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 0
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
         object Series4: TBarSeries
           Marks.Visible = False
@@ -878,7 +862,7 @@ object FormGraphOrient: TFormGraphOrient
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 1
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
         object Series6: TBarSeries
           Marks.Visible = False
@@ -904,7 +888,7 @@ object FormGraphOrient: TFormGraphOrient
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 2
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
         object Series5: TBarSeries
           Marks.Visible = False
@@ -971,10 +955,6 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheet2: TTabSheet
       Caption = #1054#1073#1098#1077#1082#1090#1099
       ImageIndex = 7
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
@@ -993,7 +973,7 @@ object FormGraphOrient: TFormGraphOrient
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 0
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
         object Series7: TBarSeries
           Marks.Visible = False
@@ -1019,7 +999,7 @@ object FormGraphOrient: TFormGraphOrient
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 1
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
         object Series8: TBarSeries
           Marks.Visible = False
@@ -1087,10 +1067,6 @@ object FormGraphOrient: TFormGraphOrient
     object ShowFragmentTab: TTabSheet
       Caption = #1054#1090#1086#1073#1088#1072#1078#1077#1085#1080#1077' '#1092#1088#1072#1075#1084#1077#1085#1090#1086#1074
       ImageIndex = 8
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object FragmentShowScrollBox: TScrollBox
         Left = 0
         Top = 33
@@ -1218,10 +1194,6 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheet3: TTabSheet
       Caption = #1057#1090#1072#1090#1080#1089#1090#1080#1082#1072' '#1087#1086' '#1079#1074#1077#1079#1076#1072#1084
       ImageIndex = 9
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
@@ -1290,7 +1262,7 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 0
         Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
       object Chart8: TChart
@@ -1358,7 +1330,7 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 1
         Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TGDIPlusCanvas'
+        DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
     end
@@ -1370,7 +1342,7 @@ object FormGraphOrient: TFormGraphOrient
     Height = 21
     Anchors = [akRight, akBottom]
     TabOrder = 3
-    Text = '620'
+    Text = '0'
   end
   object EditSizeY: TEdit
     Left = 987
@@ -1382,7 +1354,7 @@ object FormGraphOrient: TFormGraphOrient
     Text = '220'
   end
   object EditTimeDev: TEdit
-    Left = 265
+    Left = 513
     Top = 796
     Width = 121
     Height = 21
@@ -1391,22 +1363,22 @@ object FormGraphOrient: TFormGraphOrient
     Text = '0'
   end
   object EditNumCadr: TEdit
-    Left = 450
+    Left = 703
     Top = 796
     Width = 57
     Height = 21
-    Anchors = [akLeft, akBottom]
+    Anchors = [akRight, akBottom]
     NumbersOnly = True
     TabOrder = 6
     Text = '0'
     OnChange = EditNumCadrChange
   end
   object UpDown1: TUpDown
-    Left = 507
+    Left = 760
     Top = 796
-    Width = 17
+    Width = 15
     Height = 21
-    Anchors = [akLeft, akBottom]
+    Anchors = [akRight, akBottom]
     Associate = EditNumCadr
     Max = 10000
     TabOrder = 7
@@ -1472,5 +1444,13 @@ object FormGraphOrient: TFormGraphOrient
   object OpenDialog: TOpenDialog
     Left = 1112
     Top = 136
+  end
+  object ChartEditor1: TChartEditor
+    GalleryHeight = 0
+    GalleryWidth = 0
+    Height = 0
+    Width = 0
+    Left = 1176
+    Top = 568
   end
 end

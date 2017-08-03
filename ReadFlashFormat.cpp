@@ -325,12 +325,12 @@ void ConvertDataNO(struct DataNO data, struct CadrInfo &mCadr, int NC)
 	}
 	else mCadr.IsOrient=false;
 
-	mCadr.CountStars=0;
-	mCadr.SizeStarsList=0;
-	mCadr.CountWindows=0;
-	mCadr.SizeWindowsList=0;
-	mCadr.CountLines=0;
-	mCadr.CountBlock=0;
+	mCadr.CountStars = 0;
+	mCadr.SizeStarsList = 0;
+	mCadr.CountWindows = 0;
+	mCadr.SizeWindowsList = 0;
+	mCadr.CountLines = 0;
+	mCadr.CountBlock = 0;
 }
 
 void PrintReg(FILE *ftxt, unsigned char *mas)

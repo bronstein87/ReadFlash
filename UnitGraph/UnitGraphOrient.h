@@ -27,6 +27,7 @@
 	#include <Vcl.ExtCtrls.hpp>
 	#include <Vcl.WinXCtrls.hpp>
 	#include "VCLTee.TeeTools.hpp"
+#include "VCLTee.TeeEdit.hpp"
 	#include <vector>
 	#include <Classes.hpp>
 	#include <Controls.hpp>
@@ -61,12 +62,9 @@
 	#include <algorithm>
 	#include "FragmentScrollBox.h"
 	#include "iki_img.cpp"
+	#include "SimplePlotter.h"
 
 
-
-
-	#define MaxSeries 6
-	#define NumGraph 21
 	#define MaxBlockSeries 8
 	#define MaxFrameSeries 30
 
@@ -79,6 +77,39 @@
 		int SecuenceCounter;
 	};
 
+	enum S_ID
+	{
+		AL = 1,
+		DL = 1,
+		AZ = 1,
+
+		AL_ERROR = 1,
+		DL_ERROR = 1,
+		AZ_ERROR = 1,
+
+		WX_MODEL = 1,
+		WY_MODEL = 1,
+		WZ_MODEL = 1,
+		WX_REAL = 1,
+		WY_REAL = 1,
+		WZ_REAL = 1,
+
+		WX_ERROR = 1,
+		WY_ERROR = 1,
+		WZ_ERROR = 1,
+
+		MX = 1,
+		MY = 1,
+		M_XY = 1,
+
+		NUM_FRAG = 1,
+		NUM_LOC = 1,
+		NUM_DET = 1,
+
+		FONE = 1,
+		NOISE = 1,
+		TEMP = 1
+	};
 
 	class TFormAnimateSetting;
 
@@ -181,6 +212,7 @@
 		TChart *ChartWxError;
 		TChart *ChartWyError;
 		TChart *ChartWzError;
+	TChartEditor *ChartEditor1;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -231,8 +263,6 @@
 		void SetContrast();
 
 		unique_ptr <TFormAnimateSetting> FormAnimateSetting;
-		TLineSeries *LineSeries[MaxSeries*NumGraph];
-		TLineSeries *ScrollSeries[NumGraph];
 		TChartShape *BlockSeries[MaxBlockSeries];
 		TChartShape *FrameSeries[MaxFrameSeries];
 
@@ -248,9 +278,9 @@
 		unsigned short ResizeCoef;
 		unsigned short FontSize;
 		bool CompareIKIRes;
-		int FragID;
 
-
+		std::unique_ptr <SimplePlotter> plotter;
+		vector <TChart*> Charts;
 		vector <CadrInfo> vCadrInfo;
 		vector <TImage*> ImageVector;
 		vector <FragmentData> FragmentVector;
@@ -260,15 +290,10 @@
 	public:		// User declarations
 
 		__fastcall TFormGraphOrient(TComponent* Owner);
-		void CreateLineGraph();
 		void DeleteLineGraph();
-		void CreateScrollGraph();
-		void DeleteScrollGraph();
-		void DrawScrollSeries(const struct CadrInfo &mCadr);
-		void DrawLineSeries(const vector <CadrInfo>& _vCadrInfo);
+		void InitializeSynchronization();
+		void SynchronizeCharts(double Value);
 		void SaveGraph(TChart *Chart, AnsiString suff);
-		void SetVisible(int CheckLine, bool tf);
-		void ApplySeriesSetting(AnsiString Title, TColor color);
 		void SetVisibleLabelFrame(bool isVisible);
 		int  GetCadrInfo(int NC, struct CadrInfo &mCadr);
 		void DrawAnimateHandler(void);

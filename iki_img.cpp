@@ -1,6 +1,6 @@
 #include <fstream>
 #include <stdio.h>
-
+#include <Classes.hpp>
 using namespace std;
 
 #pragma region DEFINE
@@ -9,7 +9,7 @@ using namespace std;
 #define StartId                 0xABCD
 
 #define ROUND(N) (N<0?ceil((N)-0.5):floor((N)+0.5))
-#define VERSION_ID                              "1.16.02.17"
+#define VERSION_ID                              "1.02.08.17"
 
 #pragma region whenwhere
 #define whenwhere_id                            0xAAAA
@@ -92,6 +92,8 @@ using namespace std;
 #define stars_dist_id                           0x11EB
 #define function_distortion_id		        	0x11FB
 #define dead_pix_id								0x12FB
+#define matrixtemp_id                           0x13FB
+#define frequency_id                            0x14FB
 #define device_type_name						"Тип прибора"
 #define device_sn_name							"Сериальный номер прибора"
 #define inner_radius_name          	        	"Внутренний радиус виньетирования"
@@ -108,6 +110,8 @@ using namespace std;
 #define stars_dist_name 						"СКО распределения яркости звезд"
 #define function_distortion_name                "Функция дисторсии"
 #define dead_pix_name    						"Таблица битых пикселей"
+#define matrixtemp_name                         "Температура матрицы"
+#define frequency_name                          "Частота прибора"
 #pragma end_region
 
 #pragma region filterframe
@@ -128,6 +132,7 @@ using namespace std;
 #define rec_orient_angl_id                      0x116D
 #define rec_orient_quat_id						0x117D
 #define rec_orient_matr_id						0x118D
+#define rec_angular_vel_id                      0x119D
 #define rezstat_name                            "Результат распознавания"
 #define epsilon_name							"Допуск на распознавание"
 #define m_X_Y_Cyr_name                          "Ошибка решения системы (мм)"
@@ -136,6 +141,7 @@ using namespace std;
 #define rec_orient_angl_name                    "Распознанные углы ориентации [рад]: al dl az"
 #define rec_orient_quat_name                    "Распознанный кватернион ориентации"
 #define rec_orient_matr_name                    "Распознанная матрица ориентации"
+#define rec_angular_vel_name                    "Рассчитанная угловая скорость"
 #pragma end_region
 
 #pragma region videodata
@@ -220,6 +226,7 @@ struct starinfo
 	float PixelsCount; // количество пикселей
 	float X_coordinate; // координата Х
 	float Y_coordinate; // координата У
+
 	WORD NumberStar; // номер звезды в каталоге
 	float StellarMagnitude; // звездная величина
 	char SpectralClass[2]; // спектральный класс
@@ -342,6 +349,7 @@ struct devicetype
 	int InnerRadius; // внутренний радиус виньетирования
 	int OuterRadius; // внешний радиус виньетирования
 	int ResolutionACP; // разрядность АЦП
+	unsigned short Frequency; // частота прибора
 	float EV_ACP; // число электронов в одном разряде АЦП
 	float PixelSize; // размер пикселя
 	float FocalLength; // фокусное расстояние
@@ -350,6 +358,7 @@ struct devicetype
 	float DarkSKO; // СКО темнового тока
 	float LimitingMagnitude; // предельная звездная величина
 	float StarsDistribution; // СКО распределения яркости звезд
+	double MatrixTemp; // Температура матрицы
 	funcdist DistortionFunction;
 	deadpixels TableDeadObjects;
 };
@@ -379,6 +388,7 @@ struct starsinfo
 	double RecognizedOrientationAngles[3]; // углы ориентации
 	double RecognizedOrientationQuaternion[4]; // кватернион ориентации
 	double RecognizedOrientationMatrix[3][3]; // матрица ориентации
+	double RecognizedAngularVelocity[3]; // угловая скорость
 	starinfo* StarsList; // информация о локал/расп объекте
 	REC SimulatedFrame; // смоделированный кадр
 };
@@ -399,9 +409,9 @@ class IKI_img
 {
 private:
 	template<typename T>
-	static void _FreeMemory(T(&point))
+	static void _FreeMemory(T*&point)
 	{
-		if (point != NULL)
+		// if (point != NULL)
 		{
 			delete point;
 			point = NULL;
@@ -410,9 +420,9 @@ private:
 	// ---------------------------------------------------------------------------
 
 	template<typename T>
-	static void _FreeMemoryArray(T(&array))
+	static void _FreeMemoryArray(T*&array)
 	{
-		if (array != NULL)
+		// if (array != NULL)
 		{
 			delete[]array;
 			array = NULL;
@@ -618,85 +628,16 @@ public:
 
 	__fastcall IKI_img::IKI_img(void)
 	{
-		memset(&Georeferencing, 0, sizeof(whenwhere));
-
-		CameraSettings.DataSource = "";
-		CameraSettings.SNDevice = 0;
-		CameraSettings.InnerRadius = 0;
-		CameraSettings.OuterRadius = 0;
-		CameraSettings.ResolutionACP = 0;
-		CameraSettings.EV_ACP = (float)0.0;
-		CameraSettings.PixelSize = (float)0.0;
-		CameraSettings.FocalLength = (float)0.0;
-		CameraSettings.DiameterEntrancePupil = (float)0.0;
-		CameraSettings.DarkLevel = (float)0.0;
-		CameraSettings.DarkSKO = (float)0.0;
-		CameraSettings.LimitingMagnitude = (float)0.0;
-		CameraSettings.StarsDistribution = (float)0.0;
-		CameraSettings.DistortionFunction.PolynomialDegree = 0;
-		CameraSettings.DistortionFunction.CoefficientsCount = 0;
-		CameraSettings.DistortionFunction.Coefficient = NULL;
-		CameraSettings.TableDeadObjects.RecordsCount = 0;
-		CameraSettings.TableDeadObjects.PixelData = NULL;
-
-		FilterData.BottomRight = false;
-		FilterData.TagFilter = "";
-		FilterData.FilteredPixelsCount = 0;
-		FilterData.DataPixels = NULL;
-
-		StarsData.RezStat = 0;
-		StarsData.Epsilon = (float)0.0;
-		StarsData.m_X = (float)0.0;
-		StarsData.m_Y = (float)0.0;
-		StarsData.m_Cur = (float)0.0;
-		StarsData.LocalizedCount = 0;
-		StarsData.RecognizedCount = 0;
-		StarsData.StarsList = NULL;
-		StarsData.SimulatedFrame.strrec = 0;
-		StarsData.SimulatedFrame.StarRec = NULL;
-		StarsData.RecognizedOrientationAngles[0] = (float)0.0;
-		StarsData.RecognizedOrientationAngles[1] = (float)0.0;
-		StarsData.RecognizedOrientationAngles[2] = (float)0.0;
-		StarsData.RecognizedOrientationQuaternion[0] = (float)0.0;
-		StarsData.RecognizedOrientationQuaternion[1] = (float)0.0;
-		StarsData.RecognizedOrientationQuaternion[2] = (float)0.0;
-		StarsData.RecognizedOrientationQuaternion[3] = (float)0.0;
-		StarsData.RecognizedOrientationMatrix[0][0] = (float)0.0;
-		StarsData.RecognizedOrientationMatrix[0][1] = (float)0.0;
-		StarsData.RecognizedOrientationMatrix[0][2] = (float)0.0;
-		StarsData.RecognizedOrientationMatrix[1][0] = (float)0.0;
-		StarsData.RecognizedOrientationMatrix[1][1] = (float)0.0;
-		StarsData.RecognizedOrientationMatrix[1][2] = (float)0.0;
-		StarsData.RecognizedOrientationMatrix[2][0] = (float)0.0;
-		StarsData.RecognizedOrientationMatrix[2][1] = (float)0.0;
-		StarsData.RecognizedOrientationMatrix[2][2] = (float)0.0;
-
-		ImageData.ExposureTime = (float)0.0;
-		ImageData.FrameData.DataType = 0;
-		ImageData.FrameData.DegreeBinning = 0;
-		ImageData.FrameData.FrameWidth = 0;
-		ImageData.FrameData.FrameHeight = 0;
-		ImageData.FrameData.Data = NULL;
-		ImageData.LinesData.LinesCount = 0;
-		ImageData.LinesData.DataType = 0;
-		ImageData.LinesData.DegreeBinning = 0;
-		ImageData.LinesData.LinesWidth = 0;
-		ImageData.LinesData.LinesHeight = 0;
-		ImageData.LinesData.Info = NULL;
-		ImageData.LinesData.Data = NULL;
-		ImageData.WindowsData.WindowCount = 0;
-		ImageData.WindowsData.DataType = 0;
-		ImageData.WindowsData.DegreeBinning = 0;
-		ImageData.WindowsData.SizeData = 0;
-		ImageData.WindowsData.BottomRight = false;
-		ImageData.WindowsData.Info = NULL;
-		ImageData.WindowsData.Data = NULL;
+		memset(&Georeferencing, 0, sizeof(Georeferencing));
+		memset(&CameraSettings, 0, sizeof(CameraSettings));
+		memset(&FilterData, 0, sizeof(FilterData));
+		memset(&StarsData, 0, sizeof(StarsData));
+		memset(&ImageData, 0, sizeof(ImageData));
 	}
 	// ---------------------------------------------------------------------------
 
 	__fastcall IKI_img::~IKI_img()
 	{
-		memset(&Georeferencing, 0, sizeof(whenwhere));
 		_FreeMemoryArray(CameraSettings.DistortionFunction.Coefficient);
 		_FreeMemoryArray(CameraSettings.TableDeadObjects.PixelData);
 		_FreeMemoryArray(FilterData.DataPixels);
@@ -707,10 +648,11 @@ public:
 		_FreeMemoryArray(ImageData.LinesData.Data);
 		_FreeMemoryArray(ImageData.WindowsData.Info);
 		_FreeMemoryArray(ImageData.WindowsData.Data);
-		if (!CameraSettings.DataSource.IsEmpty())
-			CameraSettings.DataSource = "";
-		if (!FilterData.TagFilter.IsEmpty())
-			FilterData.TagFilter = "";
+		memset(&Georeferencing, 0, sizeof(Georeferencing));
+		memset(&CameraSettings, 0, sizeof(CameraSettings));
+		memset(&FilterData, 0, sizeof(FilterData));
+		memset(&StarsData, 0, sizeof(StarsData));
+		memset(&ImageData, 0, sizeof(ImageData));
 	}
 	// ---------------------------------------------------------------------------
 
@@ -762,11 +704,8 @@ public:
 		PrintString(FStream, bright_right_id, bright_right_name, Value_String);
 #pragma end_region
 #pragma region era
-		if (Georeferencing.Era != 0)
-		{
-			Value_String = FloatToStrF(Georeferencing.Era, ffFixed, 8, 6);
-			PrintString(FStream, era_id, era_name, Value_String);
-		}
+		Value_String = FloatToStrF(Georeferencing.Era, ffFixed, 8, 6);
+		PrintString(FStream, era_id, era_name, Value_String);
 #pragma end_region
 #pragma region orbit_eccentricity
 		Value_String = FloatToStrF(Georeferencing.OrbitEccentricity, ffFixed, 8, 3);
@@ -982,6 +921,20 @@ public:
 			}
 		}
 #pragma end_region
+
+#pragma region matrixtemp
+		Value_String = FloatToStrF(CameraSettings.MatrixTemp, ffFixed, 10, 7);
+		PrintString(FStream, matrixtemp_id, matrixtemp_name, Value_String);
+#pragma end_region
+
+#pragma region frequency
+		if (CameraSettings.Frequency != 0)
+		{
+			Value_String = FormatFloat("#####0", CameraSettings.Frequency);
+			PrintString(FStream, frequency_id, frequency_name, Value_String);
+		}
+#pragma end_region
+
 #pragma end_region
 #pragma region FilterData
 #pragma region bottomright
@@ -1126,6 +1079,21 @@ else
 			PrintString(FStream, rec_orient_matr_id, rec_orient_matr_name, Value_String);
 		}
 #pragma end_region
+#pragma region rec_angular_vel
+		if (StarsData.RecognizedAngularVelocity[0] == 0 &&
+			StarsData.RecognizedAngularVelocity[1] == 0 &&
+			StarsData.RecognizedAngularVelocity[2] == 0)
+		{
+		}
+else
+		{
+			Value_String = "";
+			Value_String += FormatFloat("0.0######### ", StarsData.RecognizedAngularVelocity[0]);
+			Value_String += FormatFloat("0.0######### ", StarsData.RecognizedAngularVelocity[1]);
+			Value_String += FormatFloat("0.0#########", StarsData.RecognizedAngularVelocity[2]);
+			PrintString(FStream, rec_angular_vel_id, rec_angular_vel_name, Value_String);
+		}
+#pragma end_region
 #pragma end_region
 #pragma region ImageData
 		Value_String = FormatFloat("0.0#####", ImageData.ExposureTime);
@@ -1247,18 +1215,41 @@ else
 	}
 	// ---------------------------------------------------------------------------
 
-	bool ReadFormat(AnsiString filename)
+	void Clear_Memory(void)
+	{
+		_FreeMemoryArray(CameraSettings.DistortionFunction.Coefficient);
+		_FreeMemoryArray(CameraSettings.TableDeadObjects.PixelData);
+		_FreeMemoryArray(FilterData.DataPixels);
+		_FreeMemoryArray(StarsData.StarsList);
+		_FreeMemoryArray(StarsData.SimulatedFrame.StarRec);
+		_FreeMemoryArray(ImageData.FrameData.Data);
+		_FreeMemoryArray(ImageData.LinesData.Info);
+		_FreeMemoryArray(ImageData.LinesData.Data);
+		_FreeMemoryArray(ImageData.WindowsData.Info);
+		_FreeMemoryArray(ImageData.WindowsData.Data);
+		memset(&Georeferencing, 0, sizeof(Georeferencing));
+		memset(&CameraSettings, 0, sizeof(CameraSettings));
+		memset(&FilterData, 0, sizeof(FilterData));
+		memset(&StarsData, 0, sizeof(StarsData));
+		memset(&ImageData, 0, sizeof(ImageData));
+	}
+	// ---------------------------------------------------------------------------
+
+	bool ReadFormat(AnsiString filename, bool Need_Erase = false)
 	{
 		AnsiString buferstr;
 		int count_find_pos;
 		int pos_index;
 		unsigned int start;
 		unsigned int sizedata;
-		double buf[10];
+		double buf[10] = {0};
 		char* end_str = new char[2];
 		char* bufer = new char[80];
 		char* Data_buf = new char[10240]; // взял с запасом чтоб каждый раз не выделять и не очищать память под разбор каждой строки
 		TFileStream* FStream = new TFileStream(filename, fmOpenRead | fmShareExclusive);
+
+		if (Need_Erase) // если true то очищаем перед чтением
+				Clear_Memory();
 		while (FStream->Position != FStream->Size)
 		{
 			FStream->Read(&start, sizeof(start));
@@ -1360,6 +1351,8 @@ else
 					}
 					break;
 				}
+			case matrixtemp_id: CameraSettings.MatrixTemp = (float) StrToFloat(buferstr); break;
+			case frequency_id: CameraSettings.Frequency = (unsigned short)StrToInt(buferstr); break;
 #pragma end_region
 #pragma region FilterData
 			case bottomright_id: FilterData.BottomRight = StringToBool(buferstr); break;
@@ -1484,6 +1477,7 @@ else
 			case rec_orient_angl_id: StringToFloatMass(StarsData.RecognizedOrientationAngles, 3, buferstr); break;
 			case rec_orient_quat_id: StringToFloatMass(StarsData.RecognizedOrientationQuaternion, 4, buferstr); break;
 			case rec_orient_matr_id: StringToFloatMass3D(StarsData.RecognizedOrientationMatrix, 3, 3, buferstr); break;
+			case rec_angular_vel_id: StringToFloatMass(StarsData.RecognizedAngularVelocity, 3, buferstr); break;
 #pragma end_region
 #pragma region videoframe
 			case exp_time_id: ImageData.ExposureTime = (float)StrToFloat(buferstr); break;
