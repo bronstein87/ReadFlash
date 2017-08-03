@@ -66,13 +66,13 @@ void __fastcall TFormGraphOrient::MenuClearClick(TObject *Sender)
 void __fastcall TFormGraphOrient::MenuSaveClick(TObject *Sender)
 {
 
-	for (int i = 0; i < Charts.size(); i ++)
-	{
-		plotter->SaveChart(Charts[i],
-		Charts[i]->Title->ToString(),
-		StrToInt(EditSizeX->ToString()),
-		StrToInt(EditSizeY->ToString()));
-	}
+//	for (int i = 0; i < Charts.size(); i ++)
+//	{
+//		plotter->SaveChart(Charts[i],
+//		Charts[i]->Title->ToString(),
+//		StrToInt(EditSizeX->ToString()),
+//		StrToInt(EditSizeY->ToString()));
+//	}
 }       
 
 
@@ -2112,12 +2112,12 @@ void ConvertDataDTMI(struct DTMI tmi, struct CadrInfo &mCadr)
 		winInfo.CountObj = tmi.nObjectWindow[i];
 		winInfo.Width = 17;
 		winInfo.Height = 17;
-		winInfo.Xstart = tmi.centrWindow[i][0]-(mCadr.WindowsList[i].Width>>1);
-		winInfo.Ystart = tmi.centrWindow[i][1]-(mCadr.WindowsList[i].Height>>1);
+		winInfo.Xstart = tmi.centrWindow[i][0]-(winInfo.Width>>1);
+		winInfo.Ystart = tmi.centrWindow[i][1]-(winInfo.Height>>1);
 		mCadr.WindowsList.push_back(winInfo);
 
 		starList.X = tmi.centrWindow[i][0];
-        starList.Y = tmi.centrWindow[i][1];
+		starList.Y = tmi.centrWindow[i][1];
 	}
 
 	mCadr.CountBlock = 0;
@@ -2361,7 +2361,6 @@ void PrintDTMI_BOKZM(ofstream &file, struct DTMI_BOKZM tmi)
 	file<<flush;
 }
 
-
 unsigned short ArrayDTMI[290];
 void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 {
@@ -2426,8 +2425,6 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 		PrepareStartDraw();
 	}
 }
-
-
 
 
 
@@ -3152,7 +3149,8 @@ void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec
 	cadrInfo.CountLocalObj = reader->StarsData.LocalizedCount;
 	cadrInfo.CountDeterObj = reader->StarsData.RecognizedCount;
 	cadrInfo.SizeStarsList = reader->StarsData.SimulatedFrame.strrec;
-	cadrInfo.SizeObjectsList =  cadrInfo.CountDeterObj;
+	cadrInfo.SizeObjectsList =  cadrInfo.CountLocalObj;
+//	cadrInfo.SizeObjectsList =  cadrInfo.CountDeterObj;
 	cadrInfo.SizeWindowsList = cadrInfo.CountWindows;
 
 
@@ -3196,7 +3194,6 @@ void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec
 		objInfo.Dx = reader->StarsData.StarsList[i].DX;
 		objInfo.Dy = reader->StarsData.StarsList[i].DY;
 		cadrInfo.ObjectsList.push_back(objInfo);
-
 	}
 
 	for (int i = 0; i < cadrInfo.SizeWindowsList; i ++)
@@ -3274,12 +3271,13 @@ void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec
 	for (int i = 0; i < 3; i ++)
 	{
 		cadrInfo.AnglesOrient[i] = reader->StarsData.RecognizedOrientationAngles[i];
-		cadrInfo.OmegaOrient[i] = reader->Georeferencing.DeviceAngularVelocity[i];
-		cadrInfo.OmegaOrientRES[i] = reader->StarsData.RecognizedAngularVelocity[i];
+		cadrInfo.AnglesModel[i] = reader->Georeferencing.OrientationAngles[i];
+		cadrInfo.OmegaOrient[i] = reader->StarsData.RecognizedAngularVelocity[i];
+		cadrInfo.OmegaModel[i] = reader->Georeferencing.DeviceAngularVelocity[i];
 
 		for (int j = 0; j < 3; j ++)
 		{
-			cadrInfo.MatrixOrient[i][j] = reader->StarsData.RecognizedOrientationMatrix[i][j];	
+			cadrInfo.MatrixOrient[i][j] = reader->StarsData.RecognizedOrientationMatrix[i][j];
 		}
 	}
 
@@ -3287,8 +3285,8 @@ void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec
 	{
 		for (int i = 0; i < 3; i++)
 		{
-			cadrInfo.OmegaDiff[i] = reader->Georeferencing.DeviceAngularVelocity[i]
-			- reader->StarsData.RecognizedAngularVelocity[i];
+			cadrInfo.OmegaDiff[i] = reader->StarsData.RecognizedAngularVelocity[i]
+			- reader->Georeferencing.DeviceAngularVelocity[i];
 		}
 
 
@@ -3343,9 +3341,8 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 					double Time =  vCadrInfo.back().Time;
 					if (vCadrInfo.back().IsOrient)
 					{
-						plotter->AddPoint(ChartAl, 0, Time, vCadrInfo.back().AnglesOrient[0] * RTD);
-						plotter->AddPoint(ChartDl, 0, Time, vCadrInfo.back().AnglesOrient[1] * RTD);
-						plotter->AddPoint(ChartAz, 0, Time, vCadrInfo.back().AnglesOrient[2] * RTD);
+						plotter->SetTitle("измерения");
+
 						plotter->AddPoint(ChartMx, 0, Time, vCadrInfo.back().MeanErrorX * 1000.);
 						plotter->AddPoint(ChartMy, 0, Time, vCadrInfo.back().MeanErrorY * 1000.);
 						plotter->AddPoint(ChartMxy, 0, Time, vCadrInfo.back().MeanErrorXY * 1000.);
@@ -3358,18 +3355,24 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 						plotter->AddPoint(ChartAlError, 0, Time, vCadrInfo.back().AnglesDiff[0] * RTS);
 						plotter->AddPoint(ChartDlError, 0, Time, vCadrInfo.back().AnglesDiff[1] * RTS);
 						plotter->AddPoint(ChartAzError, 0, Time, vCadrInfo.back().AnglesDiff[2] * RTS);
-						plotter->AddPoint(ChartWxError, 0, Time, vCadrInfo.back().OmegaOrientRES[0] * RTM);
-						plotter->AddPoint(ChartWyError, 0, Time, vCadrInfo.back().OmegaOrientRES[1] * RTM);
-						plotter->AddPoint(ChartWzError, 0, Time, vCadrInfo.back().OmegaOrientRES[2] * RTM);
-						plotter->SetTitle("Смоделированная");
+						plotter->AddPoint(ChartWxError, 0, Time, vCadrInfo.back().OmegaDiff[0] * RTS);
+						plotter->AddPoint(ChartWyError, 0, Time, vCadrInfo.back().OmegaDiff[1] * RTS);
+						plotter->AddPoint(ChartWzError, 0, Time, vCadrInfo.back().OmegaDiff[2] * RTS);
+						plotter->AddPoint(ChartAl, 0, Time, vCadrInfo.back().AnglesOrient[0] * RTD);
+						plotter->AddPoint(ChartDl, 0, Time, vCadrInfo.back().AnglesOrient[1] * RTD);
+						plotter->AddPoint(ChartAz, 0, Time, vCadrInfo.back().AnglesOrient[2] * RTD);
 						plotter->AddPoint(ChartWx, 0, Time, vCadrInfo.back().OmegaOrient[0] * RTM);
 						plotter->AddPoint(ChartWy, 0, Time, vCadrInfo.back().OmegaOrient[1] * RTM);
 						plotter->AddPoint(ChartWz, 0, Time, vCadrInfo.back().OmegaOrient[2] * RTM);
-						plotter->SetTitle("Реальная");
-						plotter->SetSeriesColor(clRed);
-						plotter->AddPoint(ChartWx, 1, Time, vCadrInfo.back().OmegaOrientRES[0] * RTM);
-						plotter->AddPoint(ChartWy, 1, Time, vCadrInfo.back().OmegaOrientRES[1] * RTM);
-						plotter->AddPoint(ChartWz, 1, Time, vCadrInfo.back().OmegaOrientRES[2] * RTM);
+
+						plotter->SetTitle("модель");
+						plotter->SetSeriesColor(clLime);
+						plotter->AddPoint(ChartAl, 1, Time, vCadrInfo.back().AnglesModel[0] * RTD);
+						plotter->AddPoint(ChartDl, 1, Time, vCadrInfo.back().AnglesModel[1] * RTD);
+						plotter->AddPoint(ChartAz, 1, Time, vCadrInfo.back().AnglesModel[2] * RTD);
+						plotter->AddPoint(ChartWx, 1, Time, vCadrInfo.back().OmegaModel[0] * RTM);
+						plotter->AddPoint(ChartWy, 1, Time, vCadrInfo.back().OmegaModel[1] * RTM);
+						plotter->AddPoint(ChartWz, 1, Time, vCadrInfo.back().OmegaModel[2] * RTM);
 
 					}
 				}
@@ -3390,4 +3393,6 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 			PrepareStartDraw();
 		}
 }
+
+
 

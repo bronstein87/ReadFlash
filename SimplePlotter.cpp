@@ -47,11 +47,11 @@ void SimplePlotter::SetSeriesOptions(TLineSeries* Series)
 {
 
 	Series->Title = Title;
-		eries->SeriesColor = SeriesColor;
-		Series->Pointer->Visible = ShowPoints;
-		if (ShowPoints) Series->Pointer->Size = PointSize;
-		Series->Pen->Visible = ShowLines;
-		Series->Pointer->Style = PointerStyle;
+	Series->SeriesColor = SeriesColor;
+	Series->Pointer->Visible = ShowPoints;
+	if (ShowPoints) Series->Pointer->Size = PointSize;
+	Series->Pen->Visible = ShowLines;
+	Series->Pointer->Style = PointerStyle;
 
 }
 

@@ -73,7 +73,7 @@ object FormGraphOrient: TFormGraphOrient
     Top = 8
     Width = 1160
     Height = 777
-    ActivePage = TabSheet8
+    ActivePage = TabSheet10
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
     object TabSheet5: TTabSheet
@@ -707,7 +707,7 @@ object FormGraphOrient: TFormGraphOrient
           ClickableLine = False
           Pointer.Brush.Gradient.Angle = 38
           Pointer.Brush.Gradient.Direction = gdFromTopLeft
-          Pointer.Brush.Gradient.EndColor = 6144242
+          Pointer.Brush.Gradient.EndColor = 10708548
           Pointer.Brush.Gradient.MidColor = 16059031
           Pointer.Brush.Gradient.StartColor = 14540754
           Pointer.Brush.Gradient.Visible = True
@@ -716,11 +716,11 @@ object FormGraphOrient: TFormGraphOrient
           Pointer.Emboss.Visible = True
           Pointer.Gradient.Angle = 38
           Pointer.Gradient.Direction = gdFromTopLeft
-          Pointer.Gradient.EndColor = 6144242
+          Pointer.Gradient.EndColor = 10708548
           Pointer.Gradient.MidColor = 16059031
           Pointer.Gradient.StartColor = 14540754
           Pointer.Gradient.Visible = True
-          Pointer.HorizSize = 10
+          Pointer.HorizSize = 16
           Pointer.InflateMargins = False
           Pointer.Pen.Color = 1358954496
           Pointer.Pen.Width = 0
@@ -733,7 +733,7 @@ object FormGraphOrient: TFormGraphOrient
           Pointer.Shadow.VertSize = 19
           Pointer.Shadow.Visible = True
           Pointer.Style = psCircle
-          Pointer.VertSize = 10
+          Pointer.VertSize = 16
           XValues.Name = 'X'
           XValues.Order = loAscending
           YValues.Name = 'Y'
