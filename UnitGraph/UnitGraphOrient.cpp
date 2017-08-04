@@ -376,7 +376,7 @@ void TFormGraphOrient::DrawBlock(const struct CadrInfo &mCadr)
 			else ObjShiftWnd[k] = ObjShiftWnd[k - 1] + mCadr.WindowsList[k - 1].CountObj;
 
 			int j = 0;
-			for (int i = ObjShiftWnd[k]; i<ObjShiftWnd[k]+mCadr.WindowsList[k].CountObj; i++)
+			for (int i = ObjShiftWnd[k]; i < ObjShiftWnd[k]+mCadr.WindowsList[k].CountObj; i++)
 			{
 				if (FormAnimateSetting->CheckBoxApplyWindowsSeries->Checked) {
 					switch (j + 1)
@@ -3330,12 +3330,12 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 				for (int i = 0; i < fileList->Count; i ++)
 				{
 					std::unique_ptr <IKI_img> reader(new IKI_img());
-					if	(reader->ReadFormat(fileList->Strings[i]))
+					if	(reader->ReadFormat(fileList->Strings[i], false))
 					{
 						if	(i != fileList->Count - 1
 						&& AnsiContainsStr(fileList->Strings[i + 1], ".res"))
 						{
-							if (reader->ReadFormat(fileList->Strings[i + 1]))
+							if (reader->ReadFormat(fileList->Strings[i + 1], false))
 							{
 								CompareIKIRes = true;
 								i = i + 1;
