@@ -65,7 +65,7 @@ struct FragmentData
 
 // функция для изменения контраста изображения
 // алгоритм смотри здесь: https://habrahabr.ru/post/139428/
-void changeContrast(int ConstrastCoefficient,TImage * ImageToCorrect);
+void changeContrast(int ConstrastCoefficient,TImage* ImageToCorrect);
 std::unique_ptr<TBitmap> changeContrast(int ContrastCoefficient, FragmentData& FData);
 std::unique_ptr<TBitmap> createFragmentBitmap(FragmentData& FData);
 void resizeBitmap(unsigned int Width, unsigned int Height, TBitmap* BitmapToScale);

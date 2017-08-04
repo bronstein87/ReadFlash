@@ -5,6 +5,7 @@
 #include <Classes.hpp>
 #include <VCLTee.Chart.hpp>
 #include <VCLTee.Series.hpp>
+
 class SimplePlotter
 {
 	public:
@@ -45,9 +46,11 @@ class SimplePlotter
 		ShowLines = _ShowLines;
 	}
 
-    void ClearChart(TChart* Chart);
+	void ClearChart(TChart* Chart);
 
-    void ResetOptions();
+	void SaveChart(TChart* Chart, AnsiString name, unsigned int Height, unsigned int Width);
+
+	void ResetOptions();
 
 
 	private:

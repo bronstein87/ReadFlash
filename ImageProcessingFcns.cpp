@@ -20,7 +20,7 @@
 			}
 		}
 
-		AverageBrightness /= Width*Height;
+		AverageBrightness /= Width * Height;
 		double CorrectionCoefficient = 1.0 + ConstrastCoefficient / 100.0;
 
 		std::vector<int> Palette;
@@ -39,10 +39,10 @@
 			Palette.push_back(temp);
 		}
 
-		for(int i=0;i<Height;i++)
+		for(int i = 0;i < Height;i ++)
 		{
 			BitmapLine = (TRGBTriple*)ImageToCorrect->Picture->Bitmap->ScanLine[i];
-			for(int j=0;j<Width;j++)
+			for(int j = 0;j < Width;j++)
 			{
 			   BitmapLine[j].rgbtBlue = Palette[BitmapLine[j].rgbtBlue]  ;
 			   BitmapLine[j].rgbtGreen = Palette[BitmapLine[j].rgbtGreen] ;
@@ -63,6 +63,8 @@ std::unique_ptr <TBitmap> changeContrast(int ContrastCoefficient, FragmentData& 
 		FData.min = *std::min_element(FData.RawFragment, FData.RawFragment + FragmentSize - 1);
 		FData.max = *std::max_element(FData.RawFragment, FData.RawFragment + FragmentSize - 1);
 
+		if (FData.min == FData.max) throw std::logic_error("Минимальная яркость равна максимальной");
+
 		int sum = 0;
 		for (int i = 0; i < FragmentSize; i++)
 		{
@@ -71,7 +73,7 @@ std::unique_ptr <TBitmap> changeContrast(int ContrastCoefficient, FragmentData& 
 		FData.mean = sum / FragmentSize;
 	}
 
-	std::unique_ptr<TBitmap> Fragment (new TBitmap());
+	std::unique_ptr <TBitmap> Fragment (new TBitmap());
 	Fragment->PixelFormat = pf24bit;
 	Fragment->Width =  FData.SizeX;
 	Fragment->Height = FData.SizeY;
