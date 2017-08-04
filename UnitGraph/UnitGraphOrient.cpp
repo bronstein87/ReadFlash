@@ -233,7 +233,8 @@ void TFormGraphOrient::PrintTableObjects(const struct CadrInfo &mCadr)
 			TableObjectsInfo->Cells[k++][i+1] = String(mCadr.ObjectsList[i].Square);
 			TableObjectsInfo->Cells[k++][i+1] = String(mCadr.ObjectsList[i].StarID);
 			TableObjectsInfo->Cells[k++][i+1] = FloatToStrF(mCadr.ObjectsList[i].Mv, ffFixed,6,2);
-			TableObjectsInfo->Cells[k++][i+1] = String(mCadr.ObjectsList[i].Sp);
+			TableObjectsInfo->Cells[k++][i+1] = String(mCadr.ObjectsList[i].Sp[0])
+												+String(mCadr.ObjectsList[i].Sp[1]);
 			TableObjectsInfo->Cells[k++][i+1] = FloatToStrF(mCadr.ObjectsList[i].Dx*1000., ffFixed,8,2);
 			TableObjectsInfo->Cells[k++][i+1] = FloatToStrF(mCadr.ObjectsList[i].Dy*1000., ffFixed,8,2);
 		}
@@ -317,16 +318,8 @@ void TFormGraphOrient::DrawBlock(const struct CadrInfo &mCadr)
 
 	for (int i = 0; i < CountBlock; i ++)
 	{
-		if (mCadr.IsBinary)
-		{
-			TabTakeAway[i][0] = mCadr.LinesList[i].Start >> 1;
-			TabTakeAway[i][1] = mCadr.LinesList[i].Height >> 1;
-		}
-		else
-		{
-		   TabTakeAway[i][0] = mCadr.LinesList[i].Start;
-		   TabTakeAway[i][1] = mCadr.LinesList[i].Height;
-		}
+		TabTakeAway[i][0] = mCadr.LinesList[i].Start;
+		TabTakeAway[i][1] = mCadr.LinesList[i].Height;
 
 		BlockSeries[i]->Visible = true;
 		BlockSeries[i]->X0 = 0;
