@@ -202,12 +202,13 @@ void ConvertDataSLEZH(struct DataSLEZH data, struct CadrInfo &mCadr)
 	}
 
 	mCadr.CountBlock=data.CountBlock;
-	mCadr.CountLines=data.EndBufFrag;
+	mCadr.CountLines=data.EndBufFrag>>mCadr.IsBinary;
 
 	LinesInfo linesInfo;
+
 	for (int i=0; i<mCadr.CountBlock; i++) {
-		linesInfo.Start=data.TabTakeAway[i][0];
-		linesInfo.Height=data.TabTakeAway[i][1];
+		linesInfo.Start=data.TabTakeAway[i][0]>>mCadr.IsBinary;
+		linesInfo.Height=data.TabTakeAway[i][1]>>mCadr.IsBinary;
 		mCadr.LinesList.push_back(linesInfo);
 	}
 
