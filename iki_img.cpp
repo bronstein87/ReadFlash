@@ -9,7 +9,7 @@ using namespace std;
 #define StartId                 0xABCD
 
 #define ROUND(N) (N<0?ceil((N)-0.5):floor((N)+0.5))
-#define VERSION_ID                              "1.02.08.17"
+#define VERSION_ID                              "1.04.08.17"
 
 #pragma region whenwhere
 #define whenwhere_id                            0xAAAA
@@ -157,6 +157,7 @@ using namespace std;
 #define	stringframe_deg_bin_id                  0x134E
 #define	stringframe_width_id                    0x144E
 #define	stringframe_height_id                   0x164E
+#define	stringframe_SizeData_id                 0x174E
 
 #define	stringlines_id                          0x115E
 #define	stringlines_count_id                    0x125E
@@ -165,6 +166,7 @@ using namespace std;
 #define	stringlines_width_id                    0x155E
 #define	stringlines_height_id                   0x165E
 #define	stringlines_info_id                     0x175E
+#define	stringlines_SizeData_id                 0x185E
 
 #define	stringwindow_id                         0x116E
 #define	stringwindow_count_id                   0x126E
@@ -184,10 +186,12 @@ using namespace std;
 #define	stringframe_deg_bin                     "Cтепень бинирования полного кадра"
 #define	stringframe_width                       "Ширина полного кадра"
 #define	stringframe_height                      "Высота полного кадра"
+#define	stringframe_SizeData                    "Суммарный размер полного кадра в пикселях"
 
 #define	stringlines_count                       "Количество полос"
 #define	stringlines_type                        "Тип данных полос с кадра(0-byte, 1-ushort, 2-float)"
 #define	stringlines_deg_bin                     "Cтепень бинирования полос с кадра"
+#define	stringlines_SizeData                    "Суммарный размер полос в пикселях"
 #define	stringlines_width                       "Ширина блока полос"
 #define	stringlines_height                      "Высота блока полос"
 #define	stringlines_info                      	"Параметры полос"
@@ -195,7 +199,7 @@ using namespace std;
 #define	stringwindow_count                      "Количество окон"
 #define	stringwindow_type                       "Тип данных окон(0-byte, 1-ushort, 2-float)"
 #define	stringwindow_deg_bin                    "Cтепень бинирования полос с кадра"
-#define	stringwindow_SizeData                   "Суммарный размер окон в байтах"
+#define	stringwindow_SizeData                   "Суммарный размер окон в пикселях"
 #define	stringwindow_flag                       "Угол отсчета координат: false-лв, true-пн"
 #define	stringwindow_info                       "Параметры окон"
 
@@ -267,6 +271,7 @@ struct fullframe
 	unsigned int DegreeBinning; // степень бинирования
 	unsigned int FrameWidth; // ширина кадра
 	unsigned int FrameHeight; // высота кадра
+	unsigned int SizeData; // размер информации (S+=W[i]*H[i])
 	void* Data;
 };
 
@@ -283,6 +288,7 @@ struct setlines
 	unsigned int DegreeBinning; // степень бинирования
 	unsigned int LinesWidth; // ширина блока полос
 	unsigned int LinesHeight; // высота блока полос
+	unsigned int SizeData; // размер информации (S+=W[i]*H[i])
 	dataline* Info; // информация о полосах
 	void* Data; // бинарные данные
 };
@@ -297,6 +303,8 @@ struct datawindow
 	unsigned int ObjCount; // количество объектов в окне
 	float SKO; // СКО
 	float Average; // среднее
+	unsigned short ZipX; // коэффициент сжатия по Х
+	unsigned short ZipY; // коэффициент сжатия по У
 };
 
 struct setwindow
@@ -626,7 +634,7 @@ public:
 
 #pragma region ФУНКЦИИ
 
-	__fastcall IKI_img::IKI_img(void)
+	__fastcall IKI_img::IKI_img(void) /* : Georeferencing(), CameraSettings(), FilterData(),StarsData(),ImageData() */
 	{
 		memset(&Georeferencing, 0, sizeof(Georeferencing));
 		memset(&CameraSettings, 0, sizeof(CameraSettings));
@@ -1109,6 +1117,8 @@ else
 			PrintString(FStream, stringframe_width_id, stringframe_width, Value_String);
 			Value_String = FormatFloat("#####0", ImageData.FrameData.FrameHeight);
 			PrintString(FStream, stringframe_height_id, stringframe_height, Value_String);
+			Value_String = FormatFloat("#####0", ImageData.FrameData.SizeData);
+			PrintString(FStream, stringframe_SizeData_id, stringframe_SizeData, Value_String);
 		}
 #pragma end_region
 #pragma region stringlines
@@ -1124,6 +1134,8 @@ else
 			PrintString(FStream, stringlines_width_id, stringlines_width, Value_String);
 			Value_String = FormatFloat("#####0", ImageData.LinesData.LinesHeight);
 			PrintString(FStream, stringlines_height_id, stringlines_height, Value_String);
+			Value_String = FormatFloat("#####0", ImageData.LinesData.SizeData);
+			PrintString(FStream, stringlines_SizeData_id, stringlines_SizeData, Value_String);
 			Value_String = "";
 			PrintString(FStream, stringlines_info_id, stringlines_info, Value_String);
 			for (int i = 0; i < ImageData.LinesData.LinesCount; i++)
@@ -1160,7 +1172,9 @@ else
 				Value_String += FormatFloat("#####0 ", ImageData.WindowsData.Info[i].Limit);
 				Value_String += FormatFloat("#####0 ", ImageData.WindowsData.Info[i].ObjCount);
 				Value_String += FormatFloat("0.0##### ", ImageData.WindowsData.Info[i].SKO);
-				Value_String += FormatFloat("0.0#####", ImageData.WindowsData.Info[i].Average);
+				Value_String += FormatFloat("0.0##### ", ImageData.WindowsData.Info[i].Average);
+				Value_String += FormatFloat("#####0 ", ImageData.WindowsData.Info[i].ZipX);
+				Value_String += FormatFloat("#####0", ImageData.WindowsData.Info[i].ZipY);
 				print_AnsiString(FStream, Value_String);
 			}
 		}
@@ -1235,7 +1249,7 @@ else
 	}
 	// ---------------------------------------------------------------------------
 
-	bool ReadFormat(AnsiString filename, bool Need_Erase = false)
+	bool ReadFormat(AnsiString filename, bool Need_Erase)
 	{
 		AnsiString buferstr;
 		int count_find_pos;
@@ -1401,6 +1415,10 @@ else
 					{
 						FStream->Read(&sizedata, sizeof(unsigned int));
 						FStream->Read(&Data_buf[0], sizedata);
+						for (int k = 0; k < sizedata; k++)
+							if (Data_buf[k] == '\0')
+								Data_buf[k] = '.';
+
 						FStream->Read(&end_str[0], 2);
 						buferstr = AnsiString(Data_buf).SubString(1, sizedata);
 						count_find_pos = 0;
@@ -1485,12 +1503,14 @@ else
 			case stringframe_deg_bin_id: ImageData.FrameData.DegreeBinning = (unsigned int)StrToInt(buferstr); break;
 			case stringframe_width_id: ImageData.FrameData.FrameWidth = (unsigned int)StrToInt(buferstr); break;
 			case stringframe_height_id: ImageData.FrameData.FrameHeight = (unsigned int)StrToInt(buferstr); break;
+			case stringframe_SizeData_id: ImageData.FrameData.SizeData = (unsigned int)StrToInt(buferstr); break;
 
 			case stringlines_count_id: ImageData.LinesData.LinesCount = (unsigned short)StrToInt(buferstr); break;
 			case stringlines_type_id: ImageData.LinesData.DataType = (unsigned int)StrToInt(buferstr); break;
 			case stringlines_deg_bin_id: ImageData.LinesData.DegreeBinning = (unsigned int)StrToInt(buferstr); break;
 			case stringlines_width_id: ImageData.LinesData.LinesWidth = (unsigned int)StrToInt(buferstr); break;
 			case stringlines_height_id: ImageData.LinesData.LinesHeight = (unsigned int)StrToInt(buferstr); break;
+			case stringlines_SizeData_id: ImageData.LinesData.SizeData = (unsigned int)StrToInt(buferstr); break;
 			case stringlines_info_id:
 				{
 					_FreeMemoryArray(ImageData.LinesData.Info);
@@ -1532,6 +1552,8 @@ else
 						ImageData.WindowsData.Info[i].ObjCount = (unsigned int) buf[5];
 						ImageData.WindowsData.Info[i].SKO = (float) buf[6];
 						ImageData.WindowsData.Info[i].Average = (float) buf[7];
+						ImageData.WindowsData.Info[i].ZipX = (unsigned short) buf[8];
+						ImageData.WindowsData.Info[i].ZipY = (unsigned short) buf[9];
 					}
 					break;
 				}
@@ -1606,7 +1628,8 @@ else
 					case 1: ImageData.FrameData.Data = (void*)new unsigned short[size]; break;
 					case 2: ImageData.FrameData.Data = (void*)new float[size]; break;
 					}
-					FStream->Read(ImageData.FrameData.Data, size * MassType[ImageData.FrameData.DataType]);
+					if (ImageData.FrameData.SizeData != 0)
+						FStream->Read(ImageData.FrameData.Data, size * MassType[ImageData.FrameData.DataType]);
 					FStream->Read(&end_str[0], 2);
 					break;
 				}
@@ -1620,7 +1643,8 @@ else
 					case 1: ImageData.LinesData.Data = (void*)new unsigned short[size]; break;
 					case 2: ImageData.LinesData.Data = (void*)new float[size]; break;
 					}
-					FStream->Read(ImageData.LinesData.Data, size * MassType[ImageData.LinesData.DataType]);
+					if (ImageData.LinesData.SizeData != 0)
+						FStream->Read(ImageData.LinesData.Data, size * MassType[ImageData.LinesData.DataType]);
 					FStream->Read(&end_str[0], 2);
 					break;
 				}
@@ -1633,7 +1657,8 @@ else
 					case 1: ImageData.WindowsData.Data = (void*)new unsigned short[ImageData.WindowsData.SizeData]; break;
 					case 2: ImageData.WindowsData.Data = (void*)new float[ImageData.WindowsData.SizeData]; break;
 					}
-					FStream->Read(ImageData.WindowsData.Data, ImageData.WindowsData.SizeData * MassType[ImageData.WindowsData.DataType]);
+					if (ImageData.WindowsData.SizeData != 0)
+					   FStream->Read(ImageData.WindowsData.Data, ImageData.WindowsData.SizeData * MassType[ImageData.WindowsData.DataType]);
 					FStream->Read(&end_str[0], 2);
 					break;
 				}

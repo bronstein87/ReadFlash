@@ -34,6 +34,12 @@ __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 		Charts.push_back(ChartFone); Charts.push_back(ChartNoise); Charts.push_back(ChartTemp);
 		Charts.push_back(ChartAlError); Charts.push_back(ChartDlError); Charts.push_back(ChartAzError);
 		Charts.push_back(ChartWxError); Charts.push_back(ChartWyError); Charts.push_back(ChartWzError);
+
+		for (int i = 0; i < Charts.size(); i++) {
+			Charts[i]->OnMouseWheel = &ChartMouseWheel;
+			Charts[i]->OnMouseDown = &ChartMouseDown;
+		}
+
 }
 
 
@@ -59,20 +65,23 @@ void TFormGraphOrient::InitializeSynchronization()
 
 void __fastcall TFormGraphOrient::MenuClearClick(TObject *Sender)
 {
-	DeleteLineGraph();
+	if (Application->
+	MessageBoxW(L"Точно очистить, Маша? Ты не промахнулась?", L"Вы уверены, Мария?", MB_OKCANCEL) == 1)
+	{
+		DeleteLineGraph();
+	}
 }
 
 
 void __fastcall TFormGraphOrient::MenuSaveClick(TObject *Sender)
 {
-
-//	for (int i = 0; i < Charts.size(); i ++)
-//	{
-//		plotter->SaveChart(Charts[i],
-//		Charts[i]->Title->ToString(),
-//		StrToInt(EditSizeX->ToString()),
-//		StrToInt(EditSizeY->ToString()));
-//	}
+	for (int i = 0; i < Charts.size(); i ++)
+	{
+		plotter->SaveChart(Charts[i],
+		Charts[i]->Title->ToString(),
+		StrToInt(EditSizeX->ToString()),
+		StrToInt(EditSizeY->ToString()));
+	}
 }       
 
 
@@ -172,7 +181,7 @@ void TFormGraphOrient::PrintTableWindows(const struct CadrInfo &mCadr)
 	{
 		TableWindowsInfo->RowCount=TableWindowsInfo->FixedRows+1;
 		for (int k=0; k<TableWindowsInfo->ColCount; k++) {
-			TableWindowsInfo->Cells[k][1]="";
+			TableWindowsInfo->Cells[k][1] = "";
         }
     }
 }
@@ -477,10 +486,6 @@ void TFormGraphOrient::DrawAnimate(const struct CadrInfo &mCadr)
 	PrintTableWindows(mCadr);
 	PrintTableObjects(mCadr);
 
-	if (FormAnimateSetting->CheckBoxCurrentTime) {
-      SynchronizeCharts(mCadr.Time);
-	}
-
 }
 
 
@@ -510,15 +515,13 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 	
    TStringDynArray FileNameList;
    FileNameList = TDirectory::GetFiles(NeededDirectory);
-   AnsiString TimePrStr = FloatToStrF(mCadr.Time, ffFixed, 10, 10);
-   TStringDynArray TimePrTwoParts = System::Strutils::SplitString(TimePrStr,".");
+   AnsiString TimePrStr = FloatToStr(mCadr.Time);
+
 
    AnsiString FragmentFileStr;
    for(int CurrentFileName = 0;CurrentFileName < FileNameList.Length;CurrentFileName ++)
    {
-
-		if(AnsiContainsStr(FileNameList[CurrentFileName], TimePrTwoParts[0])
-		&&	AnsiContainsStr(FileNameList[CurrentFileName], TimePrTwoParts[1]))
+		if(AnsiContainsStr(FileNameList[CurrentFileName], TimePrStr))
 		  {
 				 FragmentFileStr = FileNameList[CurrentFileName];
 				 break;
@@ -528,9 +531,8 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
    if(!FragmentFileStr.IsEmpty())
    {
 
-   FILE *FragmentFile;
-   FragmentFile = fopen(FragmentFileStr.c_str(), "rb");
-   if(!FragmentFile)
+   std::ifstream fragmentFile(FragmentFileStr.c_str(), std::ios::binary);;
+   if(!fragmentFile.is_open())
    {
 		ShowMessage(AnsiString("Не удалось открыть файл ") + FragmentFileStr.c_str());
 		return;
@@ -543,7 +545,7 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 		FragmentVector.back().SizeY = mCadr.WindowsList [CurrentFragment].Height;
 		int FragmentSize =  FragmentVector.back().SizeX * FragmentVector.back().SizeY;
 		FragmentVector.back().RawFragment = new unsigned short [FragmentSize];
-		fread(FragmentVector.back().RawFragment, sizeof(unsigned short), FragmentSize, FragmentFile);
+		fragmentFile.read((char*)FragmentVector.back().RawFragment, sizeof(unsigned short) * FragmentSize);
 		std::unique_ptr<TBitmap> Fragment(createFragmentBitmap(FragmentVector.back()));
 
 
@@ -584,7 +586,7 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 	}
 
 	PlaceImageFragments(ImageScrollBoxVector);
-	fclose(FragmentFile);
+	fragmentFile.close();
 
    }
 
@@ -820,6 +822,9 @@ void  TFormGraphOrient::DrawAnimateHandler(void)
 
 		if (!GetCadrInfo(cnt, CurCadr))
 		{
+			if (FormAnimateSetting->CheckBoxCurrentTime) {
+				 SynchronizeCharts(CurCadr.Time);
+			}
 			  DrawAnimate(CurCadr);
 		}
 	}
@@ -3228,9 +3233,9 @@ void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec
 		std::string dirName = AnsiString(GetCurrentDir()).c_str() + std::string("/") + "Frag" + "_" + "IKI";
 		TDirectory::CreateDirectory(dirName.c_str());
 		std::string time = AnsiString(FloatToStr(cadrInfo.Time)).c_str();
-		std::string fileName = dirName + "/" + "Frag" + "_" + time;
+		std::string fileName = dirName + "/" + "Frag" + "_" + time + ".bin";
 		std::ofstream fragmentFile(fileName.c_str(), std::ios::binary | std::ios::trunc);
-		
+
 		if(fragmentFile.is_open())
 		{
 			char bytesInFormat = 1;
@@ -3242,7 +3247,7 @@ void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec
 			}
 
 		  fragmentFile.write(
-		  (char*)reader->ImageData.WindowsData.Data,
+		  (char*)(reader->ImageData.WindowsData.Data),
 		   reader->ImageData.WindowsData.SizeData * bytesInFormat);
 		  fragmentFile.close();
 		}
@@ -3309,90 +3314,133 @@ void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec
 
 void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 {
-		OpenDialog->Filter = "iki|*.iki;*.res";
+	try
+	{
+		OpenDialog->Filter = "iki|*.iki";
 		OpenDialog->Options << ofAllowMultiSelect;
 		if (OpenDialog->Execute())
 		{
-			vCadrInfo.clear();
-			DeleteLineGraph();
-			FileTitle = "IKI";
 			std::unique_ptr <TStringList> fileList (new TStringList());
 			fileList->Assign(OpenDialog->Files);
-			fileList->Sort();
-			SetCurrentDir(ExtractFileDir(fileList->Strings[0]));
 
-			for (int i = 0; i < fileList->Count; i ++)
+			OpenDialog->Filter = "res|*.res";
+			if (OpenDialog->Execute())
 			{
-				std::unique_ptr <IKI_img> reader(new IKI_img());
-				if	(reader->ReadFormat(fileList->Strings[i]))
+				vCadrInfo.clear();
+				DeleteLineGraph();
+				FileTitle = "IKI";
+				plotter->ResetOptions();
+				fileList->AddStrings(OpenDialog->Files);
+				fileList->Sort();
+				SetCurrentDir(ExtractFileDir(fileList->Strings[0]));
+
+				for (int i = 0; i < fileList->Count; i ++)
 				{
-					if	(i != fileList->Count - 1
-					&& AnsiContainsStr(fileList->Strings[i + 1], ".res"))
+					std::unique_ptr <IKI_img> reader(new IKI_img());
+					if	(reader->ReadFormat(fileList->Strings[i]))
 					{
-						if (reader->ReadFormat(fileList->Strings[i + 1]))
+						if	(i != fileList->Count - 1
+						&& AnsiContainsStr(fileList->Strings[i + 1], ".res"))
 						{
-							CompareIKIRes = true;
-							i = i + 1;
+							if (reader->ReadFormat(fileList->Strings[i + 1]))
+							{
+								CompareIKIRes = true;
+								i = i + 1;
+							}
+							else throw logic_error(string("Не удалось считать ") + AnsiString(fileList->Strings[i + 1]).c_str());
 						}
-						else throw logic_error(string("Не удалось считать ") + AnsiString(fileList->Strings[i + 1]).c_str());
+
+						convertIKIFormatToInfoCadr(reader.get(), vCadrInfo, CompareIKIRes);
+						double Time =  vCadrInfo.back().Time;
+						if (vCadrInfo.back().IsOrient)
+						{
+							plotter->SetTitle("измерения");
+
+							plotter->AddPoint(ChartMx, 0, Time, vCadrInfo.back().MeanErrorX * 1000.);
+							plotter->AddPoint(ChartMy, 0, Time, vCadrInfo.back().MeanErrorY * 1000.);
+							plotter->AddPoint(ChartMxy, 0, Time, vCadrInfo.back().MeanErrorXY * 1000.);
+							plotter->AddPoint(ChartNumFrag, 0, Time, vCadrInfo.back().CountWindows);
+							plotter->AddPoint(ChartNumLoc, 0, Time, vCadrInfo.back().CountLocalObj);
+							plotter->AddPoint(ChartNumDet, 0, Time, vCadrInfo.back().CountDeterObj);
+							plotter->AddPoint(ChartFone, 0, Time, vCadrInfo.back().MeanBright);
+							plotter->AddPoint(ChartNoise, 0, Time, vCadrInfo.back().SigmaBright);
+							//plotter->AddPoint(ChartTemp, 0, Time, vCadrInfo.back().MatrixTemp);
+							plotter->AddPoint(ChartAlError, 0, Time, vCadrInfo.back().AnglesDiff[0] * RTS);
+							plotter->AddPoint(ChartDlError, 0, Time, vCadrInfo.back().AnglesDiff[1] * RTS);
+							plotter->AddPoint(ChartAzError, 0, Time, vCadrInfo.back().AnglesDiff[2] * RTS);
+							plotter->AddPoint(ChartWxError, 0, Time, vCadrInfo.back().OmegaDiff[0] * RTS);
+							plotter->AddPoint(ChartWyError, 0, Time, vCadrInfo.back().OmegaDiff[1] * RTS);
+							plotter->AddPoint(ChartWzError, 0, Time, vCadrInfo.back().OmegaDiff[2] * RTS);
+							plotter->AddPoint(ChartAl, 0, Time, vCadrInfo.back().AnglesOrient[0] * RTD);
+							plotter->AddPoint(ChartDl, 0, Time, vCadrInfo.back().AnglesOrient[1] * RTD);
+							plotter->AddPoint(ChartAz, 0, Time, vCadrInfo.back().AnglesOrient[2] * RTD);
+							plotter->AddPoint(ChartWx, 0, Time, vCadrInfo.back().OmegaOrient[0] * RTM);
+							plotter->AddPoint(ChartWy, 0, Time, vCadrInfo.back().OmegaOrient[1] * RTM);
+							plotter->AddPoint(ChartWz, 0, Time, vCadrInfo.back().OmegaOrient[2] * RTM);
+
+							plotter->SetTitle("модель");
+							plotter->SetSeriesColor(clLime);
+							plotter->AddPoint(ChartAl, 1, Time, vCadrInfo.back().AnglesModel[0] * RTD);
+							plotter->AddPoint(ChartDl, 1, Time, vCadrInfo.back().AnglesModel[1] * RTD);
+							plotter->AddPoint(ChartAz, 1, Time, vCadrInfo.back().AnglesModel[2] * RTD);
+							plotter->AddPoint(ChartWx, 1, Time, vCadrInfo.back().OmegaModel[0] * RTM);
+							plotter->AddPoint(ChartWy, 1, Time, vCadrInfo.back().OmegaModel[1] * RTM);
+							plotter->AddPoint(ChartWz, 1, Time, vCadrInfo.back().OmegaModel[2] * RTM);
+
+						}
 					}
+					else throw logic_error(string("Не удалось считать ") + AnsiString(fileList->Strings[i]).c_str());
 
-					convertIKIFormatToInfoCadr(reader.get(), vCadrInfo, CompareIKIRes);
-					double Time =  vCadrInfo.back().Time;
-					if (vCadrInfo.back().IsOrient)
-					{
-						plotter->SetTitle("измерения");
-
-						plotter->AddPoint(ChartMx, 0, Time, vCadrInfo.back().MeanErrorX * 1000.);
-						plotter->AddPoint(ChartMy, 0, Time, vCadrInfo.back().MeanErrorY * 1000.);
-						plotter->AddPoint(ChartMxy, 0, Time, vCadrInfo.back().MeanErrorXY * 1000.);
-						plotter->AddPoint(ChartNumFrag, 0, Time, vCadrInfo.back().CountWindows);
-						plotter->AddPoint(ChartNumLoc, 0, Time, vCadrInfo.back().CountLocalObj);
-						plotter->AddPoint(ChartNumDet, 0, Time, vCadrInfo.back().CountDeterObj);
-						plotter->AddPoint(ChartFone, 0, Time, vCadrInfo.back().MeanBright);
-						plotter->AddPoint(ChartNoise, 0, Time, vCadrInfo.back().SigmaBright);
-						//plotter->AddPoint(ChartTemp, 0, Time, vCadrInfo.back().MatrixTemp);
-						plotter->AddPoint(ChartAlError, 0, Time, vCadrInfo.back().AnglesDiff[0] * RTS);
-						plotter->AddPoint(ChartDlError, 0, Time, vCadrInfo.back().AnglesDiff[1] * RTS);
-						plotter->AddPoint(ChartAzError, 0, Time, vCadrInfo.back().AnglesDiff[2] * RTS);
-						plotter->AddPoint(ChartWxError, 0, Time, vCadrInfo.back().OmegaDiff[0] * RTS);
-						plotter->AddPoint(ChartWyError, 0, Time, vCadrInfo.back().OmegaDiff[1] * RTS);
-						plotter->AddPoint(ChartWzError, 0, Time, vCadrInfo.back().OmegaDiff[2] * RTS);
-						plotter->AddPoint(ChartAl, 0, Time, vCadrInfo.back().AnglesOrient[0] * RTD);
-						plotter->AddPoint(ChartDl, 0, Time, vCadrInfo.back().AnglesOrient[1] * RTD);
-						plotter->AddPoint(ChartAz, 0, Time, vCadrInfo.back().AnglesOrient[2] * RTD);
-						plotter->AddPoint(ChartWx, 0, Time, vCadrInfo.back().OmegaOrient[0] * RTM);
-						plotter->AddPoint(ChartWy, 0, Time, vCadrInfo.back().OmegaOrient[1] * RTM);
-						plotter->AddPoint(ChartWz, 0, Time, vCadrInfo.back().OmegaOrient[2] * RTM);
-
-						plotter->SetTitle("модель");
-						plotter->SetSeriesColor(clLime);
-						plotter->AddPoint(ChartAl, 1, Time, vCadrInfo.back().AnglesModel[0] * RTD);
-						plotter->AddPoint(ChartDl, 1, Time, vCadrInfo.back().AnglesModel[1] * RTD);
-						plotter->AddPoint(ChartAz, 1, Time, vCadrInfo.back().AnglesModel[2] * RTD);
-						plotter->AddPoint(ChartWx, 1, Time, vCadrInfo.back().OmegaModel[0] * RTM);
-						plotter->AddPoint(ChartWy, 1, Time, vCadrInfo.back().OmegaModel[1] * RTM);
-						plotter->AddPoint(ChartWz, 1, Time, vCadrInfo.back().OmegaModel[2] * RTM);
-
-					}
 				}
-				else throw logic_error(string("Не удалось считать ") + AnsiString(fileList->Strings[i]).c_str());
 
+				struct {
+
+					bool operator()(const CadrInfo& a,const CadrInfo& b)
+					{
+						return a.Time < b.Time;
+					}
+
+				} CadrCompare ;
+
+				std::sort(vCadrInfo.begin(), vCadrInfo.end(), CadrCompare);
+				PrepareStartDraw();
 			}
 
-			struct {
-
-				bool operator()(const CadrInfo& a,const CadrInfo& b)
-				{
-					return a.Time < b.Time;
-				}
-
-			} CadrCompare ;
-
-			std::sort(vCadrInfo.begin(), vCadrInfo.end(), CadrCompare);
-			PrepareStartDraw();
 		}
+	}
+	catch (std::exception &e)
+	{
+		ShowMessage(e.what());
+	}
 }
 
 
+ void __fastcall TFormGraphOrient::ChartMouseWheel(TObject *Sender, TShiftState Shift,
+		  int WheelDelta, const TPoint &MousePos, bool &Handled)
+{
+	TChart* Chart = dynamic_cast <TChart*> (Sender);
+	if (Shift.Contains(ssCtrl))
+	{
+		Chart->Zoom->Direction = tzdVertical;
+	}
+	else
+	{
+	   Chart->Zoom->Direction = tzdBoth;
+	}
+}
+
+
+void __fastcall TFormGraphOrient::ChartMouseDown(TObject *Sender, TMouseButton Button,
+          TShiftState Shift, int X, int Y)
+{
+	TChart* Chart = dynamic_cast <TChart*> (Sender);
+	if (Shift.Contains(ssCtrl))
+	{
+		Chart->Zoom->Direction = tzdVertical;
+	}
+	else
+	{
+	   Chart->Zoom->Direction = tzdBoth;
+	}
+}
 

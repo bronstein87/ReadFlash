@@ -73,7 +73,7 @@ object FormGraphOrient: TFormGraphOrient
     Top = 8
     Width = 1160
     Height = 777
-    ActivePage = TabSheet10
+    ActivePage = TabSheet5
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
     object TabSheet5: TTabSheet
@@ -81,22 +81,25 @@ object FormGraphOrient: TFormGraphOrient
       DesignSize = (
         1152
         749)
-      object ChartAl: TChart
+      object ChartDl: TChart
         Left = 16
-        Top = 3
+        Top = 251
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
         Legend.LegendStyle = lsSeries
         Legend.Shadow.HorizSize = 0
         Legend.Shadow.VertSize = 0
         Title.Font.Height = -13
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
-          #1055#1088#1103#1084#1086#1077' '#1074#1086#1089#1093#1086#1078#1076#1077#1085#1080#1077', '#1075#1088#1072#1076)
+          #1057#1082#1083#1086#1085#1077#1085#1080#1077', '#1075#1088#1072#1076)
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
         View3D = False
+        Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 0
@@ -109,35 +112,13 @@ object FormGraphOrient: TFormGraphOrient
           39)
         ColorPaletteIndex = 13
       end
-      object ChartDl: TChart
-        Left = 16
-        Top = 252
-        Width = 1117
-        Height = 250
-        BackWall.Brush.Style = bsClear
-        Legend.LegendStyle = lsSeries
-        Legend.Shadow.HorizSize = 0
-        Legend.Shadow.VertSize = 0
-        Title.Font.Height = -13
-        Title.Font.Style = [fsBold]
-        Title.Text.Strings = (
-          #1057#1082#1083#1086#1085#1077#1085#1080#1077', '#1075#1088#1072#1076)
-        BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
-        LeftAxis.AxisValuesFormat = '#,##0.#####'
-        View3D = False
-        BevelOuter = bvNone
-        Color = clWhite
-        TabOrder = 1
-        Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TTeeCanvas3D'
-        ColorPaletteIndex = 13
-      end
       object ChartAz: TChart
         Left = 16
-        Top = 497
+        Top = 496
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
         Legend.LegendStyle = lsSeries
         Legend.Shadow.HorizSize = 0
         Legend.Shadow.VertSize = 0
@@ -147,12 +128,50 @@ object FormGraphOrient: TFormGraphOrient
           #1040#1079#1080#1084#1091#1090', '#1075#1088#1072#1076)
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
         View3D = False
+        Zoom.MouseWheel = pmwNormal
+        BevelOuter = bvNone
+        Color = clWhite
+        TabOrder = 1
+        Anchors = [akLeft, akRight]
+        DefaultCanvas = 'TTeeCanvas3D'
+        PrintMargins = (
+          15
+          39
+          15
+          39)
+        ColorPaletteIndex = 13
+      end
+      object ChartAl: TChart
+        Left = 16
+        Top = 17
+        Width = 1117
+        Height = 250
+        BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
+        Legend.LegendStyle = lsSeries
+        Legend.Shadow.HorizSize = 0
+        Legend.Shadow.VertSize = 0
+        Title.Font.Height = -13
+        Title.Font.Style = [fsBold]
+        Title.Text.Strings = (
+          #1055#1088#1103#1084#1086#1077' '#1074#1086#1089#1093#1086#1078#1076#1077#1085#1080#1077', '#1075#1088#1072#1076)
+        BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
+        LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
+        View3D = False
+        Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 2
         Anchors = [akLeft, akRight]
         DefaultCanvas = 'TTeeCanvas3D'
+        PrintMargins = (
+          15
+          39
+          15
+          39)
         ColorPaletteIndex = 13
       end
     end
@@ -168,6 +187,7 @@ object FormGraphOrient: TFormGraphOrient
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
         Legend.LegendStyle = lsSeries
         Legend.Shadow.HorizSize = 0
         Legend.Shadow.VertSize = 0
@@ -177,7 +197,9 @@ object FormGraphOrient: TFormGraphOrient
           #1054#1096#1080#1073#1082#1072' '#1072#1079#1080#1084#1091#1090#1072', '#1075#1088#1072#1076)
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
         View3D = False
+        Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 0
@@ -191,6 +213,7 @@ object FormGraphOrient: TFormGraphOrient
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
         Legend.LegendStyle = lsSeries
         Legend.Shadow.HorizSize = 0
         Legend.Shadow.VertSize = 0
@@ -200,7 +223,9 @@ object FormGraphOrient: TFormGraphOrient
           #1054#1096#1080#1073#1082#1072' '#1089#1082#1083#1086#1085#1077#1085#1080#1103', '#1075#1088#1072#1076)
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
         View3D = False
+        Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 1
@@ -214,6 +239,7 @@ object FormGraphOrient: TFormGraphOrient
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
         Legend.LegendStyle = lsSeries
         Legend.Shadow.HorizSize = 0
         Legend.Shadow.VertSize = 0
@@ -223,7 +249,9 @@ object FormGraphOrient: TFormGraphOrient
           #1054#1096#1080#1073#1082#1072' '#1087#1088#1103#1084#1086#1075#1086' '#1074#1086#1089#1093#1086#1078#1076#1077#1085#1080#1103', '#1075#1088#1072#1076)
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
         View3D = False
+        Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 2
@@ -244,6 +272,7 @@ object FormGraphOrient: TFormGraphOrient
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
         Legend.LegendStyle = lsSeries
         Legend.Shadow.HorizSize = 0
         Legend.Shadow.VertSize = 0
@@ -253,7 +282,9 @@ object FormGraphOrient: TFormGraphOrient
           'Wx, '#39'/c')
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
         View3D = False
+        Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 0
@@ -267,6 +298,7 @@ object FormGraphOrient: TFormGraphOrient
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
         Legend.LegendStyle = lsSeries
         Legend.Shadow.HorizSize = 0
         Legend.Shadow.VertSize = 0
@@ -276,7 +308,9 @@ object FormGraphOrient: TFormGraphOrient
           'Wy, '#39'/c')
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
         View3D = False
+        Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 1
@@ -290,6 +324,7 @@ object FormGraphOrient: TFormGraphOrient
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
         Legend.LegendStyle = lsSeries
         Legend.Shadow.HorizSize = 0
         Legend.Shadow.VertSize = 0
@@ -299,7 +334,9 @@ object FormGraphOrient: TFormGraphOrient
           'Wz, '#39'/c')
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
         View3D = False
+        Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 2
@@ -320,6 +357,7 @@ object FormGraphOrient: TFormGraphOrient
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
         Legend.LegendStyle = lsSeries
         Legend.Shadow.HorizSize = 0
         Legend.Shadow.VertSize = 0
@@ -329,7 +367,9 @@ object FormGraphOrient: TFormGraphOrient
           ' '#1054#1096#1080#1073#1082#1072' Wx, '#39'/c')
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
         View3D = False
+        Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 0
@@ -343,6 +383,7 @@ object FormGraphOrient: TFormGraphOrient
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
         Legend.LegendStyle = lsSeries
         Legend.Shadow.HorizSize = 0
         Legend.Shadow.VertSize = 0
@@ -352,7 +393,9 @@ object FormGraphOrient: TFormGraphOrient
           #1054#1096#1080#1073#1082#1072' Wy, '#39'/c')
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
         View3D = False
+        Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 1
@@ -366,6 +409,7 @@ object FormGraphOrient: TFormGraphOrient
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
         Legend.LegendStyle = lsSeries
         Legend.Shadow.HorizSize = 0
         Legend.Shadow.VertSize = 0
@@ -375,7 +419,9 @@ object FormGraphOrient: TFormGraphOrient
           #1054#1096#1080#1073#1082#1072' Wz, '#39'/c')
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
         View3D = False
+        Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 2
@@ -396,6 +442,7 @@ object FormGraphOrient: TFormGraphOrient
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
         Legend.LegendStyle = lsSeries
         Legend.Shadow.HorizSize = 0
         Legend.Shadow.VertSize = 0
@@ -405,7 +452,9 @@ object FormGraphOrient: TFormGraphOrient
           'mx, '#1084#1082#1084)
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
         View3D = False
+        Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 0
@@ -419,6 +468,7 @@ object FormGraphOrient: TFormGraphOrient
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
         Legend.LegendStyle = lsSeries
         Legend.Shadow.HorizSize = 0
         Legend.Shadow.VertSize = 0
@@ -428,7 +478,9 @@ object FormGraphOrient: TFormGraphOrient
           'my, '#1084#1082#1084)
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
         View3D = False
+        Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 1
@@ -438,20 +490,23 @@ object FormGraphOrient: TFormGraphOrient
       end
       object ChartMxy: TChart
         Left = 16
-        Top = 497
+        Top = 496
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
         Legend.LegendStyle = lsSeries
         Legend.Shadow.HorizSize = 0
         Legend.Shadow.VertSize = 0
-        Title.Font.Height = -15
+        Title.Font.Height = -13
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
           'm_cur, '#1084#1082#1084)
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
         View3D = False
+        Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 2
@@ -472,6 +527,7 @@ object FormGraphOrient: TFormGraphOrient
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
         Legend.LegendStyle = lsSeries
         Legend.Shadow.HorizSize = 0
         Legend.Shadow.VertSize = 0
@@ -481,7 +537,9 @@ object FormGraphOrient: TFormGraphOrient
           #1063#1080#1089#1083#1086' '#1092#1088#1072#1075#1084#1077#1085#1090#1086#1074)
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
         View3D = False
+        Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 0
@@ -495,6 +553,7 @@ object FormGraphOrient: TFormGraphOrient
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
         Legend.LegendStyle = lsSeries
         Legend.Shadow.HorizSize = 0
         Legend.Shadow.VertSize = 0
@@ -504,7 +563,9 @@ object FormGraphOrient: TFormGraphOrient
           #1063#1080#1089#1083#1086' '#1083#1086#1082#1072#1083#1080#1079#1086#1074#1072#1085#1085#1099#1093' '#1086#1073#1098#1077#1082#1090#1086#1074)
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
         View3D = False
+        Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 1
@@ -518,6 +579,7 @@ object FormGraphOrient: TFormGraphOrient
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
         Legend.LegendStyle = lsSeries
         Legend.Shadow.HorizSize = 0
         Legend.Shadow.VertSize = 0
@@ -527,7 +589,9 @@ object FormGraphOrient: TFormGraphOrient
           #1063#1080#1089#1083#1086' '#1088#1072#1089#1087#1086#1079#1085#1072#1085#1085#1099#1093' '#1079#1074#1077#1079#1076)
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
         View3D = False
+        Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 2
@@ -548,6 +612,7 @@ object FormGraphOrient: TFormGraphOrient
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
         Legend.LegendStyle = lsSeries
         Legend.Shadow.HorizSize = 0
         Legend.Shadow.VertSize = 0
@@ -557,7 +622,9 @@ object FormGraphOrient: TFormGraphOrient
           #1059#1088#1086#1074#1077#1085#1100' '#1092#1086#1085#1072', '#1045#1052#1056)
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
         View3D = False
+        Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 0
@@ -571,6 +638,7 @@ object FormGraphOrient: TFormGraphOrient
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
         Legend.LegendStyle = lsSeries
         Legend.Shadow.HorizSize = 0
         Legend.Shadow.VertSize = 0
@@ -580,7 +648,9 @@ object FormGraphOrient: TFormGraphOrient
           #1059#1088#1086#1074#1077#1085#1100' '#1096#1091#1084#1072' (1'#1057#1050#1054'), '#1045#1052#1056)
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
         View3D = False
+        Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 1
@@ -594,6 +664,7 @@ object FormGraphOrient: TFormGraphOrient
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
         Legend.LegendStyle = lsSeries
         Legend.Shadow.HorizSize = 0
         Legend.Shadow.VertSize = 0
@@ -603,7 +674,9 @@ object FormGraphOrient: TFormGraphOrient
           #1058#1077#1084#1087#1077#1088#1072#1090#1091#1088#1072' '#1050#1052#1054#1055'-'#1084#1072#1090#1088#1080#1094#1099)
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
         View3D = False
+        Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
         Color = clWhite
         TabOrder = 2
@@ -707,7 +780,7 @@ object FormGraphOrient: TFormGraphOrient
           ClickableLine = False
           Pointer.Brush.Gradient.Angle = 38
           Pointer.Brush.Gradient.Direction = gdFromTopLeft
-          Pointer.Brush.Gradient.EndColor = 10708548
+          Pointer.Brush.Gradient.EndColor = 6144242
           Pointer.Brush.Gradient.MidColor = 16059031
           Pointer.Brush.Gradient.StartColor = 14540754
           Pointer.Brush.Gradient.Visible = True
@@ -716,11 +789,11 @@ object FormGraphOrient: TFormGraphOrient
           Pointer.Emboss.Visible = True
           Pointer.Gradient.Angle = 38
           Pointer.Gradient.Direction = gdFromTopLeft
-          Pointer.Gradient.EndColor = 10708548
+          Pointer.Gradient.EndColor = 6144242
           Pointer.Gradient.MidColor = 16059031
           Pointer.Gradient.StartColor = 14540754
           Pointer.Gradient.Visible = True
-          Pointer.HorizSize = 16
+          Pointer.HorizSize = 14
           Pointer.InflateMargins = False
           Pointer.Pen.Color = 1358954496
           Pointer.Pen.Width = 0
@@ -733,7 +806,7 @@ object FormGraphOrient: TFormGraphOrient
           Pointer.Shadow.VertSize = 19
           Pointer.Shadow.Visible = True
           Pointer.Style = psCircle
-          Pointer.VertSize = 16
+          Pointer.VertSize = 14
           XValues.Name = 'X'
           XValues.Order = loAscending
           YValues.Name = 'Y'

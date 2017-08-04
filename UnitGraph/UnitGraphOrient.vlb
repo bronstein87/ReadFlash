@@ -1,7 +1,4 @@
-﻿[ChartDl]
-Coordinates=150,214,58,58
-
-[TabSheet2]
+﻿[TabSheet2]
 Coordinates=97,396,77,36
 
 [MenuClear]
@@ -100,9 +97,6 @@ Coordinates=441,10,60,58
 [TabSheet8]
 Coordinates=278,350,77,36
 
-[ChartAl]
-Coordinates=186,146,57,58
-
 [EditTimeDev]
 Coordinates=218,214,88,58
 
@@ -157,9 +151,6 @@ Coordinates=242,557,58,36
 [ChartMy]
 Coordinates=305,282,63,58
 
-[ChartAz]
-Coordinates=500,78,61,58
-
 [ButtonAdd]
 Coordinates=10,146,74,58
 
@@ -203,9 +194,6 @@ Coordinates=845,1,117,58
 [ContrastCheckBox]
 Coordinates=814,298,114,58
 Visible=True
-
-[ChartMxy]
-Coordinates=154,78,65,58
 
 [ChartTemp]
 Coordinates=418,78,72,58

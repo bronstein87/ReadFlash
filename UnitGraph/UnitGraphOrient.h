@@ -77,39 +77,6 @@
 		int SecuenceCounter;
 	};
 
-	enum S_ID
-	{
-		AL = 1,
-		DL = 1,
-		AZ = 1,
-
-		AL_ERROR = 1,
-		DL_ERROR = 1,
-		AZ_ERROR = 1,
-
-		WX_MODEL = 1,
-		WY_MODEL = 1,
-		WZ_MODEL = 1,
-		WX_REAL = 1,
-		WY_REAL = 1,
-		WZ_REAL = 1,
-
-		WX_ERROR = 1,
-		WY_ERROR = 1,
-		WZ_ERROR = 1,
-
-		MX = 1,
-		MY = 1,
-		M_XY = 1,
-
-		NUM_FRAG = 1,
-		NUM_LOC = 1,
-		NUM_DET = 1,
-
-		FONE = 1,
-		NOISE = 1,
-		TEMP = 1
-	};
 
 	class TFormAnimateSetting;
 
@@ -120,9 +87,6 @@
 		TButton *ButtonClear;
 		TPageControl *PageControl2;
 		TTabSheet *TabSheet5;
-		TChart *ChartAl;
-		TChart *ChartDl;
-		TChart *ChartAz;
 		TTabSheet *TabSheet6;
 		TChart *ChartWx;
 		TChart *ChartWy;
@@ -130,7 +94,6 @@
 		TTabSheet *TabSheet7;
 		TChart *ChartMx;
 		TChart *ChartMy;
-		TChart *ChartMxy;
 		TTabSheet *TabSheet8;
 		TChart *ChartNumFrag;
 		TChart *ChartNumLoc;
@@ -212,7 +175,11 @@
 		TChart *ChartWxError;
 		TChart *ChartWyError;
 		TChart *ChartWzError;
-	TChartEditor *ChartEditor1;
+		TChartEditor *ChartEditor1;
+	TChart *ChartMxy;
+	TChart *ChartDl;
+	TChart *ChartAz;
+	TChart *ChartAl;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -261,6 +228,10 @@
 		void readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
 		void __fastcall OnScroll(TObject* Sender);
 		void SetContrast();
+		void __fastcall ChartMouseWheel(TObject *Sender, TShiftState Shift, int WheelDelta,
+			const TPoint &MousePos, bool &Handled);
+		void __fastcall ChartMouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
+		  int X, int Y);
 
 		unique_ptr <TFormAnimateSetting> FormAnimateSetting;
 		TChartShape *BlockSeries[MaxBlockSeries];
