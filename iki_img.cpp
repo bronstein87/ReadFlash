@@ -1543,7 +1543,7 @@ else
 						FStream->Read(&Data_buf[0], sizedata);
 						FStream->Read(&end_str[0], 2);
 						buferstr = AnsiString(Data_buf).SubString(1, sizedata);
-						StringToFloatMass(buf, 8, buferstr);
+						StringToFloatMass(buf, 10, buferstr);
 						ImageData.WindowsData.Info[i].WindowWidth = (unsigned int) buf[0];
 						ImageData.WindowsData.Info[i].WindowHeight = (unsigned int) buf[1];
 						ImageData.WindowsData.Info[i].X = (unsigned int) buf[2];

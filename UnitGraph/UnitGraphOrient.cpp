@@ -3213,8 +3213,8 @@ void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec
 		 winInfo.Sigma =  reader->ImageData.WindowsData.Info[i].SKO;
 		 winInfo.Level =  reader->ImageData.WindowsData.Info[i].Limit;
 		 winInfo.Mv = 0;
-		 winInfo.ZipX = 0;
-		 winInfo.ZipY = 0;
+		 winInfo.ZipX = reader->ImageData.WindowsData.Info[i].ZipX;
+		 winInfo.ZipY = reader->ImageData.WindowsData.Info[i].ZipY;
 		 winInfo.StarID = 0;
 		 winInfo.Sp[0] = 0;
 		 winInfo.Sp[1] = 0;
@@ -3379,11 +3379,9 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 							plotter->AddPoint(ChartWx, 1, Time, vCadrInfo.back().OmegaModel[0] * RTM);
 							plotter->AddPoint(ChartWy, 1, Time, vCadrInfo.back().OmegaModel[1] * RTM);
 							plotter->AddPoint(ChartWz, 1, Time, vCadrInfo.back().OmegaModel[2] * RTM);
-
 						}
 					}
 					else throw logic_error(string("Не удалось считать ") + AnsiString(fileList->Strings[i]).c_str());
-
 				}
 
 				struct {
