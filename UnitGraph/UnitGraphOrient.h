@@ -155,7 +155,7 @@
 		TGroupBox *GroupBox1;
 		TLabel *Label8;
 		TUpDown *UpDown2;
-		TLabel *LabelFrameError;
+	TLabel *LabelFrameReport;
 		TCheckBox *PixelBrightCheckBox;
 		TEdit *PixelSizeEdit;
 		TLabel *Label9;

@@ -164,9 +164,6 @@ Coordinates=461,282,123,36
 [MenuOpenTMI]
 Coordinates=676,56,100,36
 
-[LabelFrameError]
-Coordinates=0,0,112,58
-
 [N1]
 Coordinates=412,310,40,36
 
@@ -209,4 +206,7 @@ Coordinates=73,214,67,58
 
 [OpenDialog]
 Coordinates=676,1,89,36
+
+[LabelFrameReport]
+Coordinates=0,0,112,58
 

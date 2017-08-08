@@ -407,7 +407,7 @@ void TFormGraphOrient::DrawBlock(const struct CadrInfo &mCadr)
 
 		if (CountLocalObj != mCadr.CountLocalObj) {
 
-			LabelFrameError->Caption = "Несоответствие числа фрагментов и массива ObjFrag[]!";
+			LabelFrameReport->Caption = "Несоответствие числа фрагментов и массива ObjFrag[]!";
 		}
 		delete [] ObjShiftWnd;
 
@@ -500,11 +500,11 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 	AnsiString NeededDirectory = GetCurrentDir() + "\\Frag_" + FileTitle;
 	if (!TDirectory::Exists(NeededDirectory))
 	{
-		LabelFrameError->Visible = true;
-		LabelFrameError->Caption = "Указан неверный путь к директории фрагментов";
+		LabelFrameReport->Visible = true;
+		LabelFrameReport->Caption = "Указан неверный путь к директории фрагментов";
 		return;
 	}
-	else LabelFrameError->Visible = false;
+	else LabelFrameReport->Visible = false;
 	
    TStringDynArray FileNameList;
    FileNameList = TDirectory::GetFiles(NeededDirectory);
@@ -3221,7 +3221,7 @@ void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec
 		 cadrInfo.WindowsList.push_back(winInfo);
 	}
 
-	if (reader->ImageData.WindowsData.Data != NULL) {
+	if (reader->ImageData.WindowsData.SizeData != 0) {
 		
 		std::string dirName = AnsiString(GetCurrentDir()).c_str() + std::string("/") + "Frag" + "_" + "IKI";
 		TDirectory::CreateDirectory(dirName.c_str());
@@ -3382,6 +3382,7 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 						}
 					}
 					else throw logic_error(string("Не удалось считать ") + AnsiString(fileList->Strings[i]).c_str());
+					LabelFrameReport->Caption = "Cчитано " + IntToStr(i + 1) + " файлов из " + IntToStr(fileList->Count / 2);
 				}
 
 				struct {
