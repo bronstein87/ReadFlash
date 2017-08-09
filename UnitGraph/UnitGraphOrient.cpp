@@ -3382,6 +3382,7 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 						}
 					}
 					else throw logic_error(string("Не удалось считать ") + AnsiString(fileList->Strings[i]).c_str());
+					Application->ProcessMessages();
 					LabelFrameReport->Caption = "Cчитано " + IntToStr(i + 1) + " файлов из " + IntToStr(fileList->Count / 2);
 				}
 
