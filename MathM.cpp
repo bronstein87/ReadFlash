@@ -129,3 +129,35 @@ void multMatrix(const double Matr1[3][3],const double Matr2[3][3], double Matr[3
         }
     }
 }
+
+template <class InputIterator, class T, class UnaryOperation>
+std::pair<T,T> calculateMeanStDv (InputIterator first, InputIterator last, T init, UnaryOperation extractWtC)
+{
+    if (first == last) return std::pair<T,T>(extractWtC(first), T());
+
+    T dispersio = 0;
+    for (InputIterator i = first;i < last;i ++)
+    {
+        init += extractWtC(i);
+        dispersio += pow(extractWtC(i), 2);
+    }
+    auto count = std::distance(first,last);
+    T mean = init / count;
+    dispersio = (dispersio / count) - pow(mean, 2);
+
+    return std::pair <T,T> (mean, sqrt(dispersio));
+
+}
+
+void ToGMS(double gradAngle, int& gradus, int& minutes, int& seconds)
+{
+	gradus = gradAngle;
+    minutes = std::abs(gradAngle - gradus) * 60;
+    seconds = (std::abs(gradAngle - gradus) - (static_cast <double> (minutes) / 60)) * 3600;
+
+    if (gradAngle < 0 && gradAngle > -1)
+    {
+        minutes = -minutes;
+        seconds = -seconds;
+	}
+}

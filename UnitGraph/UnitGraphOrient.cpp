@@ -4,6 +4,8 @@
 #pragma package(smart_init)
 #pragma link "VCLTee.TeeTools"
 #pragma link "VCLTee.TeeEdit"
+#pragma link "VCLTee.ErrorBar"
+#pragma link "VCLTee.TeeHighLowLine"
 #pragma resource "*.dfm"
 
 
@@ -20,13 +22,14 @@ void SwapShort(short *word1, short *word2)
 __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 		: TForm(Owner),
 		FormAnimateSetting(new TFormAnimateSetting(this)),
-		plotter(new SimplePlotter())
+		plotter(new SimplePlotter()),
+		ScaleFactorForScrollBox(10.2),
+		ScaleFactorForImage(10),
+		Contrast(1),
+		ResizeCoef(16),
+		FontSize(7)
+
 {
-		ScaleFactorForScrollBox = 10.2;
-		ScaleFactorForImage = 10;
-		Contrast = 1;
-		ResizeCoef = 16;
-		FontSize = 7;
 		Charts.push_back(ChartAl); Charts.push_back(ChartDl); Charts.push_back(ChartAz);
 		Charts.push_back(ChartWx); Charts.push_back(ChartWy); Charts.push_back(ChartWz);
 		Charts.push_back(ChartMx); Charts.push_back(ChartMy); Charts.push_back(ChartMxy);
@@ -34,6 +37,8 @@ __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 		Charts.push_back(ChartFone); Charts.push_back(ChartNoise); Charts.push_back(ChartTemp);
 		Charts.push_back(ChartAlError); Charts.push_back(ChartDlError); Charts.push_back(ChartAzError);
 		Charts.push_back(ChartWxError); Charts.push_back(ChartWyError); Charts.push_back(ChartWzError);
+		Charts.push_back(ChartAnalyzeErrorAl); Charts.push_back(ChartAnalyzeErrorDl); Charts.push_back(ChartAnalyzeErrorAz);
+		Charts.push_back(ChartAnalyzeXV); Charts.push_back(ChartAnalyzeYV); Charts.push_back(ChartAnalyzeZV);
 
 		for (int i = 0; i < Charts.size(); i++) {
 			Charts[i]->OnMouseWheel = &ChartMouseWheel;
@@ -77,12 +82,10 @@ void __fastcall TFormGraphOrient::MenuSaveClick(TObject *Sender)
 {
 	for (int i = 0; i < Charts.size(); i ++)
 	{
-		plotter->SaveChart(Charts[i],
-		Charts[i]->Title->ToString(),
-		StrToInt(EditSizeX->ToString()),
-		StrToInt(EditSizeY->ToString()));
+		UnicodeString Title = LeftStr(Charts[i]->Title->Text->Text, PosEx(",", Charts[i]->Title->Text->Text, 1) - 1);
+		plotter->SaveChart(Charts[i], Title, 500, 900);
 	}
-}       
+}
 
 
 void __fastcall TFormGraphOrient::FormCreate(TObject *Sender)
@@ -174,13 +177,12 @@ void TFormGraphOrient::PrintTableWindows(const struct CadrInfo &mCadr)
 											  + String(mCadr.WindowsList[i].Height);
 			TableWindowsInfo->Cells[k++][i+1] = String(mCadr.WindowsList[i].ZipX) + "x"
 											  + String(mCadr.WindowsList[i].ZipY);
-	//		TableWindowsInfo->Cells[4][i]=String(mCadr.WindowsList[i].StarID);
 		}
 	}
 	else
 	{
-		TableWindowsInfo->RowCount=TableWindowsInfo->FixedRows+1;
-		for (int k=0; k<TableWindowsInfo->ColCount; k++) {
+		TableWindowsInfo->RowCount = TableWindowsInfo->FixedRows+1;
+		for (int k = 0; k < TableWindowsInfo->ColCount; k ++) {
 			TableWindowsInfo->Cells[k][1] = "";
         }
     }
@@ -201,7 +203,6 @@ void TFormGraphOrient::InitTableObjects(void)
 	TableObjectsInfo->ColCount = 10;
 	TableObjectsInfo->FixedCols = 0;
 	TableObjectsInfo->FixedRows = 1;
-
 	TableObjectsInfo->Cells[k++][0] = "№";
 	TableObjectsInfo->Cells[k++][0] = "Xloc";
 	TableObjectsInfo->Cells[k++][0] = "Yloc";
@@ -221,10 +222,7 @@ void TFormGraphOrient::PrintTableObjects(const struct CadrInfo &mCadr)
 		TableObjectsInfo->RowCount = mCadr.SizeObjectsList+TableWindowsInfo->FixedRows;
 
 		for (int i = 0; i<mCadr.SizeObjectsList; i++) {
-			if (mCadr.ObjectsList[i].StarID) {
-//				for (int j=0; j<TableObjectsInfo->ColCount; j++)
-//					TableObjectsInfo->Cells[j][i+1]->Color=clRed;
-			}
+
 			int k = 0;
 			TableObjectsInfo->Cells[k++][i+1] = String(i+1);
 			TableObjectsInfo->Cells[k++][i+1] = FloatToStrF(mCadr.ObjectsList[i].X, ffFixed,10,4);
@@ -241,9 +239,9 @@ void TFormGraphOrient::PrintTableObjects(const struct CadrInfo &mCadr)
 	}
 	else
 	{
-		TableObjectsInfo->RowCount=TableObjectsInfo->FixedRows+1;
-		for (int k=0; k<TableObjectsInfo->ColCount; k++) {
-			TableObjectsInfo->Cells[k][1]="-";
+		TableObjectsInfo->RowCount = TableObjectsInfo->FixedRows + 1;
+		for (int k = 0; k < TableObjectsInfo->ColCount; k++) {
+			TableObjectsInfo->Cells[k][1] = "-";
         }
 	}
 }
@@ -274,7 +272,7 @@ void TFormGraphOrient::SetVisibleLabelFrame(bool isVisible)
 {
 	for (int i=0; i<MaxFrameSeries; i++)
 	{
-		FrameSeries[i]->Marks->Visible=isVisible;
+		FrameSeries[i]->Marks->Visible = isVisible;
 	}
 }
 
@@ -406,7 +404,6 @@ void TFormGraphOrient::DrawBlock(const struct CadrInfo &mCadr)
 		}
 
 		if (CountLocalObj != mCadr.CountLocalObj) {
-
 			LabelFrameReport->Caption = "Несоответствие числа фрагментов и массива ObjFrag[]!";
 		}
 		delete [] ObjShiftWnd;
@@ -504,8 +501,7 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 		LabelFrameReport->Caption = "Указан неверный путь к директории фрагментов";
 		return;
 	}
-	else LabelFrameReport->Visible = false;
-	
+
    TStringDynArray FileNameList;
    FileNameList = TDirectory::GetFiles(NeededDirectory);
    AnsiString TimePrStr = FloatToStr(mCadr.Time);
@@ -548,7 +544,7 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 		ImageScrollBoxVector.back()->Width = Fragment->Width * ScaleFactorForScrollBox;
 		ImageScrollBoxVector.back()->OnVerticalScroll = &OnScroll;
 		ImageScrollBoxVector.back()->OnHorizontalScroll = &OnScroll;
-		ImageScrollBoxVector.back()->Height=Fragment->Height * ScaleFactorForScrollBox;
+		ImageScrollBoxVector.back()->Height = Fragment->Height * ScaleFactorForScrollBox;
 		ImageScrollBoxVector.back()->OnMouseWheelUp= &FormMouseWheelUp;
 		ImageScrollBoxVector.back()->OnMouseWheelDown= &FormMouseWheelDown;
 		ImageScrollBoxVector.back()->SetParentComponent(FragmentShowScrollBox);
@@ -572,7 +568,7 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 		FragmentNumber->Width = 15;
 		FragmentNumber->Canvas->Brush->Color = clWhite;
 		TRect TheRect = Rect(0, 0, 15, 15);
-		FragmentNumber->Canvas->TextRect(TheRect, 0, 0, IntToStr(CurrentFragment));
+		FragmentNumber->Canvas->TextRect(TheRect, 0, 0, IntToStr(CurrentFragment + 1));
 		FragmentNumber->SetParentComponent(ImageScrollBoxVector.back());
 		FragmentsNumbers.push_back(FragmentNumber);
 
@@ -589,7 +585,7 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 	{
 		for(int i = 0; i < ImageVector.size(); i ++)
 		{
-			writePixelValue(FragmentVector[i], ImageVector[i]->Picture->Bitmap, ResizeCoef, 5 , 7);
+			writePixelValue(FragmentVector[i], ImageVector[i]->Picture->Bitmap, ResizeCoef, 5, 7);
 		}
 	}
 }
@@ -597,7 +593,7 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 void __fastcall TFormGraphOrient::OnScroll(TObject* Sender)
 {
 	FragmentScrollBox* ScrollBox = dynamic_cast <FragmentScrollBox*> (Sender);
-	TImage* FragmentNumber = dynamic_cast <TImage*>( ScrollBox->Components[1]);
+	TImage* FragmentNumber = dynamic_cast  <TImage*> ( ScrollBox->Components[1]);
 	FragmentNumber->Top = 0;
 	FragmentNumber->Left = 0;
 
@@ -661,7 +657,6 @@ void __fastcall TFormGraphOrient::FragmentShowScrollBoxResize(TObject *Sender)
 	   ImageVector[currentFragment]->Canvas->
 	   StretchDraw(Rect(0, 0, ImageVector[currentFragment]->Width, ImageVector[currentFragment]->Height),Fragment.get());
 	   resizeBitmap(FragmentVector[currentFragment].SizeX * ResizeCoef, FragmentVector[currentFragment].SizeY * ResizeCoef, ImageVector[currentFragment]->Picture->Bitmap);
-
 	}
 }
 
@@ -812,13 +807,16 @@ void  TFormGraphOrient::DrawAnimateHandler(void)
 	{
 		CadrInfo CurCadr;
 		int cnt = StrToInt(EditNumCadr->Text);
-
 		if (!GetCadrInfo(cnt, CurCadr))
 		{
 			if (FormAnimateSetting->CheckBoxCurrentTime) {
 				 SynchronizeCharts(CurCadr.Time);
 			}
-			  DrawAnimate(CurCadr);
+
+			if (CurCadr.FrameNumber != 0) {
+				LabelFrameReport->Caption = "Номер кадра из файла: " + IntToStr(CurCadr.FrameNumber);
+			}
+			DrawAnimate(CurCadr);
 		}
 	}
 	catch(std::exception &e)
@@ -832,7 +830,7 @@ void  TFormGraphOrient::PrintTableWindowsHandler(void)
 	try
 	{
 		CadrInfo CurCadr;
-		int cnt=StrToInt(EditNumCadr->Text);
+		int cnt = StrToInt(EditNumCadr->Text);
 
 		if (!GetCadrInfo(cnt, CurCadr))
 		{
@@ -850,7 +848,7 @@ void  TFormGraphOrient::PrintTableObjectsHandler(void)
 	try
 	{
 		CadrInfo CurCadr;
-		int cnt=StrToInt(EditNumCadr->Text);
+		int cnt = StrToInt(EditNumCadr->Text);
 
 		if (!GetCadrInfo(cnt, CurCadr))
 		{
@@ -1102,7 +1100,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 			fread(&Marker,sizeof(int),1,fflesh);
 			if (GetInt(Marker) == 0x55550000)
 			{
-				fread(&buf,sizeof(short),2,fflesh);
+				fread(&buf,sizeof(short), 2, fflesh);
 				fprintf(ftxt,"%6d 0x%04x %10d\n",buf[0],buf[1], CntWord*sizeof(CntWord));
 				CntWord=2;
 			}
@@ -1535,8 +1533,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 		fclose(flog_reg);
 		fclose(flog_pix);
 		fclose(flog_orient);
-
-        PrepareStartDraw();
+		PrepareStartDraw();
 	 }
   }
 	catch(std::string &s)
@@ -2684,8 +2681,6 @@ void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrIn
 						objInfo.Dy = 0;
 						cadrInfo.ObjectsList.push_back(objInfo);
 				}
-
-
 		   }
 			else throw std::logic_error(errorMessage);
 
@@ -3134,6 +3129,7 @@ void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec
 {
 	CadrInfo cadrInfo;
 	cadrInfo.Time = reader->Georeferencing.DateTime.Val;
+	cadrInfo.FrameNumber = reader->Georeferencing.FrameNumber;
 	cadrInfo.IsBinary = reader->ImageData.FrameData.DegreeBinning;
 	cadrInfo.DataType = reader->ImageData.FrameData.DataType;
 	cadrInfo.IsReverse = false;
@@ -3309,46 +3305,46 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 {
 	try
 	{
+		LabelFrameReport->Caption = "HELLO";
 		OpenDialog->Filter = "iki|*.iki";
 		OpenDialog->Options << ofAllowMultiSelect;
 		if (OpenDialog->Execute())
 		{
-			std::unique_ptr <TStringList> fileList (new TStringList());
-			fileList->Assign(OpenDialog->Files);
-
+			std::unique_ptr <TStringList> FileList (new TStringList());
+			FileList->Assign(OpenDialog->Files);
 			OpenDialog->Filter = "res|*.res";
 			if (OpenDialog->Execute())
 			{
-				vCadrInfo.clear();
-				DeleteLineGraph();
-				FileTitle = "IKI";
 				plotter->ResetOptions();
-				fileList->AddStrings(OpenDialog->Files);
-				fileList->Sort();
-				SetCurrentDir(ExtractFileDir(fileList->Strings[0]));
+				DeleteLineGraph();
+				vCadrInfo.clear();
+				FileTitle = "IKI";
+				FileList->AddStrings(OpenDialog->Files);
+				FileList->Sort();
+				SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
 
-				for (int i = 0; i < fileList->Count; i ++)
+				for (int i = 0; i < FileList->Count; i ++)
 				{
 					std::unique_ptr <IKI_img> reader(new IKI_img());
-					if	(reader->ReadFormat(fileList->Strings[i], false))
+					if	(reader->ReadFormat(FileList->Strings[i], false))
 					{
-						if	(i != fileList->Count - 1
-						&& AnsiContainsStr(fileList->Strings[i + 1], ".res"))
+						if	(i != FileList->Count - 1
+						&& AnsiContainsStr(FileList->Strings[i + 1], ".res"))
 						{
-							if (reader->ReadFormat(fileList->Strings[i + 1], false))
+							if (reader->ReadFormat(FileList->Strings[i + 1], false))
 							{
 								CompareIKIRes = true;
 								i = i + 1;
 							}
-							else throw logic_error(string("Не удалось считать ") + AnsiString(fileList->Strings[i + 1]).c_str());
+							else throw logic_error(string("Не удалось считать ") + AnsiString(FileList->Strings[i + 1]).c_str());
 						}
 
 						convertIKIFormatToInfoCadr(reader.get(), vCadrInfo, CompareIKIRes);
 						double Time =  vCadrInfo.back().Time;
+
 						if (vCadrInfo.back().IsOrient)
 						{
 							plotter->SetTitle("измерения");
-
 							plotter->AddPoint(ChartMx, 0, Time, vCadrInfo.back().MeanErrorX * 1000.);
 							plotter->AddPoint(ChartMy, 0, Time, vCadrInfo.back().MeanErrorY * 1000.);
 							plotter->AddPoint(ChartMxy, 0, Time, vCadrInfo.back().MeanErrorXY * 1000.);
@@ -3380,12 +3376,16 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 							plotter->AddPoint(ChartWy, 1, Time, vCadrInfo.back().OmegaModel[1] * RTM);
 							plotter->AddPoint(ChartWz, 1, Time, vCadrInfo.back().OmegaModel[2] * RTM);
 						}
+						if (i % 100 == 0)
+						{
+							Application->ProcessMessages();
+							LabelFrameReport->Caption = "Cчитано " + IntToStr(i / 2) + " файлов из " + IntToStr(FileList->Count / 2);
+						}
 					}
-					else throw logic_error(string("Не удалось считать ") + AnsiString(fileList->Strings[i]).c_str());
-					Application->ProcessMessages();
-					LabelFrameReport->Caption = "Cчитано " + IntToStr(i + 1) + " файлов из " + IntToStr(fileList->Count / 2);
-				}
+					else throw logic_error(string("Не удалось считать ") + AnsiString(FileList->Strings[i]).c_str());
 
+
+				}
 				struct {
 
 					bool operator()(const CadrInfo& a,const CadrInfo& b)
@@ -3436,4 +3436,218 @@ void __fastcall TFormGraphOrient::ChartMouseDown(TObject *Sender, TMouseButton B
 	   Chart->Zoom->Direction = tzdBoth;
 	}
 }
+
+ // перенести
+template <class InputIterator, class Value, class UnaryOperation>
+std::pair<Value, Value> calculateMeanStdDv (InputIterator first, InputIterator last, Value init, UnaryOperation extractWtC)
+{
+	if (first == last) return std::pair<Value, Value>(extractWtC(*first), Value());
+
+	Value dispersio = 0;
+	for (InputIterator i = first;i < last;i ++)
+	{
+		init += extractWtC(*i);
+		dispersio += pow(extractWtC(*i), 2);
+	}
+	auto count = std::distance(first,last);
+	Value mean = init / count;
+	dispersio = (dispersio / count) - pow(mean, 2);
+
+	return std::pair <Value,Value> (mean, sqrt(dispersio));
+}
+
+
+void __fastcall TFormGraphOrient::ErrorAnalyzeClick(TObject *Sender)
+{
+	FileOpenDialog1->Options << fdoPickFolders << fdoAllowMultiSelect;
+	if (FileOpenDialog1->Execute())
+	{
+		TPointSeries* seriesXMax = new TPointSeries(ChartAnalyzeXV);
+		seriesXMax->Title = "Максимум";
+		TPointSeries* seriesYMax = new TPointSeries(ChartAnalyzeYV);
+		seriesYMax->Title = "Максимум";
+		TPointSeries* seriesZMax = new TPointSeries(ChartAnalyzeZV);
+		seriesZMax->Title = "Максимум";
+		TPointSeries* seriesAlMax = new TPointSeries(ChartAnalyzeErrorAl);
+		seriesAlMax->Title = "Максимум";
+		TPointSeries* seriesDlMax = new TPointSeries(ChartAnalyzeErrorDl);
+		seriesDlMax->Title = "Максимум";
+		TPointSeries* seriesAzMax = new TPointSeries(ChartAnalyzeErrorAz);
+		seriesAzMax->Title = "Максимум";
+
+		TPointSeries* seriesXMin = new TPointSeries(ChartAnalyzeXV);
+		seriesXMin->Title = "Минимум";
+		TPointSeries* seriesYMin = new TPointSeries(ChartAnalyzeYV);
+		seriesYMin->Title = "Минимум";
+		TPointSeries* seriesZMin = new TPointSeries(ChartAnalyzeZV);
+		seriesZMin->Title = "Минимум";
+		TPointSeries* seriesAlMin = new TPointSeries(ChartAnalyzeErrorAl);
+		seriesAlMin->Title = "Минимум";
+		TPointSeries* seriesDlMin = new TPointSeries(ChartAnalyzeErrorDl);
+		seriesDlMin->Title = "Минимум";
+		TPointSeries* seriesAzMin = new TPointSeries(ChartAnalyzeErrorAz);
+		seriesAzMin->Title = "Минимум";
+
+		TPointSeries* seriesXSKO = new TPointSeries(ChartAnalyzeXV);
+		seriesXSKO->Title = "СКО";
+		TPointSeries* seriesYSKO = new TPointSeries(ChartAnalyzeYV);
+		seriesYSKO->Title = "СКО";
+		TPointSeries* seriesZSKO = new TPointSeries(ChartAnalyzeZV);
+		seriesZSKO->Title = "СКО";
+		TPointSeries* seriesAlSKO = new TPointSeries(ChartAnalyzeErrorAl);
+		seriesAlSKO->Title = "СКО";
+		TPointSeries* seriesDlSKO = new TPointSeries(ChartAnalyzeErrorDl);
+		seriesDlSKO->Title = "СКО";
+		TPointSeries* seriesAzSKO = new TPointSeries(ChartAnalyzeErrorAz);
+		seriesAzSKO->Title = "СКО";
+
+		TPointSeries* seriesXMean =  new TPointSeries(ChartAnalyzeXV);
+		seriesXMean->Title = "Среднее";
+		TPointSeries* seriesYMean =  new TPointSeries(ChartAnalyzeYV);
+		seriesYMean->Title = "Среднее";
+		TPointSeries* seriesZMean =  new TPointSeries(ChartAnalyzeZV);
+		seriesZMean->Title = "Среднее";
+		TPointSeries* seriesAlMean = new TPointSeries(ChartAnalyzeErrorAl);
+		seriesAlMean->Title = "Среднее";
+		TPointSeries* seriesDlMean = new TPointSeries(ChartAnalyzeErrorDl);
+		seriesDlMean->Title = "Среднее";
+		TPointSeries* seriesAzMean = new TPointSeries(ChartAnalyzeErrorAz);
+		seriesAzMean->Title = "Среднее";
+
+		ChartAnalyzeXV->AddSeries(seriesXMax);
+		ChartAnalyzeXV->AddSeries(seriesXMin);
+		ChartAnalyzeXV->AddSeries(seriesXSKO);
+		ChartAnalyzeXV->AddSeries(seriesXMean);
+		ChartAnalyzeYV->AddSeries(seriesYMax);
+		ChartAnalyzeYV->AddSeries(seriesYMin);
+		ChartAnalyzeYV->AddSeries(seriesYSKO);
+		ChartAnalyzeYV->AddSeries(seriesYMean);
+		ChartAnalyzeZV->AddSeries(seriesZMax);
+		ChartAnalyzeZV->AddSeries(seriesZMin);
+		ChartAnalyzeZV->AddSeries(seriesZSKO);
+		ChartAnalyzeZV->AddSeries(seriesZMean);
+		ChartAnalyzeErrorAl->AddSeries(seriesAlMax);
+		ChartAnalyzeErrorAl->AddSeries(seriesAlMin);
+		ChartAnalyzeErrorAl->AddSeries(seriesAlSKO);
+		ChartAnalyzeErrorAl->AddSeries(seriesAlMean);
+		ChartAnalyzeErrorDl->AddSeries(seriesDlMax);
+		ChartAnalyzeErrorDl->AddSeries(seriesDlMin);
+		ChartAnalyzeErrorDl->AddSeries(seriesDlSKO);
+		ChartAnalyzeErrorDl->AddSeries(seriesDlMean);
+		ChartAnalyzeErrorAz->AddSeries(seriesAzMax);
+		ChartAnalyzeErrorAz->AddSeries(seriesAzMin);
+		ChartAnalyzeErrorAz->AddSeries(seriesAzSKO);
+		ChartAnalyzeErrorAz->AddSeries(seriesAzMean);
+
+		std::unique_ptr <IKI_img> reader(new IKI_img());
+		for (int i = 0; i < FileOpenDialog1->Files->Count; i ++)
+		{
+			
+			TStringDynArray FileNameList = TDirectory::GetFiles(FileOpenDialog1->Files->Strings[i]);
+			std::unique_ptr <TStringList> FileList (new TStringList());
+			for (int fileIndex = FileNameList.Low; fileIndex < FileNameList.High; fileIndex ++)
+			{
+				FileList->Add(FileNameList[fileIndex]);
+			} 
+
+			typedef System::Math::Vectors::TPoint3D Point;
+			vector <Point> AngularSpeedErrorValues;
+			vector <Point> AngleErrorValues;
+			
+			for (int j = 0; j < FileList->Count; j ++)
+			{
+			   if (reader->ReadFormat(FileList->Strings[j], false))
+			   {
+
+					if	(j != FileList->Count - 1
+					&& AnsiContainsStr(FileList->Strings[j + 1], ".res"))
+					{
+						if (reader->ReadFormat(FileList->Strings[j + 1], false))
+						{
+							j = j + 1;
+						}
+						else throw logic_error(string("Не удалось считать ") + AnsiString(FileList->Strings[i + 1]).c_str());
+
+						AngularSpeedErrorValues.push_back(
+						Point::Create(reader->StarsData.RecognizedAngularVelocity[0] - reader->Georeferencing.DeviceAngularVelocity[0],
+						reader->StarsData.RecognizedAngularVelocity[1] - reader->Georeferencing.DeviceAngularVelocity[1],
+						reader->StarsData.RecognizedAngularVelocity[2] - reader->Georeferencing.DeviceAngularVelocity[2]));
+
+						AngleErrorValues.push_back(
+						Point::Create(reader->StarsData.RecognizedOrientationAngles[0] - reader->Georeferencing.OrientationAngles[0],
+						reader->StarsData.RecognizedOrientationAngles[1] - reader->Georeferencing.OrientationAngles[1],
+						reader->StarsData.RecognizedOrientationAngles[2] - reader->Georeferencing.OrientationAngles[2]));	
+					}
+					
+			   }
+			   else throw logic_error(string("Не удалось считать ") + AnsiString(FileList->Strings[i + 1]).c_str());
+			}
+
+
+				 int gradus, minutes, seconds;
+				 ToGMS (reader->StarsData.RecognizedAngularVelocity[0] * RTD, gradus, minutes, seconds);
+				 UnicodeString Label = FloatToStr(gradus) + "г." + FloatToStr(minutes) + "м." + FloatToStr(seconds) + "c.";
+
+				 struct { bool operator()(const Point& a,const Point& b) { return a.X < b.X;} } ComparePointX;
+				 struct { float operator() (const Point& a) {return a.X;} } AddX;
+
+				 vector <Point>::iterator Max = std::max_element(AngularSpeedErrorValues.begin(), AngularSpeedErrorValues.end(), ComparePointX);
+				 vector <Point>::iterator Min = std::min_element(AngularSpeedErrorValues.begin(), AngularSpeedErrorValues.end(), ComparePointX);
+				 std::pair <float, float> MeanSkoX = calculateMeanStdDv(AngularSpeedErrorValues.begin(), AngularSpeedErrorValues.end(),0.0, AddX);
+				 seriesXMax->AddXY(i, Max->X * RTS, Label);
+				 seriesXMin->AddXY(i, Min->X * RTS, Label);
+				 seriesXSKO->AddXY(i, MeanSkoX.second * RTS, Label);
+				 seriesXMean->AddXY(i, MeanSkoX.first * RTS, Label);
+
+				 Max = std::max_element(AngleErrorValues.begin(), AngleErrorValues.end(), ComparePointX);
+				 Min = std::min_element(AngleErrorValues.begin(), AngleErrorValues.end(), ComparePointX);
+				 MeanSkoX = calculateMeanStdDv(AngleErrorValues.begin(), AngleErrorValues.end(),0.0, AddX);
+				 seriesAlMax->AddXY(i, Max->X * RTS, Label);
+				 seriesAlMin->AddXY(i, Min->X * RTS, Label);
+				 seriesAlSKO->AddXY(i, MeanSkoX.second * RTS, Label);
+				 seriesAlMean->AddXY(i, MeanSkoX.first * RTS, Label);
+
+				 struct { bool operator()(const Point& a,const Point& b) { return a.Y < b.Y; } } ComparePointY;
+				 struct { float operator() (const Point& a) { return a.Y;} } AddY;
+
+				 Max = std::max_element(AngularSpeedErrorValues.begin(), AngularSpeedErrorValues.end(), ComparePointY);
+				 Min = std::min_element(AngularSpeedErrorValues.begin(), AngularSpeedErrorValues.end(), ComparePointY);
+				 std::pair <float, float> MeanSkoY = calculateMeanStdDv(AngularSpeedErrorValues.begin(), AngularSpeedErrorValues.end(),0.0, AddY);
+				 seriesYMax->AddXY(i, Max->X * RTS, Label);
+				 seriesYMin->AddXY(i, Min->X * RTS, Label);
+				 seriesYSKO->AddXY(i, MeanSkoY.second * RTS, Label);
+				 seriesYMean->AddXY(i, MeanSkoY.first * RTS, Label);
+
+				 Max = std::max_element(AngleErrorValues.begin(), AngleErrorValues.end(), ComparePointY);
+				 Min = std::min_element(AngleErrorValues.begin(), AngleErrorValues.end(), ComparePointY);
+				 MeanSkoY = calculateMeanStdDv(AngleErrorValues.begin(), AngleErrorValues.end(),0.0, AddY);
+				 seriesDlMax->AddXY(i, Max->X * RTS, Label);
+				 seriesDlMin->AddXY(i, Min->X * RTS, Label);
+				 seriesDlSKO->AddXY(i, MeanSkoY.second * RTS, Label);
+				 seriesDlMean->AddXY(i, MeanSkoY.first * RTS, Label);
+
+				 struct { bool operator() (const Point& a,const Point& b) { return a.Z < b.Z; } } ComparePointZ;
+				 struct { float operator() (const Point& a) { return a.Z;} } AddZ;
+				
+				 Max = std::max_element(AngularSpeedErrorValues.begin(), AngularSpeedErrorValues.end(), ComparePointZ);
+				 Min = std::min_element(AngularSpeedErrorValues.begin(), AngularSpeedErrorValues.end(), ComparePointZ);
+				 std::pair <float, float> MeanSkoZ = calculateMeanStdDv(AngularSpeedErrorValues.begin(), AngularSpeedErrorValues.end(),0.0, AddZ);
+				 seriesZMax->AddXY(i, Max->X * RTS, Label);
+				 seriesZMin->AddXY(i, Min->X * RTS, Label);
+				 seriesZSKO->AddXY(i, MeanSkoZ.second * RTS, Label);
+				 seriesZMean->AddXY(i, MeanSkoZ.first * RTS, Label);
+
+				 Max = std::max_element(AngleErrorValues.begin(), AngleErrorValues.end(), ComparePointZ);
+				 Min = std::min_element(AngleErrorValues.begin(), AngleErrorValues.end(), ComparePointZ);
+				 MeanSkoZ = calculateMeanStdDv(AngleErrorValues.begin(), AngleErrorValues.end(),0.0, AddZ);
+				 seriesAzMax->AddXY(i, Max->X * RTS, Label);
+				 seriesAzMin->AddXY(i, Min->X * RTS, Label);
+				 seriesAzSKO->AddXY(i, MeanSkoZ.second * RTS, Label);
+				 seriesAzMean->AddXY(i, MeanSkoZ.first * RTS, Label);
+		}
+	}
+
+
+}
+//---------------------------------------------------------------------------
 

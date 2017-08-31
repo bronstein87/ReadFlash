@@ -27,7 +27,9 @@
 	#include <Vcl.ExtCtrls.hpp>
 	#include <Vcl.WinXCtrls.hpp>
 	#include "VCLTee.TeeTools.hpp"
-#include "VCLTee.TeeEdit.hpp"
+	#include "VCLTee.TeeEdit.hpp"
+	#include "VCLTee.ErrorBar.hpp"
+	#include "VCLTee.TeeHighLowLine.hpp"
 	#include <vector>
 	#include <Classes.hpp>
 	#include <Controls.hpp>
@@ -85,7 +87,7 @@
 	__published:	// IDE-managed Components
 		TButton *ButtonAdd;
 		TButton *ButtonClear;
-		TPageControl *PageControl2;
+	TPageControl *Fyf;
 		TTabSheet *TabSheet5;
 		TTabSheet *TabSheet6;
 		TChart *ChartWx;
@@ -155,7 +157,7 @@
 		TGroupBox *GroupBox1;
 		TLabel *Label8;
 		TUpDown *UpDown2;
-	TLabel *LabelFrameReport;
+		TLabel *LabelFrameReport;
 		TCheckBox *PixelBrightCheckBox;
 		TEdit *PixelSizeEdit;
 		TLabel *Label9;
@@ -176,10 +178,20 @@
 		TChart *ChartWyError;
 		TChart *ChartWzError;
 		TChartEditor *ChartEditor1;
-	TChart *ChartMxy;
-	TChart *ChartDl;
-	TChart *ChartAz;
-	TChart *ChartAl;
+		TChart *ChartMxy;
+		TChart *ChartAl;
+		TChart *ChartDl;
+		TChart *ChartAz;
+	TTabSheet *TabSheet12;
+	TChart *ChartAnalyzeXV;
+	TChart *ChartAnalyzeYV;
+	TChart *ChartAnalyzeZV;
+	TMenuItem *ErrorAnalyze;
+	TFileOpenDialog *FileOpenDialog1;
+	TTabSheet *TabSheet13;
+	TChart *ChartAnalyzeErrorAl;
+	TChart *ChartAnalyzeErrorDl;
+	TChart *ChartAnalyzeErrorAz;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -206,6 +218,7 @@
 		void __fastcall PixelSizeEditChange(TObject *Sender);
 		void __fastcall FontSizeEditChange(TObject *Sender);
 		void __fastcall ReadIKIFormatClick(TObject *Sender);
+	void __fastcall ErrorAnalyzeClick(TObject *Sender);
 
 
 	private:	// User declarations

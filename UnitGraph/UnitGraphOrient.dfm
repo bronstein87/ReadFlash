@@ -45,9 +45,10 @@ object FormGraphOrient: TFormGraphOrient
   object LabelFrameReport: TLabel
     Left = 16
     Top = 797
-    Width = 3
+    Width = 10
     Height = 13
     Anchors = [akLeft, akBottom]
+    Caption = 'lol'
   end
   object ButtonAdd: TButton
     Left = 1040
@@ -68,12 +69,12 @@ object FormGraphOrient: TFormGraphOrient
     TabOrder = 1
     Visible = False
   end
-  object PageControl2: TPageControl
+  object Fyf: TPageControl
     Left = 16
     Top = 8
     Width = 1160
     Height = 777
-    ActivePage = TabSheet5
+    ActivePage = TabSheet12
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 2
     object TabSheet5: TTabSheet
@@ -81,9 +82,9 @@ object FormGraphOrient: TFormGraphOrient
       DesignSize = (
         1152
         749)
-      object ChartDl: TChart
+      object ChartAl: TChart
         Left = 16
-        Top = 259
+        Top = 17
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
@@ -94,14 +95,8 @@ object FormGraphOrient: TFormGraphOrient
         Title.Font.Height = -13
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
-          #1057#1082#1083#1086#1085#1077#1085#1080#1077', '#1075#1088#1072#1076)
-        BottomAxis.Automatic = False
-        BottomAxis.AutomaticMaximum = False
-        BottomAxis.AutomaticMinimum = False
+          #1055#1088#1103#1084#1086#1077' '#1074#1086#1089#1093#1086#1078#1076#1077#1085#1080#1077', '#1075#1088#1072#1076)
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
-        LeftAxis.Automatic = False
-        LeftAxis.AutomaticMaximum = False
-        LeftAxis.AutomaticMinimum = False
         LeftAxis.AxisValuesFormat = '#,##0.#####'
         Panning.MouseWheel = pmwNone
         RightAxis.Automatic = False
@@ -124,9 +119,9 @@ object FormGraphOrient: TFormGraphOrient
           39)
         ColorPaletteIndex = 13
       end
-      object ChartAz: TChart
+      object ChartDl: TChart
         Left = 16
-        Top = 504
+        Top = 265
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
@@ -137,10 +132,16 @@ object FormGraphOrient: TFormGraphOrient
         Title.Font.Height = -13
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
-          #1040#1079#1080#1084#1091#1090', '#1075#1088#1072#1076)
+          #1057#1082#1083#1086#1085#1077#1085#1080#1077', '#1075#1088#1072#1076)
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
         Panning.MouseWheel = pmwNone
+        RightAxis.Automatic = False
+        RightAxis.AutomaticMaximum = False
+        RightAxis.AutomaticMinimum = False
+        TopAxis.Automatic = False
+        TopAxis.AutomaticMaximum = False
+        TopAxis.AutomaticMinimum = False
         View3D = False
         Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
@@ -155,9 +156,9 @@ object FormGraphOrient: TFormGraphOrient
           39)
         ColorPaletteIndex = 13
       end
-      object ChartAl: TChart
+      object ChartAz: TChart
         Left = 16
-        Top = 17
+        Top = 509
         Width = 1117
         Height = 250
         BackWall.Brush.Style = bsClear
@@ -168,10 +169,16 @@ object FormGraphOrient: TFormGraphOrient
         Title.Font.Height = -13
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
-          #1055#1088#1103#1084#1086#1077' '#1074#1086#1089#1093#1086#1078#1076#1077#1085#1080#1077', '#1075#1088#1072#1076)
+          #1040#1079#1080#1084#1091#1090', '#1075#1088#1072#1076)
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
         Panning.MouseWheel = pmwNone
+        RightAxis.Automatic = False
+        RightAxis.AutomaticMaximum = False
+        RightAxis.AutomaticMinimum = False
+        TopAxis.Automatic = False
+        TopAxis.AutomaticMaximum = False
+        TopAxis.AutomaticMinimum = False
         View3D = False
         Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
@@ -262,6 +269,103 @@ object FormGraphOrient: TFormGraphOrient
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
         Panning.MouseWheel = pmwNone
+        View3D = False
+        Zoom.MouseWheel = pmwNormal
+        BevelOuter = bvNone
+        Color = clWhite
+        TabOrder = 2
+        Anchors = [akLeft, akRight]
+        DefaultCanvas = 'TTeeCanvas3D'
+        ColorPaletteIndex = 13
+      end
+    end
+    object TabSheet13: TTabSheet
+      Caption = #1040#1085#1072#1083#1080#1079' '#1086#1096#1080#1073#1086#1082' '#1091#1075#1083#1086#1074
+      ImageIndex = 13
+      DesignSize = (
+        1152
+        749)
+      object ChartAnalyzeErrorAl: TChart
+        Left = -4
+        Top = 0
+        Width = 1117
+        Height = 250
+        BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
+        Legend.LegendStyle = lsSeries
+        Legend.Shadow.HorizSize = 0
+        Legend.Shadow.VertSize = 0
+        Title.Font.Height = -13
+        Title.Font.Style = [fsBold]
+        Title.Text.Strings = (
+          #1054#1096#1080#1073#1082#1072' '#1087#1088#1103#1084#1086#1075#1086' '#1074#1086#1089#1093#1086#1078#1076#1077#1085#1080#1103', '#1091#1075#1083'. '#1089#1077#1082)
+        BottomAxis.Title.Caption = #1057#1082#1086#1088#1086#1089#1090#1100', '#1043#1052#1057
+        LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
+        View3D = False
+        Zoom.MouseWheel = pmwNormal
+        BevelOuter = bvNone
+        Color = clWhite
+        TabOrder = 0
+        Anchors = [akLeft, akRight]
+        DefaultCanvas = 'TTeeCanvas3D'
+        ColorPaletteIndex = 13
+      end
+      object ChartAnalyzeErrorDl: TChart
+        Left = -4
+        Top = 256
+        Width = 1117
+        Height = 250
+        BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
+        Legend.LegendStyle = lsSeries
+        Legend.Shadow.HorizSize = 0
+        Legend.Shadow.VertSize = 0
+        Title.Font.Height = -13
+        Title.Font.Style = [fsBold]
+        Title.Text.Strings = (
+          #1054#1096#1080#1073#1082#1072' '#1089#1082#1083#1086#1085#1077#1085#1080#1103', '#1091#1075#1083'. '#1089#1077#1082)
+        BottomAxis.Title.Caption = #1057#1082#1086#1088#1086#1089#1090#1100', '#1043#1052#1057
+        LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
+        RightAxis.Automatic = False
+        RightAxis.AutomaticMaximum = False
+        RightAxis.AutomaticMinimum = False
+        TopAxis.Automatic = False
+        TopAxis.AutomaticMaximum = False
+        TopAxis.AutomaticMinimum = False
+        View3D = False
+        Zoom.MouseWheel = pmwNormal
+        BevelOuter = bvNone
+        Color = clWhite
+        TabOrder = 1
+        Anchors = [akLeft, akRight]
+        DefaultCanvas = 'TTeeCanvas3D'
+        ColorPaletteIndex = 13
+      end
+      object ChartAnalyzeErrorAz: TChart
+        Left = -4
+        Top = 508
+        Width = 1117
+        Height = 250
+        BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
+        Legend.LegendStyle = lsSeries
+        Legend.Shadow.HorizSize = 0
+        Legend.Shadow.VertSize = 0
+        Title.Font.Height = -13
+        Title.Font.Style = [fsBold]
+        Title.Text.Strings = (
+          #1054#1096#1080#1073#1082#1072' '#1072#1079#1080#1084#1091#1090#1072', '#1091#1075#1083'. '#1089#1077#1082)
+        BottomAxis.Title.Caption = #1057#1082#1086#1088#1086#1089#1090#1100', '#1043#1052#1057
+        LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
+        RightAxis.Automatic = False
+        RightAxis.AutomaticMaximum = False
+        RightAxis.AutomaticMinimum = False
+        TopAxis.Automatic = False
+        TopAxis.AutomaticMaximum = False
+        TopAxis.AutomaticMinimum = False
         View3D = False
         Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
@@ -429,6 +533,103 @@ object FormGraphOrient: TFormGraphOrient
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
           #1054#1096#1080#1073#1082#1072' Wz, '#1091#1075#1083'. '#1089#1077#1082'/'#1089)
+        BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
+        LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
+        View3D = False
+        Zoom.MouseWheel = pmwNormal
+        BevelOuter = bvNone
+        Color = clWhite
+        TabOrder = 2
+        Anchors = [akLeft, akRight]
+        DefaultCanvas = 'TTeeCanvas3D'
+        ColorPaletteIndex = 13
+      end
+    end
+    object TabSheet12: TTabSheet
+      Caption = #1040#1085#1072#1083#1080#1079' '#1086#1096#1080#1073#1086#1082' '#1089#1082#1086#1088#1086#1089#1090#1080
+      ImageIndex = 4
+      DesignSize = (
+        1152
+        749)
+      object ChartAnalyzeXV: TChart
+        Left = 3
+        Top = 0
+        Width = 1117
+        Height = 250
+        BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
+        Legend.LegendStyle = lsSeries
+        Legend.Shadow.HorizSize = 0
+        Legend.Shadow.VertSize = 0
+        Title.Font.Height = -13
+        Title.Font.Style = [fsBold]
+        Title.Text.Strings = (
+          ' '#1054#1096#1080#1073#1082#1072' Wx, '#1091#1075#1083'. '#1089#1077#1082'/'#1089)
+        BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
+        LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
+        RightAxis.Automatic = False
+        RightAxis.AutomaticMaximum = False
+        RightAxis.AutomaticMinimum = False
+        TopAxis.Automatic = False
+        TopAxis.AutomaticMaximum = False
+        TopAxis.AutomaticMinimum = False
+        View3D = False
+        Zoom.MouseWheel = pmwNormal
+        BevelOuter = bvNone
+        Color = clWhite
+        TabOrder = 0
+        Anchors = [akLeft, akRight]
+        DefaultCanvas = 'TTeeCanvas3D'
+        ColorPaletteIndex = 13
+      end
+      object ChartAnalyzeYV: TChart
+        Left = 3
+        Top = 248
+        Width = 1117
+        Height = 250
+        BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
+        Legend.LegendStyle = lsSeries
+        Legend.Shadow.HorizSize = 0
+        Legend.Shadow.VertSize = 0
+        Title.Font.Height = -13
+        Title.Font.Style = [fsBold]
+        Title.Text.Strings = (
+          ' '#1054#1096#1080#1073#1082#1072' Wy, '#1091#1075#1083'. '#1089#1077#1082'/'#1089)
+        BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
+        LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
+        RightAxis.Automatic = False
+        RightAxis.AutomaticMaximum = False
+        RightAxis.AutomaticMinimum = False
+        TopAxis.Automatic = False
+        TopAxis.AutomaticMaximum = False
+        TopAxis.AutomaticMinimum = False
+        View3D = False
+        Zoom.MouseWheel = pmwNormal
+        BevelOuter = bvNone
+        Color = clWhite
+        TabOrder = 1
+        Anchors = [akLeft, akRight]
+        DefaultCanvas = 'TTeeCanvas3D'
+        ColorPaletteIndex = 13
+      end
+      object ChartAnalyzeZV: TChart
+        Left = 3
+        Top = 496
+        Width = 1117
+        Height = 250
+        BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
+        Legend.LegendStyle = lsSeries
+        Legend.Shadow.HorizSize = 0
+        Legend.Shadow.VertSize = 0
+        Title.Font.Height = -13
+        Title.Font.Style = [fsBold]
+        Title.Text.Strings = (
+          ' '#1054#1096#1080#1073#1082#1072' Wz, '#1091#1075#1083'. '#1089#1077#1082'/'#1089)
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
         Panning.MouseWheel = pmwNone
@@ -752,7 +953,7 @@ object FormGraphOrient: TFormGraphOrient
         Height = 686
         Legend.Visible = False
         Title.Text.Strings = (
-          'TChart')
+          #1044#1074#1080#1078#1077#1085#1080#1077' '#1079#1074#1105#1079#1076)
         BottomAxis.Automatic = False
         BottomAxis.AutomaticMaximum = False
         BottomAxis.AutomaticMinimum = False
@@ -805,7 +1006,7 @@ object FormGraphOrient: TFormGraphOrient
           Pointer.Gradient.MidColor = 16059031
           Pointer.Gradient.StartColor = 14540754
           Pointer.Gradient.Visible = True
-          Pointer.HorizSize = 9
+          Pointer.HorizSize = 11
           Pointer.InflateMargins = False
           Pointer.Pen.Color = 1358954496
           Pointer.Pen.Width = 0
@@ -818,7 +1019,7 @@ object FormGraphOrient: TFormGraphOrient
           Pointer.Shadow.VertSize = 19
           Pointer.Shadow.Visible = True
           Pointer.Style = psCircle
-          Pointer.VertSize = 9
+          Pointer.VertSize = 11
           XValues.Name = 'X'
           XValues.Order = loAscending
           YValues.Name = 'Y'
@@ -1461,12 +1662,13 @@ object FormGraphOrient: TFormGraphOrient
   object UpDown1: TUpDown
     Left = 760
     Top = 796
-    Width = 15
+    Width = 16
     Height = 21
     Anchors = [akRight, akBottom]
     Associate = EditNumCadr
     Max = 99999999
     TabOrder = 7
+    Thousands = False
   end
   object SortFileCheckBox: TCheckBox
     Left = 789
@@ -1512,6 +1714,10 @@ object FormGraphOrient: TFormGraphOrient
         Caption = #1044#1072#1085#1085#1099#1077' '#1080#1079' '#1092#1086#1088#1084#1072#1090#1072' '#1048#1050#1048
         OnClick = ReadIKIFormatClick
       end
+      object ErrorAnalyze: TMenuItem
+        Caption = #1040#1085#1072#1083#1080#1079' '#1086#1096#1080#1073#1086#1082
+        OnClick = ErrorAnalyzeClick
+      end
     end
     object MenuSave: TMenuItem
       Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100
@@ -1537,5 +1743,12 @@ object FormGraphOrient: TFormGraphOrient
     Width = 0
     Left = 1176
     Top = 568
+  end
+  object FileOpenDialog1: TFileOpenDialog
+    FavoriteLinks = <>
+    FileTypes = <>
+    Options = []
+    Left = 1112
+    Top = 248
   end
 end

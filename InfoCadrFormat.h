@@ -37,7 +37,10 @@ struct LinesInfo
 
 struct CadrInfo
 {
+	_fastcall CadrInfo(): Time(0), FrameNumber(0) { }
+
 	double Time;
+	int FrameNumber;
 	bool IsBinary, IsReverse;   //признак бинирования, признак реверса изображения
 	bool IsOrient; //признак определения ориентации
 	unsigned short CountPixFilter;       //число пикселей выше порога
