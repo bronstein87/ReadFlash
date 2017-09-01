@@ -2036,6 +2036,7 @@ std::string fileName;
 	}
 	file.close();
 }
+
 void PrintLocalMLOC(struct LOC tmi)
 {
 	std::string fileName="BOKZ_"+tmi.timeBOKZ;
@@ -2285,6 +2286,12 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 	}
 }
 
+struct MSHI_BOKZM {
+	unsigned short status1, status2;
+	float timeBOKZ;
+	float Mornt[3][3];
+};
+
 struct DTMI_BOKZM {
 	float timeBOKZ;
 	unsigned short status1, status2;
@@ -2302,6 +2309,7 @@ void ConvertDataDTMI_BOKZM(struct DTMI_BOKZM tmi, struct CadrInfo &mCadr)
 	mCadr.ImageHeight = 512;
 	mCadr.ImageWidth = 512;
 //	mCadr.Time=data.Tpr_sec+data.Tpr_msec/1000.;
+	mCadr.Time = tmi.timeBOKZ;
 	mCadr.CountLocalObj = tmi.nLocalObj;
 
 	if (tmi.nLocalObj < MAX_OBJ_BOKZM) mCadr.SizeObjectsList = tmi.nLocalObj;
@@ -2328,6 +2336,39 @@ void ConvertDataDTMI_BOKZM(struct DTMI_BOKZM tmi, struct CadrInfo &mCadr)
 	mCadr.CountDeterObj = 0;
 	mCadr.CountStars = 0;
 	mCadr.SizeStarsList = 0;
+}
+
+void PrintMSHI_BOKZM(ofstream &file, struct MSHI_BOKZM tmi)
+{
+	file<<"____________________________________"<<"\n";
+	file<<"Массив МШИОР"<<"\n";
+	file<<"Tpr\t"<<tmi.timeBOKZ<<"\n";
+	file<<uppercase<<hex<<setfill('0');
+	file<<"КС1\t"<<"0x"<<setw(4)<<tmi.status1<<"\n";
+	file<<"КС2\t"<<"0x"<<setw(4)<<tmi.status2<<"\n";
+	file<<dec<<setfill(' ');
+	file<<"Матрица ориентации:\n";
+	file<<std::setprecision(8);
+	for (int i = 0; i < 3; i++) {
+		file<<std::setw(12)<<tmi.Mornt[i][0];
+		file<<std::setw(12)<<tmi.Mornt[i][1];
+		file<<std::setw(12)<<tmi.Mornt[i][2]<<"\n";
+	}
+
+//	double ang[3], MorntT[3][3];
+//
+//	for (int i = 0; i < 3; i++) {
+//		for (int j = 0; j < 3; j++) {
+//            MorntT[i][j] =  tmi.Mornt[j][i];
+//		}
+//	}
+//	MatrixToEkvAngles(MorntT, ang);
+//	file<<"Углы ориентации:\n";
+//	file<<"Al = "<<ang[0]*RTD<<"\t";
+//	file<<"Dl = "<<ang[1]*RTD<<"\t";
+//	file<<"Az = "<<ang[2]*RTD<<"\n";
+	file<<"____________________________________"<<"\n";
+	file<<flush;
 }
 
 void PrintDTMI_BOKZM(ofstream &file, struct DTMI_BOKZM tmi)
@@ -2357,9 +2398,10 @@ void PrintDTMI_BOKZM(ofstream &file, struct DTMI_BOKZM tmi)
 }
 
 unsigned short ArrayDTMI[290];
+unsigned short ArrayMSHI[22];
+
 void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 {
-	struct DTMI_BOKZM tmi;
 //	short mDay, mMonth, mYear, mHour, mMin, mSec;
 
     OpenDialog->Options.Clear();
@@ -2380,6 +2422,7 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 		}
 
 		ofstream fout((FileTitle+"_decode.txt").c_str());
+		ofstream fmshi((FileTitle + "_mshi.txt").c_str());
 
 		std::string line, word1, word2, word3;
 		unsigned short hex_val, dec_val;
@@ -2387,36 +2430,102 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 		while (!finp.eof())
 		{
 			getline(finp, line, '\n' );
-			if (line.find("ТМОС") != std::string::npos) {
-				struct CadrInfo mCadr;
 
-				//sscanf(line, "ТМОС %d.%d.%d %d:%d:%d ", );
-				for (int i = 0; i < 290; i++) {
-					finp>>word1>>word2>>dec_val;
-					sscanf(word1.c_str(),"[%d]", &ind);
-					sscanf(word2.c_str(),"0X%x", &hex_val);
-					if ((i == ind)&&(hex_val == dec_val)) {
-						ArrayDTMI[i] = hex_val;
+//чтение массива МШИОР
+			if (line.find("МШИОР") != std::string::npos) {
+				getline(finp, line, '\n' );
+				if (line.find("ТМОС") != std::string::npos) {
+					fout<<"\n"<<line<<"\n";
+					getline(finp, line, '\n' );
+
+                    unsigned short nWord = 0;
+					do
+					{
+						getline(finp, line, '\n' );
+						if (line.find("CISO_MSHIOR") != std::string::npos) {
+							int nBOKZ = -1;
+							unsigned short word, buf;
+							if (sscanf(line.c_str(), "CISO_MSHIOR[%ld].W[%d] %d", &nBOKZ, &buf, &word) == 3) {
+								if ((nWord >= 0) && (nWord < 22)) {
+									ArrayMSHI[nWord] =  word;
+                                    nWord++;
+								}
+							}
+						}
+					} while (line.find("CIS1_DSP.TMOS") == std::string::npos);
+
+					struct MSHI_BOKZM mshi;
+					memcpy(&mshi, ArrayMSHI, 22*sizeof(short));
+					PrintMSHI_BOKZM(fout, mshi);
+
+					double ang[3], MorntT[3][3];
+
+					for (int i = 0; i < 3; i++) {
+						for (int j = 0; j < 3; j++) {
+							MorntT[i][j] =  mshi.Mornt[j][i];
+						}
 					}
-				}
-				memcpy(&tmi.timeBOKZ, &ArrayDTMI[2], 30*sizeof(short));
-				memcpy(&tmi.LocalList[2][0], &ArrayDTMI[36], 28*sizeof(short));
-				memcpy(&tmi.LocalList[5][2], &ArrayDTMI[68], 28*sizeof(short));
-				memcpy(&tmi.LocalList[9][0], &ArrayDTMI[100],28*sizeof(short));
-				memcpy(&tmi.LocalList[12][2], &ArrayDTMI[132],28*sizeof(short));
-				memcpy(&tmi.LocalList[16][0], &ArrayDTMI[164],28*sizeof(short));
-				memcpy(&tmi.LocalList[19][2], &ArrayDTMI[196],28*sizeof(short));
-				memcpy(&tmi.LocalList[23][0], &ArrayDTMI[228],28*sizeof(short));
-				memcpy(&tmi.LocalList[26][2], &ArrayDTMI[260],28*sizeof(short));
-				fout<<"\n"<<line<<"\n";
 
-				PrintDTMI_BOKZM(fout, tmi);
-				ConvertDataDTMI_BOKZM(tmi, mCadr);
-				vCadrInfo.push_back(mCadr);
+					MatrixToEkvAngles(MorntT, ang);
+
+					if (mshi.status1 == 0xE004) {
+						plotter->AddPoint(ChartAl, 0, mshi.timeBOKZ, ang[0]*RTD);
+						plotter->AddPoint(ChartDl, 0, mshi.timeBOKZ, ang[1]*RTD);
+						plotter->AddPoint(ChartAz, 0, mshi.timeBOKZ, ang[2]*RTD);
+					}
+
+					fmshi<<std::setprecision(8);
+					fmshi<<mshi.timeBOKZ<<"\t";
+					fmshi<<uppercase<<hex<<setfill('0');
+					fmshi<<"0x"<<setw(4)<<mshi.status1<<"\t";
+					fmshi<<"0x"<<setw(4)<<mshi.status2<<"\t";
+					fmshi<<dec<<setfill(' ');
+
+					fmshi<<ang[0]*RTD<<"\t";
+					fmshi<<ang[1]*RTD<<"\t";
+					fmshi<<ang[2]*RTD<<"\n";
+                }
+			}
+
+//чтение массива ДТМИ
+			if (line.find("ДТМИ") != std::string::npos) {
+				getline(finp, line, '\n' );
+				if (line.find("ТМОС") != std::string::npos) {
+					fout<<"\n"<<line<<"\n";
+
+					for (int i = 0; i < 290; i++) {
+						finp>>word1>>word2>>dec_val;
+						int n1 = sscanf(word1.c_str(),"[%d]", &ind);
+						int n2 = sscanf(word2.c_str(),"0X%x", &hex_val);
+						if ((i == ind)&&(hex_val == dec_val)) {
+							ArrayDTMI[i] = hex_val;
+						}
+						else break;
+					}
+
+					struct DTMI_BOKZM dtmi;
+					memcpy(&dtmi.timeBOKZ, &ArrayDTMI[2], 30*sizeof(short));
+					memcpy(&dtmi.LocalList[2][0], &ArrayDTMI[36], 28*sizeof(short));
+					memcpy(&dtmi.LocalList[5][2], &ArrayDTMI[68], 28*sizeof(short));
+					memcpy(&dtmi.LocalList[9][0], &ArrayDTMI[100],28*sizeof(short));
+					memcpy(&dtmi.LocalList[12][2], &ArrayDTMI[132],28*sizeof(short));
+					memcpy(&dtmi.LocalList[16][0], &ArrayDTMI[164],28*sizeof(short));
+					memcpy(&dtmi.LocalList[19][2], &ArrayDTMI[196],28*sizeof(short));
+					memcpy(&dtmi.LocalList[23][0], &ArrayDTMI[228],28*sizeof(short));
+					memcpy(&dtmi.LocalList[26][2], &ArrayDTMI[260],28*sizeof(short));
+
+					PrintDTMI_BOKZM(fout, dtmi);
+
+					struct CadrInfo mCadr;
+					ConvertDataDTMI_BOKZM(dtmi, mCadr);
+					vCadrInfo.push_back(mCadr);
+					plotter->AddPoint(ChartNumLoc, 0, mCadr.Time, mCadr.CountLocalObj);
+				}
 			}
 		}
 		finp.close();
 		fout.close();
+		fmshi.close();
 		PrepareStartDraw();
 	}
 }
