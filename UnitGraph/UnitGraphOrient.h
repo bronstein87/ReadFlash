@@ -192,6 +192,10 @@
 	TChart *ChartAnalyzeErrorAl;
 	TChart *ChartAnalyzeErrorDl;
 	TChart *ChartAnalyzeErrorAz;
+	TTabSheet *TabSheet14;
+	TChart *ChartErrorOX;
+	TChart *ChartErrorOY;
+	TChart *ChartErrorOZ;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);

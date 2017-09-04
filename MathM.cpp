@@ -130,6 +130,22 @@ void multMatrix(const double Matr1[3][3],const double Matr2[3][3], double Matr[3
     }
 }
 
+double GetAxisAngle(double lmn1[3], double lmn2[3])
+{
+	double l1, m1, n1, l2, m2, n2;
+	double diff_axes, l_or, m_or, n_or;
+
+	l1 = lmn1[0];  m1 = lmn1[1];   n1 = lmn1[2];
+	l2 = lmn2[0];  m2 = lmn2[1];   n2 = lmn2[2];
+
+	l_or=m1*n2-m2*n1;
+	m_or=n1*l2-n2*l1;
+	n_or=l1*m2-l2*m1;
+
+	diff_axes=sqrtm(l_or*l_or+m_or*m_or+n_or*n_or);
+	return asinm(diff_axes);
+}
+
 template <class InputIterator, class T, class UnaryOperation>
 std::pair<T,T> calculateMeanStDv (InputIterator first, InputIterator last, T init, UnaryOperation extractWtC)
 {
