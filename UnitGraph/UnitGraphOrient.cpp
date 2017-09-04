@@ -81,9 +81,12 @@ void __fastcall TFormGraphOrient::MenuClearClick(TObject *Sender)
 
 void __fastcall TFormGraphOrient::MenuSaveClick(TObject *Sender)
 {
+	UnicodeString ScreenFolderName = "\\" + FormatDateTime("yyyy-mm-dd hh.mm.ss", Now()) + " " + "Cкриншоты\\";
+	TDirectory::CreateDirectoryW(GetCurrentDir() + ScreenFolderName);
 	for (int i = 0; i < Charts.size(); i ++)
 	{
 		UnicodeString Title = LeftStr(Charts[i]->Title->Text->Text, PosEx(",", Charts[i]->Title->Text->Text, 1) - 1);
+		Title = GetCurrentDir() + ScreenFolderName + Title;
 		plotter->SaveChart(Charts[i], Title, 500, 900);
 	}
 }
@@ -3419,7 +3422,6 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 {
 	try
 	{
-		LabelFrameReport->Caption = "HELLO";
 		OpenDialog->Filter = "iki|*.iki";
 		OpenDialog->Options << ofAllowMultiSelect;
 		if (OpenDialog->Execute())
@@ -3579,80 +3581,73 @@ void __fastcall TFormGraphOrient::ErrorAnalyzeClick(TObject *Sender)
 	FileOpenDialog1->Options << fdoPickFolders << fdoAllowMultiSelect;
 	if (FileOpenDialog1->Execute())
 	{
-		TPointSeries* seriesXMax = new TPointSeries(ChartAnalyzeXV);
-		seriesXMax->Title = "Максимум";
-		TPointSeries* seriesYMax = new TPointSeries(ChartAnalyzeYV);
-		seriesYMax->Title = "Максимум";
-		TPointSeries* seriesZMax = new TPointSeries(ChartAnalyzeZV);
-		seriesZMax->Title = "Максимум";
-		TPointSeries* seriesAlMax = new TPointSeries(ChartAnalyzeErrorAl);
-		seriesAlMax->Title = "Максимум";
-		TPointSeries* seriesDlMax = new TPointSeries(ChartAnalyzeErrorDl);
-		seriesDlMax->Title = "Максимум";
-		TPointSeries* seriesAzMax = new TPointSeries(ChartAnalyzeErrorAz);
-		seriesAzMax->Title = "Максимум";
+		THighLowLineSeries* seriesX = new THighLowLineSeries(ChartAnalyzeXV);
+		seriesX->Title = "Max/Min";
+		seriesX->Pen->Width = 3;
+		THighLowLineSeries* seriesY = new THighLowLineSeries(ChartAnalyzeYV);
+		seriesY->Title = "Max/Min";
+		seriesY->Pen->Width = 3;
+		THighLowLineSeries* seriesZ = new THighLowLineSeries(ChartAnalyzeZV);
+		seriesZ->Title = "Max/Min";
+		seriesZ->Pen->Width = 3;
+		THighLowLineSeries* seriesAl = new THighLowLineSeries(ChartAnalyzeErrorAl);
+		seriesAl->Title = "Max/Min";
+		seriesAl->Pen->Width = 3;
+		THighLowLineSeries* seriesDl = new THighLowLineSeries(ChartAnalyzeErrorDl);
+		seriesDl->Title = "Max/Min";
+		seriesDl->Pen->Width = 3;
+		THighLowLineSeries* seriesAz = new THighLowLineSeries(ChartAnalyzeErrorAz);
+		seriesAz->Title = "Max/Min";
+		seriesAz->Pen->Width = 3;
 
-		TPointSeries* seriesXMin = new TPointSeries(ChartAnalyzeXV);
-		seriesXMin->Title = "Минимум";
-		TPointSeries* seriesYMin = new TPointSeries(ChartAnalyzeYV);
-		seriesYMin->Title = "Минимум";
-		TPointSeries* seriesZMin = new TPointSeries(ChartAnalyzeZV);
-		seriesZMin->Title = "Минимум";
-		TPointSeries* seriesAlMin = new TPointSeries(ChartAnalyzeErrorAl);
-		seriesAlMin->Title = "Минимум";
-		TPointSeries* seriesDlMin = new TPointSeries(ChartAnalyzeErrorDl);
-		seriesDlMin->Title = "Минимум";
-		TPointSeries* seriesAzMin = new TPointSeries(ChartAnalyzeErrorAz);
-		seriesAzMin->Title = "Минимум";
-
-		TPointSeries* seriesXSKO = new TPointSeries(ChartAnalyzeXV);
+		THighLowLineSeries* seriesXSKO = new THighLowLineSeries(ChartAnalyzeXV);
 		seriesXSKO->Title = "СКО";
-		TPointSeries* seriesYSKO = new TPointSeries(ChartAnalyzeYV);
+		THighLowLineSeries* seriesYSKO = new THighLowLineSeries(ChartAnalyzeYV);
 		seriesYSKO->Title = "СКО";
-		TPointSeries* seriesZSKO = new TPointSeries(ChartAnalyzeZV);
+		THighLowLineSeries* seriesZSKO = new THighLowLineSeries(ChartAnalyzeZV);
 		seriesZSKO->Title = "СКО";
-		TPointSeries* seriesAlSKO = new TPointSeries(ChartAnalyzeErrorAl);
+		THighLowLineSeries* seriesAlSKO = new THighLowLineSeries(ChartAnalyzeErrorAl);
 		seriesAlSKO->Title = "СКО";
-		TPointSeries* seriesDlSKO = new TPointSeries(ChartAnalyzeErrorDl);
+		THighLowLineSeries* seriesDlSKO = new THighLowLineSeries(ChartAnalyzeErrorDl);
 		seriesDlSKO->Title = "СКО";
-		TPointSeries* seriesAzSKO = new TPointSeries(ChartAnalyzeErrorAz);
+		THighLowLineSeries* seriesAzSKO = new THighLowLineSeries(ChartAnalyzeErrorAz);
 		seriesAzSKO->Title = "СКО";
 
 		TPointSeries* seriesXMean =  new TPointSeries(ChartAnalyzeXV);
 		seriesXMean->Title = "Среднее";
+		seriesXMean->Pointer->Style = psCircle;
 		TPointSeries* seriesYMean =  new TPointSeries(ChartAnalyzeYV);
 		seriesYMean->Title = "Среднее";
+		seriesYMean->Pointer->Style = psCircle;
 		TPointSeries* seriesZMean =  new TPointSeries(ChartAnalyzeZV);
 		seriesZMean->Title = "Среднее";
+		seriesZMean->Pointer->Style = psCircle;
 		TPointSeries* seriesAlMean = new TPointSeries(ChartAnalyzeErrorAl);
 		seriesAlMean->Title = "Среднее";
+		seriesAlMean->Pointer->Style = psCircle;
 		TPointSeries* seriesDlMean = new TPointSeries(ChartAnalyzeErrorDl);
 		seriesDlMean->Title = "Среднее";
+		seriesDlMean->Pointer->Style = psCircle;
 		TPointSeries* seriesAzMean = new TPointSeries(ChartAnalyzeErrorAz);
 		seriesAzMean->Title = "Среднее";
+		seriesAzMean->Pointer->Style = psCircle;
 
-		ChartAnalyzeXV->AddSeries(seriesXMax);
-		ChartAnalyzeXV->AddSeries(seriesXMin);
+	   ChartAnalyzeXV->AddSeries(seriesX);
 		ChartAnalyzeXV->AddSeries(seriesXSKO);
 		ChartAnalyzeXV->AddSeries(seriesXMean);
-		ChartAnalyzeYV->AddSeries(seriesYMax);
-		ChartAnalyzeYV->AddSeries(seriesYMin);
+		ChartAnalyzeYV->AddSeries(seriesY);
 		ChartAnalyzeYV->AddSeries(seriesYSKO);
 		ChartAnalyzeYV->AddSeries(seriesYMean);
-		ChartAnalyzeZV->AddSeries(seriesZMax);
-		ChartAnalyzeZV->AddSeries(seriesZMin);
+		ChartAnalyzeZV->AddSeries(seriesZ);
 		ChartAnalyzeZV->AddSeries(seriesZSKO);
 		ChartAnalyzeZV->AddSeries(seriesZMean);
-		ChartAnalyzeErrorAl->AddSeries(seriesAlMax);
-		ChartAnalyzeErrorAl->AddSeries(seriesAlMin);
+		ChartAnalyzeErrorAl->AddSeries(seriesAl);
 		ChartAnalyzeErrorAl->AddSeries(seriesAlSKO);
 		ChartAnalyzeErrorAl->AddSeries(seriesAlMean);
-		ChartAnalyzeErrorDl->AddSeries(seriesDlMax);
-		ChartAnalyzeErrorDl->AddSeries(seriesDlMin);
+		ChartAnalyzeErrorDl->AddSeries(seriesDl);
 		ChartAnalyzeErrorDl->AddSeries(seriesDlSKO);
 		ChartAnalyzeErrorDl->AddSeries(seriesDlMean);
-		ChartAnalyzeErrorAz->AddSeries(seriesAzMax);
-		ChartAnalyzeErrorAz->AddSeries(seriesAzMin);
+		ChartAnalyzeErrorAz->AddSeries(seriesAz);
 		ChartAnalyzeErrorAz->AddSeries(seriesAzSKO);
 		ChartAnalyzeErrorAz->AddSeries(seriesAzMean);
 
@@ -3703,7 +3698,7 @@ void __fastcall TFormGraphOrient::ErrorAnalyzeClick(TObject *Sender)
 
 				 int gradus, minutes, seconds;
 				 ToGMS (reader->StarsData.RecognizedAngularVelocity[0] * RTD, gradus, minutes, seconds);
-				 UnicodeString Label = FloatToStr(gradus) + "г." + FloatToStr(minutes) + "м." + FloatToStr(seconds) + "c.";
+				 UnicodeString Label = FloatToStr(gradus) + "°" + FloatToStr(minutes) + "'" + FloatToStr(seconds) + "''";
 
 				 struct { bool operator()(const Point& a,const Point& b) { return a.X < b.X;} } ComparePointX;
 				 struct { float operator() (const Point& a) {return a.X;} } AddX;
@@ -3711,16 +3706,15 @@ void __fastcall TFormGraphOrient::ErrorAnalyzeClick(TObject *Sender)
 				 vector <Point>::iterator Max = std::max_element(AngularSpeedErrorValues.begin(), AngularSpeedErrorValues.end(), ComparePointX);
 				 vector <Point>::iterator Min = std::min_element(AngularSpeedErrorValues.begin(), AngularSpeedErrorValues.end(), ComparePointX);
 				 std::pair <float, float> MeanSkoX = calculateMeanStdDv(AngularSpeedErrorValues.begin(), AngularSpeedErrorValues.end(),0.0, AddX);
-				 seriesXMax->AddXY(i, Max->X * RTS, Label);
-				 seriesXMin->AddXY(i, Min->X * RTS, Label);
+				 seriesX->AddHighLow(i, Max->X * RTS, Min->X * RTS, Label);
 				 seriesXSKO->AddXY(i, MeanSkoX.second * RTS, Label);
 				 seriesXMean->AddXY(i, MeanSkoX.first * RTS, Label);
 
 				 Max = std::max_element(AngleErrorValues.begin(), AngleErrorValues.end(), ComparePointX);
 				 Min = std::min_element(AngleErrorValues.begin(), AngleErrorValues.end(), ComparePointX);
 				 MeanSkoX = calculateMeanStdDv(AngleErrorValues.begin(), AngleErrorValues.end(),0.0, AddX);
-				 seriesAlMax->AddXY(i, Max->X * RTS, Label);
-				 seriesAlMin->AddXY(i, Min->X * RTS, Label);
+
+				 seriesAl->AddHighLow(i, Max->X * RTS, Min->X * RTS, Label);
 				 seriesAlSKO->AddXY(i, MeanSkoX.second * RTS, Label);
 				 seriesAlMean->AddXY(i, MeanSkoX.first * RTS, Label);
 
@@ -3730,16 +3724,14 @@ void __fastcall TFormGraphOrient::ErrorAnalyzeClick(TObject *Sender)
 				 Max = std::max_element(AngularSpeedErrorValues.begin(), AngularSpeedErrorValues.end(), ComparePointY);
 				 Min = std::min_element(AngularSpeedErrorValues.begin(), AngularSpeedErrorValues.end(), ComparePointY);
 				 std::pair <float, float> MeanSkoY = calculateMeanStdDv(AngularSpeedErrorValues.begin(), AngularSpeedErrorValues.end(),0.0, AddY);
-				 seriesYMax->AddXY(i, Max->X * RTS, Label);
-				 seriesYMin->AddXY(i, Min->X * RTS, Label);
+				 seriesY->AddHighLow(i, Max->Y * RTS, Min->Y * RTS, Label);
 				 seriesYSKO->AddXY(i, MeanSkoY.second * RTS, Label);
 				 seriesYMean->AddXY(i, MeanSkoY.first * RTS, Label);
 
 				 Max = std::max_element(AngleErrorValues.begin(), AngleErrorValues.end(), ComparePointY);
 				 Min = std::min_element(AngleErrorValues.begin(), AngleErrorValues.end(), ComparePointY);
 				 MeanSkoY = calculateMeanStdDv(AngleErrorValues.begin(), AngleErrorValues.end(),0.0, AddY);
-				 seriesDlMax->AddXY(i, Max->X * RTS, Label);
-				 seriesDlMin->AddXY(i, Min->X * RTS, Label);
+				 seriesDl->AddHighLow(i, Max->Y * RTS, Min->Y * RTS, Label);
 				 seriesDlSKO->AddXY(i, MeanSkoY.second * RTS, Label);
 				 seriesDlMean->AddXY(i, MeanSkoY.first * RTS, Label);
 
@@ -3749,16 +3741,14 @@ void __fastcall TFormGraphOrient::ErrorAnalyzeClick(TObject *Sender)
 				 Max = std::max_element(AngularSpeedErrorValues.begin(), AngularSpeedErrorValues.end(), ComparePointZ);
 				 Min = std::min_element(AngularSpeedErrorValues.begin(), AngularSpeedErrorValues.end(), ComparePointZ);
 				 std::pair <float, float> MeanSkoZ = calculateMeanStdDv(AngularSpeedErrorValues.begin(), AngularSpeedErrorValues.end(),0.0, AddZ);
-				 seriesZMax->AddXY(i, Max->X * RTS, Label);
-				 seriesZMin->AddXY(i, Min->X * RTS, Label);
+				 seriesZ->AddHighLow(i, Max->Z * RTS, Min->Z * RTS, Label);
 				 seriesZSKO->AddXY(i, MeanSkoZ.second * RTS, Label);
 				 seriesZMean->AddXY(i, MeanSkoZ.first * RTS, Label);
 
 				 Max = std::max_element(AngleErrorValues.begin(), AngleErrorValues.end(), ComparePointZ);
 				 Min = std::min_element(AngleErrorValues.begin(), AngleErrorValues.end(), ComparePointZ);
 				 MeanSkoZ = calculateMeanStdDv(AngleErrorValues.begin(), AngleErrorValues.end(),0.0, AddZ);
-				 seriesAzMax->AddXY(i, Max->X * RTS, Label);
-				 seriesAzMin->AddXY(i, Min->X * RTS, Label);
+			     seriesAz->AddHighLow(i, Max->Z * RTS, Min->Z * RTS, Label);
 				 seriesAzSKO->AddXY(i, MeanSkoZ.second * RTS, Label);
 				 seriesAzMean->AddXY(i, MeanSkoZ.first * RTS, Label);
 		}

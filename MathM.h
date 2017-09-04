@@ -14,6 +14,7 @@ double asinm(double xf);
 double atan2m(double yf, double xf);
 void quatToMatr(const double Quat[], double M_ornt[3][3]);
 void MatrixToEkvAngles(const double Matrix[3][3], double Angles[3]);
+double GetAxisAngle(double lmn1[3], double lmn2[3]);
 void calcTransitionMatrix(double pointAlpha, double pointBeta, double pointAzimut, double M_ornt[3][3]);
 void getAngularDisplacementFromOrientMatr(const double M_ornt_pr[3][3],const double M_ornt[3][3], double Wop [3]);
 void multMatrix(const double Matr1[3][3],const double Matr2[3][3], double Matr[3][3]);
