@@ -36,6 +36,7 @@ __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 		Charts.push_back(ChartNumFrag); Charts.push_back(ChartNumLoc); Charts.push_back(ChartNumDet);
 		Charts.push_back(ChartFone); Charts.push_back(ChartNoise); Charts.push_back(ChartTemp);
 		Charts.push_back(ChartAlError); Charts.push_back(ChartDlError); Charts.push_back(ChartAzError);
+        Charts.push_back(ChartErrorOX); Charts.push_back(ChartErrorOY); Charts.push_back(ChartErrorOZ);
 		Charts.push_back(ChartWxError); Charts.push_back(ChartWyError); Charts.push_back(ChartWzError);
 		Charts.push_back(ChartAnalyzeErrorAl); Charts.push_back(ChartAnalyzeErrorDl); Charts.push_back(ChartAnalyzeErrorAz);
 		Charts.push_back(ChartAnalyzeXV); Charts.push_back(ChartAnalyzeYV); Charts.push_back(ChartAnalyzeZV);
@@ -3392,9 +3393,8 @@ void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec
 			- reader->Georeferencing.DeviceAngularVelocity[i];
 		}
 
-
-	   for (int i = 0;  i  < 3; i ++)
-	   {
+		for (int i = 0;  i < 3; i++)
+		{
 			double diff = cadrInfo.AnglesOrient[i] - reader->Georeferencing.OrientationAngles[i];
 			if (abs(diff) > 5)        // потом убрать
 			{
@@ -3402,8 +3402,13 @@ void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec
 				-	abs(cadrInfo.AnglesOrient[i] - reader->Georeferencing.OrientationAngles[i]);
 			}
 			cadrInfo.AnglesDiff[i] = diff;
-	   }
+		}
 
+		for (int i = 0; i < 3; i++)
+		{
+			cadrInfo.AxesDiff[i] = GetAxisAngle(&reader->Georeferencing.OrientationMatrix[i][0],
+                                                &cadrInfo.MatrixOrient[i][0]);
+		}
 	}
 
 	GetImageBright(cadrInfo);
@@ -3463,6 +3468,9 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 							plotter->AddPoint(ChartFone, 0, Time, vCadrInfo.back().MeanBright);
 							plotter->AddPoint(ChartNoise, 0, Time, vCadrInfo.back().SigmaBright);
 							//plotter->AddPoint(ChartTemp, 0, Time, vCadrInfo.back().MatrixTemp);
+							plotter->AddPoint(ChartErrorOX, 0, Time, vCadrInfo.back().AxesDiff[0] * RTS);
+							plotter->AddPoint(ChartErrorOY, 0, Time, vCadrInfo.back().AxesDiff[1] * RTS);
+							plotter->AddPoint(ChartErrorOZ, 0, Time, vCadrInfo.back().AxesDiff[2] * RTS);
 							plotter->AddPoint(ChartAlError, 0, Time, vCadrInfo.back().AnglesDiff[0] * RTS);
 							plotter->AddPoint(ChartDlError, 0, Time, vCadrInfo.back().AnglesDiff[1] * RTS);
 							plotter->AddPoint(ChartAzError, 0, Time, vCadrInfo.back().AnglesDiff[2] * RTS);
@@ -3759,4 +3767,5 @@ void __fastcall TFormGraphOrient::ErrorAnalyzeClick(TObject *Sender)
 
 }
 //---------------------------------------------------------------------------
+
 
