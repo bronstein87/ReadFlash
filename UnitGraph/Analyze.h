@@ -15,6 +15,7 @@
 #include <VCLTee.TeeProcs.hpp>
 #include "VCLTee.TeeHighLowLine.hpp"
 #include <Vcl.Dialogs.hpp>
+#include <Vcl.ToolWin.hpp>
 #include <vector>
 #include "SimplePlotter.h"
 #include <Vcl.Dialogs.hpp>
@@ -38,20 +39,21 @@ __published:	// IDE-managed Components
 	TMainMenu *MainMenu1;
 	TMenuItem *ChooseDirectories;
 	TPageControl *PageControl1;
-	TTabSheet *TabSheet1;
 	TTabSheet *TabSheet2;
 	TMenuItem *SaveGraphs;
 	TMenuItem *ClearGraphs;
-	TChart *ChartAnalyzeErrorAl;
-	TChart *ChartAnalyzeErrorDl;
-	TChart *ChartAnalyzeErrorAz;
 	TChart *ChartAnalyzeXV;
 	TChart *ChartAnalyzeYV;
 	TChart *ChartAnalyzeZV;
 	TFileOpenDialog *FileOpenDialog1;
+	TTabSheet *TabSheet1;
+	TChart *ChartAnalyzeErrorAl;
+	TChart *ChartAnalyzeErrorDl;
+	TChart *ChartAnalyzeErrorAz;
 	void __fastcall ChooseDirectoriesClick(TObject *Sender);
 	void __fastcall SaveGraphsClick(TObject *Sender);
 	void __fastcall ClearGraphsClick(TObject *Sender);
+	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 private:	// User declarations
 	vector <TChart*> Charts;
 	std::unique_ptr <SimplePlotter> plotter;

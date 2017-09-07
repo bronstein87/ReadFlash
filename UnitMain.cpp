@@ -30,3 +30,10 @@
 
 
 
+void __fastcall TMainForm::AnalyzeLookClick(TObject *Sender)
+{
+	TAnalyzeForm * AnalyzeForm = new TAnalyzeForm(this);
+	AnalyzeForm->Show();
+}
+//---------------------------------------------------------------------------
+

@@ -5,8 +5,9 @@
 #include <tchar.h>
 #include <SysUtils.hpp>
 //---------------------------------------------------------------------------
-USEFORM("UnitMain.cpp", MainForm);
 USEFORM("UnitGraph\UnitGraphOrient.cpp", FormGraphOrient);
+USEFORM("UnitMain.cpp", MainForm);
+USEFORM("UnitGraph\Analyze.cpp", AnalyzeForm);
 USEFORM("UnitGraph\UnitAnimateSetting.cpp", FormAnimateSetting);
 //---------------------------------------------------------------------------
 int WINAPI _tWinMain(HINSTANCE, HINSTANCE, LPTSTR, int)

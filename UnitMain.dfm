@@ -21,5 +21,9 @@ object MainForm: TMainForm
       Caption = #1055#1088#1086#1089#1084#1086#1090#1088
       OnClick = MenuLookClick
     end
+    object AnalyzeLook: TMenuItem
+      Caption = #1040#1085#1072#1083#1080#1079
+      OnClick = AnalyzeLookClick
+    end
   end
 end

@@ -129,41 +129,39 @@ void __fastcall TAnalyzeForm::ChooseDirectoriesClick(TObject *Sender)
 
 			for (int j = 0; j < FileList->Count; j ++)
 			{
-			   if (reader->ReadFormat(FileList->Strings[j], false))
-			   {
-
-					if	(j != FileList->Count - 1
-					&& AnsiContainsStr(FileList->Strings[j + 1], ".res"))
+				if (!AnsiContainsStr(FileList->Strings[i], "Img"))
+				{
+					if	(reader->ReadFormat(FileList->Strings[i], false))
 					{
-						if (reader->ReadFormat(FileList->Strings[j + 1], false))
+						TStringDynArray SplittedString = SplitString(FileList->Strings[i], "\\");
+						UnicodeString ResFileName = FileOpenDialog1->Files->Strings[i] + "\\Img" + SplittedString[SplittedString.Length - 1];
+						if (reader->ReadFormat(ResFileName, false))
 						{
-							j = j + 1;
-						}
-						else throw logic_error(string("Не удалось считать ") + AnsiString(FileList->Strings[i + 1]).c_str());
+							AngularSpeedErrorValues.push_back(
+							Point::Create(reader->StarsData.RecognizedAngularVelocity[0] - reader->Georeferencing.DeviceAngularVelocity[0],
+							reader->StarsData.RecognizedAngularVelocity[1] - reader->Georeferencing.DeviceAngularVelocity[1],
+							reader->StarsData.RecognizedAngularVelocity[2] - reader->Georeferencing.DeviceAngularVelocity[2]));
 
-						AngularSpeedErrorValues.push_back(
-						Point::Create(reader->StarsData.RecognizedAngularVelocity[0] - reader->Georeferencing.DeviceAngularVelocity[0],
-						reader->StarsData.RecognizedAngularVelocity[1] - reader->Georeferencing.DeviceAngularVelocity[1],
-						reader->StarsData.RecognizedAngularVelocity[2] - reader->Georeferencing.DeviceAngularVelocity[2]));
-
-						double diffAz = reader->StarsData.RecognizedOrientationAngles[2] - reader->Georeferencing.OrientationAngles[2];
-						if (abs(diffAz) > 5)        // потом убрать
-						{
-							diffAz = (reader->StarsData.RecognizedOrientationAngles[2] + reader->Georeferencing.OrientationAngles[2])
-							-	abs(reader->StarsData.RecognizedOrientationAngles[2] - reader->Georeferencing.OrientationAngles[2]);
+							double diffAz = reader->StarsData.RecognizedOrientationAngles[2] - reader->Georeferencing.OrientationAngles[2];
+							if (abs(diffAz) > 5)        // потом убрать
+							{
+								diffAz = (reader->StarsData.RecognizedOrientationAngles[2] + reader->Georeferencing.OrientationAngles[2])
+									-	abs(reader->StarsData.RecognizedOrientationAngles[2] - reader->Georeferencing.OrientationAngles[2]);
+							}
+							AngleErrorValues.push_back(
+							Point::Create(reader->StarsData.RecognizedOrientationAngles[0] - reader->Georeferencing.OrientationAngles[0],
+							reader->StarsData.RecognizedOrientationAngles[1] - reader->Georeferencing.OrientationAngles[1], diffAz));
 						}
-						AngleErrorValues.push_back(
-						Point::Create(reader->StarsData.RecognizedOrientationAngles[0] - reader->Georeferencing.OrientationAngles[0],
-						reader->StarsData.RecognizedOrientationAngles[1] - reader->Georeferencing.OrientationAngles[1], diffAz));
+						else throw logic_error(string("Не удалось считать ") + AnsiString(FileList->Strings[i]).c_str());
 					}
-
-			   }
-			   else throw logic_error(string("Не удалось считать ") + AnsiString(FileList->Strings[i + 1]).c_str());
+					else throw logic_error(string("Не удалось считать ") + AnsiString(FileList->Strings[i + 1]).c_str());
+				}
 			}
 
-
 				 int gradus, minutes, seconds;
-				 ToGMS (reader->StarsData.RecognizedAngularVelocity[0] * RTD, gradus, minutes, seconds);
+				 double speedModule = sqrt(pow(reader->StarsData.RecognizedAngularVelocity[0] * RTD, 2) +
+					  pow(reader->StarsData.RecognizedAngularVelocity[1] * RTD, 2) + pow(reader->StarsData.RecognizedAngularVelocity[2] * RTD, 2));
+				 ToGMS (speedModule, gradus, minutes, seconds);
 				 UnicodeString Label = FloatToStr(gradus) + "°" + FloatToStr(minutes) + "'" + FloatToStr(seconds) + "''";
 
 				 struct { bool operator()(const Point& a,const Point& b) { return a.X < b.X;} } ComparePointX;
@@ -218,7 +216,6 @@ void __fastcall TAnalyzeForm::ChooseDirectoriesClick(TObject *Sender)
 				 seriesAzSKO->AddHighLow(i, (MeanSkoZ.first + MeanSkoZ.second) * RTS, (MeanSkoZ.first - MeanSkoZ.second) * RTS , Label);
 		}
 	}
-
 }
 //---------------------------------------------------------------------------
 void __fastcall TAnalyzeForm::SaveGraphsClick(TObject *Sender)
@@ -239,5 +236,10 @@ void __fastcall TAnalyzeForm::ClearGraphsClick(TObject *Sender)
 	{
 		plotter->ClearChart(Charts[i]);
 	}
+}
+//---------------------------------------------------------------------------
+void __fastcall TAnalyzeForm::FormClose(TObject *Sender, TCloseAction &Action)
+{
+	Action = caFree;
 }
 //---------------------------------------------------------------------------

@@ -68,24 +68,89 @@ object FormGraphOrient: TFormGraphOrient
     TabOrder = 1
     Visible = False
   end
+  object EditSizeX: TEdit
+    Left = 931
+    Top = 796
+    Width = 50
+    Height = 21
+    Anchors = [akRight, akBottom]
+    TabOrder = 2
+    Text = '0'
+  end
+  object EditSizeY: TEdit
+    Left = 987
+    Top = 796
+    Width = 53
+    Height = 21
+    Anchors = [akRight, akBottom]
+    TabOrder = 3
+    Text = '220'
+  end
+  object EditTimeDev: TEdit
+    Left = 513
+    Top = 796
+    Width = 121
+    Height = 21
+    Anchors = [akRight, akBottom]
+    TabOrder = 4
+    Text = '0'
+  end
+  object EditNumCadr: TEdit
+    Left = 703
+    Top = 796
+    Width = 57
+    Height = 21
+    Anchors = [akRight, akBottom]
+    NumbersOnly = True
+    TabOrder = 5
+    Text = '0'
+    OnChange = EditNumCadrChange
+  end
+  object UpDown1: TUpDown
+    Left = 760
+    Top = 796
+    Width = 16
+    Height = 21
+    Anchors = [akRight, akBottom]
+    Associate = EditNumCadr
+    Max = 99999999
+    TabOrder = 6
+    Thousands = False
+  end
+  object SortFileCheckBox: TCheckBox
+    Left = 789
+    Top = 797
+    Width = 117
+    Height = 20
+    Alignment = taLeftJustify
+    Anchors = [akRight, akBottom]
+    BiDiMode = bdLeftToRight
+    Caption = #1057#1086#1088#1090#1080#1088#1086#1074#1072#1090#1100' '#1092#1072#1081#1083
+    ParentBiDiMode = False
+    TabOrder = 7
+  end
   object Fyf: TPageControl
     Left = 16
     Top = 8
     Width = 1160
     Height = 777
-    ActivePage = TabSheet12
+    ActivePage = TabSheet11
     Anchors = [akLeft, akTop, akRight, akBottom]
-    TabOrder = 2
+    TabOrder = 8
     object TabSheet5: TTabSheet
       Caption = #1059#1075#1083#1099' '#1086#1088#1080#1077#1085#1090#1072#1094#1080#1080
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
       object ChartAl: TChart
-        Left = 16
-        Top = 17
-        Width = 1117
-        Height = 250
+        Left = 0
+        Top = 3
+        Width = 1149
+        Height = 264
         BackWall.Brush.Style = bsClear
         Legend.CheckBoxes = True
         Legend.LegendStyle = lsSeries
@@ -119,9 +184,9 @@ object FormGraphOrient: TFormGraphOrient
         ColorPaletteIndex = 13
       end
       object ChartDl: TChart
-        Left = 16
+        Left = 0
         Top = 265
-        Width = 1117
+        Width = 1149
         Height = 250
         BackWall.Brush.Style = bsClear
         Legend.CheckBoxes = True
@@ -156,9 +221,9 @@ object FormGraphOrient: TFormGraphOrient
         ColorPaletteIndex = 13
       end
       object ChartAz: TChart
-        Left = 16
+        Left = 5
         Top = 509
-        Width = 1117
+        Width = 1144
         Height = 250
         BackWall.Brush.Style = bsClear
         Legend.CheckBoxes = True
@@ -196,13 +261,17 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheet4: TTabSheet
       Caption = #1054#1096#1080#1073#1082#1072' '#1091#1075#1083#1086#1074' '#1086#1088#1080#1077#1085#1090#1072#1094#1080#1080
       ImageIndex = 10
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
       object ChartAzError: TChart
-        Left = 24
+        Left = 3
         Top = 499
-        Width = 1117
+        Width = 1138
         Height = 250
         BackWall.Brush.Style = bsClear
         Legend.CheckBoxes = True
@@ -226,9 +295,9 @@ object FormGraphOrient: TFormGraphOrient
         ColorPaletteIndex = 13
       end
       object ChartDlError: TChart
-        Left = 24
+        Left = 0
         Top = 260
-        Width = 1117
+        Width = 1141
         Height = 250
         BackWall.Brush.Style = bsClear
         Legend.CheckBoxes = True
@@ -252,9 +321,9 @@ object FormGraphOrient: TFormGraphOrient
         ColorPaletteIndex = 13
       end
       object ChartAlError: TChart
-        Left = 32
+        Left = 3
         Top = 3
-        Width = 1117
+        Width = 1146
         Height = 250
         BackWall.Brush.Style = bsClear
         Legend.CheckBoxes = True
@@ -278,17 +347,21 @@ object FormGraphOrient: TFormGraphOrient
         ColorPaletteIndex = 13
       end
     end
-    object TabSheet13: TTabSheet
-      Caption = #1040#1085#1072#1083#1080#1079' '#1086#1096#1080#1073#1086#1082' '#1091#1075#1083#1086#1074
-      ImageIndex = 13
+    object TabSheet12: TTabSheet
+      Caption = #1054#1096#1080#1073#1082#1072' '#1086#1089#1077#1081' '#1055#1057#1050
+      ImageIndex = 12
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
-      object ChartAnalyzeErrorAl: TChart
-        Left = -4
+      object ChartErrorOX: TChart
+        Left = 3
         Top = 0
-        Width = 1117
-        Height = 250
+        Width = 1150
+        Height = 242
         BackWall.Brush.Style = bsClear
         Legend.CheckBoxes = True
         Legend.LegendStyle = lsSeries
@@ -297,10 +370,16 @@ object FormGraphOrient: TFormGraphOrient
         Title.Font.Height = -13
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
-          #1054#1096#1080#1073#1082#1072' '#1087#1088#1103#1084#1086#1075#1086' '#1074#1086#1089#1093#1086#1078#1076#1077#1085#1080#1103', '#1091#1075#1083'. '#1089#1077#1082)
-        BottomAxis.Title.Caption = #1059#1075#1083#1086#1074#1072#1103' '#1089#1082#1086#1088#1086#1089#1090#1100', '#1075#1088#1072#1076
+          #1054#1096#1080#1073#1082#1072' '#1087#1086' '#1086#1089#1080' '#1054#1061', '#1091#1075#1083'. '#1089#1077#1082)
+        BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
         Panning.MouseWheel = pmwNone
+        RightAxis.Automatic = False
+        RightAxis.AutomaticMaximum = False
+        RightAxis.AutomaticMinimum = False
+        TopAxis.Automatic = False
+        TopAxis.AutomaticMaximum = False
+        TopAxis.AutomaticMinimum = False
         View3D = False
         Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
@@ -310,10 +389,10 @@ object FormGraphOrient: TFormGraphOrient
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
-      object ChartAnalyzeErrorDl: TChart
-        Left = -4
-        Top = 256
-        Width = 1117
+      object ChartErrorOY: TChart
+        Left = 3
+        Top = 248
+        Width = 1150
         Height = 250
         BackWall.Brush.Style = bsClear
         Legend.CheckBoxes = True
@@ -323,8 +402,8 @@ object FormGraphOrient: TFormGraphOrient
         Title.Font.Height = -13
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
-          #1054#1096#1080#1073#1082#1072' '#1089#1082#1083#1086#1085#1077#1085#1080#1103', '#1091#1075#1083'. '#1089#1077#1082)
-        BottomAxis.Title.Caption = #1059#1075#1083#1086#1074#1072#1103' '#1089#1082#1086#1088#1086#1089#1090#1100', '#1075#1088#1072#1076
+          #1054#1096#1080#1073#1082#1072' '#1087#1086' '#1086#1089#1080' '#1054'Y, '#1091#1075#1083'. '#1089#1077#1082)
+        BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
         Panning.MouseWheel = pmwNone
         RightAxis.Automatic = False
@@ -342,10 +421,10 @@ object FormGraphOrient: TFormGraphOrient
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
-      object ChartAnalyzeErrorAz: TChart
-        Left = -4
-        Top = 508
-        Width = 1117
+      object ChartErrorOZ: TChart
+        Left = 3
+        Top = 504
+        Width = 1150
         Height = 250
         BackWall.Brush.Style = bsClear
         Legend.CheckBoxes = True
@@ -355,8 +434,8 @@ object FormGraphOrient: TFormGraphOrient
         Title.Font.Height = -13
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
-          #1054#1096#1080#1073#1082#1072' '#1072#1079#1080#1084#1091#1090#1072', '#1091#1075#1083'. '#1089#1077#1082)
-        BottomAxis.Title.Caption = #1059#1075#1083#1086#1074#1072#1103' '#1089#1082#1086#1088#1086#1089#1090#1100', '#1075#1088#1072#1076
+          #1054#1096#1080#1073#1082#1072' '#1087#1086' '#1086#1089#1080' OZ, '#1091#1075#1083'. '#1089#1077#1082)
+        BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
         Panning.MouseWheel = pmwNone
         RightAxis.Automatic = False
@@ -378,14 +457,18 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheet6: TTabSheet
       Caption = #1059#1075#1083#1086#1074#1072#1103' '#1089#1082#1086#1088#1086#1089#1090#1100
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
       object ChartWx: TChart
-        Left = 16
-        Top = 9
-        Width = 1117
-        Height = 250
+        Left = 0
+        Top = 0
+        Width = 1149
+        Height = 259
         BackWall.Brush.Style = bsClear
         Legend.CheckBoxes = True
         Legend.LegendStyle = lsSeries
@@ -408,9 +491,9 @@ object FormGraphOrient: TFormGraphOrient
         ColorPaletteIndex = 13
       end
       object ChartWy: TChart
-        Left = 16
+        Left = 0
         Top = 252
-        Width = 1117
+        Width = 1149
         Height = 250
         BackWall.Brush.Style = bsClear
         Legend.CheckBoxes = True
@@ -434,9 +517,9 @@ object FormGraphOrient: TFormGraphOrient
         ColorPaletteIndex = 13
       end
       object ChartWz: TChart
-        Left = 16
+        Left = 0
         Top = 497
-        Width = 1117
+        Width = 1153
         Height = 250
         BackWall.Brush.Style = bsClear
         Legend.CheckBoxes = True
@@ -463,13 +546,17 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheet11: TTabSheet
       Caption = #1054#1096#1080#1073#1082#1072' '#1091#1075#1083#1086#1074#1086#1081' '#1089#1082#1086#1088#1086#1089#1090#1080
       ImageIndex = 11
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
       object ChartWxError: TChart
         Left = 3
         Top = 0
-        Width = 1117
+        Width = 1146
         Height = 250
         BackWall.Brush.Style = bsClear
         Legend.CheckBoxes = True
@@ -483,6 +570,12 @@ object FormGraphOrient: TFormGraphOrient
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
         Panning.MouseWheel = pmwNone
+        RightAxis.Automatic = False
+        RightAxis.AutomaticMaximum = False
+        RightAxis.AutomaticMinimum = False
+        TopAxis.Automatic = False
+        TopAxis.AutomaticMaximum = False
+        TopAxis.AutomaticMinimum = False
         View3D = False
         Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
@@ -495,7 +588,7 @@ object FormGraphOrient: TFormGraphOrient
       object ChartWyError: TChart
         Left = 3
         Top = 248
-        Width = 1117
+        Width = 1146
         Height = 250
         BackWall.Brush.Style = bsClear
         Legend.CheckBoxes = True
@@ -521,7 +614,7 @@ object FormGraphOrient: TFormGraphOrient
       object ChartWzError: TChart
         Left = 3
         Top = 496
-        Width = 1117
+        Width = 1150
         Height = 250
         BackWall.Brush.Style = bsClear
         Legend.CheckBoxes = True
@@ -545,126 +638,21 @@ object FormGraphOrient: TFormGraphOrient
         ColorPaletteIndex = 13
       end
     end
-    object TabSheet12: TTabSheet
-      Caption = #1040#1085#1072#1083#1080#1079' '#1086#1096#1080#1073#1086#1082' '#1089#1082#1086#1088#1086#1089#1090#1080
-      ImageIndex = 4
-      DesignSize = (
-        1152
-        749)
-      object ChartAnalyzeXV: TChart
-        Left = 3
-        Top = 0
-        Width = 1117
-        Height = 250
-        BackWall.Brush.Style = bsClear
-        Legend.CheckBoxes = True
-        Legend.LegendStyle = lsSeries
-        Legend.Shadow.HorizSize = 0
-        Legend.Shadow.VertSize = 0
-        Title.Font.Height = -13
-        Title.Font.Style = [fsBold]
-        Title.Text.Strings = (
-          ' '#1054#1096#1080#1073#1082#1072' Wx, '#1091#1075#1083'. '#1089#1077#1082'/'#1089)
-        BottomAxis.Title.Caption = #1059#1075#1083#1086#1074#1072#1103' '#1089#1082#1086#1088#1086#1089#1090#1100', '#1075#1088#1072#1076
-        LeftAxis.AxisValuesFormat = '#,##0.#####'
-        Panning.MouseWheel = pmwNone
-        RightAxis.Automatic = False
-        RightAxis.AutomaticMaximum = False
-        RightAxis.AutomaticMinimum = False
-        TopAxis.Automatic = False
-        TopAxis.AutomaticMaximum = False
-        TopAxis.AutomaticMinimum = False
-        View3D = False
-        Zoom.MouseWheel = pmwNormal
-        BevelOuter = bvNone
-        Color = clWhite
-        TabOrder = 0
-        Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TTeeCanvas3D'
-        ColorPaletteIndex = 13
-      end
-      object ChartAnalyzeYV: TChart
-        Left = 3
-        Top = 248
-        Width = 1117
-        Height = 250
-        BackWall.Brush.Style = bsClear
-        Legend.CheckBoxes = True
-        Legend.LegendStyle = lsSeries
-        Legend.Shadow.HorizSize = 0
-        Legend.Shadow.VertSize = 0
-        Title.Font.Height = -13
-        Title.Font.Style = [fsBold]
-        Title.Text.Strings = (
-          ' '#1054#1096#1080#1073#1082#1072' Wy, '#1091#1075#1083'. '#1089#1077#1082'/'#1089)
-        BottomAxis.Title.Caption = #1059#1075#1083#1086#1074#1072#1103' '#1089#1082#1086#1088#1086#1089#1090#1100', '#1075#1088#1072#1076
-        LeftAxis.AxisValuesFormat = '#,##0.#####'
-        Panning.MouseWheel = pmwNone
-        RightAxis.Automatic = False
-        RightAxis.AutomaticMaximum = False
-        RightAxis.AutomaticMinimum = False
-        TopAxis.Automatic = False
-        TopAxis.AutomaticMaximum = False
-        TopAxis.AutomaticMinimum = False
-        View3D = False
-        Zoom.MouseWheel = pmwNormal
-        BevelOuter = bvNone
-        Color = clWhite
-        TabOrder = 1
-        Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TTeeCanvas3D'
-        ColorPaletteIndex = 13
-      end
-      object ChartAnalyzeZV: TChart
-        Left = 3
-        Top = 496
-        Width = 1117
-        Height = 250
-        BackWall.Brush.Style = bsClear
-        Legend.CheckBoxes = True
-        Legend.LegendStyle = lsSeries
-        Legend.Shadow.HorizSize = 0
-        Legend.Shadow.VertSize = 0
-        Title.Font.Height = -13
-        Title.Font.Style = [fsBold]
-        Title.Text.Strings = (
-          ' '#1054#1096#1080#1073#1082#1072' Wz, '#1091#1075#1083'. '#1089#1077#1082'/'#1089)
-        BottomAxis.Automatic = False
-        BottomAxis.AutomaticMaximum = False
-        BottomAxis.AutomaticMinimum = False
-        BottomAxis.Title.Caption = #1059#1075#1083#1086#1074#1072#1103' '#1089#1082#1086#1088#1086#1089#1090#1100', '#1075#1088#1072#1076
-        LeftAxis.Automatic = False
-        LeftAxis.AutomaticMaximum = False
-        LeftAxis.AutomaticMinimum = False
-        LeftAxis.AxisValuesFormat = '#,##0.#####'
-        Panning.MouseWheel = pmwNone
-        RightAxis.Automatic = False
-        RightAxis.AutomaticMaximum = False
-        RightAxis.AutomaticMinimum = False
-        TopAxis.Automatic = False
-        TopAxis.AutomaticMaximum = False
-        TopAxis.AutomaticMinimum = False
-        View3D = False
-        Zoom.MouseWheel = pmwNormal
-        BevelOuter = bvNone
-        Color = clWhite
-        TabOrder = 2
-        Anchors = [akLeft, akRight]
-        DefaultCanvas = 'TTeeCanvas3D'
-        ColorPaletteIndex = 13
-      end
-    end
     object TabSheet7: TTabSheet
       Caption = #1056#1072#1089#1089#1086#1075#1083#1072#1089#1086#1074#1072#1085#1080#1103
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
       object ChartMx: TChart
-        Left = 16
-        Top = 9
-        Width = 1117
-        Height = 250
+        Left = 0
+        Top = 0
+        Width = 1153
+        Height = 259
         BackWall.Brush.Style = bsClear
         Legend.CheckBoxes = True
         Legend.LegendStyle = lsSeries
@@ -687,9 +675,9 @@ object FormGraphOrient: TFormGraphOrient
         ColorPaletteIndex = 13
       end
       object ChartMy: TChart
-        Left = 16
+        Left = 0
         Top = 252
-        Width = 1117
+        Width = 1149
         Height = 250
         BackWall.Brush.Style = bsClear
         Legend.CheckBoxes = True
@@ -713,9 +701,9 @@ object FormGraphOrient: TFormGraphOrient
         ColorPaletteIndex = 13
       end
       object ChartMxy: TChart
-        Left = 16
+        Left = 0
         Top = 496
-        Width = 1117
+        Width = 1149
         Height = 250
         BackWall.Brush.Style = bsClear
         Legend.CheckBoxes = True
@@ -742,13 +730,17 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheet8: TTabSheet
       Caption = #1063#1080#1089#1083#1086' '#1086#1073#1098#1077#1082#1090#1086#1074
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
       object ChartNumFrag: TChart
-        Left = 16
+        Left = 3
         Top = 0
-        Width = 1117
+        Width = 1146
         Height = 250
         BackWall.Brush.Style = bsClear
         Legend.CheckBoxes = True
@@ -772,9 +764,9 @@ object FormGraphOrient: TFormGraphOrient
         ColorPaletteIndex = 13
       end
       object ChartNumLoc: TChart
-        Left = 16
+        Left = 3
         Top = 251
-        Width = 1117
+        Width = 1150
         Height = 250
         BackWall.Brush.Style = bsClear
         Legend.CheckBoxes = True
@@ -798,9 +790,9 @@ object FormGraphOrient: TFormGraphOrient
         ColorPaletteIndex = 13
       end
       object ChartNumDet: TChart
-        Left = 16
+        Left = 3
         Top = 497
-        Width = 1117
+        Width = 1146
         Height = 250
         BackWall.Brush.Style = bsClear
         Legend.CheckBoxes = True
@@ -814,6 +806,12 @@ object FormGraphOrient: TFormGraphOrient
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
         Panning.MouseWheel = pmwNone
+        RightAxis.Automatic = False
+        RightAxis.AutomaticMaximum = False
+        RightAxis.AutomaticMinimum = False
+        TopAxis.Automatic = False
+        TopAxis.AutomaticMaximum = False
+        TopAxis.AutomaticMinimum = False
         View3D = False
         Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
@@ -827,13 +825,17 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheet9: TTabSheet
       Caption = #1055#1072#1088#1072#1084#1077#1090#1088#1099' '#1080#1079#1086#1073#1088#1072#1078#1077#1085#1080#1103
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
       object ChartFone: TChart
-        Left = 16
+        Left = 0
         Top = 8
-        Width = 1117
+        Width = 1149
         Height = 250
         BackWall.Brush.Style = bsClear
         Legend.CheckBoxes = True
@@ -857,9 +859,9 @@ object FormGraphOrient: TFormGraphOrient
         ColorPaletteIndex = 13
       end
       object ChartNoise: TChart
-        Left = 16
+        Left = 0
         Top = 252
-        Width = 1117
+        Width = 1153
         Height = 250
         BackWall.Brush.Style = bsClear
         Legend.CheckBoxes = True
@@ -883,9 +885,9 @@ object FormGraphOrient: TFormGraphOrient
         ColorPaletteIndex = 13
       end
       object ChartTemp: TChart
-        Left = 16
+        Left = 0
         Top = 498
-        Width = 1117
+        Width = 1149
         Height = 250
         BackWall.Brush.Style = bsClear
         Legend.CheckBoxes = True
@@ -912,6 +914,10 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheet10: TTabSheet
       Caption = #1044#1074#1080#1078#1077#1085#1080#1077' '#1079#1074#1077#1079#1076
       ImageIndex = 5
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
@@ -962,28 +968,75 @@ object FormGraphOrient: TFormGraphOrient
         Top = 43
         Width = 1107
         Height = 686
+        BackWall.Brush.Gradient.Direction = gdBottomTop
+        BackWall.Brush.Gradient.EndColor = clWhite
+        BackWall.Brush.Gradient.StartColor = 15395562
+        BackWall.Brush.Gradient.Visible = True
+        BackWall.Transparent = False
+        Foot.Font.Color = clBlue
+        Foot.Font.Name = 'Verdana'
+        Gradient.Direction = gdBottomTop
+        Gradient.EndColor = clWhite
+        Gradient.MidColor = 15395562
+        Gradient.StartColor = 15395562
+        Gradient.Visible = True
+        LeftWall.Color = 14745599
+        Legend.Font.Name = 'Verdana'
+        Legend.Shadow.Transparency = 0
         Legend.Visible = False
+        RightWall.Color = 14745599
+        Title.Font.Name = 'Verdana'
         Title.Text.Strings = (
           #1044#1074#1080#1078#1077#1085#1080#1077' '#1079#1074#1105#1079#1076)
         BottomAxis.Automatic = False
         BottomAxis.AutomaticMaximum = False
         BottomAxis.AutomaticMinimum = False
+        BottomAxis.Axis.Color = 4210752
+        BottomAxis.Grid.Color = 11119017
+        BottomAxis.LabelsFormat.Font.Name = 'Verdana'
         BottomAxis.Maximum = 24.036205327967800000
         BottomAxis.Minimum = -11.975843154929570000
+        BottomAxis.TicksInner.Color = 11119017
+        BottomAxis.Title.Font.Name = 'Verdana'
         Chart3DPercent = 1
+        DepthAxis.Axis.Color = 4210752
+        DepthAxis.Grid.Color = 11119017
+        DepthAxis.LabelsFormat.Font.Name = 'Verdana'
+        DepthAxis.TicksInner.Color = 11119017
+        DepthAxis.Title.Font.Name = 'Verdana'
+        DepthTopAxis.Axis.Color = 4210752
+        DepthTopAxis.Grid.Color = 11119017
+        DepthTopAxis.LabelsFormat.Font.Name = 'Verdana'
+        DepthTopAxis.TicksInner.Color = 11119017
+        DepthTopAxis.Title.Font.Name = 'Verdana'
         LeftAxis.Automatic = False
         LeftAxis.AutomaticMaximum = False
         LeftAxis.AutomaticMinimum = False
+        LeftAxis.Axis.Color = 4210752
+        LeftAxis.Grid.Color = 11119017
         LeftAxis.Inverted = True
+        LeftAxis.LabelsFormat.Font.Name = 'Verdana'
         LeftAxis.Maximum = 4644.079226920634000000
         LeftAxis.Minimum = -2337.544079528345000000
+        LeftAxis.TicksInner.Color = 11119017
+        LeftAxis.Title.Font.Name = 'Verdana'
         Panning.MouseWheel = pmwNone
         RightAxis.Automatic = False
         RightAxis.AutomaticMaximum = False
         RightAxis.AutomaticMinimum = False
+        RightAxis.Axis.Color = 4210752
+        RightAxis.Grid.Color = 11119017
+        RightAxis.LabelsFormat.Font.Name = 'Verdana'
+        RightAxis.TicksInner.Color = 11119017
+        RightAxis.Title.Font.Name = 'Verdana'
         TopAxis.Automatic = False
         TopAxis.AutomaticMaximum = False
         TopAxis.AutomaticMinimum = False
+        TopAxis.Axis.Color = 4210752
+        TopAxis.Grid.Color = 11119017
+        TopAxis.LabelsFormat.Font.Name = 'Verdana'
+        TopAxis.TicksInner.Color = 11119017
+        TopAxis.Title.Font.Name = 'Verdana'
         View3D = False
         View3DOptions.OrthoAngle = 0
         View3DOptions.Perspective = 0
@@ -1001,6 +1054,7 @@ object FormGraphOrient: TFormGraphOrient
         ColorPaletteIndex = 13
         object Series9: TBubbleSeries
           Marks.Frame.Visible = False
+          Marks.Transparent = False
           ClickableLine = False
           Pointer.Brush.Gradient.Angle = 38
           Pointer.Brush.Gradient.Direction = gdFromTopLeft
@@ -1097,6 +1151,10 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheet1: TTabSheet
       Caption = #1060#1088#1072#1075#1084#1077#1085#1090#1099
       ImageIndex = 6
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
@@ -1105,10 +1163,12 @@ object FormGraphOrient: TFormGraphOrient
         Top = 3
         Width = 516
         Height = 250
+        BackWall.Brush.Style = bsClear
         Legend.Alignment = laBottom
+        Legend.Shadow.HorizSize = 0
+        Legend.Shadow.VertSize = 0
         Legend.Visible = False
-        Title.Font.Color = clBlack
-        Title.Font.Height = -15
+        Title.Font.Height = -13
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
           #1059#1088#1086#1074#1077#1085#1100' '#1092#1086#1085#1072', '#1045#1052#1056)
@@ -1120,7 +1180,6 @@ object FormGraphOrient: TFormGraphOrient
         ColorPaletteIndex = 13
         object Series4: TBarSeries
           Marks.Visible = False
-          SeriesColor = 16744576
           Title = #1057#1088#1077#1076#1085#1077#1077
           Emboss.Color = 8882055
           Shadow.Color = 8882055
@@ -1135,10 +1194,12 @@ object FormGraphOrient: TFormGraphOrient
         Top = 500
         Width = 516
         Height = 250
+        BackWall.Brush.Style = bsClear
         Legend.Alignment = laBottom
+        Legend.Shadow.HorizSize = 0
+        Legend.Shadow.VertSize = 0
         Legend.Visible = False
-        Title.Font.Color = clBlack
-        Title.Font.Height = -15
+        Title.Font.Height = -13
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
           #1063#1080#1089#1083#1086' '#1086#1073#1098#1077#1082#1090#1086#1074' '#1074' '#1086#1082#1085#1077)
@@ -1163,7 +1224,6 @@ object FormGraphOrient: TFormGraphOrient
         ColorPaletteIndex = 13
         object Series6: TBarSeries
           Marks.Visible = False
-          SeriesColor = 16744576
           XValues.Name = 'X'
           XValues.Order = loAscending
           YValues.Name = 'Bar'
@@ -1175,9 +1235,11 @@ object FormGraphOrient: TFormGraphOrient
         Top = 251
         Width = 516
         Height = 250
+        BackWall.Brush.Style = bsClear
+        Legend.Shadow.HorizSize = 0
+        Legend.Shadow.VertSize = 0
         Legend.Visible = False
-        Title.Font.Color = clBlack
-        Title.Font.Height = -15
+        Title.Font.Height = -13
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
           #1059#1088#1086#1074#1077#1085#1100' '#1096#1091#1084#1072', '#1045#1052#1056)
@@ -1189,7 +1251,6 @@ object FormGraphOrient: TFormGraphOrient
         ColorPaletteIndex = 13
         object Series5: TBarSeries
           Marks.Visible = False
-          SeriesColor = 16744576
           XValues.Name = 'X'
           XValues.Order = loAscending
           YValues.Name = 'Bar'
@@ -1252,6 +1313,10 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheet2: TTabSheet
       Caption = #1054#1073#1098#1077#1082#1090#1099
       ImageIndex = 7
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
@@ -1260,9 +1325,11 @@ object FormGraphOrient: TFormGraphOrient
         Top = 3
         Width = 516
         Height = 250
+        BackWall.Brush.Style = bsClear
+        Legend.Shadow.HorizSize = 0
+        Legend.Shadow.VertSize = 0
         Legend.Visible = False
-        Title.Font.Color = clBlack
-        Title.Font.Height = -15
+        Title.Font.Height = -13
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
           #1048#1085#1090#1077#1075#1088#1072#1083#1100#1085#1072#1103' '#1103#1088#1082#1086#1089#1090#1100', '#1045#1052#1056)
@@ -1274,7 +1341,6 @@ object FormGraphOrient: TFormGraphOrient
         ColorPaletteIndex = 13
         object Series7: TBarSeries
           Marks.Visible = False
-          SeriesColor = 16744576
           XValues.Name = 'X'
           XValues.Order = loAscending
           YValues.Name = 'Bar'
@@ -1286,9 +1352,11 @@ object FormGraphOrient: TFormGraphOrient
         Top = 251
         Width = 516
         Height = 250
+        BackWall.Brush.Style = bsClear
+        Legend.Shadow.HorizSize = 0
+        Legend.Shadow.VertSize = 0
         Legend.Visible = False
-        Title.Font.Color = clBlack
-        Title.Font.Height = -15
+        Title.Font.Height = -13
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
           #1063#1080#1089#1083#1086' '#1101#1083#1077#1084#1077#1085#1090#1086#1074' '#1074' '#1086#1073#1098#1077#1082#1090#1077)
@@ -1300,7 +1368,6 @@ object FormGraphOrient: TFormGraphOrient
         ColorPaletteIndex = 13
         object Series8: TBarSeries
           Marks.Visible = False
-          SeriesColor = 16744576
           XValues.Name = 'X'
           XValues.Order = loAscending
           YValues.Name = 'Bar'
@@ -1364,6 +1431,10 @@ object FormGraphOrient: TFormGraphOrient
     object ShowFragmentTab: TTabSheet
       Caption = #1054#1090#1086#1073#1088#1072#1078#1077#1085#1080#1077' '#1092#1088#1072#1075#1084#1077#1085#1090#1086#1074
       ImageIndex = 8
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object FragmentShowScrollBox: TScrollBox
         Left = 0
         Top = 33
@@ -1491,6 +1562,10 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheet3: TTabSheet
       Caption = #1057#1090#1072#1090#1080#1089#1090#1080#1082#1072' '#1087#1086' '#1079#1074#1077#1079#1076#1072#1084
       ImageIndex = 9
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         1152
         749)
@@ -1511,6 +1586,7 @@ object FormGraphOrient: TFormGraphOrient
         Gradient.EndColor = clWhite
         Gradient.MidColor = 15395562
         Gradient.StartColor = 15395562
+        Gradient.Visible = True
         LeftWall.Color = 14745599
         Legend.Font.Name = 'Verdana'
         Legend.LegendStyle = lsSeries
@@ -1579,6 +1655,7 @@ object FormGraphOrient: TFormGraphOrient
         Gradient.EndColor = clWhite
         Gradient.MidColor = 15395562
         Gradient.StartColor = 15395562
+        Gradient.Visible = True
         LeftWall.Color = 14745599
         Legend.Font.Name = 'Verdana'
         Legend.LegendStyle = lsSeries
@@ -1632,67 +1709,6 @@ object FormGraphOrient: TFormGraphOrient
       end
     end
   end
-  object EditSizeX: TEdit
-    Left = 931
-    Top = 796
-    Width = 50
-    Height = 21
-    Anchors = [akRight, akBottom]
-    TabOrder = 3
-    Text = '0'
-  end
-  object EditSizeY: TEdit
-    Left = 987
-    Top = 796
-    Width = 53
-    Height = 21
-    Anchors = [akRight, akBottom]
-    TabOrder = 4
-    Text = '220'
-  end
-  object EditTimeDev: TEdit
-    Left = 513
-    Top = 796
-    Width = 121
-    Height = 21
-    Anchors = [akRight, akBottom]
-    TabOrder = 5
-    Text = '0'
-  end
-  object EditNumCadr: TEdit
-    Left = 703
-    Top = 796
-    Width = 57
-    Height = 21
-    Anchors = [akRight, akBottom]
-    NumbersOnly = True
-    TabOrder = 6
-    Text = '0'
-    OnChange = EditNumCadrChange
-  end
-  object UpDown1: TUpDown
-    Left = 760
-    Top = 796
-    Width = 16
-    Height = 21
-    Anchors = [akRight, akBottom]
-    Associate = EditNumCadr
-    Max = 99999999
-    TabOrder = 7
-    Thousands = False
-  end
-  object SortFileCheckBox: TCheckBox
-    Left = 789
-    Top = 797
-    Width = 117
-    Height = 20
-    Alignment = taLeftJustify
-    Anchors = [akRight, akBottom]
-    BiDiMode = bdLeftToRight
-    Caption = #1057#1086#1088#1090#1080#1088#1086#1074#1072#1090#1100' '#1092#1072#1081#1083
-    ParentBiDiMode = False
-    TabOrder = 8
-  end
   object MainMenu1: TMainMenu
     Left = 1112
     Top = 192
@@ -1724,10 +1740,6 @@ object FormGraphOrient: TFormGraphOrient
       object ReadIKIFormat: TMenuItem
         Caption = #1044#1072#1085#1085#1099#1077' '#1080#1079' '#1092#1086#1088#1084#1072#1090#1072' '#1048#1050#1048
         OnClick = ReadIKIFormatClick
-      end
-      object ErrorAnalyze: TMenuItem
-        Caption = #1040#1085#1072#1083#1080#1079' '#1086#1096#1080#1073#1086#1082
-        OnClick = ErrorAnalyzeClick
       end
     end
     object MenuSave: TMenuItem

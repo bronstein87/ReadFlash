@@ -1,6 +1,9 @@
+#ifndef IKI_IMG_H
+#define IKI_IMG_H
 #include <fstream>
 #include <stdio.h>
 #include <Classes.hpp>
+
 using namespace std;
 
 #pragma region DEFINE
@@ -2078,3 +2081,5 @@ else
 	// ---------------------------------------------------------------------------
 #pragma end_region
 };
+
+#endif

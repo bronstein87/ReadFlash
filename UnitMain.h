@@ -21,6 +21,9 @@
 	#include "UnitGraphOrient.h"
 	#include "UnitAnimateSetting.h"
 	#include <Vcl.WinXCtrls.hpp>
+	#include "Analyze.h"
+#include <Data.DB.hpp>
+#include <Data.Win.ADODB.hpp>
 
 //---------------------------------------------------------------------------
 class TMainForm : public TForm
@@ -28,7 +31,9 @@ class TMainForm : public TForm
 __published:	// IDE-managed Components
 	TMainMenu *MainMenu1;
 	TMenuItem *MenuLook;
+	TMenuItem *AnalyzeLook;
 	void __fastcall MenuLookClick(TObject *Sender);
+	void __fastcall AnalyzeLookClick(TObject *Sender);
 private:	// User declarations
 
 
