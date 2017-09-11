@@ -47,6 +47,9 @@ __published:	// IDE-managed Components
 	TCheckBox *CheckBoxCurrentTime;
 	TRadioButton *RadioButton1;
 	TRadioButton *RadioButton2;
+	TGroupBox *GroupBox5;
+	TLabel *Label7;
+	TEdit *EditFilePrefix;
 	void __fastcall ShapeColorLocObjTableMouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y);
 	void __fastcall ShapeColorZeroObjTableMouseDown(TObject *Sender, TMouseButton Button,

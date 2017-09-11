@@ -47,6 +47,8 @@ void TFormAnimateSetting::ReadINI(const AnsiString& fileName)
 	ShapeColorTwoObjTable->Brush->Color=TColor(StrToInt(Ini->ReadString("Colors", "TwoObjTable", clWhite)));
 	ShapeColorThreeObjTable->Brush->Color=TColor(StrToInt(Ini->ReadString("Colors", "ThreeObjTable", clWhite)));
 
+    EditFilePrefix->Text = Ini->ReadString("File", "FilePrefix", "");
+
 	CheckBoxCurrentTime->Checked=TColor(StrToInt(Ini->ReadString("CheckBox","CheckCurrentTime","1")));
 }
 //---------------------------------------------------------------------------
@@ -65,6 +67,8 @@ void TFormAnimateSetting::WriteINI(const AnsiString& fileName)
 	Ini->WriteString("Colors", "OneObjTable", IntToStr(ShapeColorOneObjTable->Brush->Color));
 	Ini->WriteString("Colors", "TwoObjTable", IntToStr(ShapeColorTwoObjTable->Brush->Color));
 	Ini->WriteString("Colors", "ThreeObjTable", IntToStr(ShapeColorThreeObjTable->Brush->Color));
+
+	Ini->WriteString("File", "FilePrefix", EditFilePrefix->Text);
 
 	Ini->WriteString("CheckBox", "CheckCurrentTime",   IntToStr((int)CheckBoxCurrentTime->Checked));
 }
