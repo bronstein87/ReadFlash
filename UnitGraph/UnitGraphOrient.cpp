@@ -485,7 +485,7 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 {
 	resetFragmentShowScrollBox();
 
-	for(unsigned int i = 0;i < ImageScrollBoxVector.size();i ++)
+	for(unsigned int i = 0;i < ImageScrollBoxVector.size();i++)
 	{
 		 ImageScrollBoxVector[i]->Free();
 	}
@@ -499,8 +499,6 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 	AnsiString NeededDirectory = GetCurrentDir() + "\\Frag_" + FileTitle;
 	if (!TDirectory::Exists(NeededDirectory))
 	{
-		LabelFrameReport->Visible = true;
-		LabelFrameReport->Caption = "Указан неверный путь к директории фрагментов";
 		return;
 	}
 
@@ -510,7 +508,7 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 
 
    AnsiString FragmentFileStr;
-   for(int CurrentFileName = 0;CurrentFileName < FileNameList.Length;CurrentFileName ++)
+   for(int CurrentFileName = 0;CurrentFileName < FileNameList.Length;CurrentFileName++)
    {
 		if(AnsiContainsStr(FileNameList[CurrentFileName], TimePrStr))
 		  {

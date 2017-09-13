@@ -4,7 +4,7 @@
         <ProjectVersion>18.2</ProjectVersion>
         <MainSource>ReadFlash.cpp</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Release</Config>
+        <Config Condition="'$(Config)'==''">Debug</Config>
         <AppType>Application</AppType>
         <FrameworkType>VCL</FrameworkType>
         <TargetedPlatforms>1</TargetedPlatforms>
@@ -67,8 +67,8 @@
         <PackageImports>rtl.bpi;vcl.bpi;bcbie.bpi;xmlrtl.bpi;vclactnband.bpi;vclx.bpi;bcbsmp.bpi;svnui.bpi;svn.bpi;bdertl.bpi;TeeUI.bpi;TeeDB.bpi;Tee.bpi;vclimg.bpi;vcldb.bpi;dbrtl.bpi;vcldbx.bpi;vcltouch.bpi;dsnap.bpi;dsnapcon.bpi;vclib.bpi;ibxpress.bpi;adortl.bpi;IndyCore.bpi;IndySystem.bpi;IndyProtocols.bpi;inet.bpi;intrawebdb_110_150.bpi;Intraweb_110_150.bpi;vclie.bpi;websnap.bpi;webdsnap.bpi;inetdb.bpi;inetdbbde.bpi;inetdbxpress.bpi;soaprtl.bpi;vclribbon.bpi;dbexpress.bpi;DbxCommonDriver.bpi;DataSnapIndy10ServerTransport.bpi;DataSnapProviderClient.bpi;DbxClientDriver.bpi;DataSnapClient.bpi;dbxcds.bpi;DataSnapServer.bpi;AzureCloud.bpi;DBXInterBaseDriver.bpi;DBXMySQLDriver.bpi;DBXFirebirdDriver.bpi;DBXSybaseASEDriver.bpi;DBXSybaseASADriver.bpi;DBXOracleDriver.bpi;DBXMSSQLDriver.bpi;DBXInformixDriver.bpi;DBXDb2Driver.bpi;$(PackageImports)</PackageImports>
         <Multithreaded>true</Multithreaded>
         <ProjectType>CppVCLApplication</ProjectType>
-        <IncludePath>Word\;UnitGraph\;C:\IKI\PROGRAMS_CB6\ReadFlashEMKA\;$(IncludePath)</IncludePath>
-        <AllPackageLibs>rtl.lib;vcl.lib;vclimg.lib;vclwinx.lib;Tee924.lib;TeePro924.lib;TeeUI924.lib;vclx.lib;xmlrtl.lib;dbrtl.lib;adortl.lib</AllPackageLibs>
+        <IncludePath>Word\;UnitGraph\;$(IncludePath)</IncludePath>
+        <AllPackageLibs>rtl.lib;vcl.lib;vclimg.lib;vclwinx.lib;Tee924.lib;TeePro924.lib;TeeUI924.lib;vclx.lib;xmlrtl.lib;dbrtl.lib;adortl.lib;bcboffice2k.lib</AllPackageLibs>
         <_TCHARMapping>wchar_t</_TCHARMapping>
         <DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
         <DynamicRTL>true</DynamicRTL>
@@ -80,6 +80,7 @@
         <ILINK_TranslatedLibraryPath>$(BDSLIB)\$(PLATFORM)\release\$(LANGDIR);$(ILINK_TranslatedLibraryPath)</ILINK_TranslatedLibraryPath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <PackageImports>bcboffice2k;bcbofficexp;$(PackageImports)</PackageImports>
         <UWP_CppLogo150>$(BDS)\bin\Artwork\Windows\UWP\cppreg_UwpDefault_150.png</UWP_CppLogo150>
         <UWP_CppLogo44>$(BDS)\bin\Artwork\Windows\UWP\cppreg_UwpDefault_44.png</UWP_CppLogo44>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
@@ -126,7 +127,7 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
-        <LinkPackageStatics>rtl.lib;vcl.lib;vclimg.lib;vclwinx.lib;Tee924.lib;TeePro924.lib;TeeUI924.lib;vclx.lib;xmlrtl.lib</LinkPackageStatics>
+        <LinkPackageStatics>rtl.lib;vcl.lib;vclimg.lib;vclwinx.lib;Tee924.lib;TeePro924.lib;TeeUI924.lib;vclx.lib;xmlrtl.lib;dbrtl.lib;adortl.lib;bcboffice2k.lib</LinkPackageStatics>
         <BT_BuildType>Debug</BT_BuildType>
         <Defines>_DEBUG;$(Defines)</Defines>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -215,10 +216,19 @@
             <DependentOn>UnitMain.h</DependentOn>
             <BuildOrder>2</BuildOrder>
         </CppCompile>
-        <FormResources Include="UnitGraph\UnitGraphOrient.dfm"/>
-        <FormResources Include="UnitMain.dfm"/>
+        <None Include="Word\ConstWord.h">
+            <BuildOrder>16</BuildOrder>
+        </None>
+        <CppCompile Include="Word\WordLibOffice.cpp">
+            <BuildOrder>17</BuildOrder>
+        </CppCompile>
+        <None Include="Word\WordLibOffice.h">
+            <BuildOrder>18</BuildOrder>
+        </None>
         <FormResources Include="UnitGraph\Analyze.dfm"/>
         <FormResources Include="UnitGraph\UnitAnimateSetting.dfm"/>
+        <FormResources Include="UnitGraph\UnitGraphOrient.dfm"/>
+        <FormResources Include="UnitMain.dfm"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -274,7 +284,6 @@
                     <ProjectProperties Name="IndexFiles">False</ProjectProperties>
                 </ProjectProperties>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k240.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\bcbofficexp240.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
                 </Excluded_Packages>
             </CPlusPlusBuilder.Personality>
@@ -339,6 +348,12 @@
                 </DeployFile>
                 <DeployFile Condition="'$(DynamicRTL)'=='true' And '$(Multithreaded)'!='true'" LocalName="$(BDS)\bin64\cc64240.dll" Class="DependencyModule">
                     <Platform Name="Win64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName=".\Debug\Win32\ReadFlash.tds" Configuration="Debug" Class="DebugSymbols">
+                    <Platform Name="Win32">
+                        <RemoteName>ReadFlash.tds</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

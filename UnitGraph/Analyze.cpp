@@ -42,6 +42,7 @@ void __fastcall TAnalyzeForm::ChooseDirectoriesClick(TObject *Sender)
 	FileOpenDialog1->Options << fdoPickFolders << fdoAllowMultiSelect;
 	if (FileOpenDialog1->Execute())
 	{
+        ClearGraphsClick(this);
 		THighLowLineSeries* seriesX = new THighLowLineSeries(ChartAnalyzeXV);
 		seriesX->Title = "Max/Min";
 		seriesX->Pen->Width = 3;
@@ -129,11 +130,11 @@ void __fastcall TAnalyzeForm::ChooseDirectoriesClick(TObject *Sender)
 
 			for (int j = 0; j < FileList->Count; j ++)
 			{
-				if (!AnsiContainsStr(FileList->Strings[i], "Img"))
+				if (!AnsiContainsStr(FileList->Strings[j], "Img") && AnsiContainsStr(FileList->Strings[j], ".iki"))
 				{
-					if	(reader->ReadFormat(FileList->Strings[i], false))
+					if	(reader->ReadFormat(FileList->Strings[j], false))
 					{
-						TStringDynArray SplittedString = SplitString(FileList->Strings[i], "\\");
+						TStringDynArray SplittedString = SplitString(FileList->Strings[j], "\\");
 						UnicodeString ResFileName = FileOpenDialog1->Files->Strings[i] + "\\Img" + SplittedString[SplittedString.Length - 1];
 						if (reader->ReadFormat(ResFileName, false))
 						{
@@ -152,9 +153,10 @@ void __fastcall TAnalyzeForm::ChooseDirectoriesClick(TObject *Sender)
 							Point::Create(reader->StarsData.RecognizedOrientationAngles[0] - reader->Georeferencing.OrientationAngles[0],
 							reader->StarsData.RecognizedOrientationAngles[1] - reader->Georeferencing.OrientationAngles[1], diffAz));
 						}
-						else throw logic_error(string("Не удалось считать ") + AnsiString(FileList->Strings[i]).c_str());
+						else throw logic_error(string("Не удалось считать ") + AnsiString(FileList->Strings[j]).c_str());
 					}
-					else throw logic_error(string("Не удалось считать ") + AnsiString(FileList->Strings[i + 1]).c_str());
+					else throw logic_error(string("Не удалось считать ") + AnsiString(FileList->Strings[j]).c_str());
+
 				}
 			}
 
