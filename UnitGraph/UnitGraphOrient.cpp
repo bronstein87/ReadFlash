@@ -477,7 +477,6 @@ void TFormGraphOrient::DrawAnimate(const struct CadrInfo &mCadr)
 
 	PrintTableWindows(mCadr);
 	PrintTableObjects(mCadr);
-
 }
 
 
@@ -596,7 +595,6 @@ void __fastcall TFormGraphOrient::OnScroll(TObject* Sender)
 	TImage* FragmentNumber = dynamic_cast  <TImage*> ( ScrollBox->Components[1]);
 	FragmentNumber->Top = 0;
 	FragmentNumber->Left = 0;
-
 }
 
 void TFormGraphOrient::resetFragmentShowScrollBox()
@@ -3324,15 +3322,19 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 				FileTitle = "IKI";
 				SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
 
+				UnicodeString filePrefix = FormAnimateSetting->EditFilePrefix->Text;
 				for (int i = 0; i < FileList->Count; i ++)
 				{
 					std::unique_ptr <IKI_img> reader(new IKI_img());
-					if( !AnsiContainsStr(FileList->Strings[i], "Img"))
+
+//					if( !AnsiContainsStr(FileList->Strings[i], "Img"))
+					if( !AnsiContainsStr(FileList->Strings[i], filePrefix))
 					{
 						if	(reader->ReadFormat(FileList->Strings[i], false))
 						{
 							TStringDynArray SplittedString = SplitString(FileList->Strings[i], "\\");
-							UnicodeString ResFileName = FileOpenDialog1->FileName + "\\Img" + SplittedString[SplittedString.Length - 1];
+//							UnicodeString ResFileName = FileOpenDialog1->FileName + "\\Img" + SplittedString[SplittedString.Length - 1];
+							UnicodeString ResFileName = FileOpenDialog1->FileName + "\\" + filePrefix + SplittedString[SplittedString.Length - 1];
 							if (reader->ReadFormat(ResFileName, false))
 							{
 								CompareIKIRes = true;

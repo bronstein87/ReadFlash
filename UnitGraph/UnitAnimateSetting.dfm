@@ -2,7 +2,7 @@ object FormAnimateSetting: TFormAnimateSetting
   Left = 0
   Top = 0
   Caption = #1053#1072#1089#1090#1088#1086#1081#1082#1080' '#1072#1085#1080#1084#1072#1094#1080#1080
-  ClientHeight = 452
+  ClientHeight = 555
   ClientWidth = 368
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -230,6 +230,29 @@ object FormAnimateSetting: TFormAnimateSetting
       Height = 17
       Caption = #1090#1086#1095#1082#1072
       TabOrder = 2
+    end
+  end
+  object GroupBox5: TGroupBox
+    Left = 8
+    Top = 447
+    Width = 352
+    Height = 74
+    Caption = #1042#1099#1073#1086#1088' '#1092#1072#1081#1083#1086#1074
+    TabOrder = 4
+    object Label7: TLabel
+      Left = 18
+      Top = 24
+      Width = 55
+      Height = 17
+      Caption = #1055#1088#1077#1092#1080#1082#1089
+    end
+    object EditFilePrefix: TEdit
+      Left = 104
+      Top = 16
+      Width = 121
+      Height = 21
+      TabOrder = 0
+      Text = 'Img'
     end
   end
   object ColorDialog1: TColorDialog
