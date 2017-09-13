@@ -422,10 +422,14 @@ void TFormGraphOrient::DrawBlock(const struct CadrInfo &mCadr)
 
 	AnsiString LabelStar;
 //  Series1->Marks->Visible=true;
+	float binCoef = 1.;
+	if (mCadr.IsBinary) binCoef = 0.5;
+
 	for (int i = 0; i < mCadr.SizeStarsList; i++){
 
 //	  LabelStar="Mv="+FloatToStrF(mCadr.StarsList[i].Mv,ffFixed,8,2);
-		Series1->AddXY(mCadr.StarsList[i].X,mCadr.StarsList[i].Y);//,LabelStar);
+		Series1->AddXY(mCadr.StarsList[i].X * binCoef,
+					   mCadr.StarsList[i].Y * binCoef);
 	}
 
 	Label1->Caption = "Звезд в поле зрения: " + IntToStr(mCadr.CountStars);
@@ -1772,12 +1776,12 @@ int TryReadDTMI(ifstream &finp, struct DTMI &tmi)
 					finp>>tmi.serialNumber;
 				}
 			}
-			else if ((word=="HAM")||(word=="НАМ")) {
+			else if ((word == "HAM") || (word == "НАМ") || (word == "НАM")) {
 				finp>>word;
-				if (word=="ЛОК") {
+				if ((word=="ЛОК") || (word == "ЛOК")) {
 					finp>>tmi.nLocalObj;
 				}
-				else if (word=="ОБЖ") {
+				else if ((word=="ОБЖ") || (word=="OБЖ")) {
 					finp>>tmi.nDeterObj;
 				}
 				else if (word=="ФРАГ") {
@@ -1867,13 +1871,13 @@ int TryReadDTMI(ifstream &finp, struct DTMI &tmi)
 					finp>>tmi.nLocal[indexParam];
 				}
 			}
-			else if ((word=="MAXH")||(word=="МАХН")) {
+			else if ((word=="MAXH")||(word=="МАХН") || (word == "МАХН")) {
 				finp>>tmi.maxHist;
 			}
-			else if (word=="ДХМАХН")  {
+			else if ((word=="ДХМАХН") || (word=="ДХМАХН")) {
 				finp>>tmi.maxHistX;
 			}
-			else if (word=="ДУМАХН") {
+			else if ((word=="ДУМАХН") || (word=="ДУМАХН")) {
 				finp>>tmi.maxHistY;
 				return 1;
 			}
@@ -2009,19 +2013,20 @@ void PrintLOC(ofstream &file, struct LOC tmi)
 
 void PrintLocalDTMI(struct DTMI tmi)
 {
-std::string fileName;
+	AnsiString fileName;
 
-	fileName="BOKZ_"+tmi.timeBOKZ;
-	for (int i = 0; i < fileName.length(); i++) {
+	fileName.printf("BOKZ_№%d_%s", tmi.serialNumber, (tmi.timeBOKZ).c_str());
+	fileName+="_DTMI_LOC.txt";
+
+	for (int i = 1; i < fileName.Length()+1; i++) {
 		if ((fileName[i]==':')||(fileName[i]==';')||(fileName[i]=='?')
 			||(fileName[i]=='>')||(fileName[i]=='<')||(fileName[i]=='=')
 			||(fileName[i]=='/')||(fileName[i]=='\\')) {
 			fileName[i]='_';
 		}
 	}
-	fileName+="_DTMI_LOC.txt";
-	ofstream file(fileName.c_str());
 
+	ofstream file(fileName.c_str());
 	file<<std::setw(6)<<"№"<<" X, pix"<<" Y, pix"<<" Bright"<<" Nel"<<"\n";
 
 	int cntLocal;
@@ -2036,15 +2041,19 @@ std::string fileName;
 }
 void PrintLocalMLOC(struct LOC tmi)
 {
-	std::string fileName="BOKZ_"+tmi.timeBOKZ;
-	for (int i = 0; i < fileName.length(); i++) {
+	AnsiString fileName;
+
+	fileName.printf("BOKZ_№%d_%s", tmi.serialNumber, (tmi.timeBOKZ).c_str());
+	fileName+="_MLOC_LOC.txt";
+
+	for (int i = 1; i < fileName.Length()+1; i++) {
 		if ((fileName[i]==':')||(fileName[i]==';')||(fileName[i]=='?')
 			||(fileName[i]=='>')||(fileName[i]=='<')||(fileName[i]=='=')
 			||(fileName[i]=='/')||(fileName[i]=='\\')) {
 			fileName[i]='_';
 		}
 	}
-	fileName+="_MLOC_LOC.txt";
+
 	ofstream file(fileName.c_str());
 
 	file<<std::setw(6)<<"№"<<" X, pix"<<" Y, pix"<<" Bright"<<" Nel"<<"\n";
@@ -3303,6 +3312,41 @@ void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec
 	cadrInfoVec.push_back(cadrInfo);
 }
 
+void StartPrintReport(IKI_img* reader)
+{
+	OpenWord(true);
+	AddDoc();
+	SetTextFormat(14,1,0,0,1);
+	AddParagraph("ПРОТОКОЛ проверки прибора " + reader->CameraSettings.DataSource+"\n");
+
+	SetTextFormat(12,1,0,0,0);
+	AddParagraph("Параметры орбиты:");
+
+	int deg, min, sec;
+	AnsiString str;
+
+	SetTextFormat(12,0,0,0,0);
+	ToGMS(reader->Georeferencing.InclinationOrbit, deg, min, sec);
+	str.sprintf("%d\° %02d' %02d""", deg, min, sec);
+	AddParagraph("Наклонение орбиты................. " + str);
+
+	ToGMS(reader->Georeferencing.LongitudeAscendingNode, deg, min, sec);
+	str.sprintf("%d\° %02d' %02d""", deg, min, sec);
+	AddParagraph("Долгота восходящего узла....... " + str);
+
+	ToGMS(reader->Georeferencing.ArgumentPerigee, deg, min, sec);
+	str.sprintf("%d\° %02d' %02d""", deg, min, sec);
+	AddParagraph("Аргумент перицентра............... " + str);
+
+	AddParagraph("Радиус орбиты " + FloatToStr(reader->Georeferencing.LengthRadiusVector) +"км");
+}
+
+void PrintReportRes(std::vector <CadrInfo>& cadrInfo)
+{
+	int count = cadrInfo.size();
+	AddParagraph("Количество кадров в обработке: " + IntToStr(count));
+}
+
 void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 {
 	try
@@ -3327,23 +3371,24 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 				{
 					std::unique_ptr <IKI_img> reader(new IKI_img());
 
-//					if( !AnsiContainsStr(FileList->Strings[i], "Img"))
 					if( !AnsiContainsStr(FileList->Strings[i], filePrefix))
 					{
 						if	(reader->ReadFormat(FileList->Strings[i], false))
 						{
 							TStringDynArray SplittedString = SplitString(FileList->Strings[i], "\\");
-//							UnicodeString ResFileName = FileOpenDialog1->FileName + "\\Img" + SplittedString[SplittedString.Length - 1];
 							UnicodeString ResFileName = FileOpenDialog1->FileName + "\\" + filePrefix + SplittedString[SplittedString.Length - 1];
 							if (reader->ReadFormat(ResFileName, false))
 							{
 								CompareIKIRes = true;
+//								if (!i) {
+//									печать параметров модели
+//									StartPrintReport(reader.get());
+//								}
 							}
 							else throw logic_error(string("Не удалось считать ") + AnsiString(FileList->Strings[i]).c_str());
 						}
 						else throw logic_error(string("Не удалось считать ") + AnsiString(FileList->Strings[i]).c_str());
 					}
-
 
 						convertIKIFormatToInfoCadr(reader.get(), vCadrInfo, CompareIKIRes);
 						double Time =  vCadrInfo.back().Time;
@@ -3391,9 +3436,8 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 							LabelFrameReport->Caption = "Cчитано " + IntToStr(i) + " файлов из " + IntToStr(FileList->Count);
 						}
 					}
-
-
-
+//печать статистики по серии кадров
+//					PrintReportRes(vCadrInfo);
 				}
 				struct {
 

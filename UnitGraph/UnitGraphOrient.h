@@ -5,7 +5,8 @@
 
 
 	//---------------------------------------------------------------------------
-	//#include <WordLibOffice.h>
+	#include "..\\Word\\WordLibOffice.h"
+
 	#include <Classes.hpp>
 	#include <Controls.hpp>
 	#include <StdCtrls.hpp>
