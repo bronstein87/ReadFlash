@@ -31,6 +31,10 @@ object AnalyzeForm: TAnalyzeForm
     object TabSheet2: TTabSheet
       Caption = #1040#1085#1072#1083#1080#1079' '#1086#1096#1080#1073#1086#1082' '#1089#1082#1086#1088#1086#1089#1090#1077#1081
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         1209
         717)
@@ -133,6 +137,10 @@ object AnalyzeForm: TAnalyzeForm
     end
     object TabSheet1: TTabSheet
       Caption = #1040#1085#1072#1083#1080#1079' '#1086#1096#1080#1073#1086#1082' '#1091#1075#1083#1086#1074
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         1209
         717)

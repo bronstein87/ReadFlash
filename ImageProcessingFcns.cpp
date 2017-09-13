@@ -80,20 +80,20 @@ std::unique_ptr <TBitmap> changeContrast(int ContrastCoefficient, FragmentData& 
 
 
 	TRGBTriple *BitmapLine; // структура, хранящая RBG
-	for (int currentColumn = 0; currentColumn < FData.SizeY; currentColumn++)
+	for (unsigned int currentColumn = 0; currentColumn < FData.SizeY; currentColumn++)
 	{
 		// указатель на currentColumn строку Bitmap
 		BitmapLine = (TRGBTriple*) Fragment->ScanLine[currentColumn];
-		for (unsigned int currentRow = 0, adress = 0; currentRow < FData.SizeX; currentRow++, adress = currentColumn * FData.SizeX + currentRow)
+		for (unsigned int currentRow = 0, adress = currentColumn * FData.SizeX; currentRow < FData.SizeX; currentRow++, adress += currentRow)
 		{
 			int ContrastValue =
 			(((FData.RawFragment[adress] - FData.mean) * ContrastCoefficient + FData.mean - FData.min) * 256) / (FData.max - FData.min);
 			if (ContrastValue < 0) ContrastValue = 0;
 			if (ContrastValue > 255) ContrastValue = 255;
 
-			BitmapLine[currentRow].rgbtBlue = ContrastValue ;
-			BitmapLine[currentRow].rgbtGreen = ContrastValue ;
-			BitmapLine[currentRow].rgbtRed = ContrastValue ;
+			BitmapLine[currentRow].rgbtBlue = ContrastValue;
+			BitmapLine[currentRow].rgbtGreen = ContrastValue;
+			BitmapLine[currentRow].rgbtRed = ContrastValue;
 		}
 	}
 
@@ -118,14 +118,11 @@ std::unique_ptr <TBitmap> changeContrast(int ContrastCoefficient, FragmentData& 
 
   void writePixelValue(FragmentData& FData,TBitmap* Bitmap, unsigned short PixelSize, unsigned short ToCenter, unsigned short FontSize)
   {
-	unsigned int PixelX = 0;
-	unsigned int PixelY = 0;
-	for (int currentColumn = 0; currentColumn < FData.SizeY; currentColumn++)
-	{
-		PixelX = 0;
-		if(currentColumn >= 1) PixelY += PixelSize;
 
-		for (unsigned int currentRow = 0, adress = 0; currentRow < FData.SizeX; currentRow++, adress = currentColumn * FData.SizeX + currentRow)
+	for (unsigned int currentColumn = 0, PixelY = 0; currentColumn < FData.SizeY; currentColumn++, PixelY += PixelSize)
+	{
+		unsigned int PixelX = 0;
+		for (unsigned int currentRow = 0, adress = currentColumn * FData.SizeX; currentRow < FData.SizeX; currentRow++, adress += currentRow)
 		{
 			int PixelValue =
 			((FData.RawFragment[adress] - FData.min) * 256) / (FData.max - FData.min);
@@ -139,7 +136,6 @@ std::unique_ptr <TBitmap> changeContrast(int ContrastCoefficient, FragmentData& 
 
 
 			TRect TheRect = Rect(PixelX, PixelY, PixelX + PixelSize, PixelY + PixelSize);
-		  //	Bitmap->Canvas->Brush->Color = clGreen;
 
 			Bitmap->Canvas->TextRect(TheRect, PixelX + ToCenter, PixelY + ToCenter, IntToStr(FData.RawFragment[adress]));
 			PixelX += PixelSize;
