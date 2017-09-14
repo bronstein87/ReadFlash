@@ -182,12 +182,14 @@
 	TEdit *FontSizeEdit;
 	TUpDown *UpDown4;
 	TTabSheet *TabSheet3;
-	TChart *Chart7;
-	TChart *Chart8;
+	TChart *ChartFragErrX;
+	TChart *ChartFragErrY;
 	TTabSheet *TabSheet12;
 	TChart *ChartErrorOX;
 	TChart *ChartErrorOY;
 	TChart *ChartErrorOZ;
+	TChart *ChartFragBright;
+	TChart *ChartFragSizeEl;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);

@@ -38,6 +38,8 @@ __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 		Charts.push_back(ChartAlError); Charts.push_back(ChartDlError); Charts.push_back(ChartAzError);
 		Charts.push_back(ChartWxError); Charts.push_back(ChartWyError); Charts.push_back(ChartWzError);
 		Charts.push_back(ChartErrorOX); Charts.push_back(ChartErrorOY); Charts.push_back(ChartErrorOZ);
+		Charts.push_back(ChartFragErrX); Charts.push_back(ChartFragErrY);
+        Charts.push_back(ChartFragBright); Charts.push_back(ChartFragSizeEl);
 
 		for (int i = 0; i < Charts.size(); i++) {
 			Charts[i]->OnMouseWheel = &ChartMouseWheel;
@@ -3429,6 +3431,32 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 							plotter->AddPoint(ChartWx, 1, Time, vCadrInfo.back().OmegaModel[0] * RTM);
 							plotter->AddPoint(ChartWy, 1, Time, vCadrInfo.back().OmegaModel[1] * RTM);
 							plotter->AddPoint(ChartWz, 1, Time, vCadrInfo.back().OmegaModel[2] * RTM);
+
+							int iObject = 0;
+							int maxDrawFrag = 12;
+							for (int iFrag = 0; iFrag < vCadrInfo.back().SizeWindowsList; iFrag++) {
+								for (int iObjFrag = 0; iObjFrag < vCadrInfo.back().WindowsList[iFrag].CountObj; iObjFrag++) {
+									plotter->SetTitle(IntToStr(iFrag+1));
+									plotter->SetShowLines(true);
+
+									if (iFrag < maxDrawFrag) {
+										TColor color = RGB((float)(maxDrawFrag-iFrag)/maxDrawFrag*255,
+															200, (float)iFrag/maxDrawFrag*255 );
+										plotter->SetSeriesColor(color);
+
+										plotter->AddPoint(ChartFragBright, iFrag, Time,
+															vCadrInfo.back().ObjectsList[iObject].Bright);
+										plotter->AddPoint(ChartFragSizeEl, iFrag, Time,
+															vCadrInfo.back().ObjectsList[iObject].Square);
+										plotter->AddPoint(ChartFragErrX, iFrag, Time,
+															vCadrInfo.back().ObjectsList[iObject].Dx*1000.);
+										plotter->AddPoint(ChartFragErrY, iFrag, Time,
+															vCadrInfo.back().ObjectsList[iObject].Dy*1000.);
+									}
+
+									iObject++;
+								}
+							}
 						}
 						if (i % 100 == 0)
 						{
@@ -3438,6 +3466,7 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 					}
 //печать статистики по серии кадров
 //					PrintReportRes(vCadrInfo);
+
 				}
 				struct {
 

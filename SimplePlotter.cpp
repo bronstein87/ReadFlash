@@ -30,10 +30,8 @@ void SimplePlotter::ResetOptions()
 
  void SimplePlotter::ClearChart(TChart* Chart)
  {
-	 for ( int j = 0; j < Chart->SeriesCount(); j ++)
-	 {
-		Chart->RemoveSeries(Chart->Series[j]);
-	 }
+	Chart->RemoveAllSeries();
+
  }
 
 void SimplePlotter::SaveChart(TChart* Chart, AnsiString name, unsigned int Height, unsigned int Width)
