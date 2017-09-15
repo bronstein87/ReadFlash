@@ -190,6 +190,7 @@
 	TChart *ChartErrorOZ;
 	TChart *ChartFragBright;
 	TChart *ChartFragSizeEl;
+	TArrowSeries *Series10;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -216,6 +217,7 @@
 		void __fastcall PixelSizeEditChange(TObject *Sender);
 		void __fastcall FontSizeEditChange(TObject *Sender);
 		void __fastcall ReadIKIFormatClick(TObject *Sender);
+	void __fastcall FormResize(TObject *Sender);
 
 
 	private:	// User declarations
@@ -280,7 +282,8 @@
 		void DrawAnimateHandler(void);
 		void PrintTableWindowsHandler(void);
 		void PrintTableObjectsHandler(void);
-        void DrawBlockHandler(void);
+		void DrawBlockHandler(void);
+        void ResizePlot(TChart *chart, double kx, double ky, int indexX, int indexY);
 	};
 	//---------------------------------------------------------------------------
 	extern PACKAGE TFormGraphOrient *FormGraphOrient;

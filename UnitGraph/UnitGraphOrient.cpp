@@ -136,6 +136,7 @@ void __fastcall TFormGraphOrient::FormCreate(TObject *Sender)
 	Series2->Selected->Hover->Hide();
 	Series3->Selected->Hover->Hide();
 	Series9->Selected->Hover->Hide();
+	Series10->Selected->Hover->Hide();
 
 	InitializeSynchronization();
 }
@@ -263,6 +264,7 @@ void TFormGraphOrient::ClearAnimate(void)
 	Series1->Clear();
 	Series2->Clear();
 	Series3->Clear();
+    Series10->Clear();
 //WindowsBar
 	Series4->Clear();
 	Series5->Clear();
@@ -451,33 +453,67 @@ void TFormGraphOrient::DrawBlock(const struct CadrInfo &mCadr)
 void TFormGraphOrient::DrawAnimate(const struct CadrInfo &mCadr)
 {
 	double X0, Y0, X1, Y1, Dx, Dy, Ist, Nel;
+	double zoomRedArrow  = 10000.;
+	double zoomBlueArrow, binCoef;
+
+	if (mCadr.IsBinary) {
+		binCoef = 0.5;
+	}
+	else {
+		binCoef = 1.;
+	}
+
+	zoomBlueArrow = mCadr.SizePixel * zoomRedArrow / binCoef;
 
 	EditTimeDev->Text = FloatToStrF(mCadr.Time,ffFixed, 10, 3);
 	ClearAnimate();
 
-	for (int i = 0; i < mCadr.SizeObjectsList; i++) {       //!!!
-		X0 = mCadr.ObjectsList[i].X;
-		Y0 = mCadr.ObjectsList[i].Y;
-		Nel = mCadr.ObjectsList[i].Square;
-		Dx = mCadr.ObjectsList[i].Dx;
-		Dy = mCadr.ObjectsList[i].Dy;
+	for (int iObject = 0; iObject < mCadr.SizeObjectsList; iObject++) {       //!!!
+		X0  = mCadr.ObjectsList[iObject].X;
+		Y0  = mCadr.ObjectsList[iObject].Y;
+		Nel = mCadr.ObjectsList[iObject].Square;
+		Dx  = mCadr.ObjectsList[iObject].Dx;
+		Dy  = mCadr.ObjectsList[iObject].Dy;
 
-		if ((!mCadr.ObjectsList[i].StarID) && (!Dx)&&(!Dy)) {
+		if ((!mCadr.ObjectsList[iObject].StarID) && (!Dx)&&(!Dy)) {
 //			Series2->AddXY(X0, Y0, "", clBlue);
 			Series9->AddBubble(X0, Y0,(int)(3*sqrtm(fabs(Nel))+0.5),"",clBlue);
 		}
 		else
 		{
-			X1=X0 - mCadr.ObjectsList[i].Dx * 10000.;
-			Y1=Y0 - mCadr.ObjectsList[i].Dy * 10000.;
-//			Series2->AddXY(X0, Y0, "", clGreen);
-			Series9->AddBubble(X0, Y0,(int)(3 * sqrtm(Nel) + 0.5),"",clGreen);
+			//локализованный объект
+			Series9->AddBubble(X0, Y0, (int)(3 * sqrtm(Nel) + 0.5), "", clGreen);
+
+			//остаточные рассогласования
+			X1 = X0 - mCadr.ObjectsList[iObject].Dx * zoomRedArrow;
+			Y1 = Y0 - mCadr.ObjectsList[iObject].Dy * zoomRedArrow;
 			Series3->AddArrow(X0, Y0, X1, Y1, "", clRed);
+
+			//ошибка локализации
+			double minDist = 1000, minDistX, minDistY;
+
+			for (int iStar = 0; iStar < mCadr.SizeStarsList; iStar++) {
+				double distX = mCadr.ObjectsList[iObject].X
+								  - mCadr.StarsList[iStar].X * binCoef;
+				double distY = mCadr.ObjectsList[iObject].Y
+								  - mCadr.StarsList[iStar].Y * binCoef;
+				double curDist = sqrtm(distX * distX + distY * distY);
+
+				if (curDist < minDist) {
+					minDist  = curDist;
+					minDistX = distX;
+					minDistY = distY;
+				}
+			}
+
+			X1 = X0 - minDistX * zoomBlueArrow;
+			Y1 = Y0 - minDistY * zoomBlueArrow;
+			Series10->AddArrow(X0, Y0, X1, Y1, "", clBlue);
 		}
 //		Series9->AddBubble(mCadr.StarsList[i].X,mCadr.StarsList[i].Y,
 //						(int)(sqrtm(mCadr.StarsList[i].Square)+1));
-
 	}
+
 	DrawFragment(mCadr);
 	DrawBlock(mCadr);
 
@@ -490,7 +526,7 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 {
 	resetFragmentShowScrollBox();
 
-	for(unsigned int i = 0;i < ImageScrollBoxVector.size();i++)
+	for(unsigned int i = 0;i < ImageScrollBoxVector.size(); i++)
 	{
 		 ImageScrollBoxVector[i]->Free();
 	}
@@ -3146,6 +3182,7 @@ void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec
 	cadrInfo.CountPixFilter = reader->FilterData.FilteredPixelsCount;
 	cadrInfo.ImageHeight = reader->ImageData.FrameData.FrameHeight;
 	cadrInfo.ImageWidth = reader->ImageData.FrameData.FrameWidth;
+    cadrInfo.SizePixel = reader->CameraSettings.PixelSize;
 	cadrInfo.StatOrient = reader->StarsData.RezStat;
 	cadrInfo.CountStars = reader->StarsData.SimulatedFrame.strrec;;
 	cadrInfo.CountWindows = reader->ImageData.WindowsData.WindowCount;
@@ -3521,5 +3558,62 @@ void __fastcall TFormGraphOrient::ChartMouseDown(TObject *Sender, TMouseButton B
 
  
 //---------------------------------------------------------------------------
+void TFormGraphOrient::ResizePlot(TChart *chart, double kx, double ky, int indexX, int indexY)
+{
+	int width  = chart->Parent->Width/kx;
+	int height = chart->Parent->Height/ky;
 
+	chart->Width  = width;
+	chart->Height = height;
+	chart->Top  = indexY * height;
+	chart->Left = indexX *width;
+}
+
+void __fastcall TFormGraphOrient::FormResize(TObject *Sender)
+{
+//углы ориентации
+	ResizePlot(ChartAl, 1, 3, 0, 0);
+	ResizePlot(ChartDl, 1, 3, 0, 1);
+	ResizePlot(ChartAz, 1, 3, 0, 2);
+
+//ошибка углов ориентации
+	ResizePlot(ChartAlError, 1, 3, 0, 0);
+	ResizePlot(ChartDlError, 1, 3, 0, 1);
+	ResizePlot(ChartAzError, 1, 3, 0, 2);
+
+//угловая скорость
+	ResizePlot(ChartWx, 1, 3, 0, 0);
+	ResizePlot(ChartWy, 1, 3, 0, 1);
+	ResizePlot(ChartWz, 1, 3, 0, 2);
+
+//ошибка угловой скорости
+	ResizePlot(ChartWxError, 1, 3, 0, 0);
+	ResizePlot(ChartWyError, 1, 3, 0, 1);
+	ResizePlot(ChartWzError, 1, 3, 0, 2);
+
+//ошибка осей ПСК
+	ResizePlot(ChartErrorOX, 1, 3, 0, 0);
+	ResizePlot(ChartErrorOY, 1, 3, 0, 1);
+	ResizePlot(ChartErrorOZ, 1, 3, 0, 2);
+
+//остаточные рассогласования
+	ResizePlot(ChartMx,  1, 3, 0, 0);
+	ResizePlot(ChartMy,  1, 3, 0, 1);
+	ResizePlot(ChartMxy, 1, 3, 0, 2);
+
+//число объектов
+	ResizePlot(ChartNumFrag, 1, 3, 0, 0);
+	ResizePlot(ChartNumLoc,  1, 3, 0, 1);
+	ResizePlot(ChartNumDet,  1, 3, 0, 2);
+
+//характеристики изображения
+	ResizePlot(ChartFone,  1, 3, 0, 0);
+	ResizePlot(ChartNoise, 1, 3, 0, 1);
+	ResizePlot(ChartTemp,  1, 3, 0, 2);
+
+//статистика по звездам
+	ResizePlot(ChartFragErrX,   2, 2, 0, 0);
+	ResizePlot(ChartFragSizeEl, 2, 2, 1, 1);
+}
+//---------------------------------------------------------------------------
 
