@@ -3619,3 +3619,35 @@ void __fastcall TFormGraphOrient::FormResize(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
+void CheckGroupSeries(TChart *chartSource, TChart *chartApply)
+{
+	for (int iSeries = 0; iSeries < chartSource->SeriesCount(); iSeries++) {
+		bool visible = chartSource->Series[iSeries]->Visible;
+		chartApply->Series[iSeries]->Visible = visible;
+	}
+}
+
+void __fastcall TFormGraphOrient::ChartsFragClickLegend(TCustomChart *Sender, TMouseButton Button,
+		  TShiftState Shift, int X, int Y)
+{
+	TChart *currentChart = (TChart*)Sender;
+	CheckGroupSeries(currentChart, ChartFragErrX);
+	CheckGroupSeries(currentChart, ChartFragErrY);
+	CheckGroupSeries(currentChart, ChartFragBright);
+	CheckGroupSeries(currentChart, ChartFragSizeEl);
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormGraphOrient::ChartOrientClickLegend(TCustomChart *Sender, TMouseButton Button,
+          TShiftState Shift, int X, int Y)
+{
+	TChart *currentChart = (TChart*)Sender;
+	CheckGroupSeries(currentChart, ChartAl);
+	CheckGroupSeries(currentChart, ChartDl);
+	CheckGroupSeries(currentChart, ChartAz);
+	CheckGroupSeries(currentChart, ChartWx);
+	CheckGroupSeries(currentChart, ChartWy);
+	CheckGroupSeries(currentChart, ChartWz);
+}
+//---------------------------------------------------------------------------
+

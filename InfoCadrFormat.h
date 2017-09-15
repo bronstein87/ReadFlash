@@ -45,6 +45,7 @@ struct CadrInfo
 	bool IsOrient; //признак определения ориентации
 	unsigned short CountPixFilter;       //число пикселей выше порога
 	unsigned short ImageWidth, ImageHeight;  //ширина и высота изображения
+	double SizePixel;
 	unsigned short StatOrient;  //статус решения задачи (0 - успешно)
 	unsigned int DataType; // признак типа 0-byte, 1-ushort, 2-float
 	double MeanBright, SigmaBright;

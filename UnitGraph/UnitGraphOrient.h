@@ -218,6 +218,10 @@
 		void __fastcall FontSizeEditChange(TObject *Sender);
 		void __fastcall ReadIKIFormatClick(TObject *Sender);
 	void __fastcall FormResize(TObject *Sender);
+	void __fastcall ChartsFragClickLegend(TCustomChart *Sender, TMouseButton Button,
+          TShiftState Shift, int X, int Y);
+	void __fastcall ChartOrientClickLegend(TCustomChart *Sender, TMouseButton Button, TShiftState Shift,
+          int X, int Y);
 
 
 	private:	// User declarations
