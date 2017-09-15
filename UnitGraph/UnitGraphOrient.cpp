@@ -3613,6 +3613,8 @@ void __fastcall TFormGraphOrient::FormResize(TObject *Sender)
 
 //статистика по звездам
 	ResizePlot(ChartFragErrX,   2, 2, 0, 0);
+	ResizePlot(ChartFragErrY,   2, 2, 0, 1);
+	ResizePlot(ChartFragBright, 2, 2, 1, 0);
 	ResizePlot(ChartFragSizeEl, 2, 2, 1, 1);
 }
 //---------------------------------------------------------------------------
