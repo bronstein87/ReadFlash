@@ -84,7 +84,7 @@ std::unique_ptr <TBitmap> changeContrast(int ContrastCoefficient, FragmentData& 
 	{
 		// указатель на currentColumn строку Bitmap
 		BitmapLine = (TRGBTriple*) Fragment->ScanLine[currentColumn];
-		for (unsigned int currentRow = 0, adress = currentColumn * FData.SizeX; currentRow < FData.SizeX; currentRow++, adress += currentRow)
+		for (unsigned int currentRow = 0, adress = currentColumn * FData.SizeX; currentRow < FData.SizeX; currentRow++, adress++)
 		{
 			int ContrastValue =
 			(((FData.RawFragment[adress] - FData.mean) * ContrastCoefficient + FData.mean - FData.min) * 256) / (FData.max - FData.min);
@@ -122,7 +122,7 @@ std::unique_ptr <TBitmap> changeContrast(int ContrastCoefficient, FragmentData& 
 	for (unsigned int currentColumn = 0, PixelY = 0; currentColumn < FData.SizeY; currentColumn++, PixelY += PixelSize)
 	{
 		unsigned int PixelX = 0;
-		for (unsigned int currentRow = 0, adress = currentColumn * FData.SizeX; currentRow < FData.SizeX; currentRow++, adress += currentRow)
+		for (unsigned int currentRow = 0, adress = currentColumn * FData.SizeX; currentRow < FData.SizeX; currentRow++, adress++)
 		{
 			int PixelValue =
 			((FData.RawFragment[adress] - FData.min) * 256) / (FData.max - FData.min);
