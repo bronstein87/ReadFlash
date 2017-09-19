@@ -17,24 +17,6 @@ __fastcall TAnalyzeForm::TAnalyzeForm(TComponent* Owner)
 }
 
 
- // перенести
-template <class InputIterator, class Value, class UnaryOperation>
-std::pair<Value, Value> calculateMeanStdDv (InputIterator first, InputIterator last, Value init, UnaryOperation extractWtC)
-{
-	if (first == last) return std::pair <Value, Value> (extractWtC(*first), Value());
-
-	Value dispersio = 0;
-	for (InputIterator i = first;i < last; i++)
-	{
-		init += extractWtC(*i);
-		dispersio += pow(extractWtC(*i), 2);
-	}
-	auto count = std::distance(first,last);
-	Value mean = init / count;
-	dispersio = (dispersio / count) - pow(mean, 2);
-
-	return std::pair <Value,Value> (mean, sqrt(dispersio));
-}
 
 //---------------------------------------------------------------------------
 void __fastcall TAnalyzeForm::ChooseDirectoriesClick(TObject *Sender)

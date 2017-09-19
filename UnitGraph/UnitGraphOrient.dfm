@@ -135,7 +135,7 @@ object FormGraphOrient: TFormGraphOrient
     Top = 8
     Width = 1160
     Height = 777
-    ActivePage = TabSheet5
+    ActivePage = TabSheet8
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 8
     object TabSheet5: TTabSheet
@@ -1047,7 +1047,7 @@ object FormGraphOrient: TFormGraphOrient
           ClickableLine = False
           Pointer.Brush.Gradient.Angle = 38
           Pointer.Brush.Gradient.Direction = gdFromTopLeft
-          Pointer.Brush.Gradient.EndColor = 10708548
+          Pointer.Brush.Gradient.EndColor = 6144242
           Pointer.Brush.Gradient.MidColor = 16059031
           Pointer.Brush.Gradient.StartColor = 14540754
           Pointer.Brush.Gradient.Visible = True
@@ -1056,11 +1056,11 @@ object FormGraphOrient: TFormGraphOrient
           Pointer.Emboss.Visible = True
           Pointer.Gradient.Angle = 38
           Pointer.Gradient.Direction = gdFromTopLeft
-          Pointer.Gradient.EndColor = 10708548
+          Pointer.Gradient.EndColor = 6144242
           Pointer.Gradient.MidColor = 16059031
           Pointer.Gradient.StartColor = 14540754
           Pointer.Gradient.Visible = True
-          Pointer.HorizSize = 16
+          Pointer.HorizSize = 12
           Pointer.InflateMargins = False
           Pointer.Pen.Color = 1358954496
           Pointer.Pen.Width = 0
@@ -1073,7 +1073,7 @@ object FormGraphOrient: TFormGraphOrient
           Pointer.Shadow.VertSize = 19
           Pointer.Shadow.Visible = True
           Pointer.Style = psCircle
-          Pointer.VertSize = 16
+          Pointer.VertSize = 12
           XValues.Name = 'X'
           XValues.Order = loAscending
           YValues.Name = 'Y'
@@ -1431,6 +1431,10 @@ object FormGraphOrient: TFormGraphOrient
     object ShowFragmentTab: TTabSheet
       Caption = #1054#1090#1086#1073#1088#1072#1078#1077#1085#1080#1077' '#1092#1088#1072#1075#1084#1077#1085#1090#1086#1074
       ImageIndex = 8
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object FragmentShowScrollBox: TScrollBox
         Left = 0
         Top = 33

@@ -1,3 +1,6 @@
+#ifndef MathM
+#define MathM
+
 #include <math.h>
 #include <vector>
 #include <utility>
@@ -20,3 +23,23 @@ void getAngularDisplacementFromOrientMatr(const double M_ornt_pr[3][3],const dou
 void multMatrix(const double Matr1[3][3],const double Matr2[3][3], double Matr[3][3]);
 void ToGMS (double gradAngle, int& gradus, int& minutes, int& seconds);
 
+template <class InputIterator, class Value, class UnaryOperation>
+std::pair<Value, Value> calculateMeanStdDv (InputIterator first, InputIterator last, Value init, UnaryOperation extractWtC)
+{
+	if (first == last) return std::pair <Value, Value> (extractWtC(*first), Value());
+
+	Value dispersio = 0;
+	for (InputIterator i = first;i < last; i++)
+	{
+		init += extractWtC(*i);
+		dispersio += pow(extractWtC(*i), 2);
+	}
+	auto count = std::distance(first,last);
+	Value mean = init / count;
+	dispersio = (dispersio / count) - pow(mean, 2);
+    if(abs(dispersio) < 0.0000000001) dispersio = 0;
+
+	return std::pair <Value,Value> (mean, sqrt(dispersio));
+}
+
+#endif

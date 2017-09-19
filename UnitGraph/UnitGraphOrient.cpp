@@ -3386,6 +3386,109 @@ void PrintReportRes(std::vector <CadrInfo>& cadrInfo)
 	AddParagraph("Количество кадров в обработке: " + IntToStr(count));
 }
 
+void TFormGraphOrient::CalculateSeriesSKO()
+{
+							struct { double operator() (const CadrInfo& a) {return a.MeanErrorX * 1000.;} } GetMeanErrX;
+							pair <double,double> meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanErrX);
+							ChartMx->Series[0]->Title = ChartMx->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+							struct { double operator() (const CadrInfo& a) {return a.MeanErrorY * 1000.;} } GetMeanErrY;
+							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanErrY);
+							ChartMy->Series[0]->Title = ChartMy->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+							struct { double operator() (const CadrInfo& a) {return a.MeanErrorXY * 1000.;} } GetMeanErrXY;
+							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanErrXY);
+							ChartMxy->Series[0]->Title = ChartMxy->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+							struct { double operator() (const CadrInfo& a) {return a.CountWindows;} } GetCountWindows;
+							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetCountWindows);
+							ChartNumFrag->Series[0]->Title = ChartNumFrag->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+							struct { double operator() (const CadrInfo& a) {return a.CountLocalObj;} } GetCountLocalObj;
+							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetCountLocalObj);
+							ChartNumLoc->Series[0]->Title = ChartNumLoc->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+							struct { double operator() (const CadrInfo& a) {return a.CountDeterObj;} } GetCountDeterObj;
+							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetCountDeterObj);
+							ChartNumDet->Series[0]->Title = ChartNumDet->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+
+							struct { double operator() (const CadrInfo& a) {return a.MeanBright;} } GetMeanBright;
+							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanBright);
+							ChartFone->Series[0]->Title = ChartFone->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+							struct { double operator() (const CadrInfo& a) {return a.SigmaBright;} } GetSigmaBright;
+							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetSigmaBright);
+							ChartNoise->Series[0]->Title = ChartNoise->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+							//struct { double operator() (const CadrInfo& a) {return a.MatrixTemp;} } GetMatrixTemp;
+						   //meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMatrixTemp);
+
+
+							struct { double operator() (const CadrInfo& a) {return a.AxesDiff[0] * RTS;} } GetAxesDiffF;
+							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAxesDiffF);
+							ChartErrorOX->Series[0]->Title = ChartErrorOX->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+							struct { double operator() (const CadrInfo& a) {return a.AxesDiff[1] * RTS;} } GetAxesDiffS;
+							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAxesDiffS);
+							ChartErrorOY->Series[0]->Title = ChartErrorOY->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+							struct { double operator() (const CadrInfo& a) {return a.AxesDiff[2] * RTS;} } GetAxesDiffT;
+							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAxesDiffT);
+							ChartErrorOZ->Series[0]->Title = ChartErrorOZ->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+
+							struct { double operator() (const CadrInfo& a) {return a.AnglesDiff[0] * RTS;} } GetAnglesDiffF;
+							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesDiffF);
+							ChartAlError->Series[0]->Title = ChartAlError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+							struct { double operator() (const CadrInfo& a) {return a.AnglesDiff[1] * RTS;} } GetAnglesDiffS;
+							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesDiffS);
+							ChartDlError->Series[0]->Title = ChartDlError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+							struct { double operator() (const CadrInfo& a) {return a.AnglesDiff[2] * RTS;} } GetAnglesDiffT;
+							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesDiffT);
+							ChartAzError->Series[0]->Title = ChartAzError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+
+							struct { double operator() (const CadrInfo& a) {return a.OmegaDiff[0] * RTS;} } GetOmegaDiffF;
+							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaDiffF);
+							ChartWxError->Series[0]->Title = ChartWxError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+							struct { double operator() (const CadrInfo& a) {return a.OmegaDiff[1] * RTS;} } GetOmegaDiffS;
+							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaDiffS);
+							ChartWyError->Series[0]->Title = ChartWyError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+							struct { double operator() (const CadrInfo& a) {return a.OmegaDiff[2] * RTS;} } GetOmegaDiffT;
+							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaDiffT);
+							ChartWzError->Series[0]->Title = ChartWzError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+
+							struct { double operator() (const CadrInfo& a) {return a.OmegaOrient[0] * RTM;} } GetOmegaOrientF;
+							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaOrientF);
+							ChartWx->Series[0]->Title = ChartWx->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+							struct { double operator() (const CadrInfo& a) {return a.OmegaOrient[1] * RTM;} } GetOmegaOrientS;
+							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaOrientS);
+							ChartWy->Series[0]->Title = ChartWy->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+							struct { double operator() (const CadrInfo& a) {return a.OmegaOrient[2] * RTM;} } GetOmegaOrientT;
+							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaOrientT);
+							ChartWz->Series[0]->Title = ChartWz->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+							struct { double operator() (const CadrInfo& a) {return a.OmegaModel[0] * RTM;} } GetOmegaModelF;
+							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaModelF);
+							ChartWx->Series[1]->Title = ChartWx->Series[1]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+							struct { double operator() (const CadrInfo& a) {return a.OmegaModel[1] * RTM;} } GetOmegaModelS;
+							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaModelS);
+							ChartWy->Series[1]->Title = ChartWy->Series[1]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+							struct { double operator() (const CadrInfo& a) {return a.OmegaModel[2] * RTM;} } GetOmegaModelT;
+							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaModelT);
+							ChartWz->Series[1]->Title = ChartWz->Series[1]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+}
 void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 {
 	try
@@ -3515,6 +3618,7 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 				} CadrCompare ;
 
 				std::sort(vCadrInfo.begin(), vCadrInfo.end(), CadrCompare);
+				CalculateSeriesSKO();
 				PrepareStartDraw();
 			}
 
