@@ -85,7 +85,16 @@ void __fastcall TFormGraphOrient::MenuSaveClick(TObject *Sender)
 	TDirectory::CreateDirectoryW(GetCurrentDir() + ScreenFolderName);
 	for (int i = 0; i < Charts.size(); i ++)
 	{
-		UnicodeString Title = LeftStr(Charts[i]->Title->Text->Text, PosEx(",", Charts[i]->Title->Text->Text, 1) - 1);
+		UnicodeString Title = IntToStr(i + 1) + " - " + Charts[i]->Title->Text->Text;
+		if (AnsiContainsStr(Title, ","))
+		{
+			Title = LeftStr(Title, PosEx(",", Title, 1) - 1);
+		}
+		else
+		{
+            Title = LeftStr(Title, PosEx("\r", Title, 1) - 1);
+        }
+	
 		Title = GetCurrentDir() + ScreenFolderName + Title;
 		plotter->SaveChart(Charts[i], Title, 500, 1100);
 	}
@@ -3500,19 +3509,19 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 		{
 			std::unique_ptr <TStringList> FileList (new TStringList());
 			FileList->Assign(OpenDialog->Files);
+			SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
+			FileOpenDialog1->FileName = GetCurrentDir();
 			if (FileOpenDialog1->Execute())
 			{
 				plotter->ResetOptions();
 				DeleteLineGraph();
 				vCadrInfo.clear();
 				FileTitle = "IKI";
-				SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
 
 				UnicodeString filePrefix = FormAnimateSetting->EditFilePrefix->Text;
 				for (int i = 0; i < FileList->Count; i ++)
 				{
 					std::unique_ptr <IKI_img> reader(new IKI_img());
-
 					if( !AnsiContainsStr(FileList->Strings[i], filePrefix))
 					{
 						if	(reader->ReadFormat(FileList->Strings[i], false))
