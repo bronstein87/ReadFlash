@@ -13,7 +13,7 @@ class SimplePlotter
 	_fastcall explicit SimplePlotter ();
 	_fastcall ~SimplePlotter();
 
-	void AddPoint (TChart* Chart, DWORD SeriesIndex, double X, double Y);
+	void AddPoint (TChart* Chart, DWORD SeriesIndex, double X, double Y, TColor Color = clWhite);
 	void AddArray (TChart* Chart, DWORD SeriesIndex, const double* ArrayX, const double* ArrayY, DWORD ArraySize);
 
 	void SetTitle (const AnsiString& _Title)
@@ -47,6 +47,8 @@ class SimplePlotter
 	}
 
 	void ClearChart(TChart* Chart);
+
+	void CheckGroupSeries(TChart *chartSource, TChart *chartApply);
 
 	void SaveChart(TChart* Chart, AnsiString name, unsigned int Height, unsigned int Width);
 

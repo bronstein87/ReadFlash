@@ -31,7 +31,15 @@ void SimplePlotter::ResetOptions()
  void SimplePlotter::ClearChart(TChart* Chart)
  {
 	Chart->RemoveAllSeries();
+ }
 
+ void SimplePlotter::CheckGroupSeries(TChart *chartSource, TChart *chartApply)
+ {
+	for (int iSeries = 0; iSeries < chartSource->SeriesCount(); iSeries++)
+	{
+		bool visible = chartSource->Series[iSeries]->Visible;
+		chartApply->Series[iSeries]->Visible = visible;
+	}
  }
 
 void SimplePlotter::SaveChart(TChart* Chart, AnsiString name, unsigned int Height, unsigned int Width)
@@ -51,13 +59,17 @@ void SimplePlotter::SaveChart(TChart* Chart, AnsiString name, unsigned int Heigh
 }
 
 
-void SimplePlotter::AddPoint (TChart* Chart, DWORD SeriesIndex, double X, double Y)
+void SimplePlotter::AddPoint (TChart* Chart, DWORD SeriesIndex, double X, double Y, TColor Color)
 {
 	  if (Chart->SeriesCount()  <= SeriesIndex ) {
 		Chart->AddSeries(new TLineSeries(Chart));
 		SetSeriesOptions(dynamic_cast <TLineSeries*> (Chart->Series[SeriesIndex]));
 	  }
-	  Chart->Series[SeriesIndex]->AddXY(X, Y);
+
+	  if (Color == clWhite) {
+		  Color = SeriesColor;
+	  }
+	  Chart->Series[SeriesIndex]->AddXY(X, Y, "", Color);
 }
 
 void  SimplePlotter::AddArray (TChart* Chart, DWORD SeriesIndex, const double* ArrayX, const double* ArrayY, DWORD ArraySize)

@@ -4,6 +4,12 @@
 
 struct StarsInfo // прогнозируемые
 {
+	__fastcall StarsInfo() :X(0), Y(0), Bright(0), StarID(0),
+	Mv(0)
+	{
+		 Sp[0] = '_';
+		 Sp[1] = '_';
+	}
 	float X, Y, Bright;
 	unsigned long StarID;
 	float Mv;
@@ -12,6 +18,12 @@ struct StarsInfo // прогнозируемые
 
 struct ObjectsInfo  // фактические объекты
 {
+	__fastcall ObjectsInfo() :X(0), Y(0), Bright(0),Square(0), StarID(0),
+	Mv(0), Dx(0), Dy(0)
+	{
+		 Sp[0] = '_';
+		 Sp[1] = '_';
+	}
 	float X, Y, Bright;
 	short Square;
 	unsigned long StarID;
@@ -22,6 +34,13 @@ struct ObjectsInfo  // фактические объекты
 
 struct WindowsInfo
 {
+	__fastcall WindowsInfo() : Xstart(0), Ystart(0),
+	Width(0),Height(0), CountObj(0), ZipX(0), ZipY(0),
+	Mean(0), Sigma(0), Level(0), StarID(0), Mv(0)
+	{
+		 Sp[0] = '_';
+		 Sp[1] = '_';
+	}
 	unsigned short Xstart, Ystart;
 	unsigned short Width, Height, CountObj, ZipX, ZipY;
 	float Mean, Sigma, Level;

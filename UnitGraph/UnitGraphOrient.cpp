@@ -6,6 +6,7 @@
 #pragma link "VCLTee.TeeEdit"
 #pragma link "VCLTee.ErrorBar"
 #pragma link "VCLTee.TeeHighLowLine"
+
 #pragma resource "*.dfm"
 
 
@@ -484,9 +485,13 @@ void TFormGraphOrient::DrawAnimate(const struct CadrInfo &mCadr)
 		Dx  = mCadr.ObjectsList[iObject].Dx;
 		Dy  = mCadr.ObjectsList[iObject].Dy;
 
-		if ((!mCadr.ObjectsList[iObject].StarID) && (!Dx)&&(!Dy)) {
-//			Series2->AddXY(X0, Y0, "", clBlue);
-			Series9->AddBubble(X0, Y0,(int)(3*sqrtm(fabs(Nel))+0.5),"",clBlue);
+		if ((!mCadr.ObjectsList[iObject].StarID) && (!Dx)&&(!Dy)) {  
+			if (Nel) {
+				Series9->AddBubble(X0, Y0,(int)(3*sqrtm(fabs(Nel))+0.5),"",clBlue);
+			}
+			else {
+			   Series2->AddXY(X0, Y0, "", clBlue);
+			}
 		}
 		else
 		{
@@ -560,22 +565,22 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
    AnsiString FragmentFileStr;
    for(int CurrentFileName = 0;CurrentFileName < FileNameList.Length;CurrentFileName++)
    {
-		if(AnsiContainsStr(FileNameList[CurrentFileName], TimePrStr))
-		  {
+		if(Ansistrings::AnsiContainsStr(FileNameList[CurrentFileName], TimePrStr))
+		{
 				 FragmentFileStr = FileNameList[CurrentFileName];
 				 break;
-		  }
+		}
    }
 
    if(!FragmentFileStr.IsEmpty())
    {
 
-   std::ifstream fragmentFile(FragmentFileStr.c_str(), std::ios::binary);;
-   if(!fragmentFile.is_open())
-   {
+	std::ifstream fragmentFile(FragmentFileStr.c_str(), std::ios::binary);;
+	if(!fragmentFile.is_open())
+	{
 		ShowMessage(AnsiString("Не удалось открыть файл ") + FragmentFileStr.c_str());
 		return;
-   }
+	}
 
 	for(int CurrentFragment = 0;CurrentFragment < mCadr.CountWindows; CurrentFragment++)
 	{
@@ -2503,7 +2508,7 @@ size_t findWord(Stream& in,const std::string& word)
   std::string lineToWrite;
   while(in >> lineToWrite)
   {
-	if (lineToWrite.find(word) != std::string::npos )
+	if (lineToWrite.find(word) != std::string::npos)
 	{
 		return  in.tellg() - lineToWrite.size();
 	}
@@ -2524,7 +2529,7 @@ size_t findLine(Stream& in,const std::string& line)
   std::string lineToWrite;
   while(std::getline(in,lineToWrite))
   {
-	if (lineToWrite.find(line) != std::string::npos )
+	if (lineToWrite.find(line) != std::string::npos)
 	{
 		return  in.tellg() - lineToWrite.size();
 	}
@@ -2542,7 +2547,7 @@ size_t findLine(Stream& in,const std::string& line)
 
 vector<string> split(const string& str, const string& delim)
 {
-    vector<string> tokens;
+	vector<string> tokens;
     size_t prev = 0, pos = 0;
     do
     {
@@ -2614,7 +2619,6 @@ void TFormGraphOrient::readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cad
 						objInfo.Y = std::atof (splittedLocData[1].c_str());
 						objInfo.Bright = std::atof (splittedLocData[2].c_str());
 						objInfo.Square = abs(std::atoi (splittedLocData[3].c_str()));
-						objInfo.Square = 0;
 						objInfo.StarID = 0;
 						objInfo.Mv = 0;
 						objInfo.Sp[0]='_';
@@ -2725,7 +2729,6 @@ void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrIn
 						objInfo.X = std::atof (splittedLocData[0].c_str());
 						objInfo.Y = std::atof (splittedLocData[1].c_str());
 						objInfo.Bright = std::atof(splittedLocData[2].c_str());
-						objInfo.Square = 0;
 						objInfo.Square = abs(std::atoi (splittedLocData[3].c_str()));
 						objInfo.StarID = 0;
 						objInfo.Mv = 0;
@@ -2746,9 +2749,9 @@ void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrIn
 					vector<string> splittedStr = split(line,"\t");
 					cadrInfo.OmegaOrient[i] = std::atof(splittedStr[1].c_str());
 				}
-				plotter->AddPoint(ChartWx, 0, cadrInfo.Time , cadrInfo.OmegaOrient[0] * RTS);
-				plotter->AddPoint(ChartWy, 0, cadrInfo.Time , cadrInfo.OmegaOrient[1] * RTS);
-				plotter->AddPoint(ChartWz, 0, cadrInfo.Time , cadrInfo.OmegaOrient[2] * RTS);
+				plotter->AddPoint(ChartWx, 0, cadrInfo.Time , cadrInfo.OmegaOrient[0] * RTM);
+				plotter->AddPoint(ChartWy, 0, cadrInfo.Time , cadrInfo.OmegaOrient[1] * RTM);
+				plotter->AddPoint(ChartWz, 0, cadrInfo.Time , cadrInfo.OmegaOrient[2] * RTM);
 
 		   }
 		   else throw std::logic_error(errorMessage);
@@ -2778,9 +2781,6 @@ void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrIn
 					cadrInfo.WindowsList.push_back(winInfo);
 				}
 				plotter->AddPoint(ChartNumFrag, 0, cadrInfo.Time,cadrInfo.CountWindows);
-
-
-
 
 		   }
 		  else throw std::logic_error(errorMessage);
@@ -2873,7 +2873,7 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 
 void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
 {
-    std::string line;
+	std::string line;
 	string errorMessage = string("Cчитывание протокола завершено необычным образом. "
 				"Возможно работа прибора была остановлена.");
 
@@ -3068,9 +3068,9 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 					vector<string> splittedStr = split(line,"\t\t\t\t");
 					cadrInfo.OmegaOrient[i] = std::atof(splittedStr[1].c_str());
 				}
-				plotter->AddPoint(ChartWx, 0, cadrInfo.Time, cadrInfo.OmegaOrient[0] * RTS);
-				plotter->AddPoint(ChartWy, 0, cadrInfo.Time, cadrInfo.OmegaOrient[1] * RTS);
-				plotter->AddPoint(ChartWz, 0, cadrInfo.Time, cadrInfo.OmegaOrient[2] * RTS);
+				plotter->AddPoint(ChartWx, 0, cadrInfo.Time, cadrInfo.OmegaOrient[0] * RTM);
+				plotter->AddPoint(ChartWy, 0, cadrInfo.Time, cadrInfo.OmegaOrient[1] * RTM);
+				plotter->AddPoint(ChartWz, 0, cadrInfo.Time, cadrInfo.OmegaOrient[2] * RTM);
 
 		   }
 		   else throw std::logic_error(errorMessage);
@@ -3152,7 +3152,7 @@ void __fastcall TFormGraphOrient::BOKZM2VParseProtocolClick(TObject *Sender)
 {
 	try
 	{
-         OpenDialog->Options.Clear();
+		 OpenDialog->Options.Clear();
 		 OpenDialog->Filter = "txt|*.txt";
 		if (OpenDialog->Execute()) {
 			vCadrInfo.clear();
@@ -3397,105 +3397,105 @@ void PrintReportRes(std::vector <CadrInfo>& cadrInfo)
 
 void TFormGraphOrient::CalculateSeriesSKO()
 {
-							struct { double operator() (const CadrInfo& a) {return a.MeanErrorX * 1000.;} } GetMeanErrX;
-							pair <double,double> meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanErrX);
-							ChartMx->Series[0]->Title = ChartMx->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	struct { double operator() (const CadrInfo& a) {return a.MeanErrorX * 1000.;} } GetMeanErrX;
+	pair <double,double> meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanErrX);
+	ChartMx->Series[0]->Title = ChartMx->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
 
-							struct { double operator() (const CadrInfo& a) {return a.MeanErrorY * 1000.;} } GetMeanErrY;
-							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanErrY);
-							ChartMy->Series[0]->Title = ChartMy->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	struct { double operator() (const CadrInfo& a) {return a.MeanErrorY * 1000.;} } GetMeanErrY;
+	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanErrY);
+	ChartMy->Series[0]->Title = ChartMy->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
 
-							struct { double operator() (const CadrInfo& a) {return a.MeanErrorXY * 1000.;} } GetMeanErrXY;
-							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanErrXY);
-							ChartMxy->Series[0]->Title = ChartMxy->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	struct { double operator() (const CadrInfo& a) {return a.MeanErrorXY * 1000.;} } GetMeanErrXY;
+	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanErrXY);
+	ChartMxy->Series[0]->Title = ChartMxy->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
 
-							struct { double operator() (const CadrInfo& a) {return a.CountWindows;} } GetCountWindows;
-							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetCountWindows);
-							ChartNumFrag->Series[0]->Title = ChartNumFrag->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	struct { double operator() (const CadrInfo& a) {return a.CountWindows;} } GetCountWindows;
+	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetCountWindows);
+	ChartNumFrag->Series[0]->Title = ChartNumFrag->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
 
-							struct { double operator() (const CadrInfo& a) {return a.CountLocalObj;} } GetCountLocalObj;
-							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetCountLocalObj);
-							ChartNumLoc->Series[0]->Title = ChartNumLoc->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	struct { double operator() (const CadrInfo& a) {return a.CountLocalObj;} } GetCountLocalObj;
+	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetCountLocalObj);
+	ChartNumLoc->Series[0]->Title = ChartNumLoc->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
 
-							struct { double operator() (const CadrInfo& a) {return a.CountDeterObj;} } GetCountDeterObj;
-							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetCountDeterObj);
-							ChartNumDet->Series[0]->Title = ChartNumDet->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
-
-
-							struct { double operator() (const CadrInfo& a) {return a.MeanBright;} } GetMeanBright;
-							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanBright);
-							ChartFone->Series[0]->Title = ChartFone->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
-
-							struct { double operator() (const CadrInfo& a) {return a.SigmaBright;} } GetSigmaBright;
-							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetSigmaBright);
-							ChartNoise->Series[0]->Title = ChartNoise->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
-
-							//struct { double operator() (const CadrInfo& a) {return a.MatrixTemp;} } GetMatrixTemp;
-						   //meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMatrixTemp);
+	struct { double operator() (const CadrInfo& a) {return a.CountDeterObj;} } GetCountDeterObj;
+	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetCountDeterObj);
+	ChartNumDet->Series[0]->Title = ChartNumDet->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
 
 
-							struct { double operator() (const CadrInfo& a) {return a.AxesDiff[0] * RTS;} } GetAxesDiffF;
-							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAxesDiffF);
-							ChartErrorOX->Series[0]->Title = ChartErrorOX->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	struct { double operator() (const CadrInfo& a) {return a.MeanBright;} } GetMeanBright;
+	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanBright);
+	ChartFone->Series[0]->Title = ChartFone->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
 
-							struct { double operator() (const CadrInfo& a) {return a.AxesDiff[1] * RTS;} } GetAxesDiffS;
-							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAxesDiffS);
-							ChartErrorOY->Series[0]->Title = ChartErrorOY->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	struct { double operator() (const CadrInfo& a) {return a.SigmaBright;} } GetSigmaBright;
+	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetSigmaBright);
+	ChartNoise->Series[0]->Title = ChartNoise->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
 
-							struct { double operator() (const CadrInfo& a) {return a.AxesDiff[2] * RTS;} } GetAxesDiffT;
-							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAxesDiffT);
-							ChartErrorOZ->Series[0]->Title = ChartErrorOZ->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
-
-
-							struct { double operator() (const CadrInfo& a) {return a.AnglesDiff[0] * RTS;} } GetAnglesDiffF;
-							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesDiffF);
-							ChartAlError->Series[0]->Title = ChartAlError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
-
-							struct { double operator() (const CadrInfo& a) {return a.AnglesDiff[1] * RTS;} } GetAnglesDiffS;
-							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesDiffS);
-							ChartDlError->Series[0]->Title = ChartDlError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
-
-							struct { double operator() (const CadrInfo& a) {return a.AnglesDiff[2] * RTS;} } GetAnglesDiffT;
-							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesDiffT);
-							ChartAzError->Series[0]->Title = ChartAzError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	//struct { double operator() (const CadrInfo& a) {return a.MatrixTemp;} } GetMatrixTemp;
+	//meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMatrixTemp);
 
 
-							struct { double operator() (const CadrInfo& a) {return a.OmegaDiff[0] * RTS;} } GetOmegaDiffF;
-							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaDiffF);
-							ChartWxError->Series[0]->Title = ChartWxError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	struct { double operator() (const CadrInfo& a) {return a.AxesDiff[0] * RTS;} } GetAxesDiffF;
+	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAxesDiffF);
+	ChartErrorOX->Series[0]->Title = ChartErrorOX->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
 
-							struct { double operator() (const CadrInfo& a) {return a.OmegaDiff[1] * RTS;} } GetOmegaDiffS;
-							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaDiffS);
-							ChartWyError->Series[0]->Title = ChartWyError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	struct { double operator() (const CadrInfo& a) {return a.AxesDiff[1] * RTS;} } GetAxesDiffS;
+	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAxesDiffS);
+	ChartErrorOY->Series[0]->Title = ChartErrorOY->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
 
-							struct { double operator() (const CadrInfo& a) {return a.OmegaDiff[2] * RTS;} } GetOmegaDiffT;
-							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaDiffT);
-							ChartWzError->Series[0]->Title = ChartWzError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	struct { double operator() (const CadrInfo& a) {return a.AxesDiff[2] * RTS;} } GetAxesDiffT;
+	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAxesDiffT);
+	ChartErrorOZ->Series[0]->Title = ChartErrorOZ->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
 
 
-							struct { double operator() (const CadrInfo& a) {return a.OmegaOrient[0] * RTM;} } GetOmegaOrientF;
-							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaOrientF);
-							ChartWx->Series[0]->Title = ChartWx->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	struct { double operator() (const CadrInfo& a) {return a.AnglesDiff[0] * RTS;} } GetAnglesDiffF;
+	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesDiffF);
+	ChartAlError->Series[0]->Title = ChartAlError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
 
-							struct { double operator() (const CadrInfo& a) {return a.OmegaOrient[1] * RTM;} } GetOmegaOrientS;
-							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaOrientS);
-							ChartWy->Series[0]->Title = ChartWy->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	struct { double operator() (const CadrInfo& a) {return a.AnglesDiff[1] * RTS;} } GetAnglesDiffS;
+	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesDiffS);
+	ChartDlError->Series[0]->Title = ChartDlError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
 
-							struct { double operator() (const CadrInfo& a) {return a.OmegaOrient[2] * RTM;} } GetOmegaOrientT;
-							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaOrientT);
-							ChartWz->Series[0]->Title = ChartWz->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	struct { double operator() (const CadrInfo& a) {return a.AnglesDiff[2] * RTS;} } GetAnglesDiffT;
+	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesDiffT);
+	ChartAzError->Series[0]->Title = ChartAzError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
 
-							struct { double operator() (const CadrInfo& a) {return a.OmegaModel[0] * RTM;} } GetOmegaModelF;
-							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaModelF);
-							ChartWx->Series[1]->Title = ChartWx->Series[1]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
 
-							struct { double operator() (const CadrInfo& a) {return a.OmegaModel[1] * RTM;} } GetOmegaModelS;
-							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaModelS);
-							ChartWy->Series[1]->Title = ChartWy->Series[1]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	struct { double operator() (const CadrInfo& a) {return a.OmegaDiff[0] * RTS;} } GetOmegaDiffF;
+	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaDiffF);
+	ChartWxError->Series[0]->Title = ChartWxError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
 
-							struct { double operator() (const CadrInfo& a) {return a.OmegaModel[2] * RTM;} } GetOmegaModelT;
-							meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaModelT);
-							ChartWz->Series[1]->Title = ChartWz->Series[1]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	struct { double operator() (const CadrInfo& a) {return a.OmegaDiff[1] * RTS;} } GetOmegaDiffS;
+	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaDiffS);
+	ChartWyError->Series[0]->Title = ChartWyError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+	struct { double operator() (const CadrInfo& a) {return a.OmegaDiff[2] * RTS;} } GetOmegaDiffT;
+	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaDiffT);
+	ChartWzError->Series[0]->Title = ChartWzError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+
+	struct { double operator() (const CadrInfo& a) {return a.OmegaOrient[0] * RTM;} } GetOmegaOrientF;
+	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaOrientF);
+	ChartWx->Series[0]->Title = ChartWx->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+	struct { double operator() (const CadrInfo& a) {return a.OmegaOrient[1] * RTM;} } GetOmegaOrientS;
+	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaOrientS);
+	ChartWy->Series[0]->Title = ChartWy->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+	struct { double operator() (const CadrInfo& a) {return a.OmegaOrient[2] * RTM;} } GetOmegaOrientT;
+	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaOrientT);
+	ChartWz->Series[0]->Title = ChartWz->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+	struct { double operator() (const CadrInfo& a) {return a.OmegaModel[0] * RTM;} } GetOmegaModelF;
+	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaModelF);
+	ChartWx->Series[1]->Title = ChartWx->Series[1]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+	struct { double operator() (const CadrInfo& a) {return a.OmegaModel[1] * RTM;} } GetOmegaModelS;
+	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaModelS);
+	ChartWy->Series[1]->Title = ChartWy->Series[1]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+
+	struct { double operator() (const CadrInfo& a) {return a.OmegaModel[2] * RTM;} } GetOmegaModelT;
+	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaModelT);
+	ChartWz->Series[1]->Title = ChartWz->Series[1]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
 
 }
 void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
@@ -3732,22 +3732,16 @@ void __fastcall TFormGraphOrient::FormResize(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void CheckGroupSeries(TChart *chartSource, TChart *chartApply)
-{
-	for (int iSeries = 0; iSeries < chartSource->SeriesCount(); iSeries++) {
-		bool visible = chartSource->Series[iSeries]->Visible;
-		chartApply->Series[iSeries]->Visible = visible;
-	}
-}
+
 
 void __fastcall TFormGraphOrient::ChartsFragClickLegend(TCustomChart *Sender, TMouseButton Button,
 		  TShiftState Shift, int X, int Y)
 {
 	TChart *currentChart = (TChart*)Sender;
-	CheckGroupSeries(currentChart, ChartFragErrX);
-	CheckGroupSeries(currentChart, ChartFragErrY);
-	CheckGroupSeries(currentChart, ChartFragBright);
-	CheckGroupSeries(currentChart, ChartFragSizeEl);
+	plotter->CheckGroupSeries(currentChart, ChartFragErrX);
+	plotter->CheckGroupSeries(currentChart, ChartFragErrY);
+	plotter->CheckGroupSeries(currentChart, ChartFragBright);
+	plotter->CheckGroupSeries(currentChart, ChartFragSizeEl);
 }
 //---------------------------------------------------------------------------
 
@@ -3755,12 +3749,266 @@ void __fastcall TFormGraphOrient::ChartOrientClickLegend(TCustomChart *Sender, T
           TShiftState Shift, int X, int Y)
 {
 	TChart *currentChart = (TChart*)Sender;
-	CheckGroupSeries(currentChart, ChartAl);
-	CheckGroupSeries(currentChart, ChartDl);
-	CheckGroupSeries(currentChart, ChartAz);
-	CheckGroupSeries(currentChart, ChartWx);
-	CheckGroupSeries(currentChart, ChartWy);
-	CheckGroupSeries(currentChart, ChartWz);
+	plotter->CheckGroupSeries(currentChart, ChartAl);
+	plotter->CheckGroupSeries(currentChart, ChartDl);
+	plotter->CheckGroupSeries(currentChart, ChartAz);
+	plotter->CheckGroupSeries(currentChart, ChartWx);
+	plotter->CheckGroupSeries(currentChart, ChartWy);
+	plotter->CheckGroupSeries(currentChart, ChartWz);
 }
 //---------------------------------------------------------------------------
+
+void TFormGraphOrient::readBOKZ601000Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
+{
+
+	try
+	{
+	
+	std::string line;
+	string errorMessage = string("Cчитывание протокола завершено необычным образом. "
+				"Возможно работа прибора была остановлена.");
+	
+
+	while (std::getline(in,line))
+	{
+		TColor errorColor = clBlue;
+		if (findLine(in,"Состав ДТМИ:") != std::string::npos)
+		{
+			CadrInfo cadrInfo;
+			cadrInfo.ImageHeight = 1024;
+			cadrInfo.ImageWidth = 1024;
+			cadrInfo.CountBlock = 0;
+			cadrInfo.CountLines = 0;
+			cadrInfo.CountStars = 0;
+			cadrInfo.SizeStarsList = 0;
+			cadrInfo.SizeWindowsList = 0;//cadrInfo.WindowsList.size();
+
+			//  время привязки в секундах
+			if(findWord(in, "информации") != std::string::npos)
+			{
+				in >> cadrInfo.Time;
+			}
+			else throw std::logic_error(errorMessage);
+
+			
+			if (findWord(in, "состояния") != std::string::npos)
+			{
+				std::string status;
+				in >> status >> status;
+
+				if (findWord(in, "состояния") != std::string::npos)
+				{
+					std::string status2;
+					in >> status2 >> status2;
+
+					 // ТО
+					if (status == "ec00")
+					{
+						if (status2.substr(0, 2) != "00")
+						{
+						   errorColor = clRed;
+						}
+					}
+					//  НО
+					else if (status == "2400")
+					{
+						errorColor = clGreen;
+						if (status2.substr(0, 2) == "0c"  || status2.substr(0, 2) == "01")
+						{
+							continue;
+						}
+						else if (status2.substr(0, 2) != "00")
+						{
+						   errorColor = clRed;
+						}
+					}
+					else if (status == "0000" && status2 == "0000")
+					{
+						continue;
+					}
+					else
+					{
+						errorColor = clRed;
+					}
+				}
+				else throw std::logic_error(errorMessage);
+			}
+			else throw std::logic_error(errorMessage);
+			// локализованные
+			
+			if (findWord(in, "объектов") != std::string::npos)
+			{
+				in >> cadrInfo.CountLocalObj;
+			}
+			else throw std::logic_error(errorMessage);
+
+
+			if (findWord(in, "объектов") != std::string::npos)
+			{
+				in >> cadrInfo.CountDeterObj;
+			}
+			else throw std::logic_error(errorMessage);
+
+
+			if (findWord(in, "фрагментов") != std::string::npos)
+			{
+				in >> cadrInfo.CountWindows;
+			}
+			else throw std::logic_error(errorMessage);
+
+
+			if(findLine(in,"	Х			Y			I			N") != std::string::npos)
+			{
+				vector<string> splittedLocData;
+				const int сountLocObj = cadrInfo.CountLocalObj;
+				ObjectsInfo objInfo;
+				for(int i = 0 ; i < сountLocObj; i ++)
+				{
+					std::getline(in,line);
+					// см. эту строку в протоколе, чтобы понять почему так
+					splittedLocData = split(line, ")\t");
+					splittedLocData = split(splittedLocData[1], "\t");
+
+					objInfo.X = std::atof (splittedLocData[0].c_str());
+					objInfo.Y = std::atof (splittedLocData[1].c_str());
+
+					if (objInfo.X == 0 && objInfo.Y == 0) {        
+						break;
+					}
+					
+					objInfo.Bright = std::atof (splittedLocData[2].c_str());
+					objInfo.Square = abs(std::atoi(splittedLocData[3].c_str()));
+					objInfo.StarID = 0;
+					objInfo.Mv = 0;
+					objInfo.Sp[0]='_';
+					objInfo.Sp[1]='_';
+					objInfo.Dx = 0;
+					objInfo.Dy = 0;
+					cadrInfo.ObjectsList.push_back(objInfo);
+				}
+				cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
+			}
+			else throw std::logic_error(errorMessage);
+			
+
+//			if(findLine(in,"16) Значение порогов во фрагментах") != std::string::npos)
+//		   {
+//				for(int i = 0; i < cadrInfo.CountWindows; i++)
+//				{
+//					WindowsInfo winInfo;
+//					std::getline(in,line);
+//					vector<string> splittedStr = split(line,"\t");
+//					winInfo.Level =  std::atoi(splittedStr[1].c_str());
+//					if (winInfo.Level == 0) {
+//						break;
+//					}
+//					cadrInfo.WindowsList.push_back(winInfo);
+//				}
+//
+//		   }
+//		  else throw std::logic_error(errorMessage);
+//
+//		   
+//		   if(findLine(in,"17) Количество объектов во фрагментах") != std::string::npos)
+//		   {
+//				for(int i = 0; i < cadrInfo.WindowsList.size(); i++)
+//				{
+//					std::getline(in,line);
+//					vector <string> splittedStr = split(line,"\t");
+//					cadrInfo.WindowsList[i].CountObj = std::atoi(splittedStr[1].c_str());
+//				}
+//
+//		   }
+//		   else throw std::logic_error(errorMessage);
+
+		   if(findLine(in,"5) Кватернион ориентации, Qо") != std::string::npos)
+		   {
+
+				for(int i = 0; i < 4; i++)
+				{
+					std::getline(in,line);
+					vector<string> splittedStr = split(line,"\t\t\t\t");
+					cadrInfo.QuatOrient[i] = std::atof(splittedStr[1].c_str());
+				}
+
+				double matrixOfOrientation [3][3];
+				quatToMatr(cadrInfo.QuatOrient, matrixOfOrientation);
+				double al = 0;
+				double dl = 0;
+				double Az = 0;
+
+				dl = asinm(matrixOfOrientation[2][2]) * RTD;
+				al = atan2m(matrixOfOrientation[2][1], matrixOfOrientation[2][0]) * RTD;   if (al<0)  al += 360.;
+				Az = atan2m(matrixOfOrientation[0][2], matrixOfOrientation[1][2]) * RTD;   if (Az<0)  Az += 360.;
+				plotter->AddPoint(ChartAl, 0, cadrInfo.Time, al, errorColor);
+				plotter->AddPoint(ChartDl, 0, cadrInfo.Time, dl, errorColor);
+				plotter->AddPoint(ChartAz, 0, cadrInfo.Time, Az, errorColor);
+
+
+		   }
+		   else break; // протоколы кончаются на ДТМИ
+
+		   if(findLine(in,"Угловая скорость по оптическим измерениям в проекциях на оси ПСК") != std::string::npos)
+		   {
+				for(int i = 0; i < 3; i++)
+				{
+					std::getline(in,line);
+					vector<string> splittedStr = split(line,"\t\t\t\t");
+					cadrInfo.OmegaOrient[i] = std::atof(splittedStr[1].c_str());
+				}
+
+		   }
+		   else throw std::logic_error(errorMessage);
+
+		   plotter->AddPoint(ChartNumFrag, 0, cadrInfo.Time, cadrInfo.CountWindows, errorColor);
+		   plotter->AddPoint(ChartNumDet, 0, cadrInfo.Time, cadrInfo.CountDeterObj, errorColor);
+		   plotter->AddPoint(ChartNumLoc, 0, cadrInfo.Time, cadrInfo.CountLocalObj, errorColor);
+		   plotter->AddPoint(ChartWx, 0, cadrInfo.Time, cadrInfo.OmegaOrient[0] * RTM * PI * 0.03125, errorColor);
+		   plotter->AddPoint(ChartWy, 0, cadrInfo.Time, cadrInfo.OmegaOrient[1] * RTM * PI * 0.03125, errorColor);
+		   plotter->AddPoint(ChartWz, 0, cadrInfo.Time, cadrInfo.OmegaOrient[2] * RTM * PI * 0.03125, errorColor);
+		   cadrInfoVec.push_back(cadrInfo);
+		   
+		}
+
+	}
+	}	
+
+	catch (std::exception &e)
+	{
+		ShowMessage(e.what());
+	}
+
+}
+
+
+void __fastcall TFormGraphOrient::BOKZM601000ParseProtocolClick(TObject *Sender)
+{
+		 OpenDialog->Options.Clear();
+		 OpenDialog->Filter = "txt|*.txt";
+		 OpenDialog->Options << ofAllowMultiSelect;
+		 if (OpenDialog->Execute()) 
+		 {
+			vCadrInfo.clear();
+			DeleteLineGraph();
+			std::unique_ptr <TStringList> FileList (new TStringList());
+			FileList->Assign(OpenDialog->Files);
+			SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
+			for (int i = 0; i < FileList->Count; i ++)
+			{
+				FileName = FileList->Strings[i];
+				ifstream in(FileName.c_str());
+				if (!in.is_open()) 
+				{
+					ShowMessage("Не удалось открыть файл");
+					return;
+				}
+				readBOKZ601000Protocol(in, vCadrInfo);
+			}
+
+			PrepareStartDraw();	
+
+		}
+}
+//---------------------------------------------------------------------------
+
 

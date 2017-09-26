@@ -31,6 +31,9 @@
 	#include "VCLTee.TeeEdit.hpp"
 	#include "VCLTee.ErrorBar.hpp"
 	#include "VCLTee.TeeHighLowLine.hpp"
+#include "frxRich.hpp"
+#include "frxClass.hpp"
+#include "frxExportRTF.hpp"
 	#include <vector>
 	#include <Classes.hpp>
 	#include <Controls.hpp>
@@ -191,6 +194,7 @@
 		TChart *ChartFragBright;
 		TChart *ChartFragSizeEl;
 		TArrowSeries *Series10;
+	TMenuItem *BOKZM601000ParseProtocol;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -222,6 +226,7 @@
           TShiftState Shift, int X, int Y);
 		void __fastcall ChartOrientClickLegend(TCustomChart *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y);
+	void __fastcall BOKZM601000ParseProtocolClick(TObject *Sender);
 
 
 	private:	// User declarations
@@ -242,6 +247,7 @@
 		void readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
 		void readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
 		void readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
+		void readBOKZ601000Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
 		void __fastcall OnScroll(TObject* Sender);
 		void SetContrast();
 		void __fastcall ChartMouseWheel(TObject *Sender, TShiftState Shift, int WheelDelta,
