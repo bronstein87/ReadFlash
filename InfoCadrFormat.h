@@ -68,6 +68,7 @@ struct CadrInfo
 	unsigned short StatOrient;  //статус решения задачи (0 - успешно)
 	unsigned int DataType; // признак типа 0-byte, 1-ushort, 2-float
 	double MeanBright, SigmaBright;
+	float Epsilon; // допуск на распознавание
 
 	unsigned short CountStars;  //число спроектированных звезд
 	unsigned short CountWindows;  //число прогнозируемых окон

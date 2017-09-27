@@ -3747,7 +3747,7 @@ void __fastcall TFormGraphOrient::ChartsFragClickLegend(TCustomChart *Sender, TM
 //---------------------------------------------------------------------------
 
 void __fastcall TFormGraphOrient::ChartOrientClickLegend(TCustomChart *Sender, TMouseButton Button,
-          TShiftState Shift, int X, int Y)
+		  TShiftState Shift, int X, int Y)
 {
 	TChart *currentChart = (TChart*)Sender;
 	plotter->CheckGroupSeries(currentChart, ChartAl);
@@ -3759,31 +3759,140 @@ void __fastcall TFormGraphOrient::ChartOrientClickLegend(TCustomChart *Sender, T
 }
 //---------------------------------------------------------------------------
 
+void writeBOKZ1000ProtocolToIKI (CadrInfo& cadrInfo, bool InfoVecEmpty, TDateTime& startDate, double& timeStep, unsigned int& counter)
+{
+	unique_ptr <IKI_img> writer (new IKI_img());
+	if (InfoVecEmpty)
+	{
+		writer->Georeferencing.DateTime = startDate;
+	}
+	else
+	{
+		startDate = IncMilliSecond(startDate, timeStep * 1000);
+		writer->Georeferencing.DateTime = startDate;
+		timeStep = 0.25;
+	}
+
+	writer->Georeferencing.FrameNumber = ++counter;
+	writer->StarsData.RezStat = 0;
+	writer->ImageData.FrameData.FrameHeight = 1024;
+	writer->ImageData.FrameData.FrameWidth = 1024;
+	writer->StarsData.SimulatedFrame.strrec = cadrInfo.SizeObjectsList;
+	writer->StarsData.LocalizedCount = cadrInfo.CountLocalObj;
+	//writer->StarsData.RecognizedCount = cadrInfo.CountDeterObj;
+	writer->StarsData.Epsilon = cadrInfo.Epsilon;
+	//writer->ImageData.WindowsData.WindowCount = cadrInfo.CountWindows;
+
+	writer->StarsData.SimulatedFrame.StarRec = new STARREC [cadrInfo.SizeObjectsList];
+	for (int i = 0; i < cadrInfo.SizeObjectsList; i++)
+	{
+		writer->StarsData.SimulatedFrame.StarRec[i].Xs = cadrInfo.ObjectsList[i].X;
+		writer->StarsData.SimulatedFrame.StarRec[i].Ys = cadrInfo.ObjectsList[i].Y;
+		writer->StarsData.SimulatedFrame.StarRec[i].Is = cadrInfo.ObjectsList[i].Bright;
+		writer->StarsData.SimulatedFrame.StarRec[i].Ns = cadrInfo.ObjectsList[i].StarID;
+		writer->StarsData.SimulatedFrame.StarRec[i].Mv = cadrInfo.ObjectsList[i].Mv;
+		writer->StarsData.SimulatedFrame.StarRec[i].Sp[0] = cadrInfo.ObjectsList[i].Sp[0];
+		writer->StarsData.SimulatedFrame.StarRec[i].Sp[1] = cadrInfo.ObjectsList[i].Sp[1];
+	}
+
+	double matrixOfOrientation [3][3];
+	quatToMatr(cadrInfo.QuatOrient, matrixOfOrientation);
+	double Angles[3];
+	MatrixToEkvAngles(matrixOfOrientation, Angles);
+	for (int i = 0; i < 3; i ++)
+	{
+		writer->Georeferencing.OrientationAngles[i] = Angles[i];
+		writer->Georeferencing.DeviceAngularVelocity[i] = cadrInfo.OmegaOrient[i] * BOKZ1000ConvCoef;
+	}
+
+	AnsiString FileName = GetCurrentDir() + "/" + "IKI_" + TDateTime::CurrentDate().DateString() + "/";
+	TDirectory::CreateDirectory(FileName);
+	char fileNumber [2];
+	sprintf (fileNumber, "%02u", counter);
+	FileName = FileName + IntToStr((int)counter) + "_" + TDateTime::CurrentDate().DateString() + "_00-00-" + fileNumber + ".iki";
+	writer->WriteFormat(FileName);
+
+}
+
 void TFormGraphOrient::readBOKZ601000Protocol(ifstream& in, vector <CadrInfo>& cadrInfoVec, unsigned int& counter, TDateTime& startDate)
 {
 
 	try
 	{
 
-
+	const string errorMessage = string("Cчитывание протокола завершено необычным образом.");
 	string line;
-	string errorMessage = string("Cчитывание протокола завершено необычным образом. "
-				"Возможно работа прибора была остановлена.");
-	
-	double timeStep = 0.25;
+	static double timeStep = 0.25;
+	static bool NeedNextFile = false;
+
+	if (NeedNextFile)
+	{
+		if (findWord(in, "такта:") != string::npos)
+		{
+			int TickNumber = 0;
+			in >> TickNumber;
+			if (TickNumber != cadrInfoVec.back().FrameNumber)
+			{
+				throw logic_error(errorMessage);
+			}
+
+		}
+		else throw logic_error(errorMessage);
+
+		if(findLine(in,"5) Кватернион ориентации, Qо") != string::npos)
+		{
+
+			for(int i = 0; i < 4; i++)
+			{
+				getline(in,line);
+				vector<string> splittedStr = split(line,"\t\t\t\t");
+				cadrInfoVec.back().QuatOrient[i] = atof(splittedStr[1].c_str());
+			}
+
+			double matrixOfOrientation [3][3];
+			quatToMatr(cadrInfoVec.back().QuatOrient, matrixOfOrientation);
+			double Angles[3];
+			MatrixToEkvAngles(matrixOfOrientation, Angles);
+
+			plotter->AddPoint(ChartAl, 0, cadrInfoVec.back().Time, Angles[0] * RTD);
+			plotter->AddPoint(ChartDl, 0, cadrInfoVec.back().Time, Angles[1] * RTD);
+			plotter->AddPoint(ChartAz, 0, cadrInfoVec.back().Time, Angles[2] * RTD);
+
+
+		}
+		else throw logic_error(errorMessage); // протоколы кончаются на ДТМИ
+
+		if(findLine(in, "Угловая скорость по оптическим измерениям в проекциях на оси ПСК") != string::npos)
+		{
+			for(int i = 0; i < 3; i++)
+			{
+				getline(in,line);
+				vector <string> splittedStr = split(line,"\t\t\t\t");
+				cadrInfoVec.back().OmegaOrient[i] = atof(splittedStr[1].c_str());
+			}
+
+		}
+		else throw logic_error(errorMessage);
+		writeBOKZ1000ProtocolToIKI (cadrInfoVec.back(), cadrInfoVec.empty(), startDate, timeStep, counter);
+		NeedNextFile = false;
+	}
+
+
+
 	while (getline(in,line))
 	{
 		TColor pointColor = clBlue;
 	if (line.find("Номер такта:") != string::npos)
 	{
+		// номер такта в ДТМИ
 		int TickNumber = 0;
 		vector <string> splitTickNumber = split(line, " ");
-		TickNumber = atoi(splitTickNumber[1].c_str());
+		TickNumber = atoi(splitTickNumber[2].c_str());
 
-		if (findLine (in,"Состав ДТМИ:") != string::npos)
+		if (findLine (in, "Состав ДТМИ:") != string::npos)
 		{
-
 			CadrInfo cadrInfo;
+			cadrInfo.FrameNumber = TickNumber;
 			cadrInfo.ImageHeight = 1024;
 			cadrInfo.ImageWidth = 1024;
 			cadrInfo.CountBlock = 0;
@@ -3865,10 +3974,9 @@ void TFormGraphOrient::readBOKZ601000Protocol(ifstream& in, vector <CadrInfo>& c
 			}
 			else throw logic_error(errorMessage);
 
-			int LimitRec = 0;
 			if (findWord(in, "распознавания") != string::npos)
 			{
-				in >> LimitRec;
+				in >> cadrInfo.Epsilon;
 			}
 			else throw logic_error(errorMessage);
 
@@ -3949,12 +4057,21 @@ void TFormGraphOrient::readBOKZ601000Protocol(ifstream& in, vector <CadrInfo>& c
 				int TickNumberSecond = 0;
 				in >> TickNumberSecond;
 				// если была рассинхронизация
-				if (TickNumber != TickNumberSecond)
+				if (cadrInfo.FrameNumber != TickNumberSecond)
 				{
 					timeStep += timeStep;
 					continue;
 				}
 			}
+			else
+			{
+				NeedNextFile = true;
+				cadrInfoVec.push_back(move(cadrInfo));
+				++counter;
+				break;
+			}
+
+
 
 		   if(findLine(in,"5) Кватернион ориентации, Qо") != string::npos)
 		   {
@@ -3977,14 +4094,16 @@ void TFormGraphOrient::readBOKZ601000Protocol(ifstream& in, vector <CadrInfo>& c
 
 
 		   }
-		   else break; // протоколы кончаются на ДТМИ
+		   else throw logic_error(errorMessage);// протоколы кончаются на ДТМИ
 
-		   if(findLine(in,"Угловая скорость по оптическим измерениям в проекциях на оси ПСК") != string::npos)
+
+
+		   if(findLine(in, "Угловая скорость по оптическим измерениям в проекциях на оси ПСК") != string::npos)
 		   {
 				for(int i = 0; i < 3; i++)
 				{
 					getline(in,line);
-					vector<string> splittedStr = split(line,"\t\t\t\t");
+					vector <string> splittedStr = split(line,"\t\t\t\t");
 					cadrInfo.OmegaOrient[i] = atof(splittedStr[1].c_str());
 				}
 
@@ -3995,66 +4114,18 @@ void TFormGraphOrient::readBOKZ601000Protocol(ifstream& in, vector <CadrInfo>& c
 		   plotter->AddPoint(ChartNumDet, 0, cadrInfo.Time, cadrInfo.CountDeterObj, pointColor);
 		   plotter->AddPoint(ChartNumLoc, 0, cadrInfo.Time, cadrInfo.CountLocalObj, pointColor);
 
-		   const double BOKZ1000ConvCoef = PI * 0.03125;
 		   plotter->AddPoint(ChartWx, 0, cadrInfo.Time, cadrInfo.OmegaOrient[0] * RTM * BOKZ1000ConvCoef, pointColor);
 		   plotter->AddPoint(ChartWy, 0, cadrInfo.Time, cadrInfo.OmegaOrient[1] * RTM * BOKZ1000ConvCoef, pointColor);
 		   plotter->AddPoint(ChartWz, 0, cadrInfo.Time, cadrInfo.OmegaOrient[2] * RTM * BOKZ1000ConvCoef, pointColor);
-		   unique_ptr <IKI_img> writer (new IKI_img());
 
-		   if (cadrInfoVec.empty())
-		   {
-				writer->Georeferencing.DateTime = startDate;
-		   }
-		   else
-		   {
-				writer->Georeferencing.DateTime = startDate + timeStep;
-				timeStep = 0.25;
-				TDateTime (2017,9,26, 00,00,00);
-		   }
-
-		   writer->Georeferencing.FrameNumber = ++counter;
-		   writer->StarsData.RezStat = 0;
-		   writer->ImageData.FrameData.FrameHeight = 1024;
-		   writer->ImageData.FrameData.FrameWidth = 1024;
-		   writer->StarsData.SimulatedFrame.strrec = cadrInfo.SizeObjectsList;
-		   writer->StarsData.LocalizedCount = cadrInfo.CountLocalObj;
-		   writer->StarsData.RecognizedCount = cadrInfo.CountDeterObj;
-
-		   writer->StarsData.SimulatedFrame.StarRec = new STARREC [cadrInfo.SizeObjectsList];
-		   for (int i = 0; i < cadrInfo.SizeObjectsList; i++)
-		   {
-				writer->StarsData.SimulatedFrame.StarRec[i].Xs = cadrInfo.ObjectsList[i].X;
-				writer->StarsData.SimulatedFrame.StarRec[i].Ys = cadrInfo.ObjectsList[i].Y;
-				writer->StarsData.SimulatedFrame.StarRec[i].Is = cadrInfo.ObjectsList[i].Bright;
-				writer->StarsData.SimulatedFrame.StarRec[i].Ns = cadrInfo.ObjectsList[i].StarID;
-				writer->StarsData.SimulatedFrame.StarRec[i].Mv = cadrInfo.ObjectsList[i].Mv;
-				writer->StarsData.SimulatedFrame.StarRec[i].Sp[0] = cadrInfo.ObjectsList[i].Sp[0];
-				writer->StarsData.SimulatedFrame.StarRec[i].Sp[1] = cadrInfo.ObjectsList[i].Sp[1];
-		   }
-
-			double matrixOfOrientation [3][3];
-			quatToMatr(cadrInfo.QuatOrient, matrixOfOrientation);
-			double Angles[3];
-			MatrixToEkvAngles(matrixOfOrientation, Angles);
-			for (int i = 0; i < 3; i ++)
-			{
-				writer->Georeferencing.OrientationAngles[i] = Angles[i];
-				writer->Georeferencing.DeviceAngularVelocity[i] = cadrInfo.OmegaOrient[i] * BOKZ1000ConvCoef;
-			}
-
-		   AnsiString FileName = GetCurrentDir() + "/" + "IKI_" + TDateTime::CurrentDate().DateString() + "/";
-		   TDirectory::CreateDirectory(FileName);
-		   char buf [2];
-		   sprintf (buf, "%02u", counter);
-		   FileName = FileName + IntToStr((int)counter) + "_" + TDateTime::CurrentDate().DateString() + "_00-00-" + buf + ".iki";
-		   writer->WriteFormat(FileName);
-		   cadrInfoVec.push_back(move(cadrInfo));
+		   writeBOKZ1000ProtocolToIKI (cadrInfo, cadrInfoVec.empty(), startDate, timeStep, counter);
+		   cadrInfoVec.push_back(cadrInfo);
 
 		}
 
 	}
 	}
-	}	
+	}
 
 	catch (exception &e)
 	{
@@ -4143,7 +4214,7 @@ void __fastcall TFormGraphOrient::BOKZM601000ParseProtocolClick(TObject *Sender)
 			FileList->Assign(OpenDialog->Files);
 			SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
 			unsigned int counter = 0;
-			TDateTime startDate = TDateTime (2017,9,26, 00,00,00);
+			TDateTime startDate = TDateTime (2017,9,26,0,0,0,0);
 			for (int i = 0; i < FileList->Count; i++)
 			{
 				FileName = FileList->Strings[i];
@@ -4153,8 +4224,8 @@ void __fastcall TFormGraphOrient::BOKZM601000ParseProtocolClick(TObject *Sender)
 					ShowMessage("Не удалось открыть файл");
 					return;
 				}
-			   //	readBOKZ601000Protocol(in, vCadrInfo, counter);
-			   readBOKZ601000MKO (in, vCadrInfo, counter, startDate);
+			   readBOKZ601000Protocol(in, vCadrInfo, counter, startDate);
+			   //readBOKZ601000MKO (in, vCadrInfo, counter);
 			}
 
 			PrepareStartDraw();

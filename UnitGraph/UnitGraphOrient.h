@@ -31,9 +31,9 @@
 	#include "VCLTee.TeeEdit.hpp"
 	#include "VCLTee.ErrorBar.hpp"
 	#include "VCLTee.TeeHighLowLine.hpp"
-#include "frxRich.hpp"
-#include "frxClass.hpp"
-#include "frxExportRTF.hpp"
+	#include "frxRich.hpp"
+	#include "frxClass.hpp"
+	#include "frxExportRTF.hpp"
 	#include <vector>
 	#include <Classes.hpp>
 	#include <Controls.hpp>
@@ -53,6 +53,7 @@
 	#include <vcl.h>
 	#include <System.IOUtils.hpp>
 	#include <SysUtils.hpp>
+	#include <DateUtils.hpp>
 	#include <System.StrUtils.hpp>
 	#include <System.Uitypes.hpp>
 	#include <stdio.h>

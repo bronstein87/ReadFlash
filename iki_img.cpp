@@ -991,7 +991,7 @@ public:
 		}
 #pragma end_region
 #pragma region local_recog
-		if (StarsData.LocalizedCount != 0)
+		if (StarsData.LocalizedCount != 0 && StarsData.StarsList != NULL)
 		{
 			Value_String = "";
 			Value_String += FormatFloat("#####0 ", StarsData.LocalizedCount);
@@ -1151,7 +1151,7 @@ else
 		}
 #pragma end_region
 #pragma region stringwindow
-		if (ImageData.WindowsData.WindowCount != 0)
+		if (ImageData.WindowsData.WindowCount != 0 && ImageData.WindowsData.Info != NULL)
 		{
 			Value_String = FormatFloat("#####0", ImageData.WindowsData.WindowCount);
 			PrintString(FStream, stringwindow_count_id, stringwindow_count, Value_String);

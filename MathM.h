@@ -10,6 +10,7 @@
 #define RTM	  3437.746770784939  /* RTM minuts in 1 radian:  60*180/pi */
 #define RTS   206264.8062470964  /* RTS seconds in 1 radian: 3600*180/pi */
 #define DTR   0.0174532925
+#define BOKZ1000ConvCoef       0.098174770424681
 
 
 double sqrtm(double xf);
