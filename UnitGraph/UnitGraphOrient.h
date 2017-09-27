@@ -247,7 +247,8 @@
 		void readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
 		void readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
 		void readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
-		void readBOKZ601000Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
+		void readBOKZ601000Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec, unsigned int& counter, TDateTime& startDate);
+		void readBOKZ601000MKO(ifstream& in, vector <CadrInfo>& cadrInfoVec, unsigned int& counter);
 		void __fastcall OnScroll(TObject* Sender);
 		void SetContrast();
 		void __fastcall ChartMouseWheel(TObject *Sender, TShiftState Shift, int WheelDelta,

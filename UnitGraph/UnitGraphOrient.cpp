@@ -485,7 +485,7 @@ void TFormGraphOrient::DrawAnimate(const struct CadrInfo &mCadr)
 		Dx  = mCadr.ObjectsList[iObject].Dx;
 		Dy  = mCadr.ObjectsList[iObject].Dy;
 
-		if ((!mCadr.ObjectsList[iObject].StarID) && (!Dx)&&(!Dy)) {  
+		if (!mCadr.ObjectsList[iObject].StarID && !Dx && !Dy) {
 			if (Nel) {
 				Series9->AddBubble(X0, Y0,(int)(3*sqrtm(fabs(Nel))+0.5),"",clBlue);
 			}
@@ -575,7 +575,7 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
    if(!FragmentFileStr.IsEmpty())
    {
 
-	std::ifstream fragmentFile(FragmentFileStr.c_str(), std::ios::binary);;
+	ifstream fragmentFile(FragmentFileStr.c_str(), ios::binary);;
 	if(!fragmentFile.is_open())
 	{
 		ShowMessage(AnsiString("Не удалось открыть файл ") + FragmentFileStr.c_str());
@@ -590,7 +590,7 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 		int FragmentSize =  FragmentVector.back().SizeX * FragmentVector.back().SizeY;
 		FragmentVector.back().RawFragment = new unsigned short [FragmentSize];
 		fragmentFile.read((char*)FragmentVector.back().RawFragment, sizeof(unsigned short) * FragmentSize);
-		std::unique_ptr<TBitmap> Fragment(createFragmentBitmap(FragmentVector.back()));
+		unique_ptr<TBitmap> Fragment(createFragmentBitmap(FragmentVector.back()));
 
 
 		ImageScrollBoxVector.push_back(new FragmentScrollBox(FragmentShowScrollBox));
@@ -705,7 +705,7 @@ void __fastcall TFormGraphOrient::FragmentShowScrollBoxResize(TObject *Sender)
 {
 	for(int currentFragment = 0;currentFragment < ImageVector.size();currentFragment ++)
 	{
-	   std::unique_ptr<TBitmap> Fragment(changeContrast(Contrast, FragmentVector[currentFragment]));
+	   unique_ptr<TBitmap> Fragment(changeContrast(Contrast, FragmentVector[currentFragment]));
 	   ImageVector[currentFragment]->Picture->Bitmap->FreeImage();
 	   ImageVector[currentFragment]->Picture->Bitmap = NULL;
 	   ImageVector[currentFragment]->Canvas->
@@ -873,7 +873,7 @@ void  TFormGraphOrient::DrawAnimateHandler(void)
 			DrawAnimate(CurCadr);
 		}
 	}
-	catch(std::exception &e)
+	catch(exception &e)
 	{
 		ShowMessage(e.what());
 	}
@@ -891,7 +891,7 @@ void  TFormGraphOrient::PrintTableWindowsHandler(void)
 			 PrintTableWindows(CurCadr);
 		}
 	}
-	catch(std::exception &e)
+	catch(exception &e)
 	{
 		ShowMessage(e.what());
 	}
@@ -909,7 +909,7 @@ void  TFormGraphOrient::PrintTableObjectsHandler(void)
 			 PrintTableObjects(CurCadr);
 		}
 	}
-	catch(std::exception &e)
+	catch(exception &e)
 	{
 		ShowMessage(e.what());
 	}
@@ -927,7 +927,7 @@ void  TFormGraphOrient::DrawBlockHandler(void)
 			 DrawBlock(CurCadr);
 		}
 	}
-	catch(std::exception &e)
+	catch(exception &e)
 	{
 		ShowMessage(e.what());
 	}
@@ -1006,7 +1006,7 @@ void GetFileTitles(AnsiString file_name, AnsiString *file_title)
 					return "";
 			   }
 
-			  std::vector<RawFileInfo>  RawFileInfoVector;
+			  vector<RawFileInfo>  RawFileInfoVector;
 			  int Marker;
 			   while(fread(&Marker, sizeof(int), 1, RawFlashFile) == 1)
 			   {
@@ -1060,7 +1060,7 @@ void GetFileTitles(AnsiString file_name, AnsiString *file_title)
 			} FlashCompare ;
 
 
-			   std::sort(RawFileInfoVector.begin(), RawFileInfoVector.end(), FlashCompare);
+			   sort(RawFileInfoVector.begin(), RawFileInfoVector.end(), FlashCompare);
 			   FILE* SortedFile;
 			   AnsiString SortedFlashFileName = GetCurrentDir() + "\\flash_sorted.dat";
 			   SortedFile = fopen(SortedFlashFileName.c_str(), "wb");
@@ -1590,12 +1590,12 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 		PrepareStartDraw();
 	 }
   }
-	catch(std::string &s)
+	catch(string &s)
 	{
 		ShowMessage(s.c_str());
 	}
 
-	catch(std::exception &e)
+	catch(exception &e)
 	{
 		ShowMessage(e.what());
 	}
@@ -1616,7 +1616,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 
 struct SHTMI1
 {
-	std::string timeBOKZ;
+	string timeBOKZ;
 	unsigned short status1, status2, post;
 	int serialNumber;
 	float Foc, Xg, Yg;
@@ -1626,7 +1626,7 @@ struct SHTMI1
 
 struct SHTMI2
 {
-	std::string timeBOKZ;
+	string timeBOKZ;
 	unsigned short status1, status2, post;
 	int serialNumber, timeExp;
 	int cntCommandWord, cntCallNO, cntNOtoSLEZH;
@@ -1636,7 +1636,7 @@ struct SHTMI2
 
 struct DTMI
 {
-	std::string timeBOKZ;
+	string timeBOKZ;
 	unsigned short status1, status2;
 	unsigned short serialNumber, timeExp;
 	unsigned short nLocalObj, nDeterObj, nWindows, epsillon;
@@ -1652,7 +1652,7 @@ struct DTMI
 
 struct LOC
 {
-	std::string timeBOKZ;
+	string timeBOKZ;
 	unsigned short status1, status2;
 	unsigned short serialNumber, timeExp;
 	unsigned short nLocalObj, nFixedObj;
@@ -1661,18 +1661,18 @@ struct LOC
 	unsigned short Reserved[2];
 } mLOC;
 
-std::string arrStatErrorEng[MAX_STAT]={{"EC1"},{"EC2"},{"EC3"},{"EC4"},
+string arrStatErrorEng[MAX_STAT]={{"EC1"},{"EC2"},{"EC3"},{"EC4"},
 							{"EC5"},{"EC6"},{"EC7"},{"EC8"},
 							{"EC9"},{"EC10"},{"EC11"},{"EC12"},
 							{"EC13"},{"EC14"},{"EC15"},{"EC16"}};
-std::string arrStatErrorRus[MAX_STAT]={{"ЕС1"},{"ЕС2"},{"ЕС3"},{"ЕС4"},
+string arrStatErrorRus[MAX_STAT]={{"ЕС1"},{"ЕС2"},{"ЕС3"},{"ЕС4"},
 							{"ЕС5"},{"ЕС6"},{"ЕС7"},{"ЕС8"},
 							{"ЕС9"},{"ЕС10"},{"ЕС11"},{"ЕС12"},
 							{"ЕС13"},{"ЕС14"},{"ЕС15"},{"ЕС16"}};
 
-unsigned int ReadBinaryString(std::string binaryString)
+unsigned int ReadBinaryString(string binaryString)
 {
-std::string test_str;
+string test_str;
 double sum=0;
 
 	for (int k=0; k<binaryString.length(); k++)
@@ -1685,7 +1685,7 @@ double sum=0;
 
 int TryReadSHTMI1(ifstream &finp, struct SHTMI1 &tmi)
 {
-std::string line, word;
+string line, word;
 
 		while (!finp.eof()){
 			finp>>word;
@@ -1734,7 +1734,7 @@ std::string line, word;
 
 int TryReadSHTMI2(ifstream &finp, struct SHTMI2 &tmi)
 {
-std::string line, word;
+string line, word;
 
 		while (!finp.eof()){
 			finp>>word;
@@ -1806,7 +1806,7 @@ std::string line, word;
 
 int TryReadDTMI(ifstream &finp, struct DTMI &tmi)
 {
-		std::string line, word, inpstr, test_word, test_str;
+		string line, word, inpstr, test_word, test_str;
 		int indexObject=0,indexParam=0, intVal, flLow=1;
 		float fl1, fl2, fl3, sum;
 		int Stat1, Stat2;
@@ -2006,15 +2006,15 @@ void PrintDTMI(ofstream &file, struct DTMI tmi)
 	file<<"NumFrag:\t"<<tmi.nWindows<<"\n";
 	file<<"EPSILON:\t"<<tmi.epsillon<<"\n";
 	file<<"DeltaT:\t"<<tmi.dTimeBOKZ<<"\n";
-	file<<std::setw(6)<<"№"<<" X, pix"<<" Y, pix"<<" Bright"<<" Nel"<<"\n";
+	file<<setw(6)<<"№"<<" X, pix"<<" Y, pix"<<" Bright"<<" Nel"<<"\n";
 	for (int i = 0; i < MAX_OBJ_DTMI; i++) {
-		file<<std::setw(6)<<(i+1)<<"\t";
+		file<<setw(6)<<(i+1)<<"\t";
 		file<<tmi.LocalList[i][0]<<"\t"<<tmi.LocalList[i][1]<<"\t";
 		file<<tmi.LocalList[i][2]<<"\t"<<tmi.LocalList[i][3]<<"\n";
 	}
-	file<<std::setw(6)<<"№"<<" X, pix"<<" Y, pix"<<"\n";
+	file<<setw(6)<<"№"<<" X, pix"<<" Y, pix"<<"\n";
 	for (int i = 0; i < MAX_WINDOW; i++) {
-		file<<std::setw(6)<<(i+1)<<"\t";
+		file<<setw(6)<<(i+1)<<"\t";
 		file<<tmi.centrWindow[i][0]<<"\t"<<tmi.centrWindow[i][1]<<"\t";
 		file<<tmi.levelWindow[i]<<"\t"<<tmi.nObjectWindow[i]<<"\n";
 	}
@@ -2052,9 +2052,9 @@ void PrintLOC(ofstream &file, struct LOC tmi)
 	file<<"NumFix: \t"<<tmi.nFixedObj<<"\n";
 	file<<"MeanC:\t"<<tmi.MeanC<<"\n";
 	file<<"SigmaC:\t"<<tmi.SigmaC<<"\n";
-	file<<std::setw(6)<<"№"<<" X, pix"<<" Y, pix"<<" Bright"<<" Nel"<<"\n";
+	file<<setw(6)<<"№"<<" X, pix"<<" Y, pix"<<" Bright"<<" Nel"<<"\n";
 	for (int i = 0; i < 32; i++) {
-		file<<std::setw(6)<<(i+1)<<"\t";
+		file<<setw(6)<<(i+1)<<"\t";
 		file<<tmi.LocalList[i][0]<<"\t"<<tmi.LocalList[i][1]<<"\t";
 		file<<tmi.LocalList[i][2]<<"\t"<<tmi.LocalList[i][3]<<"\n";
 	}
@@ -2079,13 +2079,13 @@ void PrintLocalDTMI(struct DTMI tmi)
 	}
 
 	ofstream file(fileName.c_str());
-	file<<std::setw(6)<<"№"<<" X, pix"<<" Y, pix"<<" Bright"<<" Nel"<<"\n";
+	file<<setw(6)<<"№"<<" X, pix"<<" Y, pix"<<" Bright"<<" Nel"<<"\n";
 
 	int cntLocal;
 	if (tmi.nLocalObj<MAX_OBJ_DTMI) cntLocal=tmi.nLocalObj;
 	else cntLocal=MAX_OBJ_DTMI;
 	for (int i = 0; i < cntLocal; i++) {
-		file<<std::setw(6)<<(i+1)<<"\t";
+		file<<setw(6)<<(i+1)<<"\t";
 		file<<tmi.LocalList[i][0]<<"\t"<<tmi.LocalList[i][1]<<"\t";
 		file<<tmi.LocalList[i][2]<<"\t"<<tmi.LocalList[i][3]<<"\n";
 	}
@@ -2108,12 +2108,12 @@ void PrintLocalMLOC(struct LOC tmi)
 
 	ofstream file(fileName.c_str());
 
-	file<<std::setw(6)<<"№"<<" X, pix"<<" Y, pix"<<" Bright"<<" Nel"<<"\n";
+	file<<setw(6)<<"№"<<" X, pix"<<" Y, pix"<<" Bright"<<" Nel"<<"\n";
 	int cntLocal;
 	if (tmi.nFixedObj<MAX_OBJ_MLOC) cntLocal=tmi.nFixedObj;
 	else cntLocal=MAX_OBJ_MLOC;
 	for (int i = 0; i < cntLocal; i++) {
-		file<<std::setw(6)<<(i+1)<<"\t";
+		file<<setw(6)<<(i+1)<<"\t";
 		file<<tmi.LocalList[i][0]<<"\t"<<tmi.LocalList[i][1]<<"\t";
 		file<<tmi.LocalList[i][2]<<"\t"<<tmi.LocalList[i][3]<<"\n";
 	}
@@ -2140,7 +2140,7 @@ void ConvertDataDTMI(struct DTMI tmi, struct CadrInfo &mCadr)
 		objInfo.X = tmi.LocalList[i][0];
 		objInfo.Y = tmi.LocalList[i][1];
 		objInfo.Bright = tmi.LocalList[i][2];
-		objInfo.Square = abs(tmi.LocalList[i][3]);
+		objInfo.Square = tmi.LocalList[i][3];
 		objInfo.Dx = 0;
 		objInfo.Dy = 0;
 		objInfo.StarID = 0;
@@ -2195,7 +2195,7 @@ void ConvertDataLOC(struct LOC tmi, struct CadrInfo &mCadr)
 		objInfo.X = tmi.LocalList[i][0];
 		objInfo.Y = tmi.LocalList[i][1];
 		objInfo.Bright = tmi.LocalList[i][2];
-		objInfo.Square = abs(tmi.LocalList[i][3]);
+		objInfo.Square = tmi.LocalList[i][3];
 		objInfo.Dx = 0;
 		objInfo.Dy = 0;
 		objInfo.StarID = 0;
@@ -2250,19 +2250,19 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 		}
 		fshtmi2<<"\n";
 
-		std::string line;
+		string line;
 		int cntRecDTMI = 0;
 		while (!finp.eof())
 		{
 			getline(finp, line, '\n' );
-			if (line.find("ШТМИ1")!=std::string::npos) {
+			if (line.find("ШТМИ1")!=string::npos) {
 				if(TryReadSHTMI1(finp,mSHTMI1)) {
 					PrintSHTMI1(fout,mSHTMI1);
 
 					fshtmi1<<uppercase<<hex<<setfill('0');
-					fshtmi1<<"0x"<<std::setw(4)<<mSHTMI1.status1<<"\t";
-					fshtmi1<<"0x"<<std::setw(4)<<mSHTMI1.status2<<"\t";
-					fshtmi1<<"0x"<<std::setw(4)<<mSHTMI1.post<<"\t";
+					fshtmi1<<"0x"<<setw(4)<<mSHTMI1.status1<<"\t";
+					fshtmi1<<"0x"<<setw(4)<<mSHTMI1.status2<<"\t";
+					fshtmi1<<"0x"<<setw(4)<<mSHTMI1.post<<"\t";
 					fshtmi1<<dec<<setfill(' ');
 					fshtmi1<<mSHTMI1.serialNumber<<"\t";
 					fshtmi1<<mSHTMI1.timeExp<<"\t";
@@ -2278,29 +2278,29 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 					fshtmi1<<"\n";
 				}
 			}
-			else if (line.find("ШТМИ2")!=std::string::npos) {
+			else if (line.find("ШТМИ2")!=string::npos) {
 				if(TryReadSHTMI2(finp,mSHTMI2)) {
 					PrintSHTMI2(fout,mSHTMI2);
 					fshtmi2<<uppercase<<hex<<setfill('0');
-					fshtmi2<<"0x"<<std::setw(4)<<mSHTMI2.status1<<"\t";
-					fshtmi2<<"0x"<<std::setw(4)<<mSHTMI2.status2<<"\t";
-					fshtmi2<<"0x"<<std::setw(4)<<mSHTMI2.post<<"\t";
+					fshtmi2<<"0x"<<setw(4)<<mSHTMI2.status1<<"\t";
+					fshtmi2<<"0x"<<setw(4)<<mSHTMI2.status2<<"\t";
+					fshtmi2<<"0x"<<setw(4)<<mSHTMI2.post<<"\t";
 					fshtmi2<<dec<<setfill(' ');
-					fshtmi2<<std::setw(6)<<mSHTMI2.serialNumber;
-					fshtmi2<<std::setw(6)<<mSHTMI2.timeExp;
-					fshtmi2<<std::setw(8)<<mSHTMI2.cntCommandWord;
-					fshtmi2<<std::setw(8)<<mSHTMI2.cntCallNO;
-					fshtmi2<<std::setw(8)<<mSHTMI2.cntNOtoSLEZH;
-					fshtmi2<<std::setw(8)<<mSHTMI2.cntCallTO;
-					fshtmi2<<std::setw(8)<<mSHTMI2.cntTOtoSLEZH;
-					fshtmi2<<std::setw(12)<<mSHTMI2.cntSLEZH;
+					fshtmi2<<setw(6)<<mSHTMI2.serialNumber;
+					fshtmi2<<setw(6)<<mSHTMI2.timeExp;
+					fshtmi2<<setw(8)<<mSHTMI2.cntCommandWord;
+					fshtmi2<<setw(8)<<mSHTMI2.cntCallNO;
+					fshtmi2<<setw(8)<<mSHTMI2.cntNOtoSLEZH;
+					fshtmi2<<setw(8)<<mSHTMI2.cntCallTO;
+					fshtmi2<<setw(8)<<mSHTMI2.cntTOtoSLEZH;
+					fshtmi2<<setw(12)<<mSHTMI2.cntSLEZH;
 					for (int i = 0; i < MAX_STAT; i++) {
-						fshtmi2<<std::setw(8)<<mSHTMI2.cntStatOrient[i];
+						fshtmi2<<setw(8)<<mSHTMI2.cntStatOrient[i];
 					}
 					fshtmi2<<"\n";
 				}
 			}
-			else if (line.find("ДТМИ1")!=std::string::npos) {
+			else if (line.find("ДТМИ1")!=string::npos) {
 
 				if (TryReadDTMI(finp,mDTMI)) {
 					struct CadrInfo mCadr;
@@ -2371,7 +2371,7 @@ void ConvertDataDTMI_BOKZM(struct DTMI_BOKZM tmi, struct CadrInfo &mCadr)
 		objInfo.X = tmi.LocalList[i][0];
 		objInfo.Y = tmi.LocalList[i][1];
 		objInfo.Bright = tmi.LocalList[i][2];
-		objInfo.Square = abs(tmi.LocalList[i][3]);
+		objInfo.Square = tmi.LocalList[i][3];
 		objInfo.Dx = 0;
 		objInfo.Dy = 0;
 		objInfo.StarID = 0;
@@ -2405,9 +2405,9 @@ void PrintDTMI_BOKZM(ofstream &file, struct DTMI_BOKZM tmi)
 	file<<"Texp, мс:\t"<<tmi.timeExp<<"\n";
 	file<<"NumLoc: \t"<<tmi.nLocalObj<<"\n";
 	file<<"NumFix: \t"<<tmi.nDeterObj<<"\n";
-	file<<std::setw(6)<<"№"<<" X, pix"<<" Y, pix"<<" Bright"<<" Nel"<<"\n";
+	file<<setw(6)<<"№"<<" X, pix"<<" Y, pix"<<" Bright"<<" Nel"<<"\n";
 	for (int i = 0; i < MAX_OBJ_BOKZM; i++) {
-		file<<std::setw(6)<<(i+1)<<"\t";
+		file<<setw(6)<<(i+1)<<"\t";
 		file<<tmi.LocalList[i][0]<<"\t"<<tmi.LocalList[i][1]<<"\t";
 		file<<tmi.LocalList[i][2]<<"\t"<<tmi.LocalList[i][3]<<"\n";
 	}
@@ -2440,13 +2440,13 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 
 		ofstream fout((FileTitle+"_decode.txt").c_str());
 
-		std::string line, word1, word2, word3;
+		string line, word1, word2, word3;
 		unsigned short hex_val, dec_val;
 		int cntRecDTMI = 0, ind;
 		while (!finp.eof())
 		{
 			getline(finp, line, '\n' );
-			if (line.find("ТМОС") != std::string::npos) {
+			if (line.find("ТМОС") != string::npos) {
 				struct CadrInfo mCadr;
 
 				//sscanf(line, "ТМОС %d.%d.%d %d:%d:%d ", );
@@ -2487,15 +2487,15 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 // проверяем содержит ли протокол режим локализации
 bool checkLocFile(ifstream& in)
 {
-	std::string line;
+	string line;
 	for(int i = 0; i < 3 ; i++)
 	{
-		std::getline(in,line);
+		getline(in,line);
 	}
 	// проверив, возвращаем указатель на начало файла
 	in.seekg(0);
 
-	if(line.find("Локализация") == std::string::npos)
+	if(line.find("Локализация") == string::npos)
 	{
 		return false;
 	}
@@ -2503,12 +2503,12 @@ bool checkLocFile(ifstream& in)
 }
 
 template <typename Stream>
-size_t findWord(Stream& in,const std::string& word)
+size_t findWord(Stream& in,const string& word)
 {
-  std::string lineToWrite;
+  string lineToWrite;
   while(in >> lineToWrite)
   {
-	if (lineToWrite.find(word) != std::string::npos)
+	if (lineToWrite.find(word) != string::npos)
 	{
 		return  in.tellg() - lineToWrite.size();
 	}
@@ -2520,16 +2520,16 @@ size_t findWord(Stream& in,const std::string& word)
 	throw(string("Ошибка считывания файла"));
   }
 
-  return std::string::npos;
+  return string::npos;
 }
 
 template <typename Stream>
-size_t findLine(Stream& in,const std::string& line)
+size_t findLine(Stream& in,const string& line)
 {
-  std::string lineToWrite;
-  while(std::getline(in,lineToWrite))
+  string lineToWrite;
+  while(getline(in,lineToWrite))
   {
-	if (lineToWrite.find(line) != std::string::npos)
+	if (lineToWrite.find(line) != string::npos)
 	{
 		return  in.tellg() - lineToWrite.size();
 	}
@@ -2540,7 +2540,7 @@ size_t findLine(Stream& in,const std::string& line)
 	throw(string("Ошибка считывания файла"));
   }
 
-  return std::string::npos;
+  return string::npos;
 }
 
 
@@ -2568,57 +2568,57 @@ vector<string> split(const string& str, const string& delim)
 
 void TFormGraphOrient::readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
 {
-	std::string line;
+	string line;
 	string errorMessage = string("Cчитывание протокола завершено необычным образом. "
 				"Возможно работа прибора была остановлена.");
-	while(std::getline(in,line))
+	while(getline(in,line))
 	{
-		   if(line.find("Состав ДТМИ ЛОК:") != std::string::npos)
+		   if(line.find("Состав ДТМИ ЛОК:") != string::npos)
 		   {
 				CadrInfo cadrInfo;
 				cadrInfo.CountBlock = 0;
 				cadrInfo.CountStars = 0;
 				// считываем время привязки
-				if(findWord(in,"информации") != std::string::npos)
+				if(findWord(in,"информации") != string::npos)
 				{
 					in >> cadrInfo.Time;
 				}
-				else throw std::logic_error(errorMessage);
+				else throw logic_error(errorMessage);
 
 				// ищем число локализованных объектов
-				if(findWord(in,"объектов") != std::string::npos)
+				if(findWord(in,"объектов") != string::npos)
 				{
 					in >> cadrInfo.CountLocalObj;
 					plotter->AddPoint(ChartNumLoc, 0,cadrInfo.Time,cadrInfo.CountLocalObj);
 				}
 
-				else throw std::logic_error(errorMessage);
+				else throw logic_error(errorMessage);
 
 				  //ищем число распознанных объектов
-				if(findWord(in,"объектов") != std::string::npos)
+				if(findWord(in,"объектов") != string::npos)
 				{
 					in >> cadrInfo.CountDeterObj;
 					plotter->AddPoint(ChartNumDet, 0, cadrInfo.Time,cadrInfo.CountDeterObj);
 				}
-				else throw std::logic_error(errorMessage);
+				else throw logic_error(errorMessage);
 
 				// ищем начало массива лок
-				if(findLine(in,"	Х			Y			I			N") != std::string::npos)
+				if(findLine(in,"	Х			Y			I			N") != string::npos)
 				{
 					vector<string> splittedLocData;
 					const int сountLocObj = cadrInfo.CountLocalObj;
 					ObjectsInfo objInfo;
 					for(int i = 0 ; i < сountLocObj; i ++)
 					{
-						std::getline(in,line);
+						getline(in,line);
 						// см. эту строку в протоколе, чтобы понять почему так
 						splittedLocData = split(line, ")\t");
 						splittedLocData = split(splittedLocData[1], "\t");
 
-						objInfo.X = std::atof (splittedLocData[0].c_str());
-						objInfo.Y = std::atof (splittedLocData[1].c_str());
-						objInfo.Bright = std::atof (splittedLocData[2].c_str());
-						objInfo.Square = abs(std::atoi (splittedLocData[3].c_str()));
+						objInfo.X = atof (splittedLocData[0].c_str());
+						objInfo.Y = atof (splittedLocData[1].c_str());
+						objInfo.Bright = atof (splittedLocData[2].c_str());
+						objInfo.Square = atoi(splittedLocData[3].c_str());
 						objInfo.StarID = 0;
 						objInfo.Mv = 0;
 						objInfo.Sp[0]='_';
@@ -2631,7 +2631,7 @@ void TFormGraphOrient::readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cad
 
 
 				}
-				else throw std::logic_error(errorMessage);
+				else throw logic_error(errorMessage);
 
 				cadrInfo.CountBlock = 0;
 				cadrInfo.CountWindows = 0;
@@ -2651,31 +2651,31 @@ void TFormGraphOrient::readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cad
 
 void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
 {
-	std::string line;
+	string line;
 	string errorMessage = string("Cчитывание протокола завершено необычным образом. "
 				"Возможно работа прибора была остановлена.");
-	while(std::getline(in,line))
+	while(getline(in,line))
 	{
 
-		if(line.find("и) Ориентация				определена") != std::string::npos)
+		if(line.find("и) Ориентация				определена") != string::npos)
 		{
 		   CadrInfo cadrInfo;
 		   // ищем время привязки
-			if(findWord(in,"информации") != std::string::npos)
+			if(findWord(in,"информации") != string::npos)
 			{
 				in >> cadrInfo.Time;
 			}
-		   else throw std::logic_error(errorMessage);
+		   else throw logic_error(errorMessage);
 
 
-		   if(findLine(in,"4) Кватернион ориентации, Qо") != std::string::npos)
+		   if(findLine(in,"4) Кватернион ориентации, Qо") != string::npos)
 		   {
 
 				for(int i = 0; i < 4; i++)
 				{
-					std::getline(in,line);
+					getline(in,line);
 					vector<string> splittedStr = split(line,"\t\t\t\t\t");
-					cadrInfo.QuatOrient[i] = std::atof(splittedStr[1].c_str());
+					cadrInfo.QuatOrient[i] = atof(splittedStr[1].c_str());
 				}
 
 				double matrixOfOrientation [3][3];
@@ -2693,28 +2693,28 @@ void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrIn
 				plotter->AddPoint(ChartAz, 0, cadrInfo.Time, al);
 
 		   }
-		   else throw std::logic_error(errorMessage);
+		   else throw logic_error(errorMessage);
 
 
-		   if(findWord(in,"объектов") != std::string::npos)
+		   if(findWord(in,"объектов") != string::npos)
 		   {
 				in >> cadrInfo.CountLocalObj;
 				plotter->AddPoint(ChartNumLoc, 0, cadrInfo.Time, cadrInfo.CountLocalObj);
 
 		   }
-		   else throw std::logic_error(errorMessage);
+		   else throw logic_error(errorMessage);
 
 
 		   //ищем число распознанных объектов
-		   if(findWord(in,"объектов") != std::string::npos)
+		   if(findWord(in,"объектов") != string::npos)
 		   {
 				in >> cadrInfo.CountDeterObj;
 				plotter->AddPoint(ChartNumDet, 0, cadrInfo.Time, cadrInfo.CountDeterObj);
 		   }
-		   else throw std::logic_error(errorMessage);
+		   else throw logic_error(errorMessage);
 
 		   // ищем начало массива лок
-		   if(findLine(in,"	Х			Y			I			N") != std::string::npos)
+		   if(findLine(in,"	Х			Y			I			N") != string::npos)
 		   {
 				vector<string> splittedLocData;
 				const int сountLocObj = cadrInfo.CountLocalObj;
@@ -2722,14 +2722,14 @@ void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrIn
 
 				for(int i = 0 ; i < сountLocObj; i ++)
 				{
-						std::getline(in,line);
+						getline(in,line);
 						splittedLocData = split(line,")\t");
 						splittedLocData = split(splittedLocData[1],"\t\t");
 
-						objInfo.X = std::atof (splittedLocData[0].c_str());
-						objInfo.Y = std::atof (splittedLocData[1].c_str());
-						objInfo.Bright = std::atof(splittedLocData[2].c_str());
-						objInfo.Square = abs(std::atoi (splittedLocData[3].c_str()));
+						objInfo.X = atof (splittedLocData[0].c_str());
+						objInfo.Y = atof (splittedLocData[1].c_str());
+						objInfo.Bright = atof(splittedLocData[2].c_str());
+						objInfo.Square = atoi(splittedLocData[3].c_str());
 						objInfo.StarID = 0;
 						objInfo.Mv = 0;
 						objInfo.Sp[0]='_';
@@ -2739,42 +2739,42 @@ void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrIn
 						cadrInfo.ObjectsList.push_back(objInfo);
 				}
 		   }
-			else throw std::logic_error(errorMessage);
+			else throw logic_error(errorMessage);
 
-		   if(findLine(in,"14) Проекции угловой скорости на оси ПСК") != std::string::npos)
+		   if(findLine(in,"14) Проекции угловой скорости на оси ПСК") != string::npos)
 		   {
 				for(int i = 0; i < 3; i++)
 				{
-					std::getline(in,line);
+					getline(in,line);
 					vector<string> splittedStr = split(line,"\t");
-					cadrInfo.OmegaOrient[i] = std::atof(splittedStr[1].c_str());
+					cadrInfo.OmegaOrient[i] = atof(splittedStr[1].c_str());
 				}
 				plotter->AddPoint(ChartWx, 0, cadrInfo.Time , cadrInfo.OmegaOrient[0] * RTM);
 				plotter->AddPoint(ChartWy, 0, cadrInfo.Time , cadrInfo.OmegaOrient[1] * RTM);
 				plotter->AddPoint(ChartWz, 0, cadrInfo.Time , cadrInfo.OmegaOrient[2] * RTM);
 
 		   }
-		   else throw std::logic_error(errorMessage);
+		   else throw logic_error(errorMessage);
 
 
-		   if(findLine(in,"15) Координаты центров фрагментов") != std::string::npos)
+		   if(findLine(in,"15) Координаты центров фрагментов") != string::npos)
 		   {
 				WindowsInfo winInfo;
 				const int maxCountOfObjects = 16;
 				cadrInfo.CountWindows = maxCountOfObjects;
 				for(int i = 0; i < cadrInfo.CountWindows; i++)
 				{
-					std::getline(in,line);
+					getline(in,line);
 					vector<string> splittedStr = split(line,"\t");
 
-					if(std::atoi(splittedStr[1].c_str()) == 0)
+					if(atoi(splittedStr[1].c_str()) == 0)
 					{
 						cadrInfo.CountWindows = i;
 						break;
 					}
 
-					winInfo.Xstart = (std::atof(splittedStr[1].c_str()));
-					winInfo.Ystart = (std::atof(splittedStr[2].c_str()));
+					winInfo.Xstart = (atof(splittedStr[1].c_str()));
+					winInfo.Ystart = (atof(splittedStr[2].c_str()));
 					winInfo.Mean = 0;
 					winInfo.Sigma = 0;
 					winInfo.Mv = 0;
@@ -2783,33 +2783,33 @@ void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrIn
 				plotter->AddPoint(ChartNumFrag, 0, cadrInfo.Time,cadrInfo.CountWindows);
 
 		   }
-		  else throw std::logic_error(errorMessage);
+		  else throw logic_error(errorMessage);
 
 
-		   if(findLine(in,"16) Значение порогов во фрагментах") != std::string::npos)
+		   if(findLine(in,"16) Значение порогов во фрагментах") != string::npos)
 		   {
 				for(int i = 0; i < cadrInfo.CountWindows; i++)
 				{
-					std::getline(in,line);
+					getline(in,line);
 					vector<string> splittedStr = split(line,"\t");
-					cadrInfo.WindowsList[i].Level = std::atoi(splittedStr[1].c_str());
+					cadrInfo.WindowsList[i].Level = atoi(splittedStr[1].c_str());
 				}
 
 		   }
-		  else throw std::logic_error(errorMessage);
+		  else throw logic_error(errorMessage);
 
 		   
-		   if(findLine(in,"17) Количество объектов во фрагментах") != std::string::npos)
+		   if(findLine(in,"17) Количество объектов во фрагментах") != string::npos)
 		   {
 				for(int i = 0; i < cadrInfo.CountWindows; i++)
 				{
-					std::getline(in,line);
+					getline(in,line);
 					vector<string> splittedStr = split(line,"\t");
-					cadrInfo.WindowsList[i].CountObj = std::atoi(splittedStr[1].c_str());
+					cadrInfo.WindowsList[i].CountObj = atoi(splittedStr[1].c_str());
 				}
 
 		   }
-		   else throw std::logic_error(errorMessage);
+		   else throw logic_error(errorMessage);
 
 		   cadrInfo.CountBlock = 0;
 		   cadrInfo.CountStars = 0;
@@ -2862,7 +2862,7 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 		}
 	}
 
-	catch(std::exception &e)
+	catch(exception &e)
 	{
 		ShowMessage(e.what());
 	}
@@ -2873,15 +2873,15 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 
 void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
 {
-	std::string line;
+	string line;
 	string errorMessage = string("Cчитывание протокола завершено необычным образом. "
 				"Возможно работа прибора была остановлена.");
 
 
-	while(std::getline(in,line))
+	while(getline(in,line))
 	{
 
-		if(line.find("2 Число принятых пикселей на первом кадре") != std::string::npos)
+		if(line.find("2 Число принятых пикселей на первом кадре") != string::npos)
 		{
 			// если нашли строку с числом принятых пикселей, проверяем, что их число не ноль
 			// если ноль, пропускаем такт
@@ -2894,7 +2894,7 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 		   cadrInfo.ImageWidth = 1024;
 
 			// ищем начало массива лок и фрагментов
-		   if(findLine(in,"18, 19	Массив локализованных объектов на 1-ом кадре") != std::string::npos)
+		   if(findLine(in,"18, 19	Массив локализованных объектов на 1-ом кадре") != string::npos)
 		   {
 				vector <string> splittedStr;
 				const int maxCountLocObj = 15;
@@ -2904,19 +2904,19 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 
 				for(int i = 0 ; i < maxCountLocObj; i ++)
 				{
-						std::getline(in,line);
+						getline(in,line);
 						splittedStr = split(line,"\t");
 
 						// если всё-таки объектов меньше
-						if(std::atof (splittedStr[0].c_str()) == 0)
+						if(atof (splittedStr[0].c_str()) == 0)
 						{
 							  break;
 						}
 						// заполняем все о лок
-						objInfo.X = std::atof (splittedStr[0].c_str());
-						objInfo.Y = std::atof (splittedStr[1].c_str());
-						objInfo.Bright = std::atof(splittedStr[2].c_str());
-						objInfo.Square = std::atoi (splittedStr[3].c_str());
+						objInfo.X = atof (splittedStr[0].c_str());
+						objInfo.Y = atof (splittedStr[1].c_str());
+						objInfo.Bright = atof(splittedStr[2].c_str());
+						objInfo.Square = atoi (splittedStr[3].c_str());
 						objInfo.StarID = 0;
 						objInfo.Mv = 0;
 						objInfo.Sp[0]='_';
@@ -2927,11 +2927,11 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 
 						// заполняем всё о фрагментах
 						winInfo.Mv = 0;
-						winInfo.Mean = (std::atof(splittedStr[6].c_str()));
-						winInfo.Sigma = (std::atof(splittedStr[7].c_str()));
-						winInfo.Level = (std::atof(splittedStr[8].c_str()));
-						winInfo.CountObj = std::atoi(splittedStr[9].c_str());
-						unsigned short windowSize = std::atoi(splittedStr[10].c_str());
+						winInfo.Mean = (atof(splittedStr[6].c_str()));
+						winInfo.Sigma = (atof(splittedStr[7].c_str()));
+						winInfo.Level = (atof(splittedStr[8].c_str()));
+						winInfo.CountObj = atoi(splittedStr[9].c_str());
+						unsigned short windowSize = atoi(splittedStr[10].c_str());
 
 						switch(windowSize)
 						{
@@ -2952,33 +2952,33 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 							winInfo.Height = 48;
 							break;
 						}
-						winInfo.Xstart = (std::atof(splittedStr[4].c_str())) - winInfo.Width/2;
-						winInfo.Ystart = (std::atof(splittedStr[5].c_str())) - winInfo.Height/2;
+						winInfo.Xstart = (atof(splittedStr[4].c_str())) - winInfo.Width/2;
+						winInfo.Ystart = (atof(splittedStr[5].c_str())) - winInfo.Height/2;
 						cadrInfo.WindowsList.push_back(winInfo);
 
-						starsInfo.X = (std::atof(splittedStr[4].c_str()));
-						starsInfo.Y = (std::atof(splittedStr[5].c_str()));
+						starsInfo.X = (atof(splittedStr[4].c_str()));
+						starsInfo.Y = (atof(splittedStr[5].c_str()));
 						cadrInfo.StarsList.push_back(starsInfo);
 
 				}
 
-			if(findLine(in,"18, 19	Массив локализованных объектов на 2-ом кадре") != std::string::npos)
+			if(findLine(in,"18, 19	Массив локализованных объектов на 2-ом кадре") != string::npos)
 		   {
 				for(int i = 0 ; i < maxCountLocObj; i ++)
 				{
-					std::getline(in,line);
+					getline(in,line);
 					splittedStr = split(line,"\t");
 
 					// если всё-таки объектов меньше
-					if(std::atof (splittedStr[0].c_str()) == 0)
+					if(atof (splittedStr[0].c_str()) == 0)
 					{
 						break;
 					}
 						// заполняем все о лок
-					objInfo.X = std::atof (splittedStr[0].c_str());
-					objInfo.Y = std::atof (splittedStr[1].c_str());
-					objInfo.Bright = std::atof(splittedStr[2].c_str());
-					objInfo.Square = std::atoi (splittedStr[3].c_str());
+					objInfo.X = atof (splittedStr[0].c_str());
+					objInfo.Y = atof (splittedStr[1].c_str());
+					objInfo.Bright = atof(splittedStr[2].c_str());
+					objInfo.Square = atoi (splittedStr[3].c_str());
 					objInfo.StarID = 0;
 					objInfo.Mv = 0;
 					objInfo.Sp[0] = '_';
@@ -2991,7 +2991,7 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 
 
 		   }
-			else throw std::logic_error(errorMessage);
+			else throw logic_error(errorMessage);
 
 			cadrInfo.SizeWindowsList = cadrInfo.WindowsList.size();
 			cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
@@ -2999,7 +2999,7 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 			GetImageBright(cadrInfo);
 
 		   // ищем время привязки в секундах
-			if(findWord(in, "информации") != std::string::npos)
+			if(findWord(in, "информации") != string::npos)
 			{
 				int secs = 0;
 				int msecs = 0;
@@ -3010,11 +3010,11 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 				{
 					in >> secs;
 
-					std::getline(in, line);
-					std::getline(in, line);
+					getline(in, line);
+					getline(in, line);
 
 					vector <string> splittedStr = split(line, "\t");
-					msecs =  std::atoi (splittedStr[1].c_str());
+					msecs =  atoi (splittedStr[1].c_str());
 				}
 
 				else
@@ -3029,16 +3029,16 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 				}
 				cadrInfo.Time =  static_cast <double> (secs) + static_cast <double> (msecs) / 1000;
 			}
-		   else throw std::logic_error(errorMessage);
+		   else throw logic_error(errorMessage);
 
-		   if(findLine(in,"6) Кватернион ориентации, Qо") != std::string::npos)
+		   if(findLine(in,"6) Кватернион ориентации, Qо") != string::npos)
 		   {
 
 				for(int i = 0; i < 4; i++)
 				{
-					std::getline(in,line);
+					getline(in,line);
 					vector<string> splittedStr = split(line,"\t\t\t\t");
-					cadrInfo.QuatOrient[i] = std::atof(splittedStr[1].c_str());
+					cadrInfo.QuatOrient[i] = atof(splittedStr[1].c_str());
 				}
 
 				double matrixOfOrientation [3][3];
@@ -3056,75 +3056,75 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 				plotter->AddPoint(ChartAz, 0, cadrInfo.Time, Az);
 
 		   }
-		   else throw std::logic_error(errorMessage);
+		   else throw logic_error(errorMessage);
 
 
 
-		   if(findLine(in,"Угловая скорость по оптическим измерениям в проекциях на оси ПСК") != std::string::npos)
+		   if(findLine(in,"Угловая скорость по оптическим измерениям в проекциях на оси ПСК") != string::npos)
 		   {
 				for(int i = 0; i < 3; i++)
 				{
-					std::getline(in,line);
+					getline(in,line);
 					vector<string> splittedStr = split(line,"\t\t\t\t");
-					cadrInfo.OmegaOrient[i] = std::atof(splittedStr[1].c_str());
+					cadrInfo.OmegaOrient[i] = atof(splittedStr[1].c_str());
 				}
 				plotter->AddPoint(ChartWx, 0, cadrInfo.Time, cadrInfo.OmegaOrient[0] * RTM);
 				plotter->AddPoint(ChartWy, 0, cadrInfo.Time, cadrInfo.OmegaOrient[1] * RTM);
 				plotter->AddPoint(ChartWz, 0, cadrInfo.Time, cadrInfo.OmegaOrient[2] * RTM);
 
 		   }
-		   else throw std::logic_error(errorMessage);
+		   else throw logic_error(errorMessage);
 
 
-		   if(findWord(in,"Tcmv") != std::string::npos)
+		   if(findWord(in,"Tcmv") != string::npos)
 		   {
 				double matrixTemperature = 0;
 				in >> matrixTemperature;
 				plotter->AddPoint(ChartTemp, 0, cadrInfo.Time, matrixTemperature);
 		   }
-		   else throw std::logic_error(errorMessage);
+		   else throw logic_error(errorMessage);
 
 		   // ищем число спроектированных звезд
-		   if(findWord(in,"NumProgFrag") != std::string::npos)
+		   if(findWord(in,"NumProgFrag") != string::npos)
 		   {
 				in >> cadrInfo.CountStars;
 				if(cadrInfo.CountStars <= 0) continue;
 		   }
-		   else throw std::logic_error(errorMessage);
+		   else throw logic_error(errorMessage);
 
 		   // ищем число фрагментов
-		   if(findWord(in,"NumFrag") != std::string::npos)
+		   if(findWord(in,"NumFrag") != string::npos)
 		   {
 				// общее число фрагментов
 				in >> cadrInfo.CountWindows;
 				if(cadrInfo.CountWindows <= 0) continue;
 				plotter->AddPoint(ChartNumFrag, 0, cadrInfo.Time, cadrInfo.CountWindows);
 		   }
-		   else throw std::logic_error(errorMessage);
+		   else throw logic_error(errorMessage);
 
 
 		   // число локализ. объектов
-		   if(findWord(in,"NumLoc[0]") != std::string::npos)
+		   if(findWord(in,"NumLoc[0]") != string::npos)
 		   {
 				in >> cadrInfo.CountLocalObj;
 				if(cadrInfo.CountLocalObj <= 0) continue;
 				plotter->AddPoint(ChartNumLoc, 0, cadrInfo.Time, cadrInfo.CountLocalObj);
 		   }
-		   else throw std::logic_error(errorMessage);
+		   else throw logic_error(errorMessage);
 
 
 		   //ищем число распознанных объектов
-		   if(findWord(in,"NumDet") != std::string::npos)
+		   if(findWord(in,"NumDet") != string::npos)
 		   {
 				in >> cadrInfo.CountDeterObj;
 				if(cadrInfo.CountDeterObj <= 0) continue;
 				plotter->AddPoint(ChartNumDet, 0, cadrInfo.Time, cadrInfo.CountDeterObj);
 		   }
-		   else throw std::logic_error(errorMessage);
+		   else throw logic_error(errorMessage);
 
 
 
-		   if(findWord(in,"m_cur") != std::string::npos)
+		   if(findWord(in,"m_cur") != string::npos)
 		   {
 				double m_cur = 0;
 				in >> m_cur;
@@ -3132,7 +3132,7 @@ void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrI
 				plotter->AddPoint(ChartFone, 0, cadrInfo.Time, cadrInfo.MeanBright);
 				plotter->AddPoint(ChartNoise, 0, cadrInfo.Time, cadrInfo.SigmaBright);
 		   }
-		   else throw std::logic_error(errorMessage);
+		   else throw logic_error(errorMessage);
 
 		   cadrInfo.CountBlock = 0;
 		   cadrInfo.CountLines = 0;
@@ -3172,7 +3172,7 @@ void __fastcall TFormGraphOrient::BOKZM2VParseProtocolClick(TObject *Sender)
 		}
 	}
 
-	catch (std::exception &e)
+	catch (exception &e)
 	{
 		ShowMessage(e.what());
 	}
@@ -3191,9 +3191,9 @@ void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec
 	cadrInfo.CountPixFilter = reader->FilterData.FilteredPixelsCount;
 	cadrInfo.ImageHeight = reader->ImageData.FrameData.FrameHeight;
 	cadrInfo.ImageWidth = reader->ImageData.FrameData.FrameWidth;
-    cadrInfo.SizePixel = reader->CameraSettings.PixelSize;
+	cadrInfo.SizePixel = reader->CameraSettings.PixelSize;
 	cadrInfo.StatOrient = reader->StarsData.RezStat;
-	cadrInfo.CountStars = reader->StarsData.SimulatedFrame.strrec;;
+	cadrInfo.CountStars = reader->StarsData.SimulatedFrame.strrec;
 	cadrInfo.CountWindows = reader->ImageData.WindowsData.WindowCount;
 	cadrInfo.CountLocalObj = reader->StarsData.LocalizedCount;
 	cadrInfo.CountDeterObj = reader->StarsData.RecognizedCount;
@@ -3274,11 +3274,11 @@ void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec
 
 	if (reader->ImageData.WindowsData.SizeData != 0) {
 		
-		std::string dirName = AnsiString(GetCurrentDir()).c_str() + std::string("/") + "Frag" + "_" + "IKI";
+		string dirName = AnsiString(GetCurrentDir()).c_str() + string("/") + "Frag" + "_" + "IKI";
 		TDirectory::CreateDirectory(dirName.c_str());
-		std::string time = AnsiString(FloatToStr(cadrInfo.Time)).c_str();
-		std::string fileName = dirName + "/" + "Frag" + "_" + time + ".bin";
-		std::ofstream fragmentFile(fileName.c_str(), std::ios::binary | std::ios::trunc);
+		string time = AnsiString(FloatToStr(cadrInfo.Time)).c_str();
+		string fileName = dirName + "/" + "Frag" + "_" + time + ".bin";
+		ofstream fragmentFile(fileName.c_str(), ios::binary | ios::trunc);
 
 		if(fragmentFile.is_open())
 		{
@@ -3357,7 +3357,7 @@ void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec
 	}
 
 	GetImageBright(cadrInfo);
-	cadrInfoVec.push_back(cadrInfo);
+	cadrInfoVec.push_back(move(cadrInfo));
 }
 
 void StartPrintReport(IKI_img* reader)
@@ -3389,7 +3389,7 @@ void StartPrintReport(IKI_img* reader)
 	AddParagraph("Радиус орбиты " + FloatToStr(reader->Georeferencing.LengthRadiusVector) +"км");
 }
 
-void PrintReportRes(std::vector <CadrInfo>& cadrInfo)
+void PrintReportRes(vector <CadrInfo>& cadrInfo)
 {
 	int count = cadrInfo.size();
 	AddParagraph("Количество кадров в обработке: " + IntToStr(count));
@@ -3507,24 +3507,25 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 		OpenDialog->Options << ofAllowMultiSelect;
 		if (OpenDialog->Execute())
 		{
-			std::unique_ptr <TStringList> FileList (new TStringList());
+			unique_ptr <TStringList> FileList (new TStringList());
 			FileList->Assign(OpenDialog->Files);
 			SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
 			FileOpenDialog1->FileName = GetCurrentDir();
+			FileList->Sort();
 			if (FileOpenDialog1->Execute())
 			{
 				plotter->ResetOptions();
 				DeleteLineGraph();
 				vCadrInfo.clear();
 				FileTitle = "IKI";
-
 				UnicodeString filePrefix = FormAnimateSetting->EditFilePrefix->Text;
-				for (int i = 0; i < FileList->Count; i ++)
+				unsigned short startFrom = StrToInt(FormAnimateSetting->BeginFromEdit->Text);
+				for (int i = startFrom; i < FileList->Count; i++)
 				{
-					std::unique_ptr <IKI_img> reader(new IKI_img());
+					unique_ptr <IKI_img> reader(new IKI_img());
 					if( !AnsiContainsStr(FileList->Strings[i], filePrefix))
 					{
-						if	(reader->ReadFormat(FileList->Strings[i], false))
+						if (reader->ReadFormat(FileList->Strings[i], false))
 						{
 							TStringDynArray SplittedString = SplitString(FileList->Strings[i], "\\");
 							UnicodeString ResFileName = FileOpenDialog1->FileName + "\\" + filePrefix + SplittedString[SplittedString.Length - 1];
@@ -3626,14 +3627,14 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 
 				} CadrCompare ;
 
-				std::sort(vCadrInfo.begin(), vCadrInfo.end(), CadrCompare);
+				sort(vCadrInfo.begin(), vCadrInfo.end(), CadrCompare);
 				CalculateSeriesSKO();
 				PrepareStartDraw();
 			}
 
 	}
 
-	catch (std::exception &e)
+	catch (exception &e)
 	{
 		ShowMessage(e.what());
 	}
@@ -3758,22 +3759,30 @@ void __fastcall TFormGraphOrient::ChartOrientClickLegend(TCustomChart *Sender, T
 }
 //---------------------------------------------------------------------------
 
-void TFormGraphOrient::readBOKZ601000Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
+void TFormGraphOrient::readBOKZ601000Protocol(ifstream& in, vector <CadrInfo>& cadrInfoVec, unsigned int& counter, TDateTime& startDate)
 {
 
 	try
 	{
-	
-	std::string line;
+
+
+	string line;
 	string errorMessage = string("Cчитывание протокола завершено необычным образом. "
 				"Возможно работа прибора была остановлена.");
 	
-
-	while (std::getline(in,line))
+	double timeStep = 0.25;
+	while (getline(in,line))
 	{
-		TColor errorColor = clBlue;
-		if (findLine(in,"Состав ДТМИ:") != std::string::npos)
+		TColor pointColor = clBlue;
+	if (line.find("Номер такта:") != string::npos)
+	{
+		int TickNumber = 0;
+		vector <string> splitTickNumber = split(line, " ");
+		TickNumber = atoi(splitTickNumber[1].c_str());
+
+		if (findLine (in,"Состав ДТМИ:") != string::npos)
 		{
+
 			CadrInfo cadrInfo;
 			cadrInfo.ImageHeight = 1024;
 			cadrInfo.ImageWidth = 1024;
@@ -3781,24 +3790,24 @@ void TFormGraphOrient::readBOKZ601000Protocol(ifstream& in,vector <CadrInfo>& ca
 			cadrInfo.CountLines = 0;
 			cadrInfo.CountStars = 0;
 			cadrInfo.SizeStarsList = 0;
-			cadrInfo.SizeWindowsList = 0;//cadrInfo.WindowsList.size();
+			cadrInfo.SizeWindowsList = 0;
 
 			//  время привязки в секундах
-			if(findWord(in, "информации") != std::string::npos)
+			if(findWord(in, "информации") != string::npos)
 			{
 				in >> cadrInfo.Time;
 			}
-			else throw std::logic_error(errorMessage);
+			else throw logic_error(errorMessage);
 
 			
-			if (findWord(in, "состояния") != std::string::npos)
+			if (findWord(in, "состояния") != string::npos)
 			{
-				std::string status;
+				string status;
 				in >> status >> status;
 
-				if (findWord(in, "состояния") != std::string::npos)
+				if (findWord(in, "состояния") != string::npos)
 				{
-					std::string status2;
+					string status2;
 					in >> status2 >> status2;
 
 					 // ТО
@@ -3806,78 +3815,91 @@ void TFormGraphOrient::readBOKZ601000Protocol(ifstream& in,vector <CadrInfo>& ca
 					{
 						if (status2.substr(0, 2) != "00")
 						{
-						   errorColor = clRed;
+						   pointColor = clRed;
 						}
 					}
 					//  НО
 					else if (status == "2400")
 					{
-						errorColor = clGreen;
+						pointColor = clGreen;
 						if (status2.substr(0, 2) == "0c"  || status2.substr(0, 2) == "01")
 						{
 							continue;
 						}
 						else if (status2.substr(0, 2) != "00")
 						{
-						   errorColor = clRed;
+						   pointColor = clRed;
 						}
 					}
-					else if (status == "0000" && status2 == "0000")
+					else if (status == "0000" && status2 == "0000" || status == "c400")
 					{
 						continue;
 					}
 					else
 					{
-						errorColor = clRed;
+						pointColor = clRed;
 					}
 				}
-				else throw std::logic_error(errorMessage);
+				else throw logic_error(errorMessage);
 			}
-			else throw std::logic_error(errorMessage);
+			else throw logic_error(errorMessage);
 			// локализованные
-			
-			if (findWord(in, "объектов") != std::string::npos)
+
+			if (findWord(in, "объектов") != string::npos)
 			{
 				in >> cadrInfo.CountLocalObj;
 			}
-			else throw std::logic_error(errorMessage);
+			else throw logic_error(errorMessage);
 
 
-			if (findWord(in, "объектов") != std::string::npos)
+			if (findWord(in, "объектов") != string::npos)
 			{
 				in >> cadrInfo.CountDeterObj;
 			}
-			else throw std::logic_error(errorMessage);
+			else throw logic_error(errorMessage);
 
 
-			if (findWord(in, "фрагментов") != std::string::npos)
+			if (findWord(in, "фрагментов") != string::npos)
 			{
 				in >> cadrInfo.CountWindows;
 			}
-			else throw std::logic_error(errorMessage);
+			else throw logic_error(errorMessage);
+
+			int LimitRec = 0;
+			if (findWord(in, "распознавания") != string::npos)
+			{
+				in >> LimitRec;
+			}
+			else throw logic_error(errorMessage);
 
 
-			if(findLine(in,"	Х			Y			I			N") != std::string::npos)
+			if(findLine(in,"	Х			Y			I			N") != string::npos)
 			{
 				vector<string> splittedLocData;
 				const int сountLocObj = cadrInfo.CountLocalObj;
 				ObjectsInfo objInfo;
 				for(int i = 0 ; i < сountLocObj; i ++)
 				{
-					std::getline(in,line);
+					getline(in,line);
 					// см. эту строку в протоколе, чтобы понять почему так
 					splittedLocData = split(line, ")\t");
 					splittedLocData = split(splittedLocData[1], "\t");
 
-					objInfo.X = std::atof (splittedLocData[0].c_str());
-					objInfo.Y = std::atof (splittedLocData[1].c_str());
+					objInfo.X = atof (splittedLocData[0].c_str());
+					objInfo.Y = atof (splittedLocData[1].c_str());
 
 					if (objInfo.X == 0 && objInfo.Y == 0) {        
 						break;
 					}
 					
-					objInfo.Bright = std::atof (splittedLocData[2].c_str());
-					objInfo.Square = abs(std::atoi(splittedLocData[3].c_str()));
+					objInfo.Bright = atof (splittedLocData[2].c_str());
+					objInfo.Square = atoi(splittedLocData[3].c_str());
+
+					// чтобы отобразить объект как распознаный
+					if (objInfo.Square < 0)  {
+						objInfo.StarID = 1;
+					}
+
 					objInfo.StarID = 0;
 					objInfo.Mv = 0;
 					objInfo.Sp[0]='_';
@@ -3888,17 +3910,17 @@ void TFormGraphOrient::readBOKZ601000Protocol(ifstream& in,vector <CadrInfo>& ca
 				}
 				cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
 			}
-			else throw std::logic_error(errorMessage);
-			
+			else throw logic_error(errorMessage);
 
-//			if(findLine(in,"16) Значение порогов во фрагментах") != std::string::npos)
+
+//			if(findLine(in,"16) Значение порогов во фрагментах") != string::npos)
 //		   {
 //				for(int i = 0; i < cadrInfo.CountWindows; i++)
 //				{
 //					WindowsInfo winInfo;
-//					std::getline(in,line);
+//					getline(in,line);
 //					vector<string> splittedStr = split(line,"\t");
-//					winInfo.Level =  std::atoi(splittedStr[1].c_str());
+//					winInfo.Level =  atoi(splittedStr[1].c_str());
 //					if (winInfo.Level == 0) {
 //						break;
 //					}
@@ -3906,80 +3928,207 @@ void TFormGraphOrient::readBOKZ601000Protocol(ifstream& in,vector <CadrInfo>& ca
 //				}
 //
 //		   }
-//		  else throw std::logic_error(errorMessage);
+//		  else throw logic_error(errorMessage);
 //
-//		   
-//		   if(findLine(in,"17) Количество объектов во фрагментах") != std::string::npos)
+//
+//		   if(findLine(in,"17) Количество объектов во фрагментах") != string::npos)
 //		   {
 //				for(int i = 0; i < cadrInfo.WindowsList.size(); i++)
 //				{
-//					std::getline(in,line);
+//					getline(in,line);
 //					vector <string> splittedStr = split(line,"\t");
-//					cadrInfo.WindowsList[i].CountObj = std::atoi(splittedStr[1].c_str());
+//					cadrInfo.WindowsList[i].CountObj = atoi(splittedStr[1].c_str());
 //				}
 //
 //		   }
-//		   else throw std::logic_error(errorMessage);
+//		   else throw logic_error(errorMessage);
 
-		   if(findLine(in,"5) Кватернион ориентации, Qо") != std::string::npos)
+
+			if (findWord(in, "такта:") != string::npos)
+			{
+				int TickNumberSecond = 0;
+				in >> TickNumberSecond;
+				// если была рассинхронизация
+				if (TickNumber != TickNumberSecond)
+				{
+					timeStep += timeStep;
+					continue;
+				}
+			}
+
+		   if(findLine(in,"5) Кватернион ориентации, Qо") != string::npos)
 		   {
 
 				for(int i = 0; i < 4; i++)
 				{
-					std::getline(in,line);
+					getline(in,line);
 					vector<string> splittedStr = split(line,"\t\t\t\t");
-					cadrInfo.QuatOrient[i] = std::atof(splittedStr[1].c_str());
+					cadrInfo.QuatOrient[i] = atof(splittedStr[1].c_str());
 				}
 
 				double matrixOfOrientation [3][3];
 				quatToMatr(cadrInfo.QuatOrient, matrixOfOrientation);
-				double al = 0;
-				double dl = 0;
-				double Az = 0;
+				double Angles[3];
+				MatrixToEkvAngles(matrixOfOrientation, Angles);
 
-				dl = asinm(matrixOfOrientation[2][2]) * RTD;
-				al = atan2m(matrixOfOrientation[2][1], matrixOfOrientation[2][0]) * RTD;   if (al<0)  al += 360.;
-				Az = atan2m(matrixOfOrientation[0][2], matrixOfOrientation[1][2]) * RTD;   if (Az<0)  Az += 360.;
-				plotter->AddPoint(ChartAl, 0, cadrInfo.Time, al, errorColor);
-				plotter->AddPoint(ChartDl, 0, cadrInfo.Time, dl, errorColor);
-				plotter->AddPoint(ChartAz, 0, cadrInfo.Time, Az, errorColor);
+				plotter->AddPoint(ChartAl, 0, cadrInfo.Time, Angles[0] * RTD, pointColor);
+				plotter->AddPoint(ChartDl, 0, cadrInfo.Time, Angles[1] * RTD, pointColor);
+				plotter->AddPoint(ChartAz, 0, cadrInfo.Time, Angles[2] * RTD, pointColor);
 
 
 		   }
 		   else break; // протоколы кончаются на ДТМИ
 
-		   if(findLine(in,"Угловая скорость по оптическим измерениям в проекциях на оси ПСК") != std::string::npos)
+		   if(findLine(in,"Угловая скорость по оптическим измерениям в проекциях на оси ПСК") != string::npos)
 		   {
 				for(int i = 0; i < 3; i++)
 				{
-					std::getline(in,line);
+					getline(in,line);
 					vector<string> splittedStr = split(line,"\t\t\t\t");
-					cadrInfo.OmegaOrient[i] = std::atof(splittedStr[1].c_str());
+					cadrInfo.OmegaOrient[i] = atof(splittedStr[1].c_str());
 				}
 
 		   }
-		   else throw std::logic_error(errorMessage);
+		   else throw logic_error(errorMessage);
 
-		   plotter->AddPoint(ChartNumFrag, 0, cadrInfo.Time, cadrInfo.CountWindows, errorColor);
-		   plotter->AddPoint(ChartNumDet, 0, cadrInfo.Time, cadrInfo.CountDeterObj, errorColor);
-		   plotter->AddPoint(ChartNumLoc, 0, cadrInfo.Time, cadrInfo.CountLocalObj, errorColor);
-		   plotter->AddPoint(ChartWx, 0, cadrInfo.Time, cadrInfo.OmegaOrient[0] * RTM * PI * 0.03125, errorColor);
-		   plotter->AddPoint(ChartWy, 0, cadrInfo.Time, cadrInfo.OmegaOrient[1] * RTM * PI * 0.03125, errorColor);
-		   plotter->AddPoint(ChartWz, 0, cadrInfo.Time, cadrInfo.OmegaOrient[2] * RTM * PI * 0.03125, errorColor);
-		   cadrInfoVec.push_back(cadrInfo);
-		   
+		   plotter->AddPoint(ChartNumFrag, 0, cadrInfo.Time, cadrInfo.CountWindows, pointColor);
+		   plotter->AddPoint(ChartNumDet, 0, cadrInfo.Time, cadrInfo.CountDeterObj, pointColor);
+		   plotter->AddPoint(ChartNumLoc, 0, cadrInfo.Time, cadrInfo.CountLocalObj, pointColor);
+
+		   const double BOKZ1000ConvCoef = PI * 0.03125;
+		   plotter->AddPoint(ChartWx, 0, cadrInfo.Time, cadrInfo.OmegaOrient[0] * RTM * BOKZ1000ConvCoef, pointColor);
+		   plotter->AddPoint(ChartWy, 0, cadrInfo.Time, cadrInfo.OmegaOrient[1] * RTM * BOKZ1000ConvCoef, pointColor);
+		   plotter->AddPoint(ChartWz, 0, cadrInfo.Time, cadrInfo.OmegaOrient[2] * RTM * BOKZ1000ConvCoef, pointColor);
+		   unique_ptr <IKI_img> writer (new IKI_img());
+
+		   if (cadrInfoVec.empty())
+		   {
+				writer->Georeferencing.DateTime = startDate;
+		   }
+		   else
+		   {
+				writer->Georeferencing.DateTime = startDate + timeStep;
+				timeStep = 0.25;
+				TDateTime (2017,9,26, 00,00,00);
+		   }
+
+		   writer->Georeferencing.FrameNumber = ++counter;
+		   writer->StarsData.RezStat = 0;
+		   writer->ImageData.FrameData.FrameHeight = 1024;
+		   writer->ImageData.FrameData.FrameWidth = 1024;
+		   writer->StarsData.SimulatedFrame.strrec = cadrInfo.SizeObjectsList;
+		   writer->StarsData.LocalizedCount = cadrInfo.CountLocalObj;
+		   writer->StarsData.RecognizedCount = cadrInfo.CountDeterObj;
+
+		   writer->StarsData.SimulatedFrame.StarRec = new STARREC [cadrInfo.SizeObjectsList];
+		   for (int i = 0; i < cadrInfo.SizeObjectsList; i++)
+		   {
+				writer->StarsData.SimulatedFrame.StarRec[i].Xs = cadrInfo.ObjectsList[i].X;
+				writer->StarsData.SimulatedFrame.StarRec[i].Ys = cadrInfo.ObjectsList[i].Y;
+				writer->StarsData.SimulatedFrame.StarRec[i].Is = cadrInfo.ObjectsList[i].Bright;
+				writer->StarsData.SimulatedFrame.StarRec[i].Ns = cadrInfo.ObjectsList[i].StarID;
+				writer->StarsData.SimulatedFrame.StarRec[i].Mv = cadrInfo.ObjectsList[i].Mv;
+				writer->StarsData.SimulatedFrame.StarRec[i].Sp[0] = cadrInfo.ObjectsList[i].Sp[0];
+				writer->StarsData.SimulatedFrame.StarRec[i].Sp[1] = cadrInfo.ObjectsList[i].Sp[1];
+		   }
+
+			double matrixOfOrientation [3][3];
+			quatToMatr(cadrInfo.QuatOrient, matrixOfOrientation);
+			double Angles[3];
+			MatrixToEkvAngles(matrixOfOrientation, Angles);
+			for (int i = 0; i < 3; i ++)
+			{
+				writer->Georeferencing.OrientationAngles[i] = Angles[i];
+				writer->Georeferencing.DeviceAngularVelocity[i] = cadrInfo.OmegaOrient[i] * BOKZ1000ConvCoef;
+			}
+
+		   AnsiString FileName = GetCurrentDir() + "/" + "IKI_" + TDateTime::CurrentDate().DateString() + "/";
+		   TDirectory::CreateDirectory(FileName);
+		   char buf [2];
+		   sprintf (buf, "%02u", counter);
+		   FileName = FileName + IntToStr((int)counter) + "_" + TDateTime::CurrentDate().DateString() + "_00-00-" + buf + ".iki";
+		   writer->WriteFormat(FileName);
+		   cadrInfoVec.push_back(move(cadrInfo));
+
 		}
 
 	}
+	}
 	}	
 
-	catch (std::exception &e)
+	catch (exception &e)
 	{
 		ShowMessage(e.what());
 	}
 
 }
 
+void TFormGraphOrient::readBOKZ601000MKO(ifstream& in, vector <CadrInfo>& cadrInfoVec, unsigned int& counter)
+{
+	string line;
+	unsigned int toNextDTMI = 0;
+
+	while (getline(in,line))
+	{
+		TColor pointColor = clBlue;
+		if (line.find("КС:	3CA0") != string::npos)
+		{
+			if (toNextDTMI != 0)
+			{
+				--toNextDTMI;
+				continue;
+			}
+			getline(in,line);
+			getline(in,line);
+			vector <string> splitted = split(line, "\t");
+			string status = splitted[5];
+			string status2 = splitted[6];
+
+			if (status == "EC00")
+			{
+				if (status2.substr(0, 2) != "00")
+				{
+					pointColor = clRed;
+				}
+			}
+			//  НО
+			else if (status == "2400")
+			{
+				pointColor = clGreen;
+				if (status2.substr(0, 2) == "0C"  || status2.substr(0, 2) == "01")
+				{
+					toNextDTMI = 8;
+					continue;
+				}
+				else if (status2.substr(0, 2) != "00")
+				{
+					pointColor = clRed;
+				}
+			}
+			else if (status == "0000" && status2 == "0000"
+			|| status == "C400")
+			{
+				toNextDTMI  = 8;
+				continue;
+			}
+			else
+			{
+				pointColor = clRed;
+			}
+
+			for (int i = 0; i < 8; i++)
+			{
+				 if (findLine(in,"КС:	3CA0") != string::npos)
+				 {
+
+				 }
+			}
+
+
+		}
+	}
+
+}
 
 void __fastcall TFormGraphOrient::BOKZM601000ParseProtocolClick(TObject *Sender)
 {
@@ -3990,10 +4139,12 @@ void __fastcall TFormGraphOrient::BOKZM601000ParseProtocolClick(TObject *Sender)
 		 {
 			vCadrInfo.clear();
 			DeleteLineGraph();
-			std::unique_ptr <TStringList> FileList (new TStringList());
+			unique_ptr <TStringList> FileList (new TStringList());
 			FileList->Assign(OpenDialog->Files);
 			SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
-			for (int i = 0; i < FileList->Count; i ++)
+			unsigned int counter = 0;
+			TDateTime startDate = TDateTime (2017,9,26, 00,00,00);
+			for (int i = 0; i < FileList->Count; i++)
 			{
 				FileName = FileList->Strings[i];
 				ifstream in(FileName.c_str());
@@ -4002,10 +4153,11 @@ void __fastcall TFormGraphOrient::BOKZM601000ParseProtocolClick(TObject *Sender)
 					ShowMessage("Не удалось открыть файл");
 					return;
 				}
-				readBOKZ601000Protocol(in, vCadrInfo);
+			   //	readBOKZ601000Protocol(in, vCadrInfo, counter);
+			   readBOKZ601000MKO (in, vCadrInfo, counter, startDate);
 			}
 
-			PrepareStartDraw();	
+			PrepareStartDraw();
 
 		}
 }

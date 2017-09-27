@@ -242,9 +242,16 @@ object FormAnimateSetting: TFormAnimateSetting
     object Label7: TLabel
       Left = 18
       Top = 24
-      Width = 55
-      Height = 17
+      Width = 44
+      Height = 13
       Caption = #1055#1088#1077#1092#1080#1082#1089
+    end
+    object Label8: TLabel
+      Left = 18
+      Top = 46
+      Width = 57
+      Height = 14
+      Caption = #1053#1072#1095#1080#1085#1072#1090#1100' '#1089
     end
     object EditFilePrefix: TEdit
       Left = 104
@@ -253,6 +260,14 @@ object FormAnimateSetting: TFormAnimateSetting
       Height = 21
       TabOrder = 0
       Text = 'Img'
+    end
+    object BeginFromEdit: TEdit
+      Left = 104
+      Top = 43
+      Width = 121
+      Height = 21
+      NumbersOnly = True
+      TabOrder = 1
     end
   end
   object ColorDialog1: TColorDialog
