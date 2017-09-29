@@ -62,8 +62,10 @@ void SimplePlotter::SaveChart(TChart* Chart, AnsiString name, unsigned int Heigh
 void SimplePlotter::AddPoint (TChart* Chart, DWORD SeriesIndex, double X, double Y, TColor Color)
 {
 	  if (Chart->SeriesCount()  <= SeriesIndex ) {
-		Chart->AddSeries(new TLineSeries(Chart));
-		SetSeriesOptions(dynamic_cast <TLineSeries*> (Chart->Series[SeriesIndex]));
+		for (int i = Chart->SeriesCount(); i <= SeriesIndex; i++) {
+			Chart->AddSeries(new TLineSeries(Chart));
+			SetSeriesOptions(dynamic_cast <TLineSeries*> (Chart->Series[i]));
+		}
 	  }
 
 	  if (Color == clWhite) {
@@ -74,7 +76,7 @@ void SimplePlotter::AddPoint (TChart* Chart, DWORD SeriesIndex, double X, double
 
 void  SimplePlotter::AddArray (TChart* Chart, DWORD SeriesIndex, const double* ArrayX, const double* ArrayY, DWORD ArraySize)
 {
-  	  if (Chart->SeriesCount()  <= SeriesIndex ) {
+	  if (Chart->SeriesCount()  <= SeriesIndex ) {
 		Chart->AddSeries(new TLineSeries(Chart));
 		SetSeriesOptions(dynamic_cast <TLineSeries*> (Chart->Series[SeriesIndex]));
 	  }

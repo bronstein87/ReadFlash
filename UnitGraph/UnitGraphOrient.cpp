@@ -9,8 +9,6 @@
 
 #pragma resource "*.dfm"
 
-
-
 void SwapShort(short *word1, short *word2)
 {
 	short buf;
@@ -40,15 +38,50 @@ __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 		Charts.push_back(ChartWxError); Charts.push_back(ChartWyError); Charts.push_back(ChartWzError);
 		Charts.push_back(ChartErrorOX); Charts.push_back(ChartErrorOY); Charts.push_back(ChartErrorOZ);
 		Charts.push_back(ChartFragErrX); Charts.push_back(ChartFragErrY);
-        Charts.push_back(ChartFragBright); Charts.push_back(ChartFragSizeEl);
+		Charts.push_back(ChartFragBright); Charts.push_back(ChartFragSizeEl);
+
+//может быть здесь вызывать функцию синхронизации по времени - ?
+		Charts.push_back(ChartBrightMv);  Charts.push_back(ChartSizeMv);
+		Charts.push_back(ChartBrightSize); Charts.push_back(ChartBrightSp);
 
 		for (int i = 0; i < Charts.size(); i++) {
 			Charts[i]->OnMouseWheel = &ChartMouseWheel;
 			Charts[i]->OnMouseDown = &ChartMouseDown;
 		}
-
 }
 
+void TFormGraphOrient::CheckTabSheet()
+{
+	TabSheetAngles->TabVisible = (ChartAl->SeriesCount() || ChartDl->SeriesCount()
+							   || ChartAz->SeriesCount());
+
+	TabSheetAnglesError->TabVisible = (ChartAlError->SeriesCount() || ChartDlError->SeriesCount()
+									|| ChartAlError->SeriesCount());
+
+	TabSheetAxesError->TabVisible =   (ChartErrorOX->SeriesCount() || ChartErrorOY->SeriesCount()
+									|| ChartErrorOZ->SeriesCount());
+
+	TabSheetOmega->TabVisible = (ChartWx->SeriesCount() || ChartWy->SeriesCount()
+							  || ChartWz->SeriesCount());
+
+	TabSheetOmegaError->TabVisible = (ChartWxError->SeriesCount() || ChartWyError->SeriesCount()
+								   || ChartWzError->SeriesCount());
+
+	TabSheetMxy->TabVisible = (ChartMx->SeriesCount() || ChartMy->SeriesCount()
+							|| ChartMxy->SeriesCount());
+
+	TabSheetCountObjects->TabVisible = (ChartNumFrag->SeriesCount() || ChartNumLoc->SeriesCount()
+									 || ChartNumDet->SeriesCount());
+
+	TabSheetImage->TabVisible = (ChartFone->SeriesCount() || ChartNoise->SeriesCount()
+							  || ChartTemp->SeriesCount());
+
+	TabSheetStatFrag->TabVisible = (ChartFragErrX->SeriesCount() || ChartFragErrY->SeriesCount()
+								 || ChartFragBright->SeriesCount() || ChartFragSizeEl->SeriesCount());
+
+	TabSheetStatStars->TabVisible = (ChartBrightMv->SeriesCount() || ChartSizeMv->SeriesCount()
+								  || ChartBrightSize->SeriesCount() || ChartBrightSp->SeriesCount());
+}
 
 void TFormGraphOrient::DeleteLineGraph()
 {
@@ -66,8 +99,6 @@ void TFormGraphOrient::InitializeSynchronization()
 		LineTool->AllowDrag = false;
 		Charts[i]->Tools->Add(LineTool);
 	}
-
-
 }
 
 void __fastcall TFormGraphOrient::MenuClearClick(TObject *Sender)
@@ -93,11 +124,14 @@ void __fastcall TFormGraphOrient::MenuSaveClick(TObject *Sender)
 		}
 		else
 		{
-            Title = LeftStr(Title, PosEx("\r", Title, 1) - 1);
+			Title = LeftStr(Title, PosEx("\r", Title, 1) - 1);
         }
-	
+
 		Title = GetCurrentDir() + ScreenFolderName + Title;
-		plotter->SaveChart(Charts[i], Title, 500, 1100);
+
+		if (Charts[i]->SeriesCount()) {
+			plotter->SaveChart(Charts[i], Title, 500, 1100);
+		}
 	}
 }
 
@@ -203,13 +237,6 @@ void TFormGraphOrient::PrintTableWindows(const struct CadrInfo &mCadr)
     }
 }
 
-void TFormGraphOrient::PrepareStartDraw()
-{
-	EditNumCadr->Text = 0;
-	UpDown1->Max = vCadrInfo.size() - 1;
-	DrawAnimateHandler();
-}
-
 void TFormGraphOrient::InitTableObjects(void)
 {
 	int k = 0;
@@ -259,6 +286,13 @@ void TFormGraphOrient::PrintTableObjects(const struct CadrInfo &mCadr)
 			TableObjectsInfo->Cells[k][1] = "-";
         }
 	}
+}
+
+void TFormGraphOrient::PrepareStartDraw()
+{
+	EditNumCadr->Text = 0;
+	UpDown1->Max = vCadrInfo.size() - 1;
+	DrawAnimateHandler();
 }
 
 void TFormGraphOrient::ClearAnimate(void)
@@ -1587,7 +1621,9 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 		fclose(flog_reg);
 		fclose(flog_pix);
 		fclose(flog_orient);
+
 		PrepareStartDraw();
+		CheckTabSheet();
 	 }
   }
 	catch(string &s)
@@ -2214,7 +2250,7 @@ void ConvertDataLOC(struct LOC tmi, struct CadrInfo &mCadr)
 
 void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 {
-    OpenDialog->Options.Clear();
+	OpenDialog->Options.Clear();
 	OpenDialog->Filter = "txt|*.txt";
 	if (OpenDialog->Execute()) {
 
@@ -2340,7 +2376,9 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 		fout.close();
 		fshtmi1.close();
 		fshtmi2.close();
+
 		PrepareStartDraw();
+		CheckTabSheet();
 	}
 }
 
@@ -2476,7 +2514,9 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 		}
 		finp.close();
 		fout.close();
+
 		PrepareStartDraw();
+		CheckTabSheet();
 	}
 }
 
@@ -2858,7 +2898,7 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 			}
 
 			PrepareStartDraw();
-
+			CheckTabSheet();
 		}
 	}
 
@@ -3168,7 +3208,7 @@ void __fastcall TFormGraphOrient::BOKZM2VParseProtocolClick(TObject *Sender)
 			DeleteLineGraph();
 			readmBOKZ2VProtocol(in, vCadrInfo);
 			PrepareStartDraw();
-
+			CheckTabSheet();
 		}
 	}
 
@@ -3397,106 +3437,147 @@ void PrintReportRes(vector <CadrInfo>& cadrInfo)
 
 void TFormGraphOrient::CalculateSeriesSKO()
 {
-	struct { double operator() (const CadrInfo& a) {return a.MeanErrorX * 1000.;} } GetMeanErrX;
-	pair <double,double> meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanErrX);
-	ChartMx->Series[0]->Title = ChartMx->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	pair <double, double> meanStd;
+	if (ChartMx->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a) {return a.MeanErrorX * 1000.;} } GetMeanErrX;
+		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanErrX);
+		ChartMx->Series[0]->Title = ChartMx->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	}
 
-	struct { double operator() (const CadrInfo& a) {return a.MeanErrorY * 1000.;} } GetMeanErrY;
-	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanErrY);
-	ChartMy->Series[0]->Title = ChartMy->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	if (ChartMy->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a) {return a.MeanErrorY * 1000.;} } GetMeanErrY;
+		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanErrY);
+		ChartMy->Series[0]->Title = ChartMy->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	}
 
-	struct { double operator() (const CadrInfo& a) {return a.MeanErrorXY * 1000.;} } GetMeanErrXY;
-	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanErrXY);
-	ChartMxy->Series[0]->Title = ChartMxy->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	if (ChartMxy->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a) {return a.MeanErrorXY * 1000.;} } GetMeanErrXY;
+		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanErrXY);
+		ChartMxy->Series[0]->Title = ChartMxy->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	}
 
-	struct { double operator() (const CadrInfo& a) {return a.CountWindows;} } GetCountWindows;
-	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetCountWindows);
-	ChartNumFrag->Series[0]->Title = ChartNumFrag->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	if (ChartNumFrag->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a) {return a.CountWindows;} } GetCountWindows;
+		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetCountWindows);
+		ChartNumFrag->Series[0]->Title = ChartNumFrag->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	}
 
-	struct { double operator() (const CadrInfo& a) {return a.CountLocalObj;} } GetCountLocalObj;
-	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetCountLocalObj);
-	ChartNumLoc->Series[0]->Title = ChartNumLoc->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	if (ChartNumLoc->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a) {return a.CountLocalObj;} } GetCountLocalObj;
+		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetCountLocalObj);
+		ChartNumLoc->Series[0]->Title = ChartNumLoc->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	}
 
-	struct { double operator() (const CadrInfo& a) {return a.CountDeterObj;} } GetCountDeterObj;
-	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetCountDeterObj);
-	ChartNumDet->Series[0]->Title = ChartNumDet->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	if (ChartNumDet->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a) {return a.CountDeterObj;} } GetCountDeterObj;
+		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetCountDeterObj);
+		ChartNumDet->Series[0]->Title = ChartNumDet->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	}
 
+	if (ChartFone->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a) {return a.MeanBright;} } GetMeanBright;
+		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanBright);
+		ChartFone->Series[0]->Title = ChartFone->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	}
 
-	struct { double operator() (const CadrInfo& a) {return a.MeanBright;} } GetMeanBright;
-	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanBright);
-	ChartFone->Series[0]->Title = ChartFone->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
-
-	struct { double operator() (const CadrInfo& a) {return a.SigmaBright;} } GetSigmaBright;
-	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetSigmaBright);
-	ChartNoise->Series[0]->Title = ChartNoise->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	if (ChartNoise->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a) {return a.SigmaBright;} } GetSigmaBright;
+		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetSigmaBright);
+		ChartNoise->Series[0]->Title = ChartNoise->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	}
 
 	//struct { double operator() (const CadrInfo& a) {return a.MatrixTemp;} } GetMatrixTemp;
 	//meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMatrixTemp);
 
+	if (ChartErrorOX->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a) {return a.AxesDiff[0] * RTS;} } GetAxesDiffF;
+		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAxesDiffF);
+		ChartErrorOX->Series[0]->Title = ChartErrorOX->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	}
 
-	struct { double operator() (const CadrInfo& a) {return a.AxesDiff[0] * RTS;} } GetAxesDiffF;
-	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAxesDiffF);
-	ChartErrorOX->Series[0]->Title = ChartErrorOX->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	if (ChartErrorOY->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a) {return a.AxesDiff[1] * RTS;} } GetAxesDiffS;
+		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAxesDiffS);
+		ChartErrorOY->Series[0]->Title = ChartErrorOY->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	}
 
-	struct { double operator() (const CadrInfo& a) {return a.AxesDiff[1] * RTS;} } GetAxesDiffS;
-	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAxesDiffS);
-	ChartErrorOY->Series[0]->Title = ChartErrorOY->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	if (ChartErrorOY->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a) {return a.AxesDiff[2] * RTS;} } GetAxesDiffT;
+		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAxesDiffT);
+		ChartErrorOZ->Series[0]->Title = ChartErrorOZ->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	}
 
-	struct { double operator() (const CadrInfo& a) {return a.AxesDiff[2] * RTS;} } GetAxesDiffT;
-	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAxesDiffT);
-	ChartErrorOZ->Series[0]->Title = ChartErrorOZ->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	if (ChartAlError->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a) {return a.AnglesDiff[0] * RTS;} } GetAnglesDiffF;
+		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesDiffF);
+		ChartAlError->Series[0]->Title = ChartAlError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	}
 
+	if (ChartDlError->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a) {return a.AnglesDiff[1] * RTS;} } GetAnglesDiffS;
+		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesDiffS);
+		ChartDlError->Series[0]->Title = ChartDlError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	}
 
-	struct { double operator() (const CadrInfo& a) {return a.AnglesDiff[0] * RTS;} } GetAnglesDiffF;
-	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesDiffF);
-	ChartAlError->Series[0]->Title = ChartAlError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	if (ChartAzError->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a) {return a.AnglesDiff[2] * RTS;} } GetAnglesDiffT;
+		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesDiffT);
+		ChartAzError->Series[0]->Title = ChartAzError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	}
 
-	struct { double operator() (const CadrInfo& a) {return a.AnglesDiff[1] * RTS;} } GetAnglesDiffS;
-	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesDiffS);
-	ChartDlError->Series[0]->Title = ChartDlError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	if (ChartWxError->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a) {return a.OmegaDiff[0] * RTS;} } GetOmegaDiffF;
+		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaDiffF);
+		ChartWxError->Series[0]->Title = ChartWxError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	}
 
-	struct { double operator() (const CadrInfo& a) {return a.AnglesDiff[2] * RTS;} } GetAnglesDiffT;
-	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesDiffT);
-	ChartAzError->Series[0]->Title = ChartAzError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	if (ChartWyError->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a) {return a.OmegaDiff[1] * RTS;} } GetOmegaDiffS;
+		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaDiffS);
+		ChartWyError->Series[0]->Title = ChartWyError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	}
 
+	if (ChartWzError->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a) {return a.OmegaDiff[2] * RTS;} } GetOmegaDiffT;
+		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaDiffT);
+		ChartWzError->Series[0]->Title = ChartWzError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	}
 
-	struct { double operator() (const CadrInfo& a) {return a.OmegaDiff[0] * RTS;} } GetOmegaDiffF;
-	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaDiffF);
-	ChartWxError->Series[0]->Title = ChartWxError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	if (ChartWx->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a) {return a.OmegaOrient[0] * RTM;} } GetOmegaOrientF;
+		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaOrientF);
+		ChartWx->Series[0]->Title = ChartWx->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	}
 
-	struct { double operator() (const CadrInfo& a) {return a.OmegaDiff[1] * RTS;} } GetOmegaDiffS;
-	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaDiffS);
-	ChartWyError->Series[0]->Title = ChartWyError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	if (ChartWy->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a) {return a.OmegaOrient[1] * RTM;} } GetOmegaOrientS;
+		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaOrientS);
+		ChartWy->Series[0]->Title = ChartWy->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	}
 
-	struct { double operator() (const CadrInfo& a) {return a.OmegaDiff[2] * RTS;} } GetOmegaDiffT;
-	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaDiffT);
-	ChartWzError->Series[0]->Title = ChartWzError->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	if (ChartWz->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a) {return a.OmegaOrient[2] * RTM;} } GetOmegaOrientT;
+		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaOrientT);
+		ChartWz->Series[0]->Title = ChartWz->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	}
 
+	if (ChartWx->SeriesCount() > 1) {
+		struct { double operator() (const CadrInfo& a) {return a.OmegaModel[0] * RTM;} } GetOmegaModelF;
+		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaModelF);
+		ChartWx->Series[1]->Title = ChartWx->Series[1]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	}
 
-	struct { double operator() (const CadrInfo& a) {return a.OmegaOrient[0] * RTM;} } GetOmegaOrientF;
-	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaOrientF);
-	ChartWx->Series[0]->Title = ChartWx->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	if (ChartWy->SeriesCount() > 1) {
+		struct { double operator() (const CadrInfo& a) {return a.OmegaModel[1] * RTM;} } GetOmegaModelS;
+		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaModelS);
+		ChartWy->Series[1]->Title = ChartWy->Series[1]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	}
 
-	struct { double operator() (const CadrInfo& a) {return a.OmegaOrient[1] * RTM;} } GetOmegaOrientS;
-	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaOrientS);
-	ChartWy->Series[0]->Title = ChartWy->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
-
-	struct { double operator() (const CadrInfo& a) {return a.OmegaOrient[2] * RTM;} } GetOmegaOrientT;
-	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaOrientT);
-	ChartWz->Series[0]->Title = ChartWz->Series[0]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
-
-	struct { double operator() (const CadrInfo& a) {return a.OmegaModel[0] * RTM;} } GetOmegaModelF;
-	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaModelF);
-	ChartWx->Series[1]->Title = ChartWx->Series[1]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
-
-	struct { double operator() (const CadrInfo& a) {return a.OmegaModel[1] * RTM;} } GetOmegaModelS;
-	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaModelS);
-	ChartWy->Series[1]->Title = ChartWy->Series[1]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
-
-	struct { double operator() (const CadrInfo& a) {return a.OmegaModel[2] * RTM;} } GetOmegaModelT;
-	meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaModelT);
-	ChartWz->Series[1]->Title = ChartWz->Series[1]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
-
+	if (ChartWz->SeriesCount() > 1) {
+		struct { double operator() (const CadrInfo& a) {return a.OmegaModel[2] * RTM;} } GetOmegaModelT;
+		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaModelT);
+		ChartWz->Series[1]->Title = ChartWz->Series[1]->Title + " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+	}
 }
 void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 {
@@ -3529,34 +3610,47 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 						{
 							TStringDynArray SplittedString = SplitString(FileList->Strings[i], "\\");
 							UnicodeString ResFileName = FileOpenDialog1->FileName + "\\" + filePrefix + SplittedString[SplittedString.Length - 1];
-							if (reader->ReadFormat(ResFileName, false))
+							if (FileExists(ResFileName) && (reader->ReadFormat(ResFileName, false)) )
 							{
 								CompareIKIRes = true;
 //								if (!i) {
 //									печать параметров модели
 //									StartPrintReport(reader.get());
 //								}
+								if (reader->StarsData.RezStat == 0xFF00) {
+									int aaa = 5;
+								}
 							}
-							else throw logic_error(string("Не удалось считать ") + AnsiString(FileList->Strings[i]).c_str());
+							else  {
+//								ShowMessage("Не удалось считать " + AnsiString(ResFileName));
+								CompareIKIRes = false;
+							}
+//							throw logic_error(string("Не удалось считать ") + AnsiString(FileList->Strings[i]).c_str());
 						}
-						else throw logic_error(string("Не удалось считать ") + AnsiString(FileList->Strings[i]).c_str());
+						else ShowMessage("Не удалось считать " + AnsiString(FileList->Strings[i]));
+//						throw logic_error(string("Не удалось считать ") + AnsiString(FileList->Strings[i]).c_str());
 					}
 
-						convertIKIFormatToInfoCadr(reader.get(), vCadrInfo, CompareIKIRes);
-						double Time =  vCadrInfo.back().Time;
+					convertIKIFormatToInfoCadr(reader.get(), vCadrInfo, CompareIKIRes);
+					double Time =  vCadrInfo.back().Time;
+
+					if (CompareIKIRes)
+					{
+						plotter->AddPoint(ChartNumFrag, 0, Time, vCadrInfo.back().CountWindows);
+						plotter->AddPoint(ChartNumLoc, 0, Time, vCadrInfo.back().CountLocalObj);
+
+						plotter->AddPoint(ChartFone, 0, Time, vCadrInfo.back().MeanBright);
+						plotter->AddPoint(ChartNoise, 0, Time, vCadrInfo.back().SigmaBright);
+						//plotter->AddPoint(ChartTemp, 0, Time, vCadrInfo.back().MatrixTemp);
 
 						if (vCadrInfo.back().IsOrient)
 						{
 							plotter->SetTitle("измерения");
+							plotter->SetSeriesColor(clBlue);
+							plotter->AddPoint(ChartNumDet, 0, Time, vCadrInfo.back().CountDeterObj);
 							plotter->AddPoint(ChartMx, 0, Time, vCadrInfo.back().MeanErrorX * 1000.);
 							plotter->AddPoint(ChartMy, 0, Time, vCadrInfo.back().MeanErrorY * 1000.);
 							plotter->AddPoint(ChartMxy, 0, Time, vCadrInfo.back().MeanErrorXY * 1000.);
-							plotter->AddPoint(ChartNumFrag, 0, Time, vCadrInfo.back().CountWindows);
-							plotter->AddPoint(ChartNumLoc, 0, Time, vCadrInfo.back().CountLocalObj);
-							plotter->AddPoint(ChartNumDet, 0, Time, vCadrInfo.back().CountDeterObj);
-							plotter->AddPoint(ChartFone, 0, Time, vCadrInfo.back().MeanBright);
-							plotter->AddPoint(ChartNoise, 0, Time, vCadrInfo.back().SigmaBright);
-							//plotter->AddPoint(ChartTemp, 0, Time, vCadrInfo.back().MatrixTemp);
 							plotter->AddPoint(ChartErrorOX, 0, Time, vCadrInfo.back().AxesDiff[0] * RTS);
 							plotter->AddPoint(ChartErrorOY, 0, Time, vCadrInfo.back().AxesDiff[1] * RTS);
 							plotter->AddPoint(ChartErrorOZ, 0, Time, vCadrInfo.back().AxesDiff[2] * RTS);
@@ -3582,58 +3676,98 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 							plotter->AddPoint(ChartWy, 1, Time, vCadrInfo.back().OmegaModel[1] * RTM);
 							plotter->AddPoint(ChartWz, 1, Time, vCadrInfo.back().OmegaModel[2] * RTM);
 
+							plotter->SetShowLines(true);
+							//статистика по фрагментам
 							int iObject = 0;
 							int maxDrawFrag = 12;
-							for (int iFrag = 0; iFrag < vCadrInfo.back().SizeWindowsList; iFrag++) {
+							for (int iFrag  = 0; iFrag < vCadrInfo.back().SizeWindowsList; iFrag++) {
+								TColor color = RGB((float)(maxDrawFrag-iFrag)/maxDrawFrag * 255,
+																200, (float)iFrag/maxDrawFrag * 255 );
+								plotter->SetSeriesColor(color);
+								plotter->SetTitle(IntToStr(iFrag+1));
+
 								for (int iObjFrag = 0; iObjFrag < vCadrInfo.back().WindowsList[iFrag].CountObj; iObjFrag++) {
-									plotter->SetTitle(IntToStr(iFrag+1));
-									plotter->SetShowLines(true);
-
 									if (iFrag < maxDrawFrag) {
-										TColor color = RGB((float)(maxDrawFrag-iFrag)/maxDrawFrag*255,
-															200, (float)iFrag/maxDrawFrag*255 );
-										plotter->SetSeriesColor(color);
-
 										plotter->AddPoint(ChartFragBright, iFrag, Time,
-															vCadrInfo.back().ObjectsList[iObject].Bright);
+																vCadrInfo.back().ObjectsList[iObject].Bright);
 										plotter->AddPoint(ChartFragSizeEl, iFrag, Time,
-															vCadrInfo.back().ObjectsList[iObject].Square);
+																vCadrInfo.back().ObjectsList[iObject].Square);
 										plotter->AddPoint(ChartFragErrX, iFrag, Time,
-															vCadrInfo.back().ObjectsList[iObject].Dx*1000.);
+																vCadrInfo.back().ObjectsList[iObject].Dx*1000.);
 										plotter->AddPoint(ChartFragErrY, iFrag, Time,
-															vCadrInfo.back().ObjectsList[iObject].Dy*1000.);
+																vCadrInfo.back().ObjectsList[iObject].Dy*1000.);
 									}
-
 									iObject++;
 								}
 							}
-						}
-						if (i % 100 == 0)
-						{
-							Application->ProcessMessages();
-							LabelFrameReport->Caption = "Cчитано " + IntToStr(i) + " файлов из " + IntToStr(FileList->Count);
+
+							//статистика по звездам
+							plotter->SetShowLines(false);
+							for (int iObject = 0; iObject < vCadrInfo.back().SizeObjectsList; iObject++) {
+								if (vCadrInfo.back().ObjectsList[iObject].StarID /* && Dx && Dy */) {
+									plotter->AddPoint(ChartBrightMv,   0, vCadrInfo.back().ObjectsList[iObject].Mv,
+																		  vCadrInfo.back().ObjectsList[iObject].Bright);
+									plotter->AddPoint(ChartSizeMv,     0, vCadrInfo.back().ObjectsList[iObject].Mv,
+																		  vCadrInfo.back().ObjectsList[iObject].Square);
+									plotter->AddPoint(ChartBrightSize, 0, vCadrInfo.back().ObjectsList[iObject].Square,
+																		  vCadrInfo.back().ObjectsList[iObject].Bright);
+
+//									float tempSpec = GetTempSpec(vCadrInfo.back().ObjectsList[iObject].Sp);
+//									float brightMv0 = vCadrInfo.back().ObjectsList[iObject].Bright *
+//														pow ((float)2.512, (float)vCadrInfo.back().ObjectsList[iObject].Mv);
+//									plotter->AddPoint(ChartBrightSp, 0, tempSpec, brightMv0);
+								}
+							}
 						}
 					}
-//печать статистики по серии кадров
-//					PrintReportRes(vCadrInfo);
 
-				}
-				struct {
-
-					bool operator()(const CadrInfo& a,const CadrInfo& b)
+					if (i % 100 == 0)
 					{
-						return a.Time < b.Time;
+						Application->ProcessMessages();
+						LabelFrameReport->Caption = "Cчитано " + IntToStr(i) + " файлов из " + IntToStr(FileList->Count);
 					}
-
-				} CadrCompare ;
-
-				sort(vCadrInfo.begin(), vCadrInfo.end(), CadrCompare);
-				CalculateSeriesSKO();
-				PrepareStartDraw();
+				}
 			}
 
-	}
+//печать статистики по серии кадров
+//			PrintReportRes(vCadrInfo);
+//сделать функцию CheckChartSeries
+			for (int i = 0; i < ChartFragBright->SeriesCount(); i++) {
+				if (!ChartFragBright->Series[i]->Count()) {
+					ChartFragBright->RemoveSeries(i);
+				}
+			}
+			for (int i = 0; i < ChartFragSizeEl->SeriesCount(); i++) {
+				if (!ChartFragSizeEl->Series[i]->Count()) {
+					ChartFragSizeEl->RemoveSeries(i);
+				}
+			}
+			for (int i = 0; i < ChartFragErrX->SeriesCount(); i++) {
+				if (!ChartFragErrX->Series[i]->Count()) {
+					ChartFragErrX->RemoveSeries(i);
+				}
+			}
+			for (int i = 0; i < ChartFragErrY->SeriesCount(); i++) {
+				if (!ChartFragErrY->Series[i]->Count()) {
+					ChartFragErrY->RemoveSeries(i);
+				}
+			}
 
+			struct {
+
+				bool operator()(const CadrInfo& a,const CadrInfo& b)
+				{
+					return a.Time < b.Time;
+				}
+
+			} CadrCompare ;
+
+			sort(vCadrInfo.begin(), vCadrInfo.end(), CadrCompare);
+			CalculateSeriesSKO();
+			PrepareStartDraw();
+		}
+        CheckTabSheet();
+	}
 	catch (exception &e)
 	{
 		ShowMessage(e.what());
@@ -3725,11 +3859,17 @@ void __fastcall TFormGraphOrient::FormResize(TObject *Sender)
 	ResizePlot(ChartNoise, 1, 3, 0, 1);
 	ResizePlot(ChartTemp,  1, 3, 0, 2);
 
-//статистика по звездам
+//статистика по фрагментам
 	ResizePlot(ChartFragErrX,   2, 2, 0, 0);
 	ResizePlot(ChartFragErrY,   2, 2, 0, 1);
 	ResizePlot(ChartFragBright, 2, 2, 1, 0);
 	ResizePlot(ChartFragSizeEl, 2, 2, 1, 1);
+
+//статистика по звездам
+	ResizePlot(ChartBrightMv, 2, 2, 0, 0);
+	ResizePlot(ChartSizeMv,   2, 2, 0, 1);
+	ResizePlot(ChartBrightSize, 2, 2, 1, 0);
+	ResizePlot(ChartBrightSp,   2, 2, 1, 1);
 }
 //---------------------------------------------------------------------------
 
@@ -3873,7 +4013,7 @@ void TFormGraphOrient::readBOKZ601000Protocol(ifstream& in, vector <CadrInfo>& c
 
 		}
 		else throw logic_error(errorMessage);
-		writeBOKZ1000ProtocolToIKI (cadrInfoVec.back(), cadrInfoVec.empty(), startDate, timeStep, counter);
+//		writeBOKZ1000ProtocolToIKI (cadrInfoVec.back(), cadrInfoVec.empty(), startDate, timeStep, counter);
 		NeedNextFile = false;
 	}
 
@@ -4229,7 +4369,7 @@ void __fastcall TFormGraphOrient::BOKZM601000ParseProtocolClick(TObject *Sender)
 			}
 
 			PrepareStartDraw();
-
+			CheckTabSheet();
 		}
 }
 //---------------------------------------------------------------------------

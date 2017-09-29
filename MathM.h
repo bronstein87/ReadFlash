@@ -24,6 +24,7 @@ void calcTransitionMatrix(double pointAlpha, double pointBeta, double pointAzimu
 void getAngularDisplacementFromOrientMatr(const double M_ornt_pr[3][3],const double M_ornt[3][3], double Wop [3]);
 void multMatrix(const double Matr1[3][3],const double Matr2[3][3], double Matr[3][3]);
 void ToGMS (double gradAngle, int& gradus, int& minutes, int& seconds);
+float GetTempSpec(char *sp);
 
 template <class InputIterator, class Value, class UnaryOperation>
 std::pair<Value, Value> calculateMeanStdDv (InputIterator first, InputIterator last, Value init, UnaryOperation extractWtC)

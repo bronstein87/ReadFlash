@@ -177,3 +177,43 @@ void ToGMS(double gradAngle, int& gradus, int& minutes, int& seconds)
         seconds = -seconds;
 	}
 }
+
+float GetTempSpec(char *sp)
+{
+	short IT = -1, NT;
+	float temp;
+	float TEMP[8] = {60000, 30000, 10000, 7500, 6000, 5000, 3500, 2000};
+	switch (sp[0])
+	{
+		case 'O':  { IT = 0; break;}
+		case 'B':  { IT = 1; break;}
+		case 'A':  { IT = 2; break;}
+		case 'F':  { IT = 3; break;}
+		case 'G':  { IT = 4; break;}
+		case 'K':  { IT = 5; break;}
+		case 'M':  { IT = 6; break;}
+		default:   { IT = 0; break;}
+	}
+	switch (sp[1])
+	{
+		case '0': { NT = 0; break;}
+		case '1': { NT = 1; break;}
+		case '2': { NT = 2; break;}
+		case '3': { NT = 3; break;}
+		case '4': { NT = 4; break;}
+		case '5': { NT = 5; break;}
+		case '6': { NT = 6; break;}
+		case '7': { NT = 7; break;}
+		case '8': { NT = 8; break;}
+		case '9': { NT = 9; break;}
+		case 'A': { NT = 5; break;}
+		case 'B': { NT = 5; break;}
+		case 'E': { NT = 5; break;}
+		default : { NT = 0; break;}
+	}
+	if ( (sp[0] == 'M')&&((sp[1] == '6')||(sp[1] == '7')
+	   ||(sp[1] == '8')||(sp[1] == '9'))) NT = 5;
+
+  temp = TEMP[IT] - (TEMP[IT] - TEMP[IT+1]) * ((double)NT + 0.5) / 10.;
+  return temp;
+}

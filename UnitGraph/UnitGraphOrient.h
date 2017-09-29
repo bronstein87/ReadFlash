@@ -117,35 +117,35 @@
 		TChartEditor *ChartEditor1;
 		TFileOpenDialog *FileOpenDialog1;
 		TPageControl *Fyf;
-		TTabSheet *TabSheet5;
+	TTabSheet *TabSheetAngles;
 		TChart *ChartAl;
 		TChart *ChartDl;
 		TChart *ChartAz;
-		TTabSheet *TabSheet4;
+	TTabSheet *TabSheetAnglesError;
 		TChart *ChartAzError;
 		TChart *ChartDlError;
 		TChart *ChartAlError;
-		TTabSheet *TabSheet6;
+	TTabSheet *TabSheetOmega;
 		TChart *ChartWx;
 		TChart *ChartWy;
 		TChart *ChartWz;
-		TTabSheet *TabSheet11;
+	TTabSheet *TabSheetOmegaError;
 		TChart *ChartWxError;
 		TChart *ChartWyError;
 		TChart *ChartWzError;
-		TTabSheet *TabSheet7;
+	TTabSheet *TabSheetMxy;
 		TChart *ChartMx;
 		TChart *ChartMy;
 		TChart *ChartMxy;
-		TTabSheet *TabSheet8;
+	TTabSheet *TabSheetCountObjects;
 		TChart *ChartNumFrag;
 		TChart *ChartNumLoc;
 		TChart *ChartNumDet;
-		TTabSheet *TabSheet9;
+	TTabSheet *TabSheetImage;
 		TChart *ChartFone;
 		TChart *ChartNoise;
 		TChart *ChartTemp;
-		TTabSheet *TabSheet10;
+	TTabSheet *TabSheetStarsMotion;
 		TLabel *Label4;
 		TLabel *Label3;
 		TLabel *Label2;
@@ -157,7 +157,7 @@
 		TLineSeries *Series2;
 		TArrowSeries *Series3;
 		TLineSeries *Series1;
-		TTabSheet *TabSheet1;
+	TTabSheet *TabSheetTableFrag;
 		TChart *Chart2;
 		TBarSeries *Series4;
 		TChart *Chart3;
@@ -165,7 +165,7 @@
 		TChart *Chart4;
 		TBarSeries *Series5;
 		TStringGrid *TableWindowsInfo;
-		TTabSheet *TabSheet2;
+	TTabSheet *TabSheetTableObject;
 		TChart *Chart5;
 		TBarSeries *Series7;
 		TChart *Chart6;
@@ -185,10 +185,10 @@
 		TUpDown *UpDown3;
 		TEdit *FontSizeEdit;
 		TUpDown *UpDown4;
-		TTabSheet *TabSheet3;
+	TTabSheet *TabSheetStatFrag;
 		TChart *ChartFragErrX;
 		TChart *ChartFragErrY;
-		TTabSheet *TabSheet12;
+	TTabSheet *TabSheetAxesError;
 		TChart *ChartErrorOX;
 		TChart *ChartErrorOY;
 		TChart *ChartErrorOZ;
@@ -196,6 +196,11 @@
 		TChart *ChartFragSizeEl;
 		TArrowSeries *Series10;
 	TMenuItem *BOKZM601000ParseProtocol;
+	TTabSheet *TabSheetStatStars;
+	TChart *ChartBrightMv;
+	TChart *ChartBrightSize;
+	TChart *ChartBrightSp;
+	TChart *ChartSizeMv;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -232,6 +237,7 @@
 
 	private:	// User declarations
 		void PrepareStartDraw();
+        void CheckTabSheet();
 		void InitTableObjects(void);
 		void PrintTableObjects(const struct CadrInfo &mCadr);
 		void InitTableWindows(void);
