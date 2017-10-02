@@ -9,7 +9,8 @@
 
 #pragma resource "*.dfm"
 
-//bool IsDateTime = true;
+
+using namespace parse_prot;
 
 void SwapShort(short *word1, short *word2)
 {
@@ -46,7 +47,7 @@ __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 		Charts.push_back(ChartBrightMv);  Charts.push_back(ChartSizeMv);
 		Charts.push_back(ChartBrightSize); Charts.push_back(ChartBrightSp);
 
-		for (int i = 0; i < Charts.size(); i++) {
+		for (unsigned int i = 0; i < Charts.size(); i++) {
 			Charts[i]->OnMouseWheel = &ChartMouseWheel;
 			Charts[i]->OnMouseDown = &ChartMouseDown;
 		}
@@ -87,7 +88,7 @@ void TFormGraphOrient::CheckTabSheet()
 
 void TFormGraphOrient::DeleteLineGraph()
 {
-	for (int i = 0; i < Charts.size(); i ++)
+	for (unsigned int i = 0; i < Charts.size(); i ++)
 	{
 		plotter->ClearChart(Charts[i]);
 	}
@@ -95,7 +96,7 @@ void TFormGraphOrient::DeleteLineGraph()
 
 void TFormGraphOrient::InitializeSynchronization()
 {
-	for (int i = 0; i < Charts.size(); i ++) {
+	for (unsigned int i = 0; i < Charts.size(); i ++) {
 		TColorLineTool* LineTool = new TColorLineTool(Charts[i]);
 		LineTool->Axis = Charts[i]->Axes->Bottom;
 		LineTool->AllowDrag = false;
@@ -117,9 +118,9 @@ void __fastcall TFormGraphOrient::MenuSaveClick(TObject *Sender)
 {
 	UnicodeString ScreenFolderName = "\\" + FormatDateTime("yyyy-mm-dd hh.mm.ss", Now()) + " " + "Cкриншоты\\";
 	TDirectory::CreateDirectoryW(GetCurrentDir() + ScreenFolderName);
-	for (int i = 0; i < Charts.size(); i ++)
+	for (unsigned int i = 0; i < Charts.size(); i ++)
 	{
-		UnicodeString Title = IntToStr(i + 1) + " - " + Charts[i]->Title->Text->Text;
+		UnicodeString Title = IntToStr(int(i + 1)) + " - " + Charts[i]->Title->Text->Text;
 		if (AnsiContainsStr(Title, ","))
 		{
 			Title = LeftStr(Title, PosEx(",", Title, 1) - 1);
@@ -340,7 +341,7 @@ void DrawOneScroll(double _Time, TChart *_Chart, TLineSeries *_Series)
 
 void TFormGraphOrient::SynchronizeCharts(double Value)
 {
-	for (int i = 0; i < Charts.size(); i++) {
+	for (unsigned int i = 0; i < Charts.size(); i++) {
 	   TColorLineTool* LineTool = dynamic_cast <TColorLineTool*> (Charts[i]->Tools->First());
 	   LineTool->Value = Value;
 	}
@@ -349,7 +350,6 @@ void TFormGraphOrient::SynchronizeCharts(double Value)
 void TFormGraphOrient::DrawBlock(const struct CadrInfo &mCadr)
 {
 	unsigned short CountLines, CountBlock, TabTakeAway[MaxBlockSeries][2];
-	unsigned short Border = 10;
 
 	Chart1->LeftAxis->Automatic = false;
 	Chart1->LeftAxis->Minimum = 0;
@@ -674,7 +674,7 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 	else SetContrast();
 	if(PixelBrightCheckBox->Checked)
 	{
-		for(int i = 0; i < ImageVector.size(); i ++)
+		for(unsigned int i = 0; i < ImageVector.size(); i ++)
 		{
 			writePixelValue(FragmentVector[i], ImageVector[i]->Picture->Bitmap, ResizeCoef, 5, 7);
 		}
@@ -739,7 +739,7 @@ void __fastcall TFormGraphOrient::FragmentShowScrollBoxResize(TObject *Sender)
 
 void TFormGraphOrient::SetContrast()
 {
-	for(int currentFragment = 0;currentFragment < ImageVector.size();currentFragment ++)
+	for(unsigned int currentFragment = 0;currentFragment < ImageVector.size();currentFragment ++)
 	{
 	   unique_ptr<TBitmap> Fragment(changeContrast(Contrast, FragmentVector[currentFragment]));
 	   ImageVector[currentFragment]->Picture->Bitmap->FreeImage();
@@ -842,7 +842,7 @@ void __fastcall TFormGraphOrient::PixelBrightCheckBoxClick(TObject *Sender)
 {
 	if(PixelBrightCheckBox->Checked)
 	{
-		for(int i = 0; i < ImageVector.size(); i ++)
+		for(unsigned int i = 0; i < ImageVector.size(); i ++)
 		{
 			writePixelValue(FragmentVector[i], ImageVector[i]->Picture->Bitmap, ResizeCoef, 2 , FontSize);
 		}
@@ -1159,7 +1159,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 		vCadrInfo.clear();
 		FileName = OpenDialog->FileName;
 		SetCurrentDir(ExtractFileDir(FileName));
-		GetFileTitles(FileName,&FileTitle);
+		GetFileTitles(FileName, &FileTitle);
 
 		if(SortFileCheckBox->Checked)
 		{
@@ -1643,612 +1643,75 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 
 
 
+void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
+{
+	struct DTMI_BOKZM tmi;
+	const DTMISize = 290;
+	unsigned short ArrayDTMI[DTMISize];
+
+    OpenDialog->Options.Clear();
+	OpenDialog->Filter = "txt|*.txt";
+	if (OpenDialog->Execute()) {
+
+		vCadrInfo.clear();
+		DeleteLineGraph();
+
+		FileName = OpenDialog->FileName;
+		SetCurrentDir(ExtractFileDir(FileName));
+		GetFileTitles(FileName,&FileTitle);
+
+		ifstream finp(FileName.c_str());
+		if (!finp.is_open()) {
+			ShowMessage("Файл не может быть открыт!");
+			return;
+		}
+
+		ofstream fout((FileTitle+"_decode.txt").c_str());
+
+		string line, word1, word2, word3;
+		unsigned short hex_val, dec_val;
+		int cntRecDTMI = 0, ind;
+		while (!finp.eof())
+		{
+			getline(finp, line, '\n' );
+			if (line.find("ТМОС") != string::npos) {
+				struct CadrInfo mCadr;
+
+				for (int i = 0; i < DTMISize; i++) {
+					finp >> word1 >> word2 >> dec_val;
+					sscanf(word1.c_str(),"[%d]", &ind);
+					sscanf(word2.c_str(),"0X%x", &hex_val);
+					if (i == ind && hex_val == dec_val) {
+						ArrayDTMI[i] = hex_val;
+					}
+				}
+				memcpy(&tmi.timeBOKZ, &ArrayDTMI[2], 30 * sizeof(short));
+				memcpy(&tmi.LocalList[2][0], &ArrayDTMI[36], 28 * sizeof(short));
+				memcpy(&tmi.LocalList[5][2], &ArrayDTMI[68], 28 * sizeof(short));
+				memcpy(&tmi.LocalList[9][0], &ArrayDTMI[100],28 * sizeof(short));
+				memcpy(&tmi.LocalList[12][2], &ArrayDTMI[132],28 * sizeof(short));
+				memcpy(&tmi.LocalList[16][0], &ArrayDTMI[164],28 * sizeof(short));
+				memcpy(&tmi.LocalList[19][2], &ArrayDTMI[196],28 * sizeof(short));
+				memcpy(&tmi.LocalList[23][0], &ArrayDTMI[228],28 * sizeof(short));
+				memcpy(&tmi.LocalList[26][2], &ArrayDTMI[260],28 * sizeof(short));
+				fout << "\n" << line << "\n";
+
+				PrintDTMI_BOKZM(fout, tmi);
+				ConvertDataDTMI_BOKZM(tmi, mCadr);
+				vCadrInfo.push_back(mCadr);
+			}
+		}
+		finp.close();
+		fout.close();
+
+		PrepareStartDraw();
+		CheckTabSheet();
+	}
+}
 
 
  //---------------------------------------------------------------------------
-#define MAX_STAT 	   16
-#define MAX_OBJ_DTMI   15
-#define MAX_OBJ_MLOC   32
-#define MAX_OBJ_BOKZM  30
-#define MAX_WINDOW 	   16
 
-struct SHTMI1
-{
-	string timeBOKZ;
-	unsigned short status1, status2, post;
-	int serialNumber;
-	float Foc, Xg, Yg;
-	unsigned short timeExp, Mean, Sigma, countDefect;
-    unsigned short CRC, Date, Version;
-} mSHTMI1;
-
-struct SHTMI2
-{
-	string timeBOKZ;
-	unsigned short status1, status2, post;
-	int serialNumber, timeExp;
-	int cntCommandWord, cntCallNO, cntNOtoSLEZH;
-	int cntCallTO, cntTOtoSLEZH, cntSLEZH;
-	int cntStatOrient[MAX_STAT];
-} mSHTMI2;
-
-struct DTMI
-{
-	string timeBOKZ;
-	unsigned short status1, status2;
-	unsigned short serialNumber, timeExp;
-	unsigned short nLocalObj, nDeterObj, nWindows, epsillon;
-	float dTimeBOKZ, LocalList[MAX_OBJ_DTMI][4];
-	float quatBoard[4], omega[3], centrWindow[MAX_WINDOW][2];
-	unsigned short levelWindow[MAX_WINDOW], nObjectWindow[MAX_WINDOW];
-	unsigned long timeQuatLast;
-	float quatLast[4], Epoch;
-	unsigned short nLocal[2], maxHist;
-	unsigned short maxHistX, maxHistY;
-	unsigned short test_short, Reserved[10];
-} mDTMI;
-
-struct LOC
-{
-	string timeBOKZ;
-	unsigned short status1, status2;
-	unsigned short serialNumber, timeExp;
-	unsigned short nLocalObj, nFixedObj;
-	float MeanC, SigmaC;
-	float LocalList[32][4];
-	unsigned short Reserved[2];
-} mLOC;
-
-string arrStatErrorEng[MAX_STAT]={{"EC1"},{"EC2"},{"EC3"},{"EC4"},
-							{"EC5"},{"EC6"},{"EC7"},{"EC8"},
-							{"EC9"},{"EC10"},{"EC11"},{"EC12"},
-							{"EC13"},{"EC14"},{"EC15"},{"EC16"}};
-string arrStatErrorRus[MAX_STAT]={{"ЕС1"},{"ЕС2"},{"ЕС3"},{"ЕС4"},
-							{"ЕС5"},{"ЕС6"},{"ЕС7"},{"ЕС8"},
-							{"ЕС9"},{"ЕС10"},{"ЕС11"},{"ЕС12"},
-							{"ЕС13"},{"ЕС14"},{"ЕС15"},{"ЕС16"}};
-
-unsigned int ReadBinaryString(string binaryString)
-{
-string test_str;
-double sum=0;
-
-	for (int k=0; k<binaryString.length(); k++)
-	{
-		test_str=binaryString[binaryString.length()-k-1];
-		sum+=pow(2.,k)*atoi(test_str.c_str());
-	}
-	return (unsigned int)sum;
-}
-
-int TryReadSHTMI1(ifstream &finp, struct SHTMI1 &tmi)
-{
-string line, word;
-
-		while (!finp.eof()){
-			finp>>word;
-			if ((word=="КС1")||(word=="KC1")) {
-				finp>>word;
-				tmi.status1=ReadBinaryString(word);
-			}
-			else if ((word=="КС2")||(word=="KC2")) {
-				finp>>word;
-				tmi.status2=ReadBinaryString(word);
-			}
-			else if ((word=="СЕР")||(word=="CEP")) {
-				finp>>word;
-				if ((word=="НОМ")||(word=="HOM")) {
-					finp>>tmi.serialNumber;
-				}
-			}
-			else if ((word=="ПОСТ")||(word=="ПOCT")) {
-				finp>>word;
-				tmi.post=ReadBinaryString(word);
-			}
-			else if ((word=="T")||(word=="Т")) {
-				finp>>word;
-				if (word=="ЭКСП") finp>>tmi.timeExp;
-				else tmi.timeBOKZ=word;//finp>>tmi.timeBOKZ;
-			}
-			else if (word=="ФOK") finp>>tmi.Foc;
-			else if (word=="Х0") finp>>tmi.Xg;
-			else if (word=="У0") finp>>tmi.Yg;
-			else if ((word=="МТ")||(word=="MT")) finp>>tmi.Mean;
-			else if ((word=="СТ")||(word=="CT")) finp>>tmi.Sigma;
-			else if ((word=="НАМ")||(word=="HAM")) {
-				finp>>word;
-				if ((word=="ДЕФ")||(word=="ДEФ")) finp>>tmi.countDefect;
-			}
-			else if (word=="ХСФ") finp>>tmi.CRC;
-			else if (word=="ДАТА") finp>>tmi.Date;
-			else if (word=="ВЕРСИЯ") {
-				finp>>tmi.Version;
-				return 1;
-			}
-			getline(finp, line, '\n' );
-		}
-		return 0;
-}
-
-int TryReadSHTMI2(ifstream &finp, struct SHTMI2 &tmi)
-{
-string line, word;
-
-		while (!finp.eof()){
-			finp>>word;
-			if ((word=="КС1")||(word=="KC1")) {
-				finp>>word;
-				tmi.status1=ReadBinaryString(word);
-			}
-			else if ((word=="КС2")||(word=="KC2")) {
-				finp>>word;
-				tmi.status2=ReadBinaryString(word);
-			}
-			else if ((word=="СЕР")||(word=="CEP")) {
-				finp>>word;
-				if ((word=="НОМ")||(word=="HOM")) {
-					finp>>tmi.serialNumber;
-				}
-			}
-			else if ((word=="ПОСТ")||(word=="ПOCT")) {
-				finp>>word;
-				tmi.post=ReadBinaryString(word);
-			}
-			else if ((word=="T")||(word=="Т")) {
-				finp>>word;
-				if (word=="ЭКСП") finp>>tmi.timeExp;
-				else finp>>tmi.timeBOKZ;    //ReadTimeBOKZ(word)
-			}
-			else if (word=="НАМ") {
-            	finp>>word;
-				if (word=="УСД") finp>>tmi.cntCommandWord;
-            }
-			else if ((word=="ЧИСЛ")||(word=="ЧИСЛО")) {
-				finp>>word;
-				if ((word=="НО")||(word=="HO")) {
-					finp>>tmi.cntCallNO;
-				}
-				else if (word=="НОСЛ") {
-					finp>>tmi.cntNOtoSLEZH;
-				}
-				if ((word=="TO")||(word=="ТО")) {
-					finp>>tmi.cntCallTO;
-				}
-				else if (word=="ТОСЛ") {
-					finp>>tmi.cntTOtoSLEZH;
-				}
-				else if (word=="СЛЕЖ") {
-					finp>>tmi.cntSLEZH;
-                    tmi.cntSLEZH*=2;
-				}
-			}
-			else
-			{
-				int i=0, fl_find=0;
-				while ((i < MAX_STAT)&&(!fl_find))
-				{
-					if ((word==arrStatErrorRus[i])||(word==arrStatErrorEng[i])) {
-						finp>>tmi.cntStatOrient[i];
-						fl_find=1;
-					}
-					i++;
-				}
-			}
-			if ((word == arrStatErrorRus[MAX_STAT-1]) || (word == arrStatErrorEng[MAX_STAT-1])) {
-				return 1;
-			}
-			getline(finp, line, '\n' );
-		}
-		return 0;
-}
-
-int TryReadDTMI(ifstream &finp, struct DTMI &tmi)
-{
-		string line, word, inpstr, test_word, test_str;
-		int indexObject=0,indexParam=0, intVal, flLow=1;
-		float fl1, fl2, fl3, sum;
-		int Stat1, Stat2;
-		float mday, mhour, mmin, msec;
-
-		while (!finp.eof()){
-			finp>>word;
-			if ((word=="КС1")||(word=="KC1")) {
-				finp>>word;
-				tmi.status1=ReadBinaryString(word);
-			}
-			else if ((word=="КС2")||(word=="KC2")) {
-				finp>>word;
-				tmi.status2=ReadBinaryString(word);
-			}
-			else if ((word=="СЕР")||(word=="CEP")) {
-				finp>>word;
-				if ((word=="НОМ")||(word=="HOM")) {
-					finp>>tmi.serialNumber;
-				}
-			}
-			else if ((word == "HAM") || (word == "НАМ") || (word == "НАM")) {
-				finp>>word;
-				if ((word=="ЛОК") || (word == "ЛOК")) {
-					finp>>tmi.nLocalObj;
-				}
-				else if ((word=="ОБЖ") || (word=="OБЖ")) {
-					finp>>tmi.nDeterObj;
-				}
-				else if (word=="ФРАГ") {
-					finp>>tmi.nWindows;
-				}
-			}
-			else if (word=="ЭПСИЛОН") finp>>tmi.epsillon;
-			else if (word=="ДЕЛЬТА") {
-				finp>>word;
-				if ((word=="T")||(word=="Т")) finp>>tmi.dTimeBOKZ;
-			}
-			else if ((word=="T")||(word=="Т")) {
-				finp>>word;
-				if (word=="ЭКСП") finp>>tmi.timeExp;
-				else if (word=="ПХОК") {
-					getline(finp, line, '\n' );
-
-					if (sscanf(line.c_str()," %f/ %f:%f:%f", &mday, &mhour, &mmin, &msec)==4)
-						tmi.timeQuatLast=mday*86400+mhour*3600+mmin*60+msec;
-						tmi.timeQuatLast*=8;
-//					finp>>tmi.timeQuatLast;
-				}
-				else finp>>tmi.timeBOKZ;
-			}
-			else if (word=="ЛОК") {
-				getline(finp, line, '\n' );
-				int nread=sscanf(line.c_str(),"%f%f%f", &fl1, &fl2, &fl3);
-				if (nread==3) {
-					indexObject=(short)fl1;
-					indexParam =(short)fl2;
-					tmi.LocalList[indexObject][indexParam]=fl3;
-				}
-				else if (nread==2) {
-					indexObject=(short)(fl1/10.);
-					indexParam =(short)fl1%10;
-					tmi.LocalList[indexObject][indexParam]=fl2;
-				}
-			}
-			else  if (word=="ОМЕГАО") {
-				finp>>indexParam;
-				if ((indexParam>=0)&&(indexParam<3)) {
-					finp>>tmi.omega[indexParam];
-				}
-			}
-			else  if ((word=="XYC")||(word=="ХУС")) {
-				getline(finp, line, '\n' );
-				int nread=sscanf(line.c_str(),"%f%f%f", &fl1, &fl2, &fl3);
-				if (nread==3) {
-					indexObject=(short)fl1;
-					indexParam =(short)fl2;
-					tmi.centrWindow[indexObject][indexParam]=fl3;
-				}
-				else if (nread==2) {
-					indexObject=(short)(fl1/10.);
-					indexParam =(short)fl1%10;
-					tmi.centrWindow[indexObject][indexParam]=fl2;
-				}
-			}
-			else  if (word=="ТНФРАГ") {
-				finp>>indexObject;
-				if ((indexObject>=0)&&(indexObject<MAX_WINDOW)) {
-					finp>>tmi.levelWindow[indexObject];
-				}
-			}
-			else  if (word=="ОБЖФРАГ") {
-				finp>>indexObject;
-				if ((indexObject>=0)&&(indexObject<MAX_WINDOW)) {
-					finp>>tmi.nObjectWindow[indexObject];
-				}
-			}
-			else  if (word=="ПХОК") {
-				finp>>indexParam;
-				if ((indexParam>=0)&&(indexParam<4)) {
-					finp>>tmi.quatLast[indexParam];
-				}
-			}
-			else if (word=="ЭПОХА") {
-			int test_int;
-			float test_float;
-				finp>>test_int;
-				test_float=*(float*)&test_int;
-				tmi.Epoch=test_float;
-			}
-			else  if (word=="НУМЛ") {
-				finp>>indexParam;
-				if ((indexParam>=0)&&(indexParam<2)) {
-					finp>>tmi.nLocal[indexParam];
-				}
-			}
-			else if ((word=="MAXH")||(word=="МАХН") || (word == "МАХН")) {
-				finp>>tmi.maxHist;
-			}
-			else if ((word=="ДХМАХН") || (word=="ДХМАХН")) {
-				finp>>tmi.maxHistX;
-			}
-			else if ((word=="ДУМАХН") || (word=="ДУМАХН")) {
-				finp>>tmi.maxHistY;
-				return 1;
-			}
-//			else if ((word=="ДТМИ1")||(word=="ШТМИ1")||(word=="ШТМИ2"))
-//				return 0;
-		}
-		return 0;
-}
-
-void PrintSHTMI1(ofstream &file, struct SHTMI1 tmi)
-{
-	file<<"____________________________________"<<"\n";
-	file<<"Массив ШТМИ1"<<"\n";
-	file<<"Tpr\t"<<tmi.timeBOKZ<<"\n";
-	file<<uppercase<<hex<<setfill('0');
-	file<<"КС1:\t"<<"0x"<<setw(4)<<tmi.status1<<"\n";
-	file<<"КС2:\t"<<"0x"<<setw(4)<<tmi.status2<<"\n";
-	file<<"POST:\t"<<"0x"<<setw(4)<<tmi.post<<"\n";
-	file<<dec<<setfill(' ');
-	file<<"Зав. №\t"<<tmi.serialNumber<<"\n";
-	file<<"Texp, мс:\t"<<tmi.timeExp<<"\n";
-	file<<"Foc, мм:\t"<<tmi.Foc<<"\n";
-	file<<"X0, мм:\t"<<tmi.Xg<<"\n";
-	file<<"Y0, мм:\t"<<tmi.Yg<<"\n";
-	file<<"Среднее, е.м.р.:\t"<<tmi.Mean<<"\n";
-	file<<"СКО, е.м.р.:\t"<<tmi.Sigma<<"\n";
-	file<<"Число дефектов:\t"<<tmi.countDefect<<"\n";
-	file<<"Идентификатор:\t"<<tmi.CRC<<"\n";
-	file<<"Дата:\t"<<tmi.Date<<"\n";
-	file<<"Версия:\t"<<tmi.Version<<"\n";
-	file<<"____________________________________"<<"\n";
-	file<<flush;
-}
-
-void PrintSHTMI2(ofstream &file, struct SHTMI2 tmi)
-{
-	file<<"____________________________________"<<"\n";
-	file<<"Массив ШТМИ2"<<"\n";
-	file<<"Tpr\t"<<tmi.timeBOKZ<<"\n";
-	file<<uppercase<<hex<<setfill('0');
-	file<<"КС1:\t"<<"0x"<<setw(4)<<tmi.status1<<"\n";
-	file<<"КС2:\t"<<"0x"<<setw(4)<<tmi.status2<<"\n";
-	file<<"POST:\t"<<"0x"<<setw(4)<<tmi.post<<"\n";
-	file<<dec<<setfill(' ');
-	file<<"Зав. №\t"<<tmi.serialNumber<<"\n";
-	file<<"Texp, мс:\t"<<tmi.timeExp<<"\n";
-	file<<"Число УСД:\t"<<tmi.cntCommandWord<<"\n";
-	file<<"Число НО:\t"<<tmi.cntCallNO<<"\n";
-	file<<"НО->СЛЕЖ:\t"<<tmi.cntNOtoSLEZH<<"\n";
-	file<<"Число TО:\t"<<tmi.cntCallTO<<"\n";
-	file<<"TО->СЛЕЖ:\t"<<tmi.cntTOtoSLEZH<<"\n";
-	file<<"Число СЛЕЖ:\t"<<tmi.cntSLEZH<<"\n";
-
-	for (int i = 0; i < MAX_STAT; i++) {
-		file<<"Счетчик № "<<(i+1)<<":\t"<<tmi.cntStatOrient[i]<<"\n";
-	}
-	file<<"____________________________________"<<"\n";
-	file<<flush;
-}
-
-void PrintDTMI(ofstream &file, struct DTMI tmi)
-{
-	file<<"____________________________________"<<"\n";
-	file<<"Массив ДТМИ"<<"\n";
-	file<<"Tpr\t"<<tmi.timeBOKZ<<"\n";
-	file<<uppercase<<hex<<setfill('0');
-	file<<"КС1\t"<<"0x"<<setw(4)<<tmi.status1<<"\n";
-	file<<"КС2\t"<<"0x"<<setw(4)<<tmi.status2<<"\n";
-	file<<dec<<setfill(' ');
-	file<<"Зав. №\t"<<tmi.serialNumber<<"\n";
-	file<<"Texp, мс:\t"<<tmi.timeExp<<"\n";
-	file<<"NumLoc: \t"<<tmi.nLocalObj<<"\n";
-	file<<"NumDet: \t"<<tmi.nDeterObj<<"\n";
-	file<<"NumFrag:\t"<<tmi.nWindows<<"\n";
-	file<<"EPSILON:\t"<<tmi.epsillon<<"\n";
-	file<<"DeltaT:\t"<<tmi.dTimeBOKZ<<"\n";
-	file<<setw(6)<<"№"<<" X, pix"<<" Y, pix"<<" Bright"<<" Nel"<<"\n";
-	for (int i = 0; i < MAX_OBJ_DTMI; i++) {
-		file<<setw(6)<<(i+1)<<"\t";
-		file<<tmi.LocalList[i][0]<<"\t"<<tmi.LocalList[i][1]<<"\t";
-		file<<tmi.LocalList[i][2]<<"\t"<<tmi.LocalList[i][3]<<"\n";
-	}
-	file<<setw(6)<<"№"<<" X, pix"<<" Y, pix"<<"\n";
-	for (int i = 0; i < MAX_WINDOW; i++) {
-		file<<setw(6)<<(i+1)<<"\t";
-		file<<tmi.centrWindow[i][0]<<"\t"<<tmi.centrWindow[i][1]<<"\t";
-		file<<tmi.levelWindow[i]<<"\t"<<tmi.nObjectWindow[i]<<"\n";
-	}
-
-	for (int i = 0; i < 3; i++) {
-		file<<"Wop["<<i<<"]:\t"<<tmi.omega[i]<<"\n";
-	}
-
-	file<<"Tlst:\t"<<tmi.timeQuatLast<<"\n";
-	for (int i = 0; i < 4; i++) {
-		file<<"Qlst["<<i<<"]:\t"<<tmi.quatLast[i]<<"\n";
-	}
-	file<<"NumLoc[0]: \t"<<tmi.nLocal[0]<<"\n";
-	file<<"NumLoc[1]: \t"<<tmi.nLocal[1]<<"\n";
-	file<<"Эпоха: \t"<<tmi.Epoch<<"\n";
-	file<<"MaxHist: \t"<<tmi.maxHist<<"\n";
-	file<<"MaxHistX: \t"<<tmi.maxHistX<<"\n";
-	file<<"MaxHistY: \t"<<tmi.maxHistY<<"\n";
-	file<<"____________________________________"<<"\n";
-	file<<flush;
-}
-
-void PrintLOC(ofstream &file, struct LOC tmi)
-{
-	file<<"____________________________________"<<"\n";
-	file<<"Массив МЛОК"<<"\n";
-	file<<"Tpr\t"<<tmi.timeBOKZ<<"\n";
-	file<<uppercase<<hex<<setfill('0');
-	file<<"КС1\t"<<"0x"<<setw(4)<<tmi.status1<<"\n";
-	file<<"КС2\t"<<"0x"<<setw(4)<<tmi.status2<<"\n";
-	file<<dec<<setfill(' ');
-	file<<"Зав. №\t"<<tmi.serialNumber<<"\n";
-	file<<"Texp, мс:\t"<<tmi.timeExp<<"\n";
-	file<<"NumLoc: \t"<<tmi.nLocalObj<<"\n";
-	file<<"NumFix: \t"<<tmi.nFixedObj<<"\n";
-	file<<"MeanC:\t"<<tmi.MeanC<<"\n";
-	file<<"SigmaC:\t"<<tmi.SigmaC<<"\n";
-	file<<setw(6)<<"№"<<" X, pix"<<" Y, pix"<<" Bright"<<" Nel"<<"\n";
-	for (int i = 0; i < 32; i++) {
-		file<<setw(6)<<(i+1)<<"\t";
-		file<<tmi.LocalList[i][0]<<"\t"<<tmi.LocalList[i][1]<<"\t";
-		file<<tmi.LocalList[i][2]<<"\t"<<tmi.LocalList[i][3]<<"\n";
-	}
-
-	file<<"____________________________________"<<"\n";
-	file<<flush;
-}
-
-void PrintLocalDTMI(struct DTMI tmi)
-{
-	AnsiString fileName;
-
-	fileName.printf("BOKZ_№%d_%s", tmi.serialNumber, (tmi.timeBOKZ).c_str());
-	fileName+="_DTMI_LOC.txt";
-
-	for (int i = 1; i < fileName.Length()+1; i++) {
-		if ((fileName[i]==':')||(fileName[i]==';')||(fileName[i]=='?')
-			||(fileName[i]=='>')||(fileName[i]=='<')||(fileName[i]=='=')
-			||(fileName[i]=='/')||(fileName[i]=='\\')) {
-			fileName[i]='_';
-		}
-	}
-
-	ofstream file(fileName.c_str());
-	file<<setw(6)<<"№"<<" X, pix"<<" Y, pix"<<" Bright"<<" Nel"<<"\n";
-
-	int cntLocal;
-	if (tmi.nLocalObj<MAX_OBJ_DTMI) cntLocal=tmi.nLocalObj;
-	else cntLocal=MAX_OBJ_DTMI;
-	for (int i = 0; i < cntLocal; i++) {
-		file<<setw(6)<<(i+1)<<"\t";
-		file<<tmi.LocalList[i][0]<<"\t"<<tmi.LocalList[i][1]<<"\t";
-		file<<tmi.LocalList[i][2]<<"\t"<<tmi.LocalList[i][3]<<"\n";
-	}
-	file.close();
-}
-void PrintLocalMLOC(struct LOC tmi)
-{
-	AnsiString fileName;
-
-	fileName.printf("BOKZ_№%d_%s", tmi.serialNumber, (tmi.timeBOKZ).c_str());
-	fileName+="_MLOC_LOC.txt";
-
-	for (int i = 1; i < fileName.Length()+1; i++) {
-		if ((fileName[i]==':')||(fileName[i]==';')||(fileName[i]=='?')
-			||(fileName[i]=='>')||(fileName[i]=='<')||(fileName[i]=='=')
-			||(fileName[i]=='/')||(fileName[i]=='\\')) {
-			fileName[i]='_';
-		}
-	}
-
-	ofstream file(fileName.c_str());
-
-	file<<setw(6)<<"№"<<" X, pix"<<" Y, pix"<<" Bright"<<" Nel"<<"\n";
-	int cntLocal;
-	if (tmi.nFixedObj<MAX_OBJ_MLOC) cntLocal=tmi.nFixedObj;
-	else cntLocal=MAX_OBJ_MLOC;
-	for (int i = 0; i < cntLocal; i++) {
-		file<<setw(6)<<(i+1)<<"\t";
-		file<<tmi.LocalList[i][0]<<"\t"<<tmi.LocalList[i][1]<<"\t";
-		file<<tmi.LocalList[i][2]<<"\t"<<tmi.LocalList[i][3]<<"\n";
-	}
-	file.close();
-}
-
-void ConvertDataDTMI(struct DTMI tmi, struct CadrInfo &mCadr)
-{
-	mCadr.IsBinary=true;
-//	mCadr.IsReverse=true;
-	mCadr.ImageHeight=256;
-	mCadr.ImageWidth=256;
-//	mCadr.Time=data.Tpr_sec+data.Tpr_msec/1000.;
-
-	mCadr.CountDeterObj = tmi.nDeterObj;
-	mCadr.CountWindows  = tmi.nWindows;
-	mCadr.CountLocalObj = tmi.nLocalObj;
-
-	if (tmi.nLocalObj<MAX_OBJ_DTMI) mCadr.SizeObjectsList=tmi.nLocalObj;
-	else mCadr.SizeObjectsList=MAX_OBJ_DTMI;
-
-	ObjectsInfo objInfo;
-	for (int i = 0; i < mCadr.SizeObjectsList; i++) {
-		objInfo.X = tmi.LocalList[i][0];
-		objInfo.Y = tmi.LocalList[i][1];
-		objInfo.Bright = tmi.LocalList[i][2];
-		objInfo.Square = tmi.LocalList[i][3];
-		objInfo.Dx = 0;
-		objInfo.Dy = 0;
-		objInfo.StarID = 0;
-		objInfo.Mv = 0;
-		objInfo.Sp[0] = '_';
-		objInfo.Sp[1] = '_';
-		mCadr.ObjectsList.push_back(objInfo);
-	}
-
-	if (tmi.nWindows < MAX_WINDOW) {
-		mCadr.SizeWindowsList = tmi.nWindows;
-		mCadr.SizeStarsList = tmi.nWindows;
-	}
-	else {
-		mCadr.SizeWindowsList = MAX_WINDOW;
-		mCadr.SizeStarsList =  MAX_WINDOW;
-	}
-
-	WindowsInfo winInfo;
-	StarsInfo starList;
-	for (int i = 0; i < mCadr.SizeWindowsList; i++) {
-		winInfo.Level = tmi.levelWindow[i];
-		winInfo.CountObj = tmi.nObjectWindow[i];
-		winInfo.Width = 17;
-		winInfo.Height = 17;
-		winInfo.Xstart = tmi.centrWindow[i][0]-(winInfo.Width>>1);
-		winInfo.Ystart = tmi.centrWindow[i][1]-(winInfo.Height>>1);
-		mCadr.WindowsList.push_back(winInfo);
-
-		starList.X = tmi.centrWindow[i][0];
-		starList.Y = tmi.centrWindow[i][1];
-	}
-
-	mCadr.CountBlock = 0;
-	mCadr.CountStars = 0;
-}
-
-void ConvertDataLOC(struct LOC tmi, struct CadrInfo &mCadr)
-{
-	mCadr.IsBinary = true;
-//	mCadr.IsReverse=true;
-	mCadr.ImageHeight = 256;
-	mCadr.ImageWidth = 256;
-//	mCadr.Time=data.Tpr_sec+data.Tpr_msec/1000.;
-	mCadr.CountLocalObj=tmi.nLocalObj;
-
-	if (tmi.nLocalObj<MAX_OBJ_MLOC) mCadr.SizeObjectsList=tmi.nLocalObj;
-	else mCadr.SizeObjectsList=MAX_OBJ_MLOC;
-
-	ObjectsInfo objInfo;
-	for (int i=0; i < mCadr.SizeObjectsList; i++) {
-		objInfo.X = tmi.LocalList[i][0];
-		objInfo.Y = tmi.LocalList[i][1];
-		objInfo.Bright = tmi.LocalList[i][2];
-		objInfo.Square = tmi.LocalList[i][3];
-		objInfo.Dx = 0;
-		objInfo.Dy = 0;
-		objInfo.StarID = 0;
-		objInfo.Mv = 0;
-		objInfo.Sp[0] = '_';
-		objInfo.Sp[1] = '_';
-		mCadr.ObjectsList.push_back(objInfo);
-	}
-	mCadr.CountBlock = 0;
-	mCadr.CountWindows = 0;
-	mCadr.SizeWindowsList = 0;
-	mCadr.CountDeterObj = 0;
-	mCadr.CountStars = 0;
-	mCadr.SizeStarsList = 0;
-}
 
 void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 {
@@ -2290,6 +1753,12 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 
 		string line;
 		int cntRecDTMI = 0;
+
+		SHTMI1 mSHTMI1;
+		SHTMI2 mSHTMI2;
+		DTMI mDTMI;
+		LOC mLOC;
+
 		while (!finp.eof())
 		{
 			getline(finp, line, '\n' );
@@ -2316,7 +1785,7 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 					fshtmi1<<"\n";
 				}
 			}
-			else if (line.find("ШТМИ2")!=string::npos) {
+			else if (line.find("ШТМИ2") != string::npos) {
 				if(TryReadSHTMI2(finp,mSHTMI2)) {
 					PrintSHTMI2(fout,mSHTMI2);
 					fshtmi2<<uppercase<<hex<<setfill('0');
@@ -2340,7 +1809,7 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 			}
 			else if (line.find("ДТМИ1")!=string::npos) {
 
-				if (TryReadDTMI(finp,mDTMI)) {
+				if (TryReadDTMI(finp, mDTMI)) {
 					struct CadrInfo mCadr;
 
 					if (mDTMI.status2 == 0x0005) {
@@ -2384,489 +1853,6 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 	}
 }
 
-struct DTMI_BOKZM {
-	float timeBOKZ;
-	unsigned short status1, status2;
-	unsigned short serialNumber;
-	float foc, X0, Y0;
-	unsigned short timeExp;
-	unsigned short nLocalObj, nDeterObj;
-	float LocalList[MAX_OBJ_BOKZM][4];
-};
-
-void ConvertDataDTMI_BOKZM(struct DTMI_BOKZM tmi, struct CadrInfo &mCadr)
-{
-	mCadr.IsBinary = true;
-//	mCadr.IsReverse=true;
-	mCadr.ImageHeight = 512;
-	mCadr.ImageWidth = 512;
-//	mCadr.Time=data.Tpr_sec+data.Tpr_msec/1000.;
-	mCadr.CountLocalObj = tmi.nLocalObj;
-
-	if (tmi.nLocalObj < MAX_OBJ_BOKZM) mCadr.SizeObjectsList = tmi.nLocalObj;
-	else mCadr.SizeObjectsList = MAX_OBJ_BOKZM;
-
-	ObjectsInfo objInfo;
-	for (int i = 0; i < mCadr.SizeObjectsList; i++) {
-		objInfo.X = tmi.LocalList[i][0];
-		objInfo.Y = tmi.LocalList[i][1];
-		objInfo.Bright = tmi.LocalList[i][2];
-		objInfo.Square = tmi.LocalList[i][3];
-		objInfo.Dx = 0;
-		objInfo.Dy = 0;
-		objInfo.StarID = 0;
-		objInfo.Mv = 0;
-		objInfo.Sp[0] = '_';
-		objInfo.Sp[1] = '_';
-		mCadr.ObjectsList.push_back(objInfo);
-	}
-
-	mCadr.CountBlock = 0;
-	mCadr.CountWindows = 0;
-	mCadr.SizeWindowsList = 0;
-	mCadr.CountDeterObj = 0;
-	mCadr.CountStars = 0;
-	mCadr.SizeStarsList = 0;
-}
-
-void PrintDTMI_BOKZM(ofstream &file, struct DTMI_BOKZM tmi)
-{
-	file<<"____________________________________"<<"\n";
-	file<<"Массив ДТМИ"<<"\n";
-	file<<"Tpr\t"<<tmi.timeBOKZ<<"\n";
-	file<<uppercase<<hex<<setfill('0');
-	file<<"КС1\t"<<"0x"<<setw(4)<<tmi.status1<<"\n";
-	file<<"КС2\t"<<"0x"<<setw(4)<<tmi.status2<<"\n";
-	file<<dec<<setfill(' ');
-	file<<"Зав. №\t"<<tmi.serialNumber<<"\n";
-	file<<"Foc, мм:\t"<<tmi.foc<<"\n";
-	file<<"X0, мм:\t"<<tmi.X0<<"\n";
-	file<<"Y0, мм:\t"<<tmi.Y0<<"\n";
-	file<<"Texp, мс:\t"<<tmi.timeExp<<"\n";
-	file<<"NumLoc: \t"<<tmi.nLocalObj<<"\n";
-	file<<"NumFix: \t"<<tmi.nDeterObj<<"\n";
-	file<<setw(6)<<"№"<<" X, pix"<<" Y, pix"<<" Bright"<<" Nel"<<"\n";
-	for (int i = 0; i < MAX_OBJ_BOKZM; i++) {
-		file<<setw(6)<<(i+1)<<"\t";
-		file<<tmi.LocalList[i][0]<<"\t"<<tmi.LocalList[i][1]<<"\t";
-		file<<tmi.LocalList[i][2]<<"\t"<<tmi.LocalList[i][3]<<"\n";
-	}
-	file<<"____________________________________"<<"\n";
-	file<<flush;
-}
-
-unsigned short ArrayDTMI[290];
-void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
-{
-	struct DTMI_BOKZM tmi;
-//	short mDay, mMonth, mYear, mHour, mMin, mSec;
-
-    OpenDialog->Options.Clear();
-	OpenDialog->Filter = "txt|*.txt";
-	if (OpenDialog->Execute()) {
-
-		vCadrInfo.clear();
-		DeleteLineGraph();
-
-		FileName = OpenDialog->FileName;
-		SetCurrentDir(ExtractFileDir(FileName));
-		GetFileTitles(FileName,&FileTitle);
-
-		ifstream finp(FileName.c_str());
-		if (!finp.is_open()) {
-			ShowMessage("Файл не может быть открыт!");
-			return;
-		}
-
-		ofstream fout((FileTitle+"_decode.txt").c_str());
-
-		string line, word1, word2, word3;
-		unsigned short hex_val, dec_val;
-		int cntRecDTMI = 0, ind;
-		while (!finp.eof())
-		{
-			getline(finp, line, '\n' );
-			if (line.find("ТМОС") != string::npos) {
-				struct CadrInfo mCadr;
-
-				//sscanf(line, "ТМОС %d.%d.%d %d:%d:%d ", );
-				for (int i = 0; i < 290; i++) {
-					finp>>word1>>word2>>dec_val;
-					sscanf(word1.c_str(),"[%d]", &ind);
-					sscanf(word2.c_str(),"0X%x", &hex_val);
-					if ((i == ind)&&(hex_val == dec_val)) {
-						ArrayDTMI[i] = hex_val;
-					}
-				}
-				memcpy(&tmi.timeBOKZ, &ArrayDTMI[2], 30*sizeof(short));
-				memcpy(&tmi.LocalList[2][0], &ArrayDTMI[36], 28*sizeof(short));
-				memcpy(&tmi.LocalList[5][2], &ArrayDTMI[68], 28*sizeof(short));
-				memcpy(&tmi.LocalList[9][0], &ArrayDTMI[100],28*sizeof(short));
-				memcpy(&tmi.LocalList[12][2], &ArrayDTMI[132],28*sizeof(short));
-				memcpy(&tmi.LocalList[16][0], &ArrayDTMI[164],28*sizeof(short));
-				memcpy(&tmi.LocalList[19][2], &ArrayDTMI[196],28*sizeof(short));
-				memcpy(&tmi.LocalList[23][0], &ArrayDTMI[228],28*sizeof(short));
-				memcpy(&tmi.LocalList[26][2], &ArrayDTMI[260],28*sizeof(short));
-				fout<<"\n"<<line<<"\n";
-
-				PrintDTMI_BOKZM(fout, tmi);
-				ConvertDataDTMI_BOKZM(tmi, mCadr);
-				vCadrInfo.push_back(mCadr);
-			}
-		}
-		finp.close();
-		fout.close();
-
-		PrepareStartDraw();
-		CheckTabSheet();
-	}
-}
-
-
-
-
-//---------------------------------------------------------------------------
-// проверяем содержит ли протокол режим локализации
-bool checkLocFile(ifstream& in)
-{
-	string line;
-	for(int i = 0; i < 3 ; i++)
-	{
-		getline(in,line);
-	}
-	// проверив, возвращаем указатель на начало файла
-	in.seekg(0);
-
-	if(line.find("Локализация") == string::npos)
-	{
-		return false;
-	}
-	return true;
-}
-
-template <typename Stream>
-size_t findWord(Stream& in,const string& word)
-{
-  string lineToWrite;
-  while(in >> lineToWrite)
-  {
-	if (lineToWrite.find(word) != string::npos)
-	{
-		return  in.tellg() - lineToWrite.size();
-	}
-  }
-
-
-  if(in.fail() && !in.eof())
-  {
-	throw(string("Ошибка считывания файла"));
-  }
-
-  return string::npos;
-}
-
-template <typename Stream>
-size_t findLine(Stream& in,const string& line)
-{
-  string lineToWrite;
-  while(getline(in,lineToWrite))
-  {
-	if (lineToWrite.find(line) != string::npos)
-	{
-		return  in.tellg() - lineToWrite.size();
-	}
-  }
-
-  if(in.fail() && !in.eof())
-  {
-	throw(string("Ошибка считывания файла"));
-  }
-
-  return string::npos;
-}
-
-
-
-vector<string> split(const string& str, const string& delim)
-{
-	vector<string> tokens;
-    size_t prev = 0, pos = 0;
-    do
-    {
-        pos = str.find(delim, prev);
-        if (pos == string::npos) pos = str.length();
-		string token = str.substr(prev, pos-prev);
-        if (!token.empty()) tokens.push_back(token);
-		prev = pos + delim.length();
-    }
-    while (pos < str.length() && prev < str.length());
-
-	return tokens;
-}
-
-
-
-
-
-void TFormGraphOrient::readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
-{
-	string line;
-	string errorMessage = string("Cчитывание протокола завершено необычным образом. "
-				"Возможно работа прибора была остановлена.");
-	while(getline(in,line))
-	{
-		   if(line.find("Состав ДТМИ ЛОК:") != string::npos)
-		   {
-				CadrInfo cadrInfo;
-				cadrInfo.CountBlock = 0;
-				cadrInfo.CountStars = 0;
-				// считываем время привязки
-				if(findWord(in,"информации") != string::npos)
-				{
-					in >> cadrInfo.Time;
-				}
-				else throw logic_error(errorMessage);
-
-				// ищем число локализованных объектов
-				if(findWord(in,"объектов") != string::npos)
-				{
-					in >> cadrInfo.CountLocalObj;
-					plotter->AddPoint(ChartNumLoc, 0,cadrInfo.Time,cadrInfo.CountLocalObj);
-				}
-
-				else throw logic_error(errorMessage);
-
-				  //ищем число распознанных объектов
-				if(findWord(in,"объектов") != string::npos)
-				{
-					in >> cadrInfo.CountDeterObj;
-					plotter->AddPoint(ChartNumDet, 0, cadrInfo.Time,cadrInfo.CountDeterObj);
-				}
-				else throw logic_error(errorMessage);
-
-				// ищем начало массива лок
-				if(findLine(in,"	Х			Y			I			N") != string::npos)
-				{
-					vector<string> splittedLocData;
-					const int сountLocObj = cadrInfo.CountLocalObj;
-					ObjectsInfo objInfo;
-					for(int i = 0 ; i < сountLocObj; i ++)
-					{
-						getline(in,line);
-						// см. эту строку в протоколе, чтобы понять почему так
-						splittedLocData = split(line, ")\t");
-						splittedLocData = split(splittedLocData[1], "\t");
-
-						objInfo.X = atof (splittedLocData[0].c_str());
-						objInfo.Y = atof (splittedLocData[1].c_str());
-						objInfo.Bright = atof (splittedLocData[2].c_str());
-						objInfo.Square = atoi(splittedLocData[3].c_str());
-						objInfo.StarID = 0;
-						objInfo.Mv = 0;
-						objInfo.Sp[0]='_';
-						objInfo.Sp[1]='_';
-						objInfo.Dx = 0;
-						objInfo.Dy = 0;
-
-						cadrInfo.ObjectsList.push_back(objInfo);
-					}
-
-
-				}
-				else throw logic_error(errorMessage);
-
-				cadrInfo.CountBlock = 0;
-				cadrInfo.CountWindows = 0;
-				cadrInfo.CountStars = 0;
-				cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
-                cadrInfo.SizeStarsList = 0;
-
-				cadrInfoVec.push_back(cadrInfo);
-		   }
-
-	}
-}
-
-
-
-
-
-void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
-{
-	string line;
-	string errorMessage = string("Cчитывание протокола завершено необычным образом. "
-				"Возможно работа прибора была остановлена.");
-	while(getline(in,line))
-	{
-
-		if(line.find("и) Ориентация				определена") != string::npos)
-		{
-		   CadrInfo cadrInfo;
-		   // ищем время привязки
-			if(findWord(in,"информации") != string::npos)
-			{
-				in >> cadrInfo.Time;
-			}
-		   else throw logic_error(errorMessage);
-
-
-		   if(findLine(in,"4) Кватернион ориентации, Qо") != string::npos)
-		   {
-
-				for(int i = 0; i < 4; i++)
-				{
-					getline(in,line);
-					vector<string> splittedStr = split(line,"\t\t\t\t\t");
-					cadrInfo.QuatOrient[i] = atof(splittedStr[1].c_str());
-				}
-
-				double matrixOfOrientation [3][3];
-				quatToMatr(cadrInfo.QuatOrient, matrixOfOrientation);
-				double al = 0;
-				double dl = 0;
-				double Az = 0;
-
-				dl = asinm(matrixOfOrientation[2][2]) * RTD;
-				al = atan2m(matrixOfOrientation[2][1], matrixOfOrientation[2][0])*RTD;   if (al < 0)  al += 360.;
-				Az = atan2m(matrixOfOrientation[0][2], matrixOfOrientation[1][2])*RTD;   if (Az < 0)  Az += 360.;
-
-				plotter->AddPoint(ChartAl, 0, cadrInfo.Time, al);
-				plotter->AddPoint(ChartDl, 0, cadrInfo.Time, dl);
-				plotter->AddPoint(ChartAz, 0, cadrInfo.Time, Az);
-
-		   }
-		   else throw logic_error(errorMessage);
-
-
-		   if(findWord(in,"объектов") != string::npos)
-		   {
-				in >> cadrInfo.CountLocalObj;
-				plotter->AddPoint(ChartNumLoc, 0, cadrInfo.Time, cadrInfo.CountLocalObj);
-
-		   }
-		   else throw logic_error(errorMessage);
-
-
-		   //ищем число распознанных объектов
-		   if(findWord(in,"объектов") != string::npos)
-		   {
-				in >> cadrInfo.CountDeterObj;
-				plotter->AddPoint(ChartNumDet, 0, cadrInfo.Time, cadrInfo.CountDeterObj);
-		   }
-		   else throw logic_error(errorMessage);
-
-		   // ищем начало массива лок
-		   if(findLine(in,"	Х			Y			I			N") != string::npos)
-		   {
-				vector<string> splittedLocData;
-				const int сountLocObj = cadrInfo.CountLocalObj;
-				ObjectsInfo objInfo;
-
-				for(int i = 0 ; i < сountLocObj; i ++)
-				{
-						getline(in,line);
-						splittedLocData = split(line,")\t");
-						splittedLocData = split(splittedLocData[1],"\t\t");
-
-						objInfo.X = atof (splittedLocData[0].c_str());
-						objInfo.Y = atof (splittedLocData[1].c_str());
-						objInfo.Bright = atof(splittedLocData[2].c_str());
-						objInfo.Square = atoi(splittedLocData[3].c_str());
-						objInfo.StarID = 0;
-						objInfo.Mv = 0;
-						objInfo.Sp[0]='_';
-						objInfo.Sp[1]='_';
-						objInfo.Dx = 0;
-						objInfo.Dy = 0;
-						cadrInfo.ObjectsList.push_back(objInfo);
-				}
-		   }
-			else throw logic_error(errorMessage);
-
-		   if(findLine(in,"14) Проекции угловой скорости на оси ПСК") != string::npos)
-		   {
-				for(int i = 0; i < 3; i++)
-				{
-					getline(in,line);
-					vector<string> splittedStr = split(line,"\t");
-					cadrInfo.OmegaOrient[i] = atof(splittedStr[1].c_str());
-				}
-				plotter->AddPoint(ChartWx, 0, cadrInfo.Time , cadrInfo.OmegaOrient[0] * RTM);
-				plotter->AddPoint(ChartWy, 0, cadrInfo.Time , cadrInfo.OmegaOrient[1] * RTM);
-				plotter->AddPoint(ChartWz, 0, cadrInfo.Time , cadrInfo.OmegaOrient[2] * RTM);
-
-		   }
-		   else throw logic_error(errorMessage);
-
-
-		   if(findLine(in,"15) Координаты центров фрагментов") != string::npos)
-		   {
-				WindowsInfo winInfo;
-				const int maxCountOfObjects = 16;
-				cadrInfo.CountWindows = maxCountOfObjects;
-				for(int i = 0; i < cadrInfo.CountWindows; i++)
-				{
-					getline(in,line);
-					vector<string> splittedStr = split(line,"\t");
-
-					if(atoi(splittedStr[1].c_str()) == 0)
-					{
-						cadrInfo.CountWindows = i;
-						break;
-					}
-
-					winInfo.Xstart = (atof(splittedStr[1].c_str()));
-					winInfo.Ystart = (atof(splittedStr[2].c_str()));
-					winInfo.Mean = 0;
-					winInfo.Sigma = 0;
-					winInfo.Mv = 0;
-					cadrInfo.WindowsList.push_back(winInfo);
-				}
-				plotter->AddPoint(ChartNumFrag, 0, cadrInfo.Time,cadrInfo.CountWindows);
-
-		   }
-		  else throw logic_error(errorMessage);
-
-
-		   if(findLine(in,"16) Значение порогов во фрагментах") != string::npos)
-		   {
-				for(int i = 0; i < cadrInfo.CountWindows; i++)
-				{
-					getline(in,line);
-					vector<string> splittedStr = split(line,"\t");
-					cadrInfo.WindowsList[i].Level = atoi(splittedStr[1].c_str());
-				}
-
-		   }
-		  else throw logic_error(errorMessage);
-
-		   
-		   if(findLine(in,"17) Количество объектов во фрагментах") != string::npos)
-		   {
-				for(int i = 0; i < cadrInfo.CountWindows; i++)
-				{
-					getline(in,line);
-					vector<string> splittedStr = split(line,"\t");
-					cadrInfo.WindowsList[i].CountObj = atoi(splittedStr[1].c_str());
-				}
-
-		   }
-		   else throw logic_error(errorMessage);
-
-		   cadrInfo.CountBlock = 0;
-		   cadrInfo.CountStars = 0;
-		   cadrInfo.SizeStarsList = 0;
-		   cadrInfo.SizeWindowsList = cadrInfo.WindowsList.size();
-		   cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
-
-		   cadrInfoVec.push_back(cadrInfo);
-		}
-
-	}
-
-}
-
-
 
 
 
@@ -2875,7 +1861,7 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 
 	try
 	{
-        OpenDialog->Options.Clear();
+		OpenDialog->Options.Clear();
 		OpenDialog->Filter = "txt|*.txt";
 		if (OpenDialog->Execute()) {
 			vCadrInfo.clear();
@@ -2891,12 +1877,15 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 
 			if(checkLocFile(in))
 			{
-				readBOKZ60LocProtocol(in,vCadrInfo);
+
+				HandleLoc60 handler (this);
+				readBOKZ60LocProtocol (in, vCadrInfo, handler);
 			}
 
 			else
 			{
-				readBOKZ60Protocol(in,vCadrInfo);
+				Handle60 handle(this);
+				readBOKZ60Protocol(in, vCadrInfo, handle);
 			}
 
 			PrepareStartDraw();
@@ -2904,298 +1893,17 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 		}
 	}
 
-	catch(exception &e)
-	{
+	catch (exception &e) {
 		ShowMessage(e.what());
 	}
 }
 
+// ---------------------------------------------------------------------------
 
-
-
-void TFormGraphOrient::readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec)
-{
-	string line;
-	string errorMessage = string("Cчитывание протокола завершено необычным образом. "
-				"Возможно работа прибора была остановлена.");
-
-
-	while(getline(in,line))
-	{
-
-		if(line.find("2 Число принятых пикселей на первом кадре") != string::npos)
-		{
-			// если нашли строку с числом принятых пикселей, проверяем, что их число не ноль
-			// если ноль, пропускаем такт
-			if(split(line, "\t").back() == "0")
-			{
-				continue;
-			}
-		   CadrInfo cadrInfo;
-		   cadrInfo.ImageHeight = 1024;
-		   cadrInfo.ImageWidth = 1024;
-
-			// ищем начало массива лок и фрагментов
-		   if(findLine(in,"18, 19	Массив локализованных объектов на 1-ом кадре") != string::npos)
-		   {
-				vector <string> splittedStr;
-				const int maxCountLocObj = 15;
-				ObjectsInfo objInfo;
-				WindowsInfo winInfo;
-				StarsInfo starsInfo;
-
-				for(int i = 0 ; i < maxCountLocObj; i ++)
-				{
-						getline(in,line);
-						splittedStr = split(line,"\t");
-
-						// если всё-таки объектов меньше
-						if(atof (splittedStr[0].c_str()) == 0)
-						{
-							  break;
-						}
-						// заполняем все о лок
-						objInfo.X = atof (splittedStr[0].c_str());
-						objInfo.Y = atof (splittedStr[1].c_str());
-						objInfo.Bright = atof(splittedStr[2].c_str());
-						objInfo.Square = atoi (splittedStr[3].c_str());
-						objInfo.StarID = 0;
-						objInfo.Mv = 0;
-						objInfo.Sp[0]='_';
-						objInfo.Sp[1]='_';
-						objInfo.Dx = 0;
-						objInfo.Dy = 0;
-						cadrInfo.ObjectsList.push_back(objInfo);
-
-						// заполняем всё о фрагментах
-						winInfo.Mv = 0;
-						winInfo.Mean = (atof(splittedStr[6].c_str()));
-						winInfo.Sigma = (atof(splittedStr[7].c_str()));
-						winInfo.Level = (atof(splittedStr[8].c_str()));
-						winInfo.CountObj = atoi(splittedStr[9].c_str());
-						unsigned short windowSize = atoi(splittedStr[10].c_str());
-
-						switch(windowSize)
-						{
-						case 15:
-							winInfo.Width = 24;
-							winInfo.Height = 24;
-							break;
-						case 14:
-							winInfo.Width = 24;
-							winInfo.Height = 48;
-							break;
-						case 11:
-							winInfo.Width = 48;
-							winInfo.Height = 24;
-							break;
-						case 10:
-							winInfo.Width = 48;
-							winInfo.Height = 48;
-							break;
-						}
-						winInfo.Xstart = (atof(splittedStr[4].c_str())) - winInfo.Width/2;
-						winInfo.Ystart = (atof(splittedStr[5].c_str())) - winInfo.Height/2;
-						cadrInfo.WindowsList.push_back(winInfo);
-
-						starsInfo.X = (atof(splittedStr[4].c_str()));
-						starsInfo.Y = (atof(splittedStr[5].c_str()));
-						cadrInfo.StarsList.push_back(starsInfo);
-
-				}
-
-			if(findLine(in,"18, 19	Массив локализованных объектов на 2-ом кадре") != string::npos)
-		   {
-				for(int i = 0 ; i < maxCountLocObj; i ++)
-				{
-					getline(in,line);
-					splittedStr = split(line,"\t");
-
-					// если всё-таки объектов меньше
-					if(atof (splittedStr[0].c_str()) == 0)
-					{
-						break;
-					}
-						// заполняем все о лок
-					objInfo.X = atof (splittedStr[0].c_str());
-					objInfo.Y = atof (splittedStr[1].c_str());
-					objInfo.Bright = atof(splittedStr[2].c_str());
-					objInfo.Square = atoi (splittedStr[3].c_str());
-					objInfo.StarID = 0;
-					objInfo.Mv = 0;
-					objInfo.Sp[0] = '_';
-					objInfo.Sp[1] = '_';
-					objInfo.Dx = 0;
-					objInfo.Dy = 0;
-					cadrInfo.ObjectsList.push_back(objInfo);
-				}
-		   }
-
-
-		   }
-			else throw logic_error(errorMessage);
-
-			cadrInfo.SizeWindowsList = cadrInfo.WindowsList.size();
-			cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
-			cadrInfo.SizeStarsList = cadrInfo.StarsList.size();
-			GetImageBright(cadrInfo);
-
-		   // ищем время привязки в секундах
-			if(findWord(in, "информации") != string::npos)
-			{
-				int secs = 0;
-				int msecs = 0;
-				int prevPos = in.tellg();
-
-				in>>line;
-				if(line == "с")
-				{
-					in >> secs;
-
-					getline(in, line);
-					getline(in, line);
-
-					vector <string> splittedStr = split(line, "\t");
-					msecs =  atoi (splittedStr[1].c_str());
-				}
-
-				else
-				{
-					// если там не "c", возвращаемся назад
-					in.seekg(prevPos);
-					in >> secs;
-					// ищем миллисекунды
-					findWord(in, "информации");
-					in >> msecs;
-
-				}
-				cadrInfo.Time =  static_cast <double> (secs) + static_cast <double> (msecs) / 1000;
-			}
-		   else throw logic_error(errorMessage);
-
-		   if(findLine(in,"6) Кватернион ориентации, Qо") != string::npos)
-		   {
-
-				for(int i = 0; i < 4; i++)
-				{
-					getline(in,line);
-					vector<string> splittedStr = split(line,"\t\t\t\t");
-					cadrInfo.QuatOrient[i] = atof(splittedStr[1].c_str());
-				}
-
-				double matrixOfOrientation [3][3];
-				quatToMatr(cadrInfo.QuatOrient, matrixOfOrientation);
-				double al = 0;
-				double dl = 0;
-				double Az = 0;
-
-				dl = asinm(matrixOfOrientation[2][2]) * RTD;
-				al = atan2m(matrixOfOrientation[2][1], matrixOfOrientation[2][0]) * RTD;   if (al<0)  al += 360.;
-				Az = atan2m(matrixOfOrientation[0][2], matrixOfOrientation[1][2]) * RTD;   if (Az<0)  Az += 360.;
-
-				plotter->AddPoint(ChartAl, 0, cadrInfo.Time, al);
-				plotter->AddPoint(ChartDl, 0, cadrInfo.Time, dl);
-				plotter->AddPoint(ChartAz, 0, cadrInfo.Time, Az);
-
-		   }
-		   else throw logic_error(errorMessage);
-
-
-
-		   if(findLine(in,"Угловая скорость по оптическим измерениям в проекциях на оси ПСК") != string::npos)
-		   {
-				for(int i = 0; i < 3; i++)
-				{
-					getline(in,line);
-					vector<string> splittedStr = split(line,"\t\t\t\t");
-					cadrInfo.OmegaOrient[i] = atof(splittedStr[1].c_str());
-				}
-				plotter->AddPoint(ChartWx, 0, cadrInfo.Time, cadrInfo.OmegaOrient[0] * RTM);
-				plotter->AddPoint(ChartWy, 0, cadrInfo.Time, cadrInfo.OmegaOrient[1] * RTM);
-				plotter->AddPoint(ChartWz, 0, cadrInfo.Time, cadrInfo.OmegaOrient[2] * RTM);
-
-		   }
-		   else throw logic_error(errorMessage);
-
-
-		   if(findWord(in,"Tcmv") != string::npos)
-		   {
-				double matrixTemperature = 0;
-				in >> matrixTemperature;
-				plotter->AddPoint(ChartTemp, 0, cadrInfo.Time, matrixTemperature);
-		   }
-		   else throw logic_error(errorMessage);
-
-		   // ищем число спроектированных звезд
-		   if(findWord(in,"NumProgFrag") != string::npos)
-		   {
-				in >> cadrInfo.CountStars;
-				if(cadrInfo.CountStars <= 0) continue;
-		   }
-		   else throw logic_error(errorMessage);
-
-		   // ищем число фрагментов
-		   if(findWord(in,"NumFrag") != string::npos)
-		   {
-				// общее число фрагментов
-				in >> cadrInfo.CountWindows;
-				if(cadrInfo.CountWindows <= 0) continue;
-				plotter->AddPoint(ChartNumFrag, 0, cadrInfo.Time, cadrInfo.CountWindows);
-		   }
-		   else throw logic_error(errorMessage);
-
-
-		   // число локализ. объектов
-		   if(findWord(in,"NumLoc[0]") != string::npos)
-		   {
-				in >> cadrInfo.CountLocalObj;
-				if(cadrInfo.CountLocalObj <= 0) continue;
-				plotter->AddPoint(ChartNumLoc, 0, cadrInfo.Time, cadrInfo.CountLocalObj);
-		   }
-		   else throw logic_error(errorMessage);
-
-
-		   //ищем число распознанных объектов
-		   if(findWord(in,"NumDet") != string::npos)
-		   {
-				in >> cadrInfo.CountDeterObj;
-				if(cadrInfo.CountDeterObj <= 0) continue;
-				plotter->AddPoint(ChartNumDet, 0, cadrInfo.Time, cadrInfo.CountDeterObj);
-		   }
-		   else throw logic_error(errorMessage);
-
-
-
-		   if(findWord(in,"m_cur") != string::npos)
-		   {
-				double m_cur = 0;
-				in >> m_cur;
-				plotter->AddPoint(ChartMxy, 0, cadrInfo.Time, m_cur);
-				plotter->AddPoint(ChartFone, 0, cadrInfo.Time, cadrInfo.MeanBright);
-				plotter->AddPoint(ChartNoise, 0, cadrInfo.Time, cadrInfo.SigmaBright);
-		   }
-		   else throw logic_error(errorMessage);
-
-		   cadrInfo.CountBlock = 0;
-		   cadrInfo.CountLines = 0;
-		   cadrInfoVec.push_back(cadrInfo);
-		}
-
-	}
-
-}
-
-
-
-//---------------------------------------------------------------------------
-
-
-void __fastcall TFormGraphOrient::BOKZM2VParseProtocolClick(TObject *Sender)
-{
-	try
-	{
-		 OpenDialog->Options.Clear();
-		 OpenDialog->Filter = "txt|*.txt";
+void __fastcall TFormGraphOrient::BOKZM2VParseProtocolClick(TObject *Sender) {
+	try {
+		OpenDialog->Options.Clear();
+		OpenDialog->Filter = "txt|*.txt";
 		if (OpenDialog->Execute()) {
 			vCadrInfo.clear();
 			FileName = OpenDialog->FileName;
@@ -3208,199 +1916,20 @@ void __fastcall TFormGraphOrient::BOKZM2VParseProtocolClick(TObject *Sender)
 			}
 
 			DeleteLineGraph();
-			readmBOKZ2VProtocol(in, vCadrInfo);
+
+			HandleM2V handle(this);
+			readmBOKZ2VProtocol(in, vCadrInfo, handle);
 			PrepareStartDraw();
 			CheckTabSheet();
 		}
 	}
 
-	catch (exception &e)
-	{
+	catch (exception &e) {
 		ShowMessage(e.what());
 	}
 }
 
 
-void convertIKIFormatToInfoCadr (IKI_img* reader, vector <CadrInfo>& cadrInfoVec, bool CompareIKIRes = false)
-{
-	CadrInfo cadrInfo;
-	cadrInfo.Time = reader->Georeferencing.DateTime.Val;
-	cadrInfo.FrameNumber = reader->Georeferencing.FrameNumber;
-	cadrInfo.IsBinary = reader->ImageData.FrameData.DegreeBinning;
-	cadrInfo.DataType = reader->ImageData.FrameData.DataType;
-	cadrInfo.IsReverse = false;
-	cadrInfo.IsOrient = !reader->StarsData.RezStat;
-	cadrInfo.CountPixFilter = reader->FilterData.FilteredPixelsCount;
-	cadrInfo.ImageHeight = reader->ImageData.FrameData.FrameHeight;
-	cadrInfo.ImageWidth = reader->ImageData.FrameData.FrameWidth;
-	cadrInfo.SizePixel = reader->CameraSettings.PixelSize;
-	cadrInfo.StatOrient = reader->StarsData.RezStat;
-	cadrInfo.CountStars = reader->StarsData.SimulatedFrame.strrec;
-	cadrInfo.CountWindows = reader->ImageData.WindowsData.WindowCount;
-	cadrInfo.CountLocalObj = reader->StarsData.LocalizedCount;
-	cadrInfo.CountDeterObj = reader->StarsData.RecognizedCount;
-	cadrInfo.SizeStarsList = reader->StarsData.SimulatedFrame.strrec;
-	cadrInfo.SizeObjectsList =  cadrInfo.CountLocalObj;
-//	cadrInfo.SizeObjectsList =  cadrInfo.CountDeterObj;
-	cadrInfo.SizeWindowsList = cadrInfo.CountWindows;
-
-
-	for (int i = 0; i < cadrInfo.SizeStarsList; i++)
-	{
-		if (reader->StarsData.SimulatedFrame.StarRec[i].Xs == 0
-		&&  reader->StarsData.SimulatedFrame.StarRec[i].Ys == 0)
-		{
-		   cadrInfo.SizeStarsList = i + 1;
-		   break;
-		}
-		StarsInfo starInfo;
-		starInfo.X = reader->StarsData.SimulatedFrame.StarRec[i].Xs;
-		starInfo.Y = reader->StarsData.SimulatedFrame.StarRec[i].Ys;
-		starInfo.Bright = reader->StarsData.SimulatedFrame.StarRec[i].Is;
-		starInfo.StarID = reader->StarsData.SimulatedFrame.StarRec[i].Ns;
-		starInfo.Mv = reader->StarsData.SimulatedFrame.StarRec[i].Mv;
-		starInfo.Sp[0] = reader->StarsData.SimulatedFrame.StarRec[i].Sp[0];
-		starInfo.Sp[1] = reader->StarsData.SimulatedFrame.StarRec[i].Sp[1];
-		cadrInfo.StarsList.push_back(starInfo);
-	}
-
-	for (int i = 0; i < cadrInfo.SizeObjectsList; i ++)
-	{
-		if(reader->StarsData.StarsList[i].X_coordinate == 0
-		&& reader->StarsData.StarsList[i].Y_coordinate == 0)
-		{
-		   cadrInfo.SizeObjectsList = i + 1;
-		   break;
-		}
-
-		ObjectsInfo objInfo;
-		objInfo.X = reader->StarsData.StarsList[i].X_coordinate;
-		objInfo.Y = reader->StarsData.StarsList[i].Y_coordinate;
-		objInfo.Square = reader->StarsData.StarsList[i].PixelsCount;
-		objInfo.Bright = reader->StarsData.StarsList[i].BrightnessObject;
-		objInfo.StarID = reader->StarsData.StarsList[i].NumberStar;
-		objInfo.Mv = reader->StarsData.StarsList[i].StellarMagnitude;
-		objInfo.Sp[0] = reader->StarsData.StarsList[i].SpectralClass[0];
-		objInfo.Sp[1] = reader->StarsData.StarsList[i].SpectralClass[1];
-		objInfo.Dx = reader->StarsData.StarsList[i].DX;
-		objInfo.Dy = reader->StarsData.StarsList[i].DY;
-		cadrInfo.ObjectsList.push_back(objInfo);
-	}
-
-	for (int i = 0; i < cadrInfo.SizeWindowsList; i ++)
-	{
-
-		if(reader->ImageData.WindowsData.Info[i].X == 0
-		&& reader->ImageData.WindowsData.Info[i].Y == 0)
-		{
-		   cadrInfo.SizeWindowsList = i + 1;
-		   break;
-		}
-		 WindowsInfo winInfo;
-		 winInfo.Xstart = reader->ImageData.WindowsData.Info[i].X;
-		 winInfo.Ystart = reader->ImageData.WindowsData.Info[i].Y;
-		 winInfo.Width = reader->ImageData.WindowsData.Info[i].WindowWidth;
-		 winInfo.Height = reader->ImageData.WindowsData.Info[i].WindowHeight;
-		 winInfo.CountObj = reader->ImageData.WindowsData.Info[i].ObjCount;
-		 winInfo.Mean =  reader->ImageData.WindowsData.Info[i].Average;
-		 winInfo.Sigma =  reader->ImageData.WindowsData.Info[i].SKO;
-		 winInfo.Level =  reader->ImageData.WindowsData.Info[i].Limit;
-		 winInfo.Mv = 0;
-		 winInfo.ZipX = reader->ImageData.WindowsData.Info[i].ZipX;
-		 winInfo.ZipY = reader->ImageData.WindowsData.Info[i].ZipY;
-		 winInfo.StarID = 0;
-		 winInfo.Sp[0] = 0;
-		 winInfo.Sp[1] = 0;
-		 cadrInfo.WindowsList.push_back(winInfo);
-	}
-
-	if (reader->ImageData.WindowsData.SizeData != 0) {
-		
-		string dirName = AnsiString(GetCurrentDir()).c_str() + string("/") + "Frag" + "_" + "IKI";
-		TDirectory::CreateDirectory(dirName.c_str());
-		string time = AnsiString(FloatToStr(cadrInfo.Time)).c_str();
-		string fileName = dirName + "/" + "Frag" + "_" + time + ".bin";
-		ofstream fragmentFile(fileName.c_str(), ios::binary | ios::trunc);
-
-		if(fragmentFile.is_open())
-		{
-			char bytesInFormat = 1;
-			switch (cadrInfo.DataType)
-			{
-				case 0: break;
-				case 1: bytesInFormat = 2; break;
-				case 2: bytesInFormat = 4; break;
-			}
-
-		  fragmentFile.write(
-		  (char*)(reader->ImageData.WindowsData.Data),
-		   reader->ImageData.WindowsData.SizeData * bytesInFormat);
-		  fragmentFile.close();
-		}
-	}
-
-	cadrInfo.CountLines = reader->ImageData.LinesData.LinesHeight;
-	cadrInfo.CountBlock = reader->ImageData.LinesData.LinesCount;
-
-	for (int i = 0; i < cadrInfo.CountBlock; i ++)
-	{
-		LinesInfo lineInfo;
-		lineInfo.Start = reader->ImageData.LinesData.Info[i].Y_FirstString;
-		lineInfo.Height = reader->ImageData.LinesData.Info[i].CountString;
-		cadrInfo.LinesList.push_back(lineInfo);
-	}
-
-	cadrInfo.MeanErrorX = reader->StarsData.m_X;
-	cadrInfo.MeanErrorY = reader->StarsData.m_Y;
-	cadrInfo.MeanErrorXY = reader->StarsData.m_Cur;
-
-	for (int i = 0; i < 4; i ++)
-	{
-		cadrInfo.QuatOrient[i] = reader->StarsData.RecognizedOrientationQuaternion[i];
-	}
-
-	for (int i = 0; i < 3; i ++)
-	{
-		cadrInfo.AnglesOrient[i] = reader->StarsData.RecognizedOrientationAngles[i];
-		cadrInfo.AnglesModel[i] = reader->Georeferencing.OrientationAngles[i];
-		cadrInfo.OmegaOrient[i] = reader->StarsData.RecognizedAngularVelocity[i];
-		cadrInfo.OmegaModel[i] = reader->Georeferencing.DeviceAngularVelocity[i];
-
-		for (int j = 0; j < 3; j ++)
-		{
-			cadrInfo.MatrixOrient[i][j] = reader->StarsData.RecognizedOrientationMatrix[i][j];
-		}
-	}
-
-	if (CompareIKIRes)
-	{
-		for (int i = 0; i < 3; i++)
-		{
-			cadrInfo.OmegaDiff[i] = reader->StarsData.RecognizedAngularVelocity[i]
-			- reader->Georeferencing.DeviceAngularVelocity[i];
-		}
-
-		for (int i = 0;  i < 3; i++)
-		{
-			double diff = cadrInfo.AnglesOrient[i] - reader->Georeferencing.OrientationAngles[i];
-			if (abs(diff) > 5)        // потом убрать
-			{
-				diff = (cadrInfo.AnglesOrient[i] + reader->Georeferencing.OrientationAngles[i])
-				-	abs(cadrInfo.AnglesOrient[i] - reader->Georeferencing.OrientationAngles[i]);
-			}
-			cadrInfo.AnglesDiff[i] = diff;
-		}
-
-		for (int i = 0; i < 3; i++)
-		{
-			cadrInfo.AxesDiff[i] = GetAxisAngle(&reader->Georeferencing.OrientationMatrix[i][0],
-                                                &cadrInfo.MatrixOrient[i][0]);
-		}
-	}
-
-	GetImageBright(cadrInfo);
-	cadrInfoVec.push_back(move(cadrInfo));
-}
 
 void StartPrintReport(IKI_img* reader)
 {
@@ -3624,16 +2153,14 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 								}
 							}
 							else  {
-//								ShowMessage("Не удалось считать " + AnsiString(ResFileName));
 								CompareIKIRes = false;
 							}
-//							throw logic_error(string("Не удалось считать ") + AnsiString(FileList->Strings[i]).c_str());
+
 						}
 						else ShowMessage("Не удалось считать " + AnsiString(FileList->Strings[i]));
-//						throw logic_error(string("Не удалось считать ") + AnsiString(FileList->Strings[i]).c_str());
 					}
 
-					convertIKIFormatToInfoCadr(reader.get(), vCadrInfo, CompareIKIRes);
+					vCadrInfo.push_back(move(convertIKIFormatToInfoCadr(reader.get(), CompareIKIRes)));
 					double Time =  vCadrInfo.back().Time;
 
 					if (CompareIKIRes)
@@ -3815,7 +2342,7 @@ void __fastcall TFormGraphOrient::ChartMouseDown(TObject *Sender, TMouseButton B
 	}
 }
 
- 
+
 //---------------------------------------------------------------------------
 void TFormGraphOrient::ResizePlot(TChart *chart, double kx, double ky, int indexX, int indexY)
 {
@@ -3910,454 +2437,14 @@ void __fastcall TFormGraphOrient::ChartOrientClickLegend(TCustomChart *Sender, T
 }
 //---------------------------------------------------------------------------
 
-void writeBOKZ1000ProtocolToIKI (CadrInfo& cadrInfo, bool InfoVecEmpty, TDateTime& startDate, double& timeStep, unsigned int& counter)
-{
-	unique_ptr <IKI_img> writer (new IKI_img());
-	if (InfoVecEmpty)
-	{
-		writer->Georeferencing.DateTime = startDate;
-	}
-	else
-	{
-		startDate = IncMilliSecond(startDate, timeStep * 1000);
-		writer->Georeferencing.DateTime = startDate;
-		timeStep = 0.25;
-	}
 
-	writer->Georeferencing.FrameNumber = ++counter;
-	writer->StarsData.RezStat = 0;
-	writer->ImageData.FrameData.FrameHeight = 1024;
-	writer->ImageData.FrameData.FrameWidth = 1024;
-	writer->StarsData.SimulatedFrame.strrec = cadrInfo.SizeObjectsList;
-	writer->StarsData.LocalizedCount = cadrInfo.CountLocalObj;
-	//writer->StarsData.RecognizedCount = cadrInfo.CountDeterObj;
-	writer->StarsData.Epsilon = cadrInfo.Epsilon;
-	//writer->ImageData.WindowsData.WindowCount = cadrInfo.CountWindows;
-
-	writer->StarsData.SimulatedFrame.StarRec = new STARREC [cadrInfo.SizeObjectsList];
-	for (int i = 0; i < cadrInfo.SizeObjectsList; i++)
-	{
-		writer->StarsData.SimulatedFrame.StarRec[i].Xs = cadrInfo.ObjectsList[i].X;
-		writer->StarsData.SimulatedFrame.StarRec[i].Ys = cadrInfo.ObjectsList[i].Y;
-		writer->StarsData.SimulatedFrame.StarRec[i].Is = cadrInfo.ObjectsList[i].Bright;
-		writer->StarsData.SimulatedFrame.StarRec[i].Ns = cadrInfo.ObjectsList[i].StarID;
-		writer->StarsData.SimulatedFrame.StarRec[i].Mv = cadrInfo.ObjectsList[i].Mv;
-		writer->StarsData.SimulatedFrame.StarRec[i].Sp[0] = cadrInfo.ObjectsList[i].Sp[0];
-		writer->StarsData.SimulatedFrame.StarRec[i].Sp[1] = cadrInfo.ObjectsList[i].Sp[1];
-	}
-
-	double matrixOfOrientation [3][3];
-	quatToMatr(cadrInfo.QuatOrient, matrixOfOrientation);
-	double Angles[3];
-	MatrixToEkvAngles(matrixOfOrientation, Angles);
-	for (int i = 0; i < 3; i ++)
-	{
-		writer->Georeferencing.OrientationAngles[i] = Angles[i];
-		writer->Georeferencing.DeviceAngularVelocity[i] = cadrInfo.OmegaOrient[i] * BOKZ1000ConvCoef;
-	}
-
-	AnsiString FileName = GetCurrentDir() + "/" + "IKI_" + TDateTime::CurrentDate().DateString() + "/";
-	TDirectory::CreateDirectory(FileName);
-	char fileNumber [2];
-	sprintf (fileNumber, "%02u", counter);
-	FileName = FileName + IntToStr((int)counter) + "_" + TDateTime::CurrentDate().DateString() + "_00-00-" + fileNumber + ".iki";
-	writer->WriteFormat(FileName);
-
-}
-
-void TFormGraphOrient::readBOKZ601000Protocol(ifstream& in, vector <CadrInfo>& cadrInfoVec, unsigned int& counter, TDateTime& startDate)
-{
-
-	try
-	{
-
-	const string errorMessage = string("Cчитывание протокола завершено необычным образом.");
-	string line;
-	static double timeStep = 0.25;
-	static bool NeedNextFile = false;
-
-	if (NeedNextFile)
-	{
-		if (findWord(in, "такта:") != string::npos)
-		{
-			int TickNumber = 0;
-			in >> TickNumber;
-			if (TickNumber != cadrInfoVec.back().FrameNumber)
-			{
-				throw logic_error(errorMessage);
-			}
-
-		}
-		else throw logic_error(errorMessage);
-
-		if(findLine(in,"5) Кватернион ориентации, Qо") != string::npos)
-		{
-
-			for(int i = 0; i < 4; i++)
-			{
-				getline(in,line);
-				vector<string> splittedStr = split(line,"\t\t\t\t");
-				cadrInfoVec.back().QuatOrient[i] = atof(splittedStr[1].c_str());
-			}
-
-			double matrixOfOrientation [3][3];
-			quatToMatr(cadrInfoVec.back().QuatOrient, matrixOfOrientation);
-			double Angles[3];
-			MatrixToEkvAngles(matrixOfOrientation, Angles);
-
-			plotter->AddPoint(ChartAl, 0, cadrInfoVec.back().Time, Angles[0] * RTD);
-			plotter->AddPoint(ChartDl, 0, cadrInfoVec.back().Time, Angles[1] * RTD);
-			plotter->AddPoint(ChartAz, 0, cadrInfoVec.back().Time, Angles[2] * RTD);
-
-
-		}
-		else throw logic_error(errorMessage); // протоколы кончаются на ДТМИ
-
-		if(findLine(in, "Угловая скорость по оптическим измерениям в проекциях на оси ПСК") != string::npos)
-		{
-			for(int i = 0; i < 3; i++)
-			{
-				getline(in,line);
-				vector <string> splittedStr = split(line,"\t\t\t\t");
-				cadrInfoVec.back().OmegaOrient[i] = atof(splittedStr[1].c_str());
-			}
-
-		}
-		else throw logic_error(errorMessage);
-//		writeBOKZ1000ProtocolToIKI (cadrInfoVec.back(), cadrInfoVec.empty(), startDate, timeStep, counter);
-		NeedNextFile = false;
-	}
-
-
-
-	while (getline(in,line))
-	{
-		TColor pointColor = clBlue;
-	if (line.find("Номер такта:") != string::npos)
-	{
-		// номер такта в ДТМИ
-		int TickNumber = 0;
-		vector <string> splitTickNumber = split(line, " ");
-		TickNumber = atoi(splitTickNumber[2].c_str());
-
-		if (findLine (in, "Состав ДТМИ:") != string::npos)
-		{
-			CadrInfo cadrInfo;
-			cadrInfo.FrameNumber = TickNumber;
-			cadrInfo.ImageHeight = 1024;
-			cadrInfo.ImageWidth = 1024;
-			cadrInfo.CountBlock = 0;
-			cadrInfo.CountLines = 0;
-			cadrInfo.CountStars = 0;
-			cadrInfo.SizeStarsList = 0;
-			cadrInfo.SizeWindowsList = 0;
-
-			//  время привязки в секундах
-			if(findWord(in, "информации") != string::npos)
-			{
-				in >> cadrInfo.Time;
-			}
-			else throw logic_error(errorMessage);
-
-			
-			if (findWord(in, "состояния") != string::npos)
-			{
-				string status;
-				in >> status >> status;
-
-				if (findWord(in, "состояния") != string::npos)
-				{
-					string status2;
-					in >> status2 >> status2;
-
-					 // ТО
-					if (status == "ec00")
-					{
-						if (status2.substr(0, 2) != "00")
-						{
-						   pointColor = clRed;
-						}
-					}
-					//  НО
-					else if (status == "2400")
-					{
-						pointColor = clGreen;
-						if (status2.substr(0, 2) == "0c"  || status2.substr(0, 2) == "01")
-						{
-							continue;
-						}
-						else if (status2.substr(0, 2) != "00")
-						{
-						   pointColor = clRed;
-						}
-					}
-					else if (status == "0000" && status2 == "0000" || status == "c400")
-					{
-						continue;
-					}
-					else
-					{
-						pointColor = clRed;
-					}
-				}
-				else throw logic_error(errorMessage);
-			}
-			else throw logic_error(errorMessage);
-			// локализованные
-
-			if (findWord(in, "объектов") != string::npos)
-			{
-				in >> cadrInfo.CountLocalObj;
-			}
-			else throw logic_error(errorMessage);
-
-
-			if (findWord(in, "объектов") != string::npos)
-			{
-				in >> cadrInfo.CountDeterObj;
-			}
-			else throw logic_error(errorMessage);
-
-
-			if (findWord(in, "фрагментов") != string::npos)
-			{
-				in >> cadrInfo.CountWindows;
-			}
-			else throw logic_error(errorMessage);
-
-			if (findWord(in, "распознавания") != string::npos)
-			{
-				in >> cadrInfo.Epsilon;
-			}
-			else throw logic_error(errorMessage);
-
-
-			if(findLine(in,"	Х			Y			I			N") != string::npos)
-			{
-				vector<string> splittedLocData;
-				const int сountLocObj = cadrInfo.CountLocalObj;
-				ObjectsInfo objInfo;
-				for(int i = 0 ; i < сountLocObj; i ++)
-				{
-					getline(in,line);
-					// см. эту строку в протоколе, чтобы понять почему так
-					splittedLocData = split(line, ")\t");
-					splittedLocData = split(splittedLocData[1], "\t");
-
-					objInfo.X = atof (splittedLocData[0].c_str());
-					objInfo.Y = atof (splittedLocData[1].c_str());
-
-					if (objInfo.X == 0 && objInfo.Y == 0) {        
-						break;
-					}
-					
-					objInfo.Bright = atof (splittedLocData[2].c_str());
-					objInfo.Square = atoi(splittedLocData[3].c_str());
-
-					// чтобы отобразить объект как распознаный
-					if (objInfo.Square < 0)  {
-						objInfo.StarID = 1;
-					}
-
-					objInfo.StarID = 0;
-					objInfo.Mv = 0;
-					objInfo.Sp[0]='_';
-					objInfo.Sp[1]='_';
-					objInfo.Dx = 0;
-					objInfo.Dy = 0;
-					cadrInfo.ObjectsList.push_back(objInfo);
-				}
-				cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
-			}
-			else throw logic_error(errorMessage);
-
-
-//			if(findLine(in,"16) Значение порогов во фрагментах") != string::npos)
-//		   {
-//				for(int i = 0; i < cadrInfo.CountWindows; i++)
-//				{
-//					WindowsInfo winInfo;
-//					getline(in,line);
-//					vector<string> splittedStr = split(line,"\t");
-//					winInfo.Level =  atoi(splittedStr[1].c_str());
-//					if (winInfo.Level == 0) {
-//						break;
-//					}
-//					cadrInfo.WindowsList.push_back(winInfo);
-//				}
-//
-//		   }
-//		  else throw logic_error(errorMessage);
-//
-//
-//		   if(findLine(in,"17) Количество объектов во фрагментах") != string::npos)
-//		   {
-//				for(int i = 0; i < cadrInfo.WindowsList.size(); i++)
-//				{
-//					getline(in,line);
-//					vector <string> splittedStr = split(line,"\t");
-//					cadrInfo.WindowsList[i].CountObj = atoi(splittedStr[1].c_str());
-//				}
-//
-//		   }
-//		   else throw logic_error(errorMessage);
-
-
-			if (findWord(in, "такта:") != string::npos)
-			{
-				int TickNumberSecond = 0;
-				in >> TickNumberSecond;
-				// если была рассинхронизация
-				if (cadrInfo.FrameNumber != TickNumberSecond)
-				{
-					timeStep += timeStep;
-					continue;
-				}
-			}
-			else
-			{
-				NeedNextFile = true;
-				cadrInfoVec.push_back(move(cadrInfo));
-				++counter;
-				break;
-			}
-
-
-
-		   if(findLine(in,"5) Кватернион ориентации, Qо") != string::npos)
-		   {
-
-				for(int i = 0; i < 4; i++)
-				{
-					getline(in,line);
-					vector<string> splittedStr = split(line,"\t\t\t\t");
-					cadrInfo.QuatOrient[i] = atof(splittedStr[1].c_str());
-				}
-
-				double matrixOfOrientation [3][3];
-				quatToMatr(cadrInfo.QuatOrient, matrixOfOrientation);
-				double Angles[3];
-				MatrixToEkvAngles(matrixOfOrientation, Angles);
-
-				plotter->AddPoint(ChartAl, 0, cadrInfo.Time, Angles[0] * RTD, pointColor);
-				plotter->AddPoint(ChartDl, 0, cadrInfo.Time, Angles[1] * RTD, pointColor);
-				plotter->AddPoint(ChartAz, 0, cadrInfo.Time, Angles[2] * RTD, pointColor);
-
-
-		   }
-		   else throw logic_error(errorMessage);// протоколы кончаются на ДТМИ
-
-
-
-		   if(findLine(in, "Угловая скорость по оптическим измерениям в проекциях на оси ПСК") != string::npos)
-		   {
-				for(int i = 0; i < 3; i++)
-				{
-					getline(in,line);
-					vector <string> splittedStr = split(line,"\t\t\t\t");
-					cadrInfo.OmegaOrient[i] = atof(splittedStr[1].c_str());
-				}
-
-		   }
-		   else throw logic_error(errorMessage);
-
-		   plotter->AddPoint(ChartNumFrag, 0, cadrInfo.Time, cadrInfo.CountWindows, pointColor);
-		   plotter->AddPoint(ChartNumDet, 0, cadrInfo.Time, cadrInfo.CountDeterObj, pointColor);
-		   plotter->AddPoint(ChartNumLoc, 0, cadrInfo.Time, cadrInfo.CountLocalObj, pointColor);
-
-		   plotter->AddPoint(ChartWx, 0, cadrInfo.Time, cadrInfo.OmegaOrient[0] * RTM * BOKZ1000ConvCoef, pointColor);
-		   plotter->AddPoint(ChartWy, 0, cadrInfo.Time, cadrInfo.OmegaOrient[1] * RTM * BOKZ1000ConvCoef, pointColor);
-		   plotter->AddPoint(ChartWz, 0, cadrInfo.Time, cadrInfo.OmegaOrient[2] * RTM * BOKZ1000ConvCoef, pointColor);
-
-		   writeBOKZ1000ProtocolToIKI (cadrInfo, cadrInfoVec.empty(), startDate, timeStep, counter);
-		   cadrInfoVec.push_back(cadrInfo);
-
-		}
-
-	}
-	}
-	}
-
-	catch (exception &e)
-	{
-		ShowMessage(e.what());
-	}
-
-}
-
-void TFormGraphOrient::readBOKZ601000MKO(ifstream& in, vector <CadrInfo>& cadrInfoVec, unsigned int& counter)
-{
-	string line;
-	unsigned int toNextDTMI = 0;
-
-	while (getline(in,line))
-	{
-		TColor pointColor = clBlue;
-		if (line.find("КС:	3CA0") != string::npos)
-		{
-			if (toNextDTMI != 0)
-			{
-				--toNextDTMI;
-				continue;
-			}
-			getline(in,line);
-			getline(in,line);
-			vector <string> splitted = split(line, "\t");
-			string status = splitted[5];
-			string status2 = splitted[6];
-
-			if (status == "EC00")
-			{
-				if (status2.substr(0, 2) != "00")
-				{
-					pointColor = clRed;
-				}
-			}
-			//  НО
-			else if (status == "2400")
-			{
-				pointColor = clGreen;
-				if (status2.substr(0, 2) == "0C"  || status2.substr(0, 2) == "01")
-				{
-					toNextDTMI = 8;
-					continue;
-				}
-				else if (status2.substr(0, 2) != "00")
-				{
-					pointColor = clRed;
-				}
-			}
-			else if (status == "0000" && status2 == "0000"
-			|| status == "C400")
-			{
-				toNextDTMI  = 8;
-				continue;
-			}
-			else
-			{
-				pointColor = clRed;
-			}
-
-			for (int i = 0; i < 8; i++)
-			{
-				 if (findLine(in,"КС:	3CA0") != string::npos)
-				 {
-
-				 }
-			}
-
-
-		}
-	}
-
-}
 
 void __fastcall TFormGraphOrient::BOKZM601000ParseProtocolClick(TObject *Sender)
 {
 		 OpenDialog->Options.Clear();
 		 OpenDialog->Filter = "txt|*.txt";
 		 OpenDialog->Options << ofAllowMultiSelect;
-		 if (OpenDialog->Execute()) 
+		 if (OpenDialog->Execute())
 		 {
 			vCadrInfo.clear();
 			DeleteLineGraph();
@@ -4370,19 +2457,18 @@ void __fastcall TFormGraphOrient::BOKZM601000ParseProtocolClick(TObject *Sender)
 			{
 				FileName = FileList->Strings[i];
 				ifstream in(FileName.c_str());
-				if (!in.is_open()) 
+				if (!in.is_open())
 				{
 					ShowMessage("Не удалось открыть файл");
 					return;
 				}
-			   readBOKZ601000Protocol(in, vCadrInfo, counter, startDate);
-			   //readBOKZ601000MKO (in, vCadrInfo, counter);
+
+				Handle1000 handle(this);
+				readBOKZ601000Protocol(in, vCadrInfo, counter, startDate, handle);
 			}
 
 			PrepareStartDraw();
 			CheckTabSheet();
 		}
-}
-//---------------------------------------------------------------------------
-
-
+	}
+	// ---------------------------------------------------------------------------

@@ -22,8 +22,8 @@
 	#include "UnitAnimateSetting.h"
 	#include <Vcl.WinXCtrls.hpp>
 	#include "Analyze.h"
-#include <Data.DB.hpp>
-#include <Data.Win.ADODB.hpp>
+	#include <Data.DB.hpp>
+	#include <Data.Win.ADODB.hpp>
 
 //---------------------------------------------------------------------------
 class TMainForm : public TForm

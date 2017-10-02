@@ -1,6 +1,7 @@
-#ifndef InfoCadr
-#define InfoCadr
+#ifndef INFO_CADR_H
+#define INFO_CADR_H
 #include <vector>
+#include "MathM.h"
 
 struct StarsInfo // прогнозируемые
 {
@@ -145,7 +146,7 @@ void calcOmegaDiff(std::vector <CadrInfo>& cadrInfoVec)
 	double MOrientSecond[3][3];
 	double Wop [3];
 	double dTime = 1. / 8.;
-	for (int i = 0; i < cadrInfoVec.size() - 1; i++)
+	for (unsigned int i = 0; i < cadrInfoVec.size() - 1; i++)
 	{
 		if (cadrInfoVec[i].IsOrient && cadrInfoVec[i + 1].IsOrient)
 		{

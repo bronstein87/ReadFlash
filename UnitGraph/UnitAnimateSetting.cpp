@@ -90,7 +90,7 @@ void __fastcall TFormAnimateSetting::ShapeColorDetObjTableMouseDown(TObject *Sen
 		  TMouseButton Button, TShiftState Shift, int X, int Y)
 {
 	if (ColorDialog1->Execute()) {
-		ShapeColorDetObjTable->Brush->Color=ColorDialog1->Color;
+		ShapeColorDetObjTable->Brush->Color = ColorDialog1->Color;
 		TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
 //		FormGraphOrient->DrawAnimateHandler();
 		FormGraphOrient->PrintTableObjectsHandler();

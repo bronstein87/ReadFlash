@@ -41,9 +41,7 @@
 	#include <Forms.hpp>
 	#include <Menus.hpp>
 	#include <Dialogs.hpp>
-	#include "MathM.h"
 	#include "StatLib.h"
-	#include "InfoCadrFormat.h"
 	#include "ReadFlashFormat.h"
 	#include <limits.h>
 	#include <ComCtrls.hpp>
@@ -51,15 +49,11 @@
 	#include "..\\UnitMain.h"
 	#include "UnitAnimateSetting.h"
 	#include <vcl.h>
-	#include <System.IOUtils.hpp>
 	#include <SysUtils.hpp>
-	#include <DateUtils.hpp>
 	#include <System.StrUtils.hpp>
 	#include <System.Uitypes.hpp>
 	#include <stdio.h>
 	#include <memory>
-	#include <fstream>
-	#include <iomanip>
 	#include "ImageProcessingFcns.h"
 	#include <exception>
 	#include <unordered_map>
@@ -68,8 +62,8 @@
 	#include <iterator>
 	#include <algorithm>
 	#include "FragmentScrollBox.h"
-	#include "iki_img.cpp"
 	#include "SimplePlotter.h"
+	#include "ParseProtocols.h"
 
 
 	#define MaxBlockSeries 8
@@ -83,6 +77,7 @@
 		int Size;
 		int SecuenceCounter;
 	};
+
 
 
 	class TFormAnimateSetting;
@@ -117,35 +112,35 @@
 		TChartEditor *ChartEditor1;
 		TFileOpenDialog *FileOpenDialog1;
 		TPageControl *Fyf;
-	TTabSheet *TabSheetAngles;
+		TTabSheet *TabSheetAngles;
 		TChart *ChartAl;
 		TChart *ChartDl;
 		TChart *ChartAz;
-	TTabSheet *TabSheetAnglesError;
+		TTabSheet *TabSheetAnglesError;
 		TChart *ChartAzError;
 		TChart *ChartDlError;
 		TChart *ChartAlError;
-	TTabSheet *TabSheetOmega;
+		TTabSheet *TabSheetOmega;
 		TChart *ChartWx;
 		TChart *ChartWy;
 		TChart *ChartWz;
-	TTabSheet *TabSheetOmegaError;
+		TTabSheet *TabSheetOmegaError;
 		TChart *ChartWxError;
 		TChart *ChartWyError;
 		TChart *ChartWzError;
-	TTabSheet *TabSheetMxy;
+		TTabSheet *TabSheetMxy;
 		TChart *ChartMx;
 		TChart *ChartMy;
 		TChart *ChartMxy;
-	TTabSheet *TabSheetCountObjects;
+		TTabSheet *TabSheetCountObjects;
 		TChart *ChartNumFrag;
 		TChart *ChartNumLoc;
 		TChart *ChartNumDet;
-	TTabSheet *TabSheetImage;
+		TTabSheet *TabSheetImage;
 		TChart *ChartFone;
 		TChart *ChartNoise;
 		TChart *ChartTemp;
-	TTabSheet *TabSheetStarsMotion;
+		TTabSheet *TabSheetStarsMotion;
 		TLabel *Label4;
 		TLabel *Label3;
 		TLabel *Label2;
@@ -157,7 +152,7 @@
 		TLineSeries *Series2;
 		TArrowSeries *Series3;
 		TLineSeries *Series1;
-	TTabSheet *TabSheetTableFrag;
+		TTabSheet *TabSheetTableFrag;
 		TChart *Chart2;
 		TBarSeries *Series4;
 		TChart *Chart3;
@@ -165,7 +160,7 @@
 		TChart *Chart4;
 		TBarSeries *Series5;
 		TStringGrid *TableWindowsInfo;
-	TTabSheet *TabSheetTableObject;
+		TTabSheet *TabSheetTableObject;
 		TChart *Chart5;
 		TBarSeries *Series7;
 		TChart *Chart6;
@@ -185,37 +180,37 @@
 		TUpDown *UpDown3;
 		TEdit *FontSizeEdit;
 		TUpDown *UpDown4;
-	TTabSheet *TabSheetStatFrag;
+		TTabSheet *TabSheetStatFrag;
 		TChart *ChartFragErrX;
 		TChart *ChartFragErrY;
-	TTabSheet *TabSheetAxesError;
+		TTabSheet *TabSheetAxesError;
 		TChart *ChartErrorOX;
 		TChart *ChartErrorOY;
 		TChart *ChartErrorOZ;
 		TChart *ChartFragBright;
 		TChart *ChartFragSizeEl;
 		TArrowSeries *Series10;
-	TMenuItem *BOKZM601000ParseProtocol;
-	TTabSheet *TabSheetStatStars;
-	TChart *ChartBrightMv;
-	TChart *ChartBrightSize;
-	TChart *ChartBrightSp;
-	TChart *ChartSizeMv;
+		TMenuItem *BOKZM601000ParseProtocol;
+		TTabSheet *TabSheetStatStars;
+		TChart *ChartBrightMv;
+		TChart *ChartBrightSize;
+		TChart *ChartBrightSp;
+		TChart *ChartSizeMv;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
 		void __fastcall FormCreate(TObject *Sender);
-		void __fastcall TableObjectsInfoDrawCell(TObject *Sender, int ACol, int ARow, TRect &Rect,
-			  TGridDrawState State);
-		void __fastcall TableWindowsInfoDrawCell(TObject *Sender, int ACol, int ARow, TRect &Rect,
-			  TGridDrawState State);
+		void __fastcall TableObjectsInfoDrawCell(TObject *Sender, int ACol,
+			int ARow, TRect &Rect, TGridDrawState State);
+		void __fastcall TableWindowsInfoDrawCell(TObject *Sender, int ACol,
+			int ARow, TRect &Rect, TGridDrawState State);
 		void __fastcall MenuOptionsClick(TObject *Sender);
 		void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 		void __fastcall FragmentShowScrollBoxResize(TObject *Sender);
-		void __fastcall FormMouseWheelDown(TObject *Sender, TShiftState Shift,const TPoint& MousePos,
-		  bool &Handled);
-		void __fastcall FormMouseWheelUp(TObject *Sender, TShiftState Shift,const TPoint& MousePos,
-		  bool &Handled);
+		void __fastcall FormMouseWheelDown(TObject *Sender, TShiftState Shift,
+			const TPoint& MousePos, bool &Handled);
+		void __fastcall FormMouseWheelUp(TObject *Sender, TShiftState Shift,
+			const TPoint& MousePos, bool &Handled);
 		void __fastcall MenuOpenFlashClick(TObject *Sender);
 		void __fastcall MenuOpenProgressTMIClick(TObject *Sender);
 		void __fastcall EditNumCadrChange(TObject *Sender);
@@ -228,16 +223,100 @@
 		void __fastcall FontSizeEditChange(TObject *Sender);
 		void __fastcall ReadIKIFormatClick(TObject *Sender);
 		void __fastcall FormResize(TObject *Sender);
-		void __fastcall ChartsFragClickLegend(TCustomChart *Sender, TMouseButton Button,
-          TShiftState Shift, int X, int Y);
-		void __fastcall ChartOrientClickLegend(TCustomChart *Sender, TMouseButton Button, TShiftState Shift,
-          int X, int Y);
-	void __fastcall BOKZM601000ParseProtocolClick(TObject *Sender);
+		void __fastcall ChartsFragClickLegend(TCustomChart *Sender,
+			TMouseButton Button, TShiftState Shift, int X, int Y);
+		void __fastcall ChartOrientClickLegend(TCustomChart *Sender,
+			TMouseButton Button, TShiftState Shift, int X, int Y);
+		void __fastcall BOKZM601000ParseProtocolClick(TObject *Sender);
 
 
 	private:	// User declarations
+
+		class Handle {
+		public:
+			_fastcall Handle(TFormGraphOrient* _Form) : Form(_Form) {}
+			virtual void operator()(CadrInfo& cadrInfo) = 0;
+		protected:
+			TFormGraphOrient* Form;
+		};
+		class HandleLoc60 : public Handle {
+		public:
+			_fastcall HandleLoc60(TFormGraphOrient* _Form) : Handle(_Form) {}
+
+			void operator()(CadrInfo& cadrInfo) {
+				Form->plotter->AddPoint(Form->ChartNumLoc, 0, cadrInfo.Time,cadrInfo.CountLocalObj);
+				Form->plotter->AddPoint(Form->ChartNumDet, 0, cadrInfo.Time,cadrInfo.CountDeterObj);
+			}
+
+		};
+		class Handle60: public Handle {
+		public:
+			_fastcall Handle60 (TFormGraphOrient* _Form) : Handle(_Form) {}
+
+			void operator()(CadrInfo& cadrInfo) {
+
+				Form->plotter->AddPoint(Form->ChartAl, 0, cadrInfo.Time, cadrInfo.AnglesOrient[0] * RTD);
+				Form->plotter->AddPoint(Form->ChartDl, 0, cadrInfo.Time, cadrInfo.AnglesOrient[1] * RTD);
+				Form->plotter->AddPoint(Form->ChartAz, 0, cadrInfo.Time, cadrInfo.AnglesOrient[2] * RTD);
+				Form->plotter->AddPoint(Form->ChartNumLoc, 0, cadrInfo.Time,cadrInfo.CountLocalObj);
+				Form->plotter->AddPoint(Form->ChartNumDet, 0, cadrInfo.Time,cadrInfo.CountDeterObj);
+				Form->plotter->AddPoint(Form->ChartWx, 0, cadrInfo.Time,cadrInfo.OmegaOrient[0] * RTM);
+				Form->plotter->AddPoint(Form->ChartWy, 0, cadrInfo.Time,cadrInfo.OmegaOrient[1] * RTM);
+				Form->plotter->AddPoint(Form->ChartWz, 0, cadrInfo.Time,cadrInfo.OmegaOrient[2] * RTM);
+				Form->plotter->AddPoint(Form->ChartNumFrag, 0, cadrInfo.Time,cadrInfo.CountWindows);
+			}
+
+		};
+		class HandleM2V : public Handle {
+
+		public:
+			_fastcall HandleM2V(TFormGraphOrient* _Form) : Handle(_Form) {
+			}
+
+			void operator()(CadrInfo& cadrInfo) {
+
+				Form->plotter->AddPoint(Form->ChartAl, 0, cadrInfo.Time, cadrInfo.AnglesOrient[0] * RTD);
+				Form->plotter->AddPoint(Form->ChartDl, 0, cadrInfo.Time, cadrInfo.AnglesOrient[1] * RTD);
+				Form->plotter->AddPoint(Form->ChartAz, 0, cadrInfo.Time, cadrInfo.AnglesOrient[2] * RTD);
+				Form->plotter->AddPoint(Form->ChartWx, 0, cadrInfo.Time,cadrInfo.OmegaOrient[0] * RTM);
+				Form->plotter->AddPoint(Form->ChartWy, 0, cadrInfo.Time,cadrInfo.OmegaOrient[1] * RTM);
+				Form->plotter->AddPoint(Form->ChartWz, 0, cadrInfo.Time,cadrInfo.OmegaOrient[2] * RTM);
+				Form->plotter->AddPoint(Form->ChartNumFrag, 0, cadrInfo.Time,cadrInfo.CountWindows);
+				Form->plotter->AddPoint(Form->ChartNumLoc, 0, cadrInfo.Time,cadrInfo.CountLocalObj);
+				Form->plotter->AddPoint(Form->ChartNumDet, 0, cadrInfo.Time,cadrInfo.CountDeterObj);
+				Form->plotter->AddPoint(Form->ChartMxy, 0, cadrInfo.Time, cadrInfo.MeanErrorXY);
+				Form->plotter->AddPoint(Form->ChartTemp, 0, cadrInfo.Time, cadrInfo.MatrixTemp);
+				Form->plotter->AddPoint(Form->ChartFone, 0, cadrInfo.Time,cadrInfo.MeanBright);
+				Form->plotter->AddPoint(Form->ChartNoise, 0, cadrInfo.Time,cadrInfo.SigmaBright);
+			}
+
+		};
+		class Handle1000  {
+
+		public:
+			_fastcall Handle1000(TFormGraphOrient* _Form) : Form(_Form) {
+			}
+
+			void operator()(CadrInfo& cadrInfo, TColor pointColor) {
+
+				Form->plotter->AddPoint(Form->ChartAl, 0, cadrInfo.Time,cadrInfo.AnglesOrient[0] * RTD, pointColor);
+				Form->plotter->AddPoint(Form->ChartDl, 0, cadrInfo.Time,cadrInfo.AnglesOrient[1] * RTD, pointColor);
+				Form->plotter->AddPoint(Form->ChartAz, 0, cadrInfo.Time,cadrInfo.AnglesOrient[2] * RTD, pointColor);
+				Form->plotter->AddPoint(Form->ChartNumFrag, 0, cadrInfo.Time,cadrInfo.CountWindows, pointColor);
+				Form->plotter->AddPoint(Form->ChartNumDet, 0, cadrInfo.Time,cadrInfo.CountDeterObj, pointColor);
+				Form->plotter->AddPoint(Form->ChartNumLoc, 0, cadrInfo.Time,cadrInfo.CountLocalObj, pointColor);
+				Form->plotter->AddPoint(Form->ChartWx, 0, cadrInfo.Time,cadrInfo.OmegaOrient[0] * RTM * BOKZ1000ConvCoef, pointColor);
+				Form->plotter->AddPoint(Form->ChartWy, 0, cadrInfo.Time,cadrInfo.OmegaOrient[1] * RTM * BOKZ1000ConvCoef, pointColor);
+				Form->plotter->AddPoint(Form->ChartWz, 0, cadrInfo.Time,cadrInfo.OmegaOrient[2] * RTM * BOKZ1000ConvCoef, pointColor);
+			}
+
+		private:
+			TFormGraphOrient* Form;
+
+		};
+
 		void PrepareStartDraw();
-        void CheckTabSheet();
+		void CheckTabSheet();
 		void InitTableObjects(void);
 		void PrintTableObjects(const struct CadrInfo &mCadr);
 		void InitTableWindows(void);
@@ -246,25 +325,33 @@
 		void DrawAnimate(const struct CadrInfo &mCadr);
 		void DrawBlock(const struct CadrInfo &mCadr);
 		void DrawFragment(const struct CadrInfo &mCadr);
-		void PlaceImageFragments (const vector <FragmentScrollBox*>& FragmentImages);
+		void PlaceImageFragments
+			(const vector<FragmentScrollBox*>& FragmentImages);
 		AnsiString SortRawFlashFile(const AnsiString &RawFileName);
-		void __fastcall ImageOnClick(TObject *Sender,
-		TMouseButton Button, TShiftState Shift, int X, int Y);
+		void __fastcall ImageOnClick(TObject *Sender, TMouseButton Button,
+			TShiftState Shift, int X, int Y);
 		void resetFragmentShowScrollBox();
-		void readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
-		void readBOKZ60LocProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
-		void readmBOKZ2VProtocol(ifstream& in,vector <CadrInfo>& cadrInfoVec);
-		void readBOKZ601000Protocol(ifstream& in,vector <CadrInfo>& cadrInfoVec, unsigned int& counter, TDateTime& startDate);
-		void readBOKZ601000MKO(ifstream& in, vector <CadrInfo>& cadrInfoVec, unsigned int& counter);
 		void __fastcall OnScroll(TObject* Sender);
 		void SetContrast();
-		void __fastcall ChartMouseWheel(TObject *Sender, TShiftState Shift, int WheelDelta,
-			const TPoint &MousePos, bool &Handled);
-		void __fastcall ChartMouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
-		  int X, int Y);
-        void CalculateSeriesSKO();
+		void __fastcall ChartMouseWheel(TObject *Sender, TShiftState Shift,
+			int WheelDelta, const TPoint &MousePos, bool &Handled);
+		void __fastcall ChartMouseDown(TObject *Sender, TMouseButton Button,
+			TShiftState Shift, int X, int Y);
+		void CalculateSeriesSKO();
 
-		unique_ptr <TFormAnimateSetting> FormAnimateSetting;
+		void DeleteLineGraph();
+		void InitializeSynchronization();
+		void SynchronizeCharts(double Value);
+		void SaveGraph(TChart *Chart, AnsiString suff);
+
+		int GetCadrInfo(int NC, struct CadrInfo &mCadr);
+
+
+		void DrawBlockHandler(void);
+		void ResizePlot(TChart *chart, double kx, double ky, int indexX,
+			int indexY);
+
+		unique_ptr<TFormAnimateSetting>FormAnimateSetting;
 		TChartShape *BlockSeries[MaxBlockSeries];
 		TChartShape *FrameSeries[MaxFrameSeries];
 
@@ -274,6 +361,7 @@
 		AnsiString FragDir;
 		AnsiString LocDir;
 
+		std::unique_ptr <SimplePlotter> plotter;
 		float ScaleFactorForScrollBox;
 		int ScaleFactorForImage;
 		int Contrast;
@@ -281,28 +369,21 @@
 		unsigned short FontSize;
 		bool CompareIKIRes;
 
-		std::unique_ptr <SimplePlotter> plotter;
-		vector <TChart*> Charts;
-		vector <CadrInfo> vCadrInfo;
-		vector <TImage*> ImageVector;
-		vector <FragmentData> FragmentVector;
-		vector <FragmentScrollBox*> ImageScrollBoxVector;
-		vector <TImage*> FragmentsNumbers;
+		vector<TChart*>Charts;
+		vector<CadrInfo>vCadrInfo;
+		vector<TImage*>ImageVector;
+		vector<FragmentData>FragmentVector;
+		vector<FragmentScrollBox*>ImageScrollBoxVector;
+		vector<TImage*>FragmentsNumbers;
 
 	public:		// User declarations
 
 		__fastcall TFormGraphOrient(TComponent* Owner);
-		void DeleteLineGraph();
-		void InitializeSynchronization();
-		void SynchronizeCharts(double Value);
-		void SaveGraph(TChart *Chart, AnsiString suff);
-		void SetVisibleLabelFrame(bool isVisible);
-		int  GetCadrInfo(int NC, struct CadrInfo &mCadr);
-		void DrawAnimateHandler(void);
 		void PrintTableWindowsHandler(void);
 		void PrintTableObjectsHandler(void);
-		void DrawBlockHandler(void);
-        void ResizePlot(TChart *chart, double kx, double ky, int indexX, int indexY);
+		void DrawAnimateHandler(void);
+		void SetVisibleLabelFrame(bool isVisible);
+
 	};
 	//---------------------------------------------------------------------------
 	extern PACKAGE TFormGraphOrient *FormGraphOrient;

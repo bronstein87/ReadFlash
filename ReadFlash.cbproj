@@ -157,6 +157,10 @@
         <Defines>NDEBUG;$(Defines)</Defines>
     </PropertyGroup>
     <ItemGroup>
+        <CppCompile Include="AddString.cpp">
+            <DependentOn>AddString.h</DependentOn>
+            <BuildOrder>20</BuildOrder>
+        </CppCompile>
         <CppCompile Include="FragmentScrollBox.cpp">
             <DependentOn>FragmentScrollBox.h</DependentOn>
             <BuildOrder>12</BuildOrder>
@@ -179,6 +183,10 @@
         <None Include="MathM.h">
             <BuildOrder>5</BuildOrder>
         </None>
+        <CppCompile Include="ParseProtocols.cpp">
+            <DependentOn>ParseProtocols.h</DependentOn>
+            <BuildOrder>19</BuildOrder>
+        </CppCompile>
         <CppCompile Include="ReadFlash.cpp">
             <BuildOrder>0</BuildOrder>
         </CppCompile>

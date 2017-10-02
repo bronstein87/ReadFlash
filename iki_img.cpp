@@ -1418,7 +1418,7 @@ else
 					{
 						FStream->Read(&sizedata, sizeof(unsigned int));
 						FStream->Read(&Data_buf[0], sizedata);
-						for (int k = 0; k < sizedata; k++)
+						for (unsigned int k = 0; k < sizedata; k++)
 							if (Data_buf[k] == '\0')
 								Data_buf[k] = '.';
 
