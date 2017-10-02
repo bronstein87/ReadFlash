@@ -52,6 +52,7 @@ __published:	// IDE-managed Components
 	TEdit *EditFilePrefix;
 	TLabel *Label8;
 	TEdit *BeginFromEdit;
+	TCheckBox *CheckBoxDateTime;
 	void __fastcall ShapeColorLocObjTableMouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y);
 	void __fastcall ShapeColorZeroObjTableMouseDown(TObject *Sender, TMouseButton Button,

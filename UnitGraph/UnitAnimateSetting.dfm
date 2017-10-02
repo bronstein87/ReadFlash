@@ -204,12 +204,12 @@ object FormAnimateSetting: TFormAnimateSetting
     Left = 8
     Top = 359
     Width = 352
-    Height = 82
+    Height = 108
     Caption = #1057#1074#1086#1076#1085#1099#1077' '#1075#1088#1072#1092#1080#1082#1080
     TabOrder = 3
     object CheckBoxCurrentTime: TCheckBox
       Left = 18
-      Top = 24
+      Top = 48
       Width = 191
       Height = 17
       Caption = #1054#1090#1086#1073#1088#1072#1078#1072#1090#1100' '#1090#1077#1082#1091#1097#1077#1077' '#1080#1079#1084#1077#1088#1077#1085#1080#1077
@@ -217,7 +217,7 @@ object FormAnimateSetting: TFormAnimateSetting
     end
     object RadioButton1: TRadioButton
       Left = 40
-      Top = 47
+      Top = 71
       Width = 113
       Height = 17
       Caption = #1083#1080#1085#1080#1103
@@ -225,16 +225,24 @@ object FormAnimateSetting: TFormAnimateSetting
     end
     object RadioButton2: TRadioButton
       Left = 180
-      Top = 47
+      Top = 71
       Width = 113
       Height = 17
       Caption = #1090#1086#1095#1082#1072
       TabOrder = 2
     end
+    object CheckBoxDateTime: TCheckBox
+      Left = 18
+      Top = 25
+      Width = 231
+      Height = 17
+      Caption = #1054#1090#1086#1073#1088#1072#1078#1077#1085#1080#1077' '#1076#1072#1090#1099' '#1080' '#1074#1088#1077#1084#1077#1085#1080' '#1087#1086' '#1086#1089#1080' OX'
+      TabOrder = 3
+    end
   end
   object GroupBox5: TGroupBox
     Left = 8
-    Top = 447
+    Top = 473
     Width = 352
     Height = 74
     Caption = #1042#1099#1073#1086#1088' '#1092#1072#1081#1083#1086#1074
@@ -250,7 +258,7 @@ object FormAnimateSetting: TFormAnimateSetting
       Left = 18
       Top = 46
       Width = 57
-      Height = 14
+      Height = 13
       Caption = #1053#1072#1095#1080#1085#1072#1090#1100' '#1089
     end
     object EditFilePrefix: TEdit

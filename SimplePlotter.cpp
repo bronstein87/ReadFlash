@@ -65,6 +65,10 @@ void SimplePlotter::AddPoint (TChart* Chart, DWORD SeriesIndex, double X, double
 		for (int i = Chart->SeriesCount(); i <= SeriesIndex; i++) {
 			Chart->AddSeries(new TLineSeries(Chart));
 			SetSeriesOptions(dynamic_cast <TLineSeries*> (Chart->Series[i]));
+
+			if (DateTimeX) {
+				Chart->BottomAxis->DateTimeFormat   = "dd.mm.yyyy hh:nn:ss";
+			}
 		}
 	  }
 
@@ -92,6 +96,7 @@ void SimplePlotter::SetSeriesOptions(TLineSeries* Series)
 	if (ShowPoints) Series->Pointer->Size = PointSize;
 	Series->Pen->Visible = ShowLines;
 	Series->Pointer->Style = PointerStyle;
+	Series->XValues->DateTime = DateTimeX;
 }
 
 #include "SimplePlotter.h"

@@ -45,6 +45,10 @@ class SimplePlotter
 	{
 		ShowLines = _ShowLines;
 	}
+	void SetDateTimeX (bool _DateTimeX)
+	{
+		DateTimeX = _DateTimeX;
+	}
 
 	void ClearChart(TChart* Chart);
 
@@ -70,6 +74,7 @@ class SimplePlotter
 	TColor SeriesColor;
 	bool ShowPoints;
 	bool ShowLines;
+	bool DateTimeX;
 	unsigned short PointSize;
 	TSeriesPointerStyle  PointerStyle;
 

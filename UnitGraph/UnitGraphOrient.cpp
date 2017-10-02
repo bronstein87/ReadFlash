@@ -9,6 +9,8 @@
 
 #pragma resource "*.dfm"
 
+//bool IsDateTime = true;
+
 void SwapShort(short *word1, short *word2)
 {
 	short buf;
@@ -2729,8 +2731,8 @@ void TFormGraphOrient::readBOKZ60Protocol(ifstream& in,vector <CadrInfo>& cadrIn
 				Az = atan2m(matrixOfOrientation[0][2], matrixOfOrientation[1][2])*RTD;   if (Az < 0)  Az += 360.;
 
 				plotter->AddPoint(ChartAl, 0, cadrInfo.Time, al);
-				plotter->AddPoint(ChartDl, 0, cadrInfo.Time, al);
-				plotter->AddPoint(ChartAz, 0, cadrInfo.Time, al);
+				plotter->AddPoint(ChartDl, 0, cadrInfo.Time, dl);
+				plotter->AddPoint(ChartAz, 0, cadrInfo.Time, Az);
 
 		   }
 		   else throw logic_error(errorMessage);
@@ -3636,6 +3638,10 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 
 					if (CompareIKIRes)
 					{
+						plotter->SetTitle("измерения");
+						plotter->SetSeriesColor(clBlue);
+						plotter->SetDateTimeX(FormAnimateSetting->CheckBoxDateTime->Checked);
+
 						plotter->AddPoint(ChartNumFrag, 0, Time, vCadrInfo.back().CountWindows);
 						plotter->AddPoint(ChartNumLoc, 0, Time, vCadrInfo.back().CountLocalObj);
 
@@ -3645,8 +3651,6 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 
 						if (vCadrInfo.back().IsOrient)
 						{
-							plotter->SetTitle("измерения");
-							plotter->SetSeriesColor(clBlue);
 							plotter->AddPoint(ChartNumDet, 0, Time, vCadrInfo.back().CountDeterObj);
 							plotter->AddPoint(ChartMx, 0, Time, vCadrInfo.back().MeanErrorX * 1000.);
 							plotter->AddPoint(ChartMy, 0, Time, vCadrInfo.back().MeanErrorY * 1000.);
@@ -3681,21 +3685,25 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 							int iObject = 0;
 							int maxDrawFrag = 12;
 							for (int iFrag  = 0; iFrag < vCadrInfo.back().SizeWindowsList; iFrag++) {
-								TColor color = RGB((float)(maxDrawFrag-iFrag)/maxDrawFrag * 255,
+								TColor color = RGB((float)(maxDrawFrag - iFrag)/maxDrawFrag * 255,
 																200, (float)iFrag/maxDrawFrag * 255 );
 								plotter->SetSeriesColor(color);
-								plotter->SetTitle(IntToStr(iFrag+1));
+								plotter->SetTitle(IntToStr(iFrag + 1));
 
 								for (int iObjFrag = 0; iObjFrag < vCadrInfo.back().WindowsList[iFrag].CountObj; iObjFrag++) {
 									if (iFrag < maxDrawFrag) {
 										plotter->AddPoint(ChartFragBright, iFrag, Time,
 																vCadrInfo.back().ObjectsList[iObject].Bright);
-										plotter->AddPoint(ChartFragSizeEl, iFrag, Time,
-																vCadrInfo.back().ObjectsList[iObject].Square);
-										plotter->AddPoint(ChartFragErrX, iFrag, Time,
-																vCadrInfo.back().ObjectsList[iObject].Dx*1000.);
-										plotter->AddPoint(ChartFragErrY, iFrag, Time,
-																vCadrInfo.back().ObjectsList[iObject].Dy*1000.);
+										if (vCadrInfo.back().ObjectsList[iObject].Square) {
+											plotter->AddPoint(ChartFragSizeEl, iFrag, Time,
+																	vCadrInfo.back().ObjectsList[iObject].Square);
+										}
+										if (vCadrInfo.back().ObjectsList[iObject].StarID) {
+											plotter->AddPoint(ChartFragErrX, iFrag, Time,
+																	vCadrInfo.back().ObjectsList[iObject].Dx*1000.);
+											plotter->AddPoint(ChartFragErrY, iFrag, Time,
+																	vCadrInfo.back().ObjectsList[iObject].Dy*1000.);
+										}
 									}
 									iObject++;
 								}
@@ -3703,14 +3711,17 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 
 							//статистика по звездам
 							plotter->SetShowLines(false);
+							plotter->SetDateTimeX(false);
 							for (int iObject = 0; iObject < vCadrInfo.back().SizeObjectsList; iObject++) {
 								if (vCadrInfo.back().ObjectsList[iObject].StarID /* && Dx && Dy */) {
 									plotter->AddPoint(ChartBrightMv,   0, vCadrInfo.back().ObjectsList[iObject].Mv,
 																		  vCadrInfo.back().ObjectsList[iObject].Bright);
-									plotter->AddPoint(ChartSizeMv,     0, vCadrInfo.back().ObjectsList[iObject].Mv,
+									if (vCadrInfo.back().ObjectsList[iObject].Square) {
+										plotter->AddPoint(ChartSizeMv,     0, vCadrInfo.back().ObjectsList[iObject].Mv,
 																		  vCadrInfo.back().ObjectsList[iObject].Square);
-									plotter->AddPoint(ChartBrightSize, 0, vCadrInfo.back().ObjectsList[iObject].Square,
+										plotter->AddPoint(ChartBrightSize, 0, vCadrInfo.back().ObjectsList[iObject].Square,
 																		  vCadrInfo.back().ObjectsList[iObject].Bright);
+									}
 
 //									float tempSpec = GetTempSpec(vCadrInfo.back().ObjectsList[iObject].Sp);
 //									float brightMv0 = vCadrInfo.back().ObjectsList[iObject].Bright *
