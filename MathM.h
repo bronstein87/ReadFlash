@@ -12,6 +12,13 @@
 #define DTR   0.0174532925
 #define BOKZ1000ConvCoef       0.098174770424681
 
+struct PointXYZ
+{
+	_fastcall PointXYZ(double _X, double _Y, double _Z): X(_X), Y(_Y), Z(_Z){}
+	double X;
+	double Y;
+	double Z;
+};
 
 double sqrtm(double xf);
 double acosm(double xf);
@@ -27,22 +34,31 @@ void ToGMS (double gradAngle, int& gradus, int& minutes, int& seconds);
 float GetTempSpec(char *sp);
 
 template <class InputIterator, class Value, class UnaryOperation>
-std::pair<Value, Value> calculateMeanStdDv (InputIterator first, InputIterator last, Value init, UnaryOperation extractWtC)
-{
-	if (first == last) return std::pair <Value, Value> (extractWtC(*first), Value());
+std::pair <Value, Value> calculateMeanStdDv(InputIterator first, InputIterator last, Value init, UnaryOperation extractWtC) {
+
+	bool f = false;
+	if (first == last) return std::pair <Value, Value> (extractWtC(*first, f), Value());
 
 	Value dispersio = 0;
-	for (InputIterator i = first;i < last; i++)
-	{
-		init += extractWtC(*i);
-		dispersio += pow(extractWtC(*i), 2);
+	unsigned int count_offset = 0;
+	for (InputIterator i = first; i < last; i++) {
+		Value temp = extractWtC(*i, f);
+		if (f) {
+			++count_offset;
+			f = !f;
+			continue;
+		}
+		else {
+			init += temp;
+			dispersio += pow(temp, 2);
+		}
 	}
-	auto count = std::distance(first,last);
+	auto count = std::distance(first, last) - count_offset;
 	Value mean = init / count;
 	dispersio = (dispersio / count) - pow(mean, 2);
-    if(abs(dispersio) < 0.0000000001) dispersio = 0;
-
-	return std::pair <Value,Value> (mean, sqrt(dispersio));
+	return std::pair <Value, Value> (mean, sqrtm(dispersio));
 }
+
+
 
 #endif

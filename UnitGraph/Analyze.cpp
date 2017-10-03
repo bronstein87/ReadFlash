@@ -149,7 +149,7 @@ void __fastcall TAnalyzeForm::ChooseDirectoriesClick(TObject *Sender)
 				 UnicodeString Label = FloatToStr(gradus) + "°" + FloatToStr(minutes) + "'" + FloatToStr(seconds) + "''";
 
 				 struct { bool operator()(const Point& a,const Point& b) { return a.X < b.X;} } ComparePointX;
-				 struct { float operator() (const Point& a) {return a.X;} } AddX;
+				 struct { float operator() (const Point& a, bool& f) {f = false; return a.X;} } AddX;
 
 				 vector <Point>::iterator Max = std::max_element(AngularSpeedErrorValues.begin(), AngularSpeedErrorValues.end(), ComparePointX);
 				 vector <Point>::iterator Min = std::min_element(AngularSpeedErrorValues.begin(), AngularSpeedErrorValues.end(), ComparePointX);
@@ -166,7 +166,7 @@ void __fastcall TAnalyzeForm::ChooseDirectoriesClick(TObject *Sender)
 				 seriesAlSKO->AddHighLow(i, (MeanSkoX.first + MeanSkoX.second) * RTS, (MeanSkoX.first - MeanSkoX.second) * RTS , Label);
 
 				 struct { bool operator()(const Point& a,const Point& b) { return a.Y < b.Y; } } ComparePointY;
-				 struct { float operator() (const Point& a) { return a.Y;} } AddY;
+				 struct { float operator() (const Point& a, bool& f) {f = false;  return a.Y;} } AddY;
 
 				 Max = std::max_element(AngularSpeedErrorValues.begin(), AngularSpeedErrorValues.end(), ComparePointY);
 				 Min = std::min_element(AngularSpeedErrorValues.begin(), AngularSpeedErrorValues.end(), ComparePointY);
@@ -183,7 +183,7 @@ void __fastcall TAnalyzeForm::ChooseDirectoriesClick(TObject *Sender)
 				 seriesDlMean->AddXY(i, MeanSkoY.first * RTS, Label);
 
 				 struct { bool operator() (const Point& a,const Point& b) { return a.Z < b.Z; } } ComparePointZ;
-				 struct { float operator() (const Point& a) { return a.Z;} } AddZ;
+				 struct { float operator() (const Point& a, bool& f) {f = false;  return a.Z;} } AddZ;
 
 				 Max = std::max_element(AngularSpeedErrorValues.begin(), AngularSpeedErrorValues.end(), ComparePointZ);
 				 Min = std::min_element(AngularSpeedErrorValues.begin(), AngularSpeedErrorValues.end(), ComparePointZ);
