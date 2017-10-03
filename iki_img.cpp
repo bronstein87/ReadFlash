@@ -1,8 +1,5 @@
-#ifndef IKI_IMG_H
-#define IKI_IMG_H
 #include <fstream>
 #include <stdio.h>
-#include <Classes.hpp>
 
 using namespace std;
 
@@ -12,7 +9,7 @@ using namespace std;
 #define StartId                 0xABCD
 
 #define ROUND(N) (N<0?ceil((N)-0.5):floor((N)+0.5))
-#define VERSION_ID                              "1.04.08.17"
+#define VERSION_ID                              "1.03.10.17"
 
 #pragma region whenwhere
 #define whenwhere_id                            0xAAAA
@@ -219,6 +216,10 @@ struct STARREC
 	float Xs, Ys; // координаты энергетического центра
 	float Mv; // звездная величина
 	char Sp[2]; // спектральный класс
+
+	STARREC() {
+		Is = 0; Xs = 0; Ys = 0; Mv = 0; Sp[0] = '_'; Sp[1] = '_';
+	}
 };
 
 struct REC
@@ -227,24 +228,14 @@ struct REC
 	STARREC* StarRec; // таблица сформированных звезд
 };
 
-struct starinfo
-{
-	float BrightnessObject; // яркость объекта
-	float PixelsCount; // количество пикселей
-	float X_coordinate; // координата Х
-	float Y_coordinate; // координата У
-
-	WORD NumberStar; // номер звезды в каталоге
-	float StellarMagnitude; // звездная величина
-	char SpectralClass[2]; // спектральный класс
-	float DX; // ошибка по оси Х
-	float DY; // ошибка по оси У
-};
-
 struct coefonaxis
 {
 	double X; // коэффициент по оси Х
 	double Y; // коэффициент по оси У
+
+	coefonaxis() {
+		X = 0; Y = 0;
+	}
 };
 
 struct funcdist
@@ -260,6 +251,10 @@ struct infopix // информация о битом пикселе
 	float Y_coordinate; // координата У
 	float BrightnessObj; // яркость объекта
 	WORD CoefficientObj; // размер объекта
+
+	infopix() {
+		X_coordinate = 0; Y_coordinate = 0; BrightnessObj = 0; CoefficientObj = 0;
+	}
 };
 
 struct deadpixels // структура битых пикселей
@@ -282,6 +277,10 @@ struct dataline
 {
 	int Y_FirstString; // координата У начала полосы
 	int CountString; // высота полосы
+
+	dataline() {
+		Y_FirstString = 0; CountString = 0;
+	}
 };
 
 struct setlines
@@ -308,6 +307,10 @@ struct datawindow
 	float Average; // среднее
 	unsigned short ZipX; // коэффициент сжатия по Х
 	unsigned short ZipY; // коэффициент сжатия по У
+
+	datawindow() {
+		WindowWidth = 0; WindowHeight = 0; X = 0; Y = 0; Limit = 0; ObjCount = 0; SKO = 0; Average = 0; ZipX = 0; ZipY = 0;
+	}
 };
 
 struct setwindow
@@ -379,6 +382,10 @@ struct filterdata
 	unsigned short X_coordinate; // координата Х
 	unsigned short Y_coordinate; // координата У
 	unsigned short BrightnessPixel; // яркость
+
+	filterdata() {
+		X_coordinate = 0; Y_coordinate = 0; BrightnessPixel = 0;
+	}
 };
 
 struct filterframe
@@ -387,6 +394,24 @@ struct filterframe
 	WORD FilteredPixelsCount; // количество фильтрованных пикселей
 	bool BottomRight; // флаг типа угла, false -  лв, true - пн
 	filterdata* DataPixels; // информация о пиксели
+};
+
+struct starinfo
+{
+	float BrightnessObject; // яркость объекта
+	float PixelsCount; // количество пикселей
+	float X_coordinate; // координата Х
+	float Y_coordinate; // координата У
+
+	WORD NumberStar; // номер звезды в каталоге
+	float StellarMagnitude; // звездная величина
+	char SpectralClass[2]; // спектральный класс
+	float DX; // ошибка по оси Х
+	float DY; // ошибка по оси У
+
+	starinfo() {
+		BrightnessObject = 0; PixelsCount = 0; X_coordinate = 0; Y_coordinate = 0; NumberStar = 0; StellarMagnitude = 0; SpectralClass[0] = '_'; SpectralClass[1] = '_'; DX = 0; DY = 0;
+	}
 };
 
 struct starsinfo
@@ -626,6 +651,7 @@ private:
 	// ---------------------------------------------------------------------------
 
 public:
+
 #pragma region ПЕРЕМЕННЫЕ
 
 	whenwhere Georeferencing; // когда? где?
@@ -991,7 +1017,7 @@ public:
 		}
 #pragma end_region
 #pragma region local_recog
-		if (StarsData.LocalizedCount != 0 && StarsData.StarsList != NULL)
+		if (StarsData.LocalizedCount != 0)
 		{
 			Value_String = "";
 			Value_String += FormatFloat("#####0 ", StarsData.LocalizedCount);
@@ -1151,7 +1177,7 @@ else
 		}
 #pragma end_region
 #pragma region stringwindow
-		if (ImageData.WindowsData.WindowCount != 0 && ImageData.WindowsData.Info != NULL)
+		if (ImageData.WindowsData.WindowCount != 0)
 		{
 			Value_String = FormatFloat("#####0", ImageData.WindowsData.WindowCount);
 			PrintString(FStream, stringwindow_count_id, stringwindow_count, Value_String);
@@ -1395,7 +1421,7 @@ else
 				}
 #pragma end_region
 #pragma region starsinfo
-			case rezstat_id: StarsData.RezStat = (WORD) StrToInt(buferstr); break;
+			case rezstat_id: StarsData.RezStat = (WORD) StrToInt("0x"+buferstr); break;
 			case epsilon_id: StarsData.Epsilon = (float) StrToFloat(buferstr); break;
 			case m_X_Y_Cyr_id:
 				{
@@ -1418,7 +1444,7 @@ else
 					{
 						FStream->Read(&sizedata, sizeof(unsigned int));
 						FStream->Read(&Data_buf[0], sizedata);
-						for (unsigned int k = 0; k < sizedata; k++)
+						for (int k = 0; k < sizedata; k++)
 							if (Data_buf[k] == '\0')
 								Data_buf[k] = '.';
 
@@ -1661,7 +1687,7 @@ else
 					case 2: ImageData.WindowsData.Data = (void*)new float[ImageData.WindowsData.SizeData]; break;
 					}
 					if (ImageData.WindowsData.SizeData != 0)
-					   FStream->Read(ImageData.WindowsData.Data, ImageData.WindowsData.SizeData * MassType[ImageData.WindowsData.DataType]);
+						FStream->Read(ImageData.WindowsData.Data, ImageData.WindowsData.SizeData * MassType[ImageData.WindowsData.DataType]);
 					FStream->Read(&end_str[0], 2);
 					break;
 				}
@@ -2081,5 +2107,3 @@ else
 	// ---------------------------------------------------------------------------
 #pragma end_region
 };
-
-#endif
