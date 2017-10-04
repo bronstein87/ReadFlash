@@ -196,6 +196,12 @@
 		TChart *ChartBrightSize;
 		TChart *ChartBrightSp;
 		TChart *ChartSizeMv;
+	TTabSheet *TabSheetStatFrag2;
+	TChart *ChartFragMean;
+	TChart *ChartFragNoise;
+	TChart *ChartFragLevel;
+	TTabSheet *TabSheetTableStat;
+	TStringGrid *TableStatInfo;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -228,6 +234,8 @@
 		void __fastcall ChartOrientClickLegend(TCustomChart *Sender,
 			TMouseButton Button, TShiftState Shift, int X, int Y);
 		void __fastcall BOKZM601000ParseProtocolClick(TObject *Sender);
+	void __fastcall ChartFrag2ClickLegend(TCustomChart *Sender, TMouseButton Button,
+          TShiftState Shift, int X, int Y);
 
 
 	private:	// User declarations
@@ -321,6 +329,9 @@
 		void PrintTableObjects(const struct CadrInfo &mCadr);
 		void InitTableWindows(void);
 		void PrintTableWindows(const struct CadrInfo &mCadr);
+		void InitTableStat();
+		void AddRowToStatTable(int nRow, AnsiString stringName,
+							   AnsiString stringMean, AnsiString stringSigma);
 		void ClearAnimate(void);
 		void DrawAnimate(const struct CadrInfo &mCadr);
 		void DrawBlock(const struct CadrInfo &mCadr);

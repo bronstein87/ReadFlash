@@ -111,7 +111,7 @@ namespace parse_prot {
 				if (word == "ÓÑÄ")
 					finp >> tmi.cntCommandWord;
 			}
-			else if ((word == "×ÈÑË") || (word == "×ÈÑËÎ")) {
+			else if ((word == "×ÈÑË") || (word == "×ÈÑËÎ") || (word == "×ÈCË") || (word == "×ÈCËO")) {
 				finp >> word;
 				if ((word == "ÍÎ") || (word == "HO")) {
 					finp >> tmi.cntCallNO;

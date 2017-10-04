@@ -58,6 +58,19 @@ void SimplePlotter::SaveChart(TChart* Chart, AnsiString name, unsigned int Heigh
 		Chart->Legend->Alignment = laRight;
 }
 
+void SimplePlotter::AddSeries(TChart* Chart, DWORD SeriesIndex, TColor Color)
+{
+	if (Chart->SeriesCount()  <= SeriesIndex ) {
+		for (int i = Chart->SeriesCount(); i <= SeriesIndex; i++) {
+			Chart->AddSeries(new TLineSeries(Chart));
+			SetSeriesOptions(dynamic_cast <TLineSeries*> (Chart->Series[i]));
+
+			if (DateTimeX) {
+				Chart->BottomAxis->DateTimeFormat   = "dd.mm.yyyy hh:nn:ss";
+			}
+		}
+	}
+}
 
 void SimplePlotter::AddPoint (TChart* Chart, DWORD SeriesIndex, double X, double Y, TColor Color)
 {
@@ -97,6 +110,16 @@ void SimplePlotter::SetSeriesOptions(TLineSeries* Series)
 	Series->Pen->Visible = ShowLines;
 	Series->Pointer->Style = PointerStyle;
 	Series->XValues->DateTime = DateTimeX;
+}
+
+void SimplePlotter::CheckChartSeries(TChart* Chart)
+{
+	for (int i = 0; i < Chart->SeriesCount(); i++) {
+		if (!Chart->Series[i]->Count()) {
+			Chart->RemoveSeries(i);
+			i--;
+		}
+	}
 }
 
 #include "SimplePlotter.h"
