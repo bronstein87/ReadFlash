@@ -394,6 +394,7 @@
 		void PrintTableObjectsHandler(void);
 		void DrawAnimateHandler(void);
 		void SetVisibleLabelFrame(bool isVisible);
+        AnsiString SourceDir;
 
 	};
 	//---------------------------------------------------------------------------

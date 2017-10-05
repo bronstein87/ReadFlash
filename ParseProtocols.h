@@ -87,6 +87,7 @@ namespace parse_prot {
 		{"ея16"}};
 
 	unsigned int ReadBinaryString(string binaryString);
+	AnsiString GetTimeString(unsigned long time);
 
 	int TryReadSHTMI1(ifstream &finp, struct SHTMI1 &tmi);
 

@@ -65,13 +65,12 @@ __published:	// IDE-managed Components
           TShiftState Shift, int X, int Y);
 	void __fastcall ShapeColorDetObjTableMouseDown(TObject *Sender, TMouseButton Button,
           TShiftState Shift, int X, int Y);
-	void __fastcall FormCreate(TObject *Sender);
-	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall CheckBoxApplyObjectsSeriesClick(TObject *Sender);
 	void __fastcall CheckBoxApplyWindowsSeriesClick(TObject *Sender);
 	void __fastcall CheckBoxFillTableObjectsClick(TObject *Sender);
 	void __fastcall CheckBoxFillTableWindowsClick(TObject *Sender);
 	void __fastcall CheckBoxLabelFrameClick(TObject *Sender);
+	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 private:	// User declarations
 public:		// User declarations
 	__fastcall TFormAnimateSetting(TComponent* Owner);

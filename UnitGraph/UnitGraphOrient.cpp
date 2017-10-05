@@ -52,7 +52,70 @@ __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 			Charts[i]->OnMouseWheel = &ChartMouseWheel;
 			Charts[i]->OnMouseDown = &ChartMouseDown;
 		}
+
+	SourceDir = GetCurrentDir();
+	FormAnimateSetting->ReadINI(SourceDir+"\\options.ini");
 }
+
+void __fastcall TFormGraphOrient::FormCreate(TObject *Sender)
+{
+  Label1->Caption = "Звезд в поле зрения: 0";
+  Label2->Caption = "Фрагментов в обработке: 0";
+  Label3->Caption = "Локализовано объектов: 0";
+  Label4->Caption = "Распознано объектов: 0";
+  Label5->Caption = "Блоков для чтения: 0";
+  Label6->Caption = "Общее число строк: 0";
+
+//InitFrameSeries
+	for (int i = 0; i < MaxBlockSeries; i++) {
+		BlockSeries[i] = new TChartShape(Chart1);
+		BlockSeries[i]->Selected->Hover->Hide();
+		Chart1->AddSeries(BlockSeries[i]);
+		BlockSeries[i]->Style = chasRectangle;
+		BlockSeries[i]->X0 = 0;
+		BlockSeries[i]->X1= 1024;
+		BlockSeries[i]->Y0 = 0;
+		BlockSeries[i]->Y1 = 0;
+		BlockSeries[i]->Color = clYellow;
+		BlockSeries[i]->Transparency = 70;
+	}
+
+//InitFrameSeries
+	for (int i=0; i < MaxFrameSeries; i++) {
+		FrameSeries[i] = new TChartShape(Chart1);
+		FrameSeries[i]->Selected->Hover->Hide();
+		Chart1->AddSeries(FrameSeries[i]);
+		FrameSeries[i]->Style = chasRectangle;
+		FrameSeries[i]->X0 = 0;
+		FrameSeries[i]->X1 = 0;
+		FrameSeries[i]->Y0 = 0;
+		FrameSeries[i]->Y1 = 0;
+		FrameSeries[i]->Color = clGreen;
+		FrameSeries[i]->Transparency = 70;
+	}
+
+	InitTableWindows();
+	InitTableObjects();
+	InitTableStat();
+
+	Series1->Selected->Hover->Hide();
+	Series2->Selected->Hover->Hide();
+	Series3->Selected->Hover->Hide();
+	Series9->Selected->Hover->Hide();
+	Series10->Selected->Hover->Hide();
+
+	InitializeSynchronization();
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormGraphOrient::FormClose(TObject *Sender, TCloseAction &Action)
+{
+		vCadrInfo.clear();
+		Action = caFree;
+		FormAnimateSetting->WriteINI(SourceDir+"\\options.ini");
+}
+//---------------------------------------------------------------------------
 
 void TFormGraphOrient::CheckTabSheet()
 {
@@ -132,7 +195,7 @@ void __fastcall TFormGraphOrient::MenuSaveClick(TObject *Sender)
 		else
 		{
 			Title = LeftStr(Title, PosEx("\r", Title, 1) - 1);
-        }
+		}
 
 		Title = GetCurrentDir() + ScreenFolderName + Title;
 
@@ -142,57 +205,6 @@ void __fastcall TFormGraphOrient::MenuSaveClick(TObject *Sender)
 	}
 }
 
-
-void __fastcall TFormGraphOrient::FormCreate(TObject *Sender)
-{
-  Label1->Caption = "Звезд в поле зрения: 0";
-  Label2->Caption = "Фрагментов в обработке: 0";
-  Label3->Caption = "Локализовано объектов: 0";
-  Label4->Caption = "Распознано объектов: 0";
-  Label5->Caption = "Блоков для чтения: 0";
-  Label6->Caption = "Общее число строк: 0";
-
-//InitFrameSeries
-	for (int i = 0; i < MaxBlockSeries; i++) {
-		BlockSeries[i] = new TChartShape(Chart1);
-		BlockSeries[i]->Selected->Hover->Hide();
-		Chart1->AddSeries(BlockSeries[i]);
-		BlockSeries[i]->Style = chasRectangle;
-		BlockSeries[i]->X0 = 0;
-		BlockSeries[i]->X1= 1024;
-		BlockSeries[i]->Y0 = 0;
-		BlockSeries[i]->Y1 = 0;
-		BlockSeries[i]->Color = clYellow;
-		BlockSeries[i]->Transparency = 70;
-	}
-
-//InitFrameSeries
-	for (int i=0; i < MaxFrameSeries; i++) {
-		FrameSeries[i] = new TChartShape(Chart1);
-		FrameSeries[i]->Selected->Hover->Hide();
-		Chart1->AddSeries(FrameSeries[i]);
-		FrameSeries[i]->Style = chasRectangle;
-		FrameSeries[i]->X0 = 0;
-		FrameSeries[i]->X1 = 0;
-		FrameSeries[i]->Y0 = 0;
-		FrameSeries[i]->Y1 = 0;
-		FrameSeries[i]->Color = clGreen;
-		FrameSeries[i]->Transparency = 70;
-	}
-
-	InitTableWindows();
-	InitTableObjects();
-	InitTableStat();
-
-	Series1->Selected->Hover->Hide();
-	Series2->Selected->Hover->Hide();
-	Series3->Selected->Hover->Hide();
-	Series9->Selected->Hover->Hide();
-	Series10->Selected->Hover->Hide();
-
-	InitializeSynchronization();
-}
-//---------------------------------------------------------------------------
 void TFormGraphOrient::InitTableWindows(void)
 {
 	int k = 0;
@@ -850,7 +862,6 @@ bool &Handled)
 	TImage* FragmentNumber = dynamic_cast<TImage*>(ScrollBox->Components[1]);
 	FragmentNumber->Top = 0;
 	FragmentNumber->Left = 0;
-
 }
 
 
@@ -1170,14 +1181,6 @@ int TFormGraphOrient::GetCadrInfo(int NC, struct CadrInfo &mCadr)
 void __fastcall TFormGraphOrient::MenuOptionsClick(TObject *Sender)
 {
    FormAnimateSetting->Show();
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TFormGraphOrient::FormClose(TObject *Sender, TCloseAction &Action)
-
-{
-		vCadrInfo.clear();
-		Action = caFree;
 }
 //---------------------------------------------------------------------------
 
@@ -1767,7 +1770,10 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 		ofstream fout((FileTitle + "_decode.txt").c_str());
 		ofstream fshtmi1((FileTitle + "_shtmi1.txt").c_str());
 		ofstream fshtmi2((FileTitle + "_shtmi2.txt").c_str());
+		ofstream fdtmi((FileTitle + "_dtmi.txt").c_str());
+		ofstream fmloc((FileTitle + "_mloc.txt").c_str());
 
+		fshtmi1<<"Day/Time\t";
 		fshtmi1<<"KC1\t"<<"KC2\t"<<"POST\t"<<"№\t"<<"Texp\t";
 		fshtmi1<<"Foc\t"<<"Xg\t"<<"Yg\t";
 		fshtmi1<<"Mean\t"<<"Sigma\t";
@@ -1775,6 +1781,7 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 		fshtmi1<<"Date\t"<<"Version\t";
 		fshtmi1<<"\n";
 
+		fshtmi2<<"Day/Time\t";
 		fshtmi2<<"KC1\t"<<"KC2\t"<<"POST\t"<<"№\t"<<"Texp\t";
 		fshtmi2<<"УСД\t"<<"НО\t"<<"НОСЛ\t";
 		fshtmi2<<"TО\t"<<"TОСЛ\t"<<"СЛЕЖ\t";
@@ -1783,13 +1790,26 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 		}
 		fshtmi2<<"\n";
 
+		fdtmi<<"Day/Time\t";
+		fdtmi<<"KC1\t"<<"KC2\t"<<"№\t"<<"Texp\t";
+		fdtmi<<"NumLoc\t"<<"NumDet\t"<<"NumFrag\t";
+		fdtmi<<"Eps\t"<<"DeltaT\t";
+		fdtmi<<"TimeLastQ\t";
+		fdtmi<<"\n";
+
+		fmloc<<"Day/Time\t";
+		fmloc<<"KC1\t"<<"KC2\t"<<"№\t"<<"Texp\t";
+		fmloc<<"NumLoc\t"<<"NumFixed\t";
+		fmloc<<"Mean\t"<<"Sigma\t";
+		fmloc<<"\n";
+
 		string line;
 		int cntRecDTMI = 0;
 
 		SHTMI1 mSHTMI1;
 		SHTMI2 mSHTMI2;
-		DTMI mDTMI;
-		LOC mLOC;
+		DTMI   mDTMI;
+		LOC    mLOC;
 
 		while (!finp.eof())
 		{
@@ -1797,7 +1817,7 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 			if (line.find("ШТМИ1")!=string::npos) {
 				if(TryReadSHTMI1(finp,mSHTMI1)) {
 					PrintSHTMI1(fout,mSHTMI1);
-
+					fshtmi1<<mSHTMI1.timeBOKZ<<"\t";
 					fshtmi1<<uppercase<<hex<<setfill('0');
 					fshtmi1<<"0x"<<setw(4)<<mSHTMI1.status1<<"\t";
 					fshtmi1<<"0x"<<setw(4)<<mSHTMI1.status2<<"\t";
@@ -1820,21 +1840,22 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 			else if (line.find("ШТМИ2") != string::npos) {
 				if(TryReadSHTMI2(finp,mSHTMI2)) {
 					PrintSHTMI2(fout,mSHTMI2);
+					fshtmi2<<mSHTMI2.timeBOKZ<<"\t";
 					fshtmi2<<uppercase<<hex<<setfill('0');
 					fshtmi2<<"0x"<<setw(4)<<mSHTMI2.status1<<"\t";
 					fshtmi2<<"0x"<<setw(4)<<mSHTMI2.status2<<"\t";
 					fshtmi2<<"0x"<<setw(4)<<mSHTMI2.post<<"\t";
 					fshtmi2<<dec<<setfill(' ');
-					fshtmi2<<setw(6)<<mSHTMI2.serialNumber;
-					fshtmi2<<setw(6)<<mSHTMI2.timeExp;
-					fshtmi2<<setw(8)<<mSHTMI2.cntCommandWord;
-					fshtmi2<<setw(8)<<mSHTMI2.cntCallNO;
-					fshtmi2<<setw(8)<<mSHTMI2.cntNOtoSLEZH;
-					fshtmi2<<setw(8)<<mSHTMI2.cntCallTO;
-					fshtmi2<<setw(8)<<mSHTMI2.cntTOtoSLEZH;
-					fshtmi2<<setw(12)<<mSHTMI2.cntSLEZH;
+					fshtmi2<<setw(6)<<mSHTMI2.serialNumber<<"\t";
+					fshtmi2<<setw(6)<<mSHTMI2.timeExp<<"\t";
+					fshtmi2<<setw(6)<<mSHTMI2.cntCommandWord<<"\t";
+					fshtmi2<<setw(6)<<mSHTMI2.cntCallNO<<"\t";
+					fshtmi2<<setw(6)<<mSHTMI2.cntNOtoSLEZH<<"\t";
+					fshtmi2<<setw(6)<<mSHTMI2.cntCallTO<<"\t";
+					fshtmi2<<setw(6)<<mSHTMI2.cntTOtoSLEZH<<"\t";
+					fshtmi2<<setw(8)<<mSHTMI2.cntSLEZH<<"\t";
 					for (int i = 0; i < MAX_STAT; i++) {
-						fshtmi2<<setw(8)<<mSHTMI2.cntStatOrient[i];
+						fshtmi2<<mSHTMI2.cntStatOrient[i]<<"\t";
 					}
 					fshtmi2<<"\n";
 				}
@@ -1861,12 +1882,42 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 						memcpy(&mLOC, &mDTMI, sizeof(mDTMI));
 						PrintLOC(fout,mLOC);
 						PrintLocalMLOC(mLOC);
+
+						fmloc<<mLOC.timeBOKZ<<"\t";
+						fmloc<<uppercase<<hex<<setfill('0');
+						fmloc<<"0x"<<setw(4)<<mLOC.status1<<"\t";
+						fmloc<<"0x"<<setw(4)<<mLOC.status2<<"\t";
+						fmloc<<dec<<setfill(' ');
+						fmloc<<setw(6)<<mLOC.serialNumber<<"\t";
+						fmloc<<setw(6)<<mLOC.timeExp<<"\t";
+						fmloc<<setw(6)<<mLOC.nLocalObj<<"\t";
+						fmloc<<setw(6)<<mLOC.nFixedObj<<"\t";
+						fmloc<<setw(6)<<mLOC.MeanC<<"\t";
+						fmloc<<setw(6)<<mLOC.SigmaC<<"\t";
+						fmloc<<"\n";
+
 						ConvertDataLOC(mLOC, mCadr);
 						mCadr.Time = cntRecDTMI++;
 					}
 					else {
 						PrintDTMI(fout,mDTMI);
 						PrintLocalDTMI(mDTMI);
+
+						fdtmi<<mDTMI.timeBOKZ<<"\t";
+						fdtmi<<uppercase<<hex<<setfill('0');
+						fdtmi<<"0x"<<setw(4)<<mDTMI.status1<<"\t";
+						fdtmi<<"0x"<<setw(4)<<mDTMI.status2<<"\t";
+						fdtmi<<dec<<setfill(' ');
+						fdtmi<<setw(6)<<mDTMI.serialNumber<<"\t";
+						fdtmi<<setw(6)<<mDTMI.timeExp<<"\t";
+						fdtmi<<setw(6)<<mDTMI.nLocalObj<<"\t";
+						fdtmi<<setw(6)<<mDTMI.nDeterObj<<"\t";
+						fdtmi<<setw(6)<<mDTMI.nWindows<<"\t";
+						fdtmi<<setw(6)<<mDTMI.epsillon<<"\t";
+						fdtmi<<setw(6)<<mDTMI.dTimeBOKZ<<"\t";
+						fdtmi<<setw(6)<<GetTimeString(mDTMI.timeQuatLast)<<"\t";
+						fdtmi<<"\n";
+
 						ConvertDataDTMI(mDTMI, mCadr);
 						mCadr.Time=cntRecDTMI++;
 					}
@@ -1879,6 +1930,8 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 		fout.close();
 		fshtmi1.close();
 		fshtmi2.close();
+		fdtmi.close();
+		fmloc.close();
 
 		PrepareStartDraw();
 		CheckTabSheet();

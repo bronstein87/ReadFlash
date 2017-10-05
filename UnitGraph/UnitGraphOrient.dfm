@@ -135,7 +135,7 @@ object FormGraphOrient: TFormGraphOrient
     Top = 8
     Width = 1160
     Height = 777
-    ActivePage = TabSheetStatFrag
+    ActivePage = TabSheetStatStars
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 8
     object TabSheetAngles: TTabSheet
@@ -1490,7 +1490,7 @@ object FormGraphOrient: TFormGraphOrient
           Margins.Bottom = 0
           Align = alCustom
           TabOrder = 1
-          Text = '10'
+          Text = '25'
           OnChange = ScaleEditChange
         end
         object UpDown2: TUpDown
@@ -1500,7 +1500,7 @@ object FormGraphOrient: TFormGraphOrient
           Height = 21
           Margins.Bottom = 0
           Associate = ScaleEdit
-          Position = 10
+          Position = 25
           TabOrder = 2
         end
         object PixelBrightCheckBox: TCheckBox
@@ -1520,7 +1520,7 @@ object FormGraphOrient: TFormGraphOrient
           Height = 21
           Margins.Bottom = 0
           TabOrder = 4
-          Text = '24'
+          Text = '25'
           OnChange = PixelSizeEditChange
         end
         object UpDown3: TUpDown
@@ -1530,7 +1530,7 @@ object FormGraphOrient: TFormGraphOrient
           Height = 21
           Margins.Bottom = 0
           Associate = PixelSizeEdit
-          Position = 24
+          Position = 25
           TabOrder = 5
         end
         object FontSizeEdit: TEdit
@@ -1540,7 +1540,7 @@ object FormGraphOrient: TFormGraphOrient
           Height = 21
           Margins.Bottom = 0
           TabOrder = 6
-          Text = '7'
+          Text = '10'
           OnChange = FontSizeEditChange
         end
         object UpDown4: TUpDown
@@ -1550,7 +1550,7 @@ object FormGraphOrient: TFormGraphOrient
           Height = 21
           Margins.Bottom = 0
           Associate = FontSizeEdit
-          Position = 7
+          Position = 10
           TabOrder = 7
         end
       end

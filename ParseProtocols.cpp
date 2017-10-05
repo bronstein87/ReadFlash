@@ -18,6 +18,24 @@ namespace parse_prot {
 		return (unsigned int) sum;
 	}
 
+	AnsiString GetTimeString(unsigned long time)
+	{
+		AnsiString str, sTime = " ";
+		int day, hour, min, sec;
+		double day_double = time/86400./8.;
+
+		day = (int)day_double;
+		hour = (day_double - (int)day) * 24 + 1e-7;
+		min  = (day_double - day - hour/24.) * 24 * 60 + 1e-7;
+		sec  = (day_double - day - hour/24. - min/24./60.) * 86400. + 1e-7;
+		if (day > 0) {
+			sTime  = IntToStr(day) + "/";
+		}
+		str.sprintf("%02d:%02d:%02d", hour, min, sec);
+		sTime += str;
+		return sTime;
+	}
+
 	int TryReadSHTMI1(ifstream &finp, struct SHTMI1 &tmi) {
 		string line, word;
 
@@ -103,8 +121,10 @@ namespace parse_prot {
 				finp >> word;
 				if (word == "› —œ")
 					finp >> tmi.timeExp;
-				else
+				else {
 					finp >> tmi.timeBOKZ; // ReadTimeBOKZ(word)
+					tmi.timeBOKZ = word + tmi.timeBOKZ;
+				}
 			}
 			else if (word == "Õ¿Ã") {
 				finp >> word;
@@ -200,14 +220,23 @@ namespace parse_prot {
 					getline(finp, line, '\n');
 
 					if (sscanf(line.c_str(), " %f/ %f:%f:%f", &mday, &mhour,
-						&mmin, &msec) == 4)
+						&mmin, &msec) == 4) {
 						tmi.timeQuatLast = mday * 86400 + mhour * 3600 +
 							mmin * 60 + msec;
+					}
+					else if (sscanf(line.c_str(), "%f:%f:%f", &mhour,
+						&mmin, &msec) == 3) {
+						tmi.timeQuatLast = mhour * 3600 +
+							mmin * 60 + msec;
+					}
+					else  tmi.timeQuatLast = 0;
 					tmi.timeQuatLast *= 8;
 					// finp>>tmi.timeQuatLast;
 				}
-				else
+				else {
 					finp >> tmi.timeBOKZ;
+					tmi.timeBOKZ = word + tmi.timeBOKZ;
+				}
 			}
 			else if (word == "ÀŒ ") {
 				getline(finp, line, '\n');
@@ -376,7 +405,8 @@ namespace parse_prot {
 			file << "Wop[" << i << "]:\t" << tmi.omega[i] << "\n";
 		}
 
-		file << "Tlst:\t" << tmi.timeQuatLast << "\n";
+
+		file << "Tlst:\t" << GetTimeString(tmi.timeQuatLast).c_str() << "\n";
 		for (int i = 0; i < 4; i++) {
 			file << "Qlst[" << i << "]:\t" << tmi.quatLast[i] << "\n";
 		}

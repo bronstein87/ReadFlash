@@ -16,9 +16,6 @@
 	{
 
 	}
-
-
-
 	//---------------------------------------------------------------------------
 
 	void __fastcall  TMainForm::MenuLookClick(TObject *Sender)
