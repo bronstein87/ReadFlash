@@ -120,20 +120,22 @@ void __fastcall TAnalyzeForm::ChooseDirectoriesClick(TObject *Sender)
 						UnicodeString ResFileName = FileOpenDialog1->Files->Strings[i] + "\\Img" + SplittedString[SplittedString.Length - 1];
 						if (reader->ReadFormat(ResFileName, false))
 						{
-							AngularSpeedErrorValues.push_back(
-							Point::Create(reader->StarsData.RecognizedAngularVelocity[0] - reader->Georeferencing.DeviceAngularVelocity[0],
-							reader->StarsData.RecognizedAngularVelocity[1] - reader->Georeferencing.DeviceAngularVelocity[1],
-							reader->StarsData.RecognizedAngularVelocity[2] - reader->Georeferencing.DeviceAngularVelocity[2]));
+							if(!reader->StarsData.RezStat) {
+								AngularSpeedErrorValues.push_back(
+								Point::Create(reader->StarsData.RecognizedAngularVelocity[0] - reader->Georeferencing.DeviceAngularVelocity[0],
+								reader->StarsData.RecognizedAngularVelocity[1] - reader->Georeferencing.DeviceAngularVelocity[1],
+								reader->StarsData.RecognizedAngularVelocity[2] - reader->Georeferencing.DeviceAngularVelocity[2]));
 
-							double diffAz = reader->StarsData.RecognizedOrientationAngles[2] - reader->Georeferencing.OrientationAngles[2];
-							if (abs(diffAz) > 5)        // потом убрать
-							{
-								diffAz = (reader->StarsData.RecognizedOrientationAngles[2] + reader->Georeferencing.OrientationAngles[2])
-									-	abs(reader->StarsData.RecognizedOrientationAngles[2] - reader->Georeferencing.OrientationAngles[2]);
+								double diffAz = reader->StarsData.RecognizedOrientationAngles[2] - reader->Georeferencing.OrientationAngles[2];
+								if (abs(diffAz) > 5)        // потом убрать
+								{
+									diffAz = (reader->StarsData.RecognizedOrientationAngles[2] + reader->Georeferencing.OrientationAngles[2])
+										-	abs(reader->StarsData.RecognizedOrientationAngles[2] - reader->Georeferencing.OrientationAngles[2]);
+								}
+								AngleErrorValues.push_back(
+								Point::Create(reader->StarsData.RecognizedOrientationAngles[0] - reader->Georeferencing.OrientationAngles[0],
+								reader->StarsData.RecognizedOrientationAngles[1] - reader->Georeferencing.OrientationAngles[1], diffAz));
 							}
-							AngleErrorValues.push_back(
-							Point::Create(reader->StarsData.RecognizedOrientationAngles[0] - reader->Georeferencing.OrientationAngles[0],
-							reader->StarsData.RecognizedOrientationAngles[1] - reader->Georeferencing.OrientationAngles[1], diffAz));
 						}
 						else throw logic_error(string("Ќе удалось считать ") + AnsiString(FileList->Strings[j]).c_str());
 					}
