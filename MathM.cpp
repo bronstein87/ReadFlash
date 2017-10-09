@@ -158,7 +158,7 @@ std::pair<T,T> calculateMeanStDv (InputIterator first, InputIterator last, T ini
         dispersio += pow(extractWtC(i), 2);
     }
     auto count = std::distance(first,last);
-    T mean = init / count;
+	T mean = init / count;
     dispersio = (dispersio / count) - pow(mean, 2);
 
     return std::pair <T,T> (mean, sqrt(dispersio));

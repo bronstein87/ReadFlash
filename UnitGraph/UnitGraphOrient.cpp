@@ -68,9 +68,9 @@ void __fastcall TFormGraphOrient::FormCreate(TObject *Sender)
 
 //InitFrameSeries
 	for (int i = 0; i < MaxBlockSeries; i++) {
-		BlockSeries[i] = new TChartShape(Chart1);
+		BlockSeries[i] = new TChartShape(ChartMatrix);
 		BlockSeries[i]->Selected->Hover->Hide();
-		Chart1->AddSeries(BlockSeries[i]);
+		ChartMatrix->AddSeries(BlockSeries[i]);
 		BlockSeries[i]->Style = chasRectangle;
 		BlockSeries[i]->X0 = 0;
 		BlockSeries[i]->X1= 1024;
@@ -78,13 +78,14 @@ void __fastcall TFormGraphOrient::FormCreate(TObject *Sender)
 		BlockSeries[i]->Y1 = 0;
 		BlockSeries[i]->Color = clYellow;
 		BlockSeries[i]->Transparency = 70;
+		BlockSeries[i]->Legend->Visible = false;
 	}
 
 //InitFrameSeries
 	for (int i=0; i < MaxFrameSeries; i++) {
-		FrameSeries[i] = new TChartShape(Chart1);
+		FrameSeries[i] = new TChartShape(ChartMatrix);
 		FrameSeries[i]->Selected->Hover->Hide();
-		Chart1->AddSeries(FrameSeries[i]);
+		ChartMatrix->AddSeries(FrameSeries[i]);
 		FrameSeries[i]->Style = chasRectangle;
 		FrameSeries[i]->X0 = 0;
 		FrameSeries[i]->X1 = 0;
@@ -92,6 +93,7 @@ void __fastcall TFormGraphOrient::FormCreate(TObject *Sender)
 		FrameSeries[i]->Y1 = 0;
 		FrameSeries[i]->Color = clGreen;
 		FrameSeries[i]->Transparency = 70;
+		FrameSeries[i]->Legend->Visible = false;
 	}
 
 	InitTableWindows();
@@ -99,10 +101,14 @@ void __fastcall TFormGraphOrient::FormCreate(TObject *Sender)
 	InitTableStat();
 
 	Series1->Selected->Hover->Hide();
-	Series2->Selected->Hover->Hide();
 	Series3->Selected->Hover->Hide();
 	Series9->Selected->Hover->Hide();
 	Series10->Selected->Hover->Hide();
+
+	Series1->Title  = "звёзды";
+	Series3->Title  = "ошибка уравнивания";
+	Series10->Title = "ошибка локализации";
+	Series9->Title  = "объекты";
 
 	InitializeSynchronization();
 
@@ -313,7 +319,7 @@ void TFormGraphOrient::InitTableStat()
 	int k = 0;
 
 	TableStatInfo->RowCount = 25;
-	TableStatInfo->ColCount = 6;
+	TableStatInfo->ColCount = 7;
 	TableStatInfo->FixedCols = 0;
 	TableStatInfo->FixedRows = 1;
 	TableStatInfo->Cells[k++][0] = "Параметр";
@@ -321,15 +327,19 @@ void TFormGraphOrient::InitTableStat()
 	TableStatInfo->Cells[k++][0] = "1 СКО";
 	TableStatInfo->Cells[k++][0] = "Минимум";
 	TableStatInfo->Cells[k++][0] = "Максимум";
+	TableStatInfo->Cells[k++][0] = "";
 	TableStatInfo->Cells[k++][0] = "Разброс";
 }
 
-void TFormGraphOrient::AddRowToStatTable(int nRow, AnsiString stringName,
-										 AnsiString stringMean, AnsiString stringSigma)
+void TFormGraphOrient::AddRowToStatTable(int nRow, AnsiString stringName, Statistika _stat, int p1,int p2)
 {
 	TableStatInfo->Cells[0][nRow] = stringName;
-	TableStatInfo->Cells[1][nRow] = stringMean;
-	TableStatInfo->Cells[2][nRow] = stringSigma;
+	TableStatInfo->Cells[1][nRow] = FloatToStrF(_stat.mean, ffFixed, p1, p2);
+	TableStatInfo->Cells[2][nRow] = FloatToStrF(_stat.sigma, ffFixed, p1, p2);
+	TableStatInfo->Cells[3][nRow] = FloatToStrF(_stat.min,  ffFixed, p1, p2);
+	TableStatInfo->Cells[4][nRow] = FloatToStrF(_stat.max,  ffFixed, p1, p2);
+	TableStatInfo->Cells[6][nRow] = FloatToStrF(_stat.max - _stat.min,  ffFixed, p1, p2);
+//	TableStatInfo->Cells[5][nRow] = FloatToStrF(5.,  ffFixed, p1, p2);
 }
 
 //void TFormGraphOrient::PrintTableStat()
@@ -353,7 +363,6 @@ void TFormGraphOrient::ClearAnimate(void)
 //AnimatePoints
 	Series9->Clear();
 	Series1->Clear();
-	Series2->Clear();
 	Series3->Clear();
     Series10->Clear();
 //WindowsBar
@@ -395,12 +404,12 @@ void TFormGraphOrient::DrawBlock(const struct CadrInfo &mCadr)
 {
 	unsigned short CountLines, CountBlock, TabTakeAway[MaxBlockSeries][2];
 
-	Chart1->LeftAxis->Automatic = false;
-	Chart1->LeftAxis->Minimum = 0;
-	Chart1->LeftAxis->Maximum = mCadr.ImageHeight;
-	Chart1->BottomAxis->Automatic = false;
-	Chart1->BottomAxis->Minimum = 0;
-	Chart1->BottomAxis->Maximum = mCadr.ImageWidth;
+	ChartMatrix->LeftAxis->Automatic = false;
+	ChartMatrix->LeftAxis->Minimum = 0;
+	ChartMatrix->LeftAxis->Maximum = mCadr.ImageHeight;
+	ChartMatrix->BottomAxis->Automatic = false;
+	ChartMatrix->BottomAxis->Minimum = 0;
+	ChartMatrix->BottomAxis->Maximum = mCadr.ImageWidth;
 
 //DrawBlocks()
 	CountLines = 0;
@@ -543,7 +552,7 @@ void TFormGraphOrient::DrawBlock(const struct CadrInfo &mCadr)
 void TFormGraphOrient::DrawAnimate(const struct CadrInfo &mCadr)
 {
 	double X0, Y0, X1, Y1, Dx, Dy, Ist, Nel;
-	double zoomRedArrow  = 10000.;
+	double zoomRedArrow  = StrToFloat(EditScale->Text)*1000.;
 	double zoomBlueArrow, binCoef;
 
 	if (mCadr.IsBinary) {
@@ -570,7 +579,7 @@ void TFormGraphOrient::DrawAnimate(const struct CadrInfo &mCadr)
 				Series9->AddBubble(X0, Y0,(int)(3*sqrtm(fabs(Nel))+0.5),"",clBlue);
 			}
 			else {
-			   Series2->AddXY(X0, Y0, "", clBlue);
+			   Series9->AddXY(X0, Y0, 1, clBlue);
 			}
 		}
 		else
@@ -2054,45 +2063,46 @@ void PrintReportRes(vector <CadrInfo>& cadrInfo)
 void TFormGraphOrient::CalculateSeriesSKO()
 {
 	pair <double, double> meanStd;
+	Statistika statParam;
 	int numberRow = 1;
 
 	if (ChartFone->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.MeanBright;} } GetMeanBright;
 		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanBright);
-		AddRowToStatTable(numberRow++, "Уровень фона, ЕМР",
-				FloatToStrF(meanStd.first, ffFixed, 8, 2), FloatToStrF(meanStd.second, ffFixed, 8, 2));
+		statParam = calculateStatParam(vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanBright);
+		AddRowToStatTable(numberRow++, "Уровень фона, ЕМР", statParam, 8, 2);
 		ChartFone->Series[0]->Title += " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
 	}
 
 	if (ChartNoise->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.SigmaBright;} } GetSigmaBright;
 		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetSigmaBright);
-		AddRowToStatTable(numberRow++, "СКО фона, ЕМР",
-				FloatToStrF(meanStd.first, ffFixed, 8, 2), FloatToStrF(meanStd.second, ffFixed, 8, 2));
+		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetSigmaBright);
+		AddRowToStatTable(numberRow++, "СКО фона, ЕМР", statParam, 8, 2);
 		ChartNoise->Series[0]->Title += " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
 	}
 
 	if (ChartNumFrag->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = false; return a.CountWindows;} } GetCountWindows;
 		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetCountWindows);
-		AddRowToStatTable(numberRow++, "Число фрагментов",
-				FloatToStrF(meanStd.first, ffFixed, 8, 2), FloatToStrF(meanStd.second, ffFixed, 8, 2));
+		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetCountWindows);
+		AddRowToStatTable(numberRow++, "Число фрагментов", statParam, 8, 2);
 		ChartNumFrag->Series[0]->Title += " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
 	}
 
 	if (ChartNumLoc->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = false; return a.CountLocalObj;} } GetCountLocalObj;
 		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetCountLocalObj);
-		AddRowToStatTable(numberRow++, "Число объектов",
-				FloatToStrF(meanStd.first, ffFixed, 8, 2), FloatToStrF(meanStd.second, ffFixed, 8, 2));
+		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetCountLocalObj);
+		AddRowToStatTable(numberRow++, "Число объектов", statParam, 8, 2);
 		ChartNumLoc->Series[0]->Title += " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
 	}
 
 	if (ChartNumDet->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = false; return a.CountDeterObj;} } GetCountDeterObj;
 		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetCountDeterObj);
-		AddRowToStatTable(numberRow++, "Число звезд",
-				FloatToStrF(meanStd.first, ffFixed, 8, 2), FloatToStrF(meanStd.second, ffFixed, 8, 2));
+		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetCountDeterObj);
+		AddRowToStatTable(numberRow++, "Число звезд", statParam, 8, 2);
 		ChartNumDet->Series[0]->Title += " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
 	}
 
@@ -2102,150 +2112,187 @@ void TFormGraphOrient::CalculateSeriesSKO()
 	if (ChartAl->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.AnglesOrient[0];} } GetAnglesOrientAl;
 		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesOrientAl);
-		AddRowToStatTable(numberRow++, "Прямое восхождение, град/угл. сек",
-				FloatToStrF(meanStd.first * RTD, ffFixed, 8, 4), FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4));
+		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesOrientAl);
+		statParam.mean *= RTD; 		statParam.sigma *= RTS;
+		statParam.min *= RTD;		statParam.max *= RTD;
+		AddRowToStatTable(numberRow++, "Прямое восхождение, град/угл. сек", statParam, 8, 4);
 //		ChartAl->Series[0]->Title += " CКО: " + FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4);
 	}
 
 	if (ChartDl->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.AnglesOrient[1];} } GetAnglesOrientDl;
 		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesOrientDl);
-		AddRowToStatTable(numberRow++,"Склонение, град/угл. сек",
-				FloatToStrF(meanStd.first * RTD, ffFixed, 8, 4), FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4));
+		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesOrientDl);
+		statParam.mean *= RTD; 		statParam.sigma *= RTS;
+		statParam.min *= RTD;		statParam.max *= RTD;
+		AddRowToStatTable(numberRow++,"Склонение, град/угл. сек", statParam, 8, 4);
 //		ChartDl->Series[0]->Title += " CКО: " + FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4);
 	}
 
 	if (ChartAz->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.AnglesOrient[2];} } GetAnglesOrientAz;
 		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesOrientAz);
-		AddRowToStatTable(numberRow++, "Азимут, град/угл. сек",
-				FloatToStrF(meanStd.first * RTD, ffFixed, 8, 4), FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4));
+		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesOrientAz);
+		statParam.mean *= RTD; 		statParam.sigma *= RTS;
+		statParam.min *= RTD;		statParam.max *= RTD;
+		AddRowToStatTable(numberRow++, "Азимут, град/угл. сек", statParam, 8, 4);
 //		ChartAz->Series[0]->Title += " CКО: " + FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4);
 	}
 
 	if (ChartAlError->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.AnglesDiff[0];} } GetAnglesDiffF;
 		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesDiffF);
-		AddRowToStatTable(numberRow++, "Ошибка угла Al, угл. сек",
-				FloatToStrF(meanStd.first * RTS, ffFixed, 8, 4), FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4));
+		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesDiffF);
+		statParam.mean *= RTS; 		statParam.sigma *= RTS;
+		statParam.min *= RTS;		statParam.max *= RTS;
+		AddRowToStatTable(numberRow++, "Ошибка угла Al, угл. сек", statParam, 8, 4);
 		ChartAlError->Series[0]->Title += " CКО: " + FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4);
 	}
 
 	if (ChartDlError->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.AnglesDiff[1];} } GetAnglesDiffS;
 		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesDiffS);
-		AddRowToStatTable(numberRow++,"Ошибка угла Dl, угл. сек",
-				FloatToStrF(meanStd.first * RTS, ffFixed, 8, 4), FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4));
+		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesDiffS);
+		statParam.mean *= RTS; 		statParam.sigma *= RTS;
+		statParam.min *= RTS;		statParam.max *= RTS;
+		AddRowToStatTable(numberRow++,"Ошибка угла Dl, угл. сек", statParam, 8, 4);
 		ChartDlError->Series[0]->Title += " CКО: " + FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4);
 	}
 
 	if (ChartAzError->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.AnglesDiff[2];} } GetAnglesDiffT;
 		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesDiffT);
-		AddRowToStatTable(numberRow++, "Ошибка угла Az, угл. сек",
-				FloatToStrF(meanStd.first * RTS, ffFixed, 8, 4), FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4));
+		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesDiffT);
+		statParam.mean *= RTS; 		statParam.sigma *= RTS;
+		statParam.min *= RTS;		statParam.max *= RTS;
+		AddRowToStatTable(numberRow++, "Ошибка угла Az, угл. сек", statParam, 8, 4);
 		ChartAzError->Series[0]->Title += " CКО: " + FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4);
 	}
 
 	if (ChartErrorOX->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.AxesDiff[0];} } GetAxesDiffF;
 		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAxesDiffF);
-		AddRowToStatTable(numberRow++, "Ошибка по оси OX, угл. сек",
-				FloatToStrF(meanStd.first * RTS, ffFixed, 8, 4), FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4));
+		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAxesDiffF);
+		statParam.mean *= RTS; 		statParam.sigma *= RTS;
+		statParam.min *= RTS;		statParam.max *= RTS;
+		AddRowToStatTable(numberRow++, "Ошибка по оси OX, угл. сек", statParam, 8, 4);
 		ChartErrorOX->Series[0]->Title += " CКО: " + FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4);
 	}
 
 	if (ChartErrorOY->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.AxesDiff[1];} } GetAxesDiffS;
 		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAxesDiffS);
-		AddRowToStatTable(numberRow++, "Ошибка по оси OY, угл. сек",
-				FloatToStrF(meanStd.first * RTS, ffFixed, 8, 4), FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4));
+		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAxesDiffS);
+		statParam.mean *= RTS; 		statParam.sigma *= RTS;
+		statParam.min *= RTS;		statParam.max *= RTS;
+		AddRowToStatTable(numberRow++, "Ошибка по оси OY, угл. сек", statParam, 8, 4);
 		ChartErrorOY->Series[0]->Title += " CКО: " + FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4);
 	}
 
 	if (ChartErrorOZ->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.AxesDiff[2];} } GetAxesDiffT;
 		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAxesDiffT);
-		AddRowToStatTable(numberRow++, "Ошибка по оси OZ, угл. сек",
-				FloatToStrF(meanStd.first * RTS, ffFixed, 8, 4), FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4));
+		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAxesDiffT);
+		statParam.mean *= RTS; 		statParam.sigma *= RTS;
+		statParam.min *= RTS;		statParam.max *= RTS;
+		AddRowToStatTable(numberRow++, "Ошибка по оси OZ, угл. сек", statParam, 8, 4);
 		ChartErrorOZ->Series[0]->Title += " CКО: " + FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4);
 	}
 
 	if (ChartWx->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.OmegaOrient[0];} } GetOmegaOrientF;
 		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaOrientF);
-		AddRowToStatTable(numberRow++, "Угловая скорость по оси OX, угл. мин/с (угл. сек/с)",
-				FloatToStrF(meanStd.first * RTM, ffFixed, 8, 4), FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4));
+		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaOrientF);
+		statParam.mean *= RTM; 		statParam.sigma *= RTM;
+		statParam.min *= RTM;		statParam.max *= RTM;
+		AddRowToStatTable(numberRow++, "Угловая скорость по оси OX, угл. мин/с (угл. сек/с)", statParam, 8, 4);
 		ChartWx->Series[0]->Title += " CКО: " + FloatToStrF(meanStd.second * RTM, ffFixed, 8, 4);
 	}
 
 	if (ChartWy->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.OmegaOrient[1];} } GetOmegaOrientS;
 		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaOrientS);
-		AddRowToStatTable(numberRow++, "Угловая скорость по оси OY, угл. мин/с (угл. сек/с)",
-				FloatToStrF(meanStd.first * RTM, ffFixed, 8, 4), FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4));
+		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaOrientS);
+		statParam.mean *= RTM; 		statParam.sigma *= RTM;
+		statParam.min *= RTM;		statParam.max *= RTM;
+		AddRowToStatTable(numberRow++, "Угловая скорость по оси OY, угл. мин/с (угл. сек/с)", statParam, 8, 4);
 		ChartWy->Series[0]->Title += " CКО: " + FloatToStrF(meanStd.second * RTM, ffFixed, 8, 4);
 	}
 
 	if (ChartWz->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.OmegaOrient[2];} } GetOmegaOrientT;
 		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaOrientT);
-		AddRowToStatTable(numberRow++, "Угловая скорость по оси OZ, угл. мин/с (угл. сек/с)",
-				FloatToStrF(meanStd.first * RTM, ffFixed, 8, 4), FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4));
+		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaOrientT);
+		statParam.mean *= RTM; 		statParam.sigma *= RTM;
+		statParam.min *= RTM;		statParam.max *= RTM;
+		AddRowToStatTable(numberRow++, "Угловая скорость по оси OZ, угл. мин/с (угл. сек/с)", statParam, 8, 4);
 		ChartWz->Series[0]->Title += " CКО: " + FloatToStrF(meanStd.second * RTM, ffFixed, 8, 4);
 	}
 
 	if (ChartWxError->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.OmegaDiff[0];} } GetOmegaDiffF;
 		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaDiffF);
-		AddRowToStatTable(numberRow++, "Ошибка Wx, угл. сек/с",
-				FloatToStrF(meanStd.first * RTS, ffFixed, 8, 4), FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4));
+		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaDiffF);
+		statParam.mean *= RTS; 		statParam.sigma *= RTS;
+		statParam.min *= RTS;		statParam.max *= RTS;
+		AddRowToStatTable(numberRow++, "Ошибка Wx, угл. сек/с", statParam, 8, 4);
 		ChartWxError->Series[0]->Title += " CКО: " + FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4);
 	}
 
 	if (ChartWyError->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.OmegaDiff[1];} } GetOmegaDiffS;
 		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaDiffS);
-		AddRowToStatTable(numberRow++, "Ошибка Wy, угл. сек/с",
-				FloatToStrF(meanStd.first * RTS, ffFixed, 8, 4), FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4));
+		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaDiffS);
+		statParam.mean *= RTS; 		statParam.sigma *= RTS;
+		statParam.min *= RTS;		statParam.max *= RTS;
+		AddRowToStatTable(numberRow++, "Ошибка Wy, угл. сек/с", statParam, 8, 4);
 		ChartWyError->Series[0]->Title += " CКО: " + FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4);
 	}
 
 	if (ChartWzError->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.OmegaDiff[2];} } GetOmegaDiffT;
 		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaDiffT);
-		AddRowToStatTable(numberRow++, "Ошибка Wz, угл. сек/с",
-				FloatToStrF(meanStd.first * RTS, ffFixed, 8, 4), FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4));
+		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaDiffT);
+		statParam.mean *= RTS; 		statParam.sigma *= RTS;
+		statParam.min *= RTS;		statParam.max *= RTS;
+		AddRowToStatTable(numberRow++, "Ошибка Wz, угл. сек/с", statParam, 8, 4);
 		ChartWzError->Series[0]->Title += " CКО: " + FloatToStrF(meanStd.second * RTS, ffFixed, 8, 4);
 	}
 
 	if (ChartMx->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.MeanErrorX;} } GetMeanErrX;
 		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanErrX);
-		AddRowToStatTable(numberRow++, "mx, мкм",
-				FloatToStrF(meanStd.first * 1000., ffFixed, 8, 4), FloatToStrF(meanStd.second * 1000., ffFixed, 8, 4));
+		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanErrX);
+		statParam.mean *= 1000; 	statParam.sigma *= 1000;
+		statParam.min *= 1000;		statParam.max *= 1000;
+		AddRowToStatTable(numberRow++, "mx, мкм", statParam, 8, 4);
 		ChartMx->Series[0]->Title += " CКО: " + FloatToStrF(meanStd.second * 1000., ffFixed, 8, 4);
 	}
 
 	if (ChartMy->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.MeanErrorY;} } GetMeanErrY;
 		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanErrY);
-		AddRowToStatTable(numberRow++, "my, мкм",
-				FloatToStrF(meanStd.first * 1000., ffFixed, 8, 4), FloatToStrF(meanStd.second * 1000., ffFixed, 8, 4));
+		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanErrY);
+		statParam.mean *= 1000; 	statParam.sigma *= 1000;
+		statParam.min *= 1000;		statParam.max *= 1000;
+		AddRowToStatTable(numberRow++, "my, мкм", statParam, 8, 4);
 		ChartMy->Series[0]->Title += " CКО: " + FloatToStrF(meanStd.second * 1000., ffFixed, 8, 4);
 	}
 
 	if (ChartMxy->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.MeanErrorXY;} } GetMeanErrXY;
 		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanErrXY);
-		AddRowToStatTable(numberRow++, "mxy, мкм",
-				FloatToStrF(meanStd.first * 1000., ffFixed, 8, 4), FloatToStrF(meanStd.second * 1000., ffFixed, 8, 4));
+		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanErrXY);
+		statParam.mean *= 1000; 	statParam.sigma *= 1000;
+		statParam.min *= 1000;		statParam.max *= 1000;
+		AddRowToStatTable(numberRow++, "mxy, мкм", statParam, 8, 4);
 		ChartMxy->Series[0]->Title += " CКО: " + FloatToStrF(meanStd.second * 1000., ffFixed, 8, 4);
 	}
 
 	if (ChartWx->SeriesCount() > 1) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.OmegaModel[0];} } GetOmegaModelF;
 		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaModelF);
+//		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaModelF);
 //		AddRowToStatTable(numberRow++, ChartWx->Title,
 //				FloatToStrF(meanStd.first * RTM, ffFixed, 8, 4), FloatToStrF(meanStd.second * RTM, ffFixed, 8, 4));
 		ChartWx->Series[1]->Title += " CКО: " + FloatToStrF(meanStd.second * RTM, ffFixed, 8, 4);
@@ -2254,6 +2301,7 @@ void TFormGraphOrient::CalculateSeriesSKO()
 	if (ChartWy->SeriesCount() > 1) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.OmegaModel[1];} } GetOmegaModelS;
 		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaModelS);
+//		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaModelS);
 //		AddRowToStatTable(numberRow++, ChartWy->Title,
 //				FloatToStrF(meanStd.first * RTM, ffFixed, 8, 4), FloatToStrF(meanStd.second * RTM, ffFixed, 8, 4));
 		ChartWy->Series[1]->Title += " CКО: " + FloatToStrF(meanStd.second * RTM, ffFixed, 8, 4);
@@ -2262,6 +2310,7 @@ void TFormGraphOrient::CalculateSeriesSKO()
 	if (ChartWz->SeriesCount() > 1) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.OmegaModel[2];} } GetOmegaModelT;
 		meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaModelT);
+//		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaModelT);
 //		AddRowToStatTable(numberRow++, ChartWz->Title,
 //				FloatToStrF(meanStd.first * RTM, ffFixed, 8, 4), FloatToStrF(meanStd.second * RTM, ffFixed, 8, 4));
 		ChartWz->Series[1]->Title += " CКО: " + FloatToStrF(meanStd.second * RTM, ffFixed, 8, 4);

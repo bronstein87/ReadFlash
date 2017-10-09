@@ -50,6 +50,13 @@ object FormGraphOrient: TFormGraphOrient
     Height = 13
     Anchors = [akLeft, akBottom]
   end
+  object Label12: TLabel
+    Left = 227
+    Top = 799
+    Width = 46
+    Height = 13
+    Caption = #1052#1072#1089#1096#1090#1072#1073
+  end
   object ButtonAdd: TButton
     Left = 1040
     Top = 600
@@ -135,7 +142,7 @@ object FormGraphOrient: TFormGraphOrient
     Top = 8
     Width = 1160
     Height = 777
-    ActivePage = TabSheetStatStars
+    ActivePage = TabSheetTableStat
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 8
     object TabSheetAngles: TTabSheet
@@ -951,7 +958,7 @@ object FormGraphOrient: TFormGraphOrient
         Height = 13
         Caption = 'Label6'
       end
-      object Chart1: TChart
+      object ChartMatrix: TChart
         Left = 22
         Top = 43
         Width = 1107
@@ -968,9 +975,10 @@ object FormGraphOrient: TFormGraphOrient
         Gradient.MidColor = 15395562
         Gradient.StartColor = 15395562
         LeftWall.Color = 14745599
+        Legend.Alignment = laBottom
+        Legend.CheckBoxes = True
         Legend.Font.Name = 'Verdana'
         Legend.Shadow.Transparency = 0
-        Legend.Visible = False
         RightWall.Color = clWhite
         Title.Font.Name = 'Verdana'
         Title.Font.Style = [fsBold]
@@ -1041,83 +1049,6 @@ object FormGraphOrient: TFormGraphOrient
           15
           19)
         ColorPaletteIndex = 13
-        object Series9: TBubbleSeries
-          Marks.Frame.Visible = False
-          Marks.Transparent = False
-          ClickableLine = False
-          Pointer.Brush.Gradient.Angle = 38
-          Pointer.Brush.Gradient.Direction = gdFromTopLeft
-          Pointer.Brush.Gradient.EndColor = 6144242
-          Pointer.Brush.Gradient.MidColor = 16059031
-          Pointer.Brush.Gradient.StartColor = 14540754
-          Pointer.Brush.Gradient.Visible = True
-          Pointer.DarkPen = -42
-          Pointer.Emboss.Transparency = 47
-          Pointer.Emboss.Visible = True
-          Pointer.Gradient.Angle = 38
-          Pointer.Gradient.Direction = gdFromTopLeft
-          Pointer.Gradient.EndColor = 6144242
-          Pointer.Gradient.MidColor = 16059031
-          Pointer.Gradient.StartColor = 14540754
-          Pointer.Gradient.Visible = True
-          Pointer.HorizSize = 9
-          Pointer.InflateMargins = False
-          Pointer.Pen.Color = 1358954496
-          Pointer.Pen.Width = 0
-          Pointer.Pen.Fill.Gradient.Direction = gdLeftRight
-          Pointer.Pen.Fill.Gradient.Visible = True
-          Pointer.Shadow.Color = clWhite
-          Pointer.Shadow.HorizSize = 19
-          Pointer.Shadow.SmoothBlur = 41
-          Pointer.Shadow.Transparency = 100
-          Pointer.Shadow.VertSize = 19
-          Pointer.Shadow.Visible = True
-          Pointer.Style = psCircle
-          Pointer.VertSize = 9
-          XValues.Name = 'X'
-          XValues.Order = loAscending
-          YValues.Name = 'Y'
-          YValues.Order = loNone
-          RadiusValues.Name = 'Radius'
-          RadiusValues.Order = loNone
-        end
-        object Series2: TLineSeries
-          SeriesColor = clBlue
-          Brush.BackColor = clDefault
-          LinePen.Color = clBlue
-          LinePen.Visible = False
-          Pointer.Brush.Gradient.EndColor = clBlue
-          Pointer.Gradient.EndColor = clBlue
-          Pointer.InflateMargins = True
-          Pointer.Style = psCircle
-          Pointer.Visible = True
-          XValues.Name = 'X'
-          XValues.Order = loAscending
-          YValues.Name = 'Y'
-          YValues.Order = loNone
-        end
-        object Series3: TArrowSeries
-          Marks.Frame.Visible = False
-          Marks.Transparent = True
-          SeriesColor = clRed
-          ClickableLine = False
-          Pointer.Brush.Gradient.EndColor = clRed
-          Pointer.Gradient.EndColor = clRed
-          Pointer.InflateMargins = False
-          Pointer.Style = psRectangle
-          XValues.Name = 'X'
-          XValues.Order = loAscending
-          YValues.Name = 'Y'
-          YValues.Order = loNone
-          EndXValues.Name = 'EndX'
-          EndXValues.Order = loNone
-          EndYValues.Name = 'EndY'
-          EndYValues.Order = loNone
-          StartXValues.Name = 'X'
-          StartXValues.Order = loAscending
-          StartYValues.Name = 'Y'
-          StartYValues.Order = loNone
-        end
         object Series1: TLineSeries
           Marks.Emboss.Color = 8487297
           Marks.Shadow.Color = 8487297
@@ -1135,10 +1066,73 @@ object FormGraphOrient: TFormGraphOrient
           YValues.Order = loNone
           Transparency = 47
         end
+        object Series9: TBubbleSeries
+          Marks.Frame.Visible = False
+          Marks.Transparent = False
+          ClickableLine = False
+          Pointer.Brush.Gradient.Angle = 38
+          Pointer.Brush.Gradient.Direction = gdFromTopLeft
+          Pointer.Brush.Gradient.EndColor = 10708548
+          Pointer.Brush.Gradient.MidColor = 16059031
+          Pointer.Brush.Gradient.StartColor = 14540754
+          Pointer.Brush.Gradient.Visible = True
+          Pointer.DarkPen = -42
+          Pointer.Emboss.Transparency = 47
+          Pointer.Emboss.Visible = True
+          Pointer.Gradient.Angle = 38
+          Pointer.Gradient.Direction = gdFromTopLeft
+          Pointer.Gradient.EndColor = 10708548
+          Pointer.Gradient.MidColor = 16059031
+          Pointer.Gradient.StartColor = 14540754
+          Pointer.Gradient.Visible = True
+          Pointer.HorizSize = 16
+          Pointer.InflateMargins = False
+          Pointer.Pen.Color = 1358954496
+          Pointer.Pen.Width = 0
+          Pointer.Pen.Fill.Gradient.Direction = gdLeftRight
+          Pointer.Pen.Fill.Gradient.Visible = True
+          Pointer.Shadow.Color = clWhite
+          Pointer.Shadow.HorizSize = 19
+          Pointer.Shadow.SmoothBlur = 41
+          Pointer.Shadow.Transparency = 100
+          Pointer.Shadow.VertSize = 19
+          Pointer.Shadow.Visible = True
+          Pointer.Style = psCircle
+          Pointer.VertSize = 16
+          XValues.Name = 'X'
+          XValues.Order = loAscending
+          YValues.Name = 'Y'
+          YValues.Order = loNone
+          RadiusValues.Name = 'Radius'
+          RadiusValues.Order = loNone
+        end
         object Series10: TArrowSeries
           Marks.Frame.Visible = False
           Marks.Transparent = True
+          SeriesColor = clBlue
           ClickableLine = False
+          Pointer.InflateMargins = False
+          Pointer.Style = psRectangle
+          XValues.Name = 'X'
+          XValues.Order = loAscending
+          YValues.Name = 'Y'
+          YValues.Order = loNone
+          EndXValues.Name = 'EndX'
+          EndXValues.Order = loNone
+          EndYValues.Name = 'EndY'
+          EndYValues.Order = loNone
+          StartXValues.Name = 'X'
+          StartXValues.Order = loAscending
+          StartYValues.Name = 'Y'
+          StartYValues.Order = loNone
+        end
+        object Series3: TArrowSeries
+          Marks.Frame.Visible = False
+          Marks.Transparent = True
+          SeriesColor = clRed
+          ClickableLine = False
+          Pointer.Brush.Gradient.EndColor = clRed
+          Pointer.Gradient.EndColor = clRed
           Pointer.InflateMargins = False
           Pointer.Style = psRectangle
           XValues.Name = 'X'
@@ -1431,10 +1425,6 @@ object FormGraphOrient: TFormGraphOrient
     object ShowFragmentTab: TTabSheet
       Caption = #1054#1090#1086#1073#1088#1072#1078#1077#1085#1080#1077' '#1092#1088#1072#1075#1084#1077#1085#1090#1086#1074
       ImageIndex = 8
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object FragmentShowScrollBox: TScrollBox
         Left = 0
         Top = 33
@@ -2410,6 +2400,14 @@ object FormGraphOrient: TFormGraphOrient
           24)
       end
     end
+  end
+  object EditScale: TEdit
+    Left = 284
+    Top = 796
+    Width = 121
+    Height = 21
+    TabOrder = 9
+    Text = '20'
   end
   object MainMenu1: TMainMenu
     Left = 1112

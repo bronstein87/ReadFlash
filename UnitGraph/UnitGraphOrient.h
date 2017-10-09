@@ -147,9 +147,8 @@
 		TLabel *Label1;
 		TLabel *Label5;
 		TLabel *Label6;
-		TChart *Chart1;
+	TChart *ChartMatrix;
 		TBubbleSeries *Series9;
-		TLineSeries *Series2;
 		TArrowSeries *Series3;
 		TLineSeries *Series1;
 		TTabSheet *TabSheetTableFrag;
@@ -202,6 +201,8 @@
 	TChart *ChartFragLevel;
 	TTabSheet *TabSheetTableStat;
 	TStringGrid *TableStatInfo;
+	TLabel *Label12;
+	TEdit *EditScale;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -330,8 +331,7 @@
 		void InitTableWindows(void);
 		void PrintTableWindows(const struct CadrInfo &mCadr);
 		void InitTableStat();
-		void AddRowToStatTable(int nRow, AnsiString stringName,
-							   AnsiString stringMean, AnsiString stringSigma);
+		void AddRowToStatTable(int nRow, AnsiString stringName, Statistika _stat, int p1,int p2);
 		void ClearAnimate(void);
 		void DrawAnimate(const struct CadrInfo &mCadr);
 		void DrawBlock(const struct CadrInfo &mCadr);

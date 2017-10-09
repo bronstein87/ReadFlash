@@ -20,6 +20,12 @@ struct PointXYZ
 	double Z;
 };
 
+struct Statistika
+{
+	double mean, sigma;
+	double min, max;
+};
+
 double sqrtm(double xf);
 double acosm(double xf);
 double asinm(double xf);
@@ -59,6 +65,48 @@ std::pair <Value, Value> calculateMeanStdDv(InputIterator first, InputIterator l
 	return std::pair <Value, Value> (mean, sqrtm(dispersio));
 }
 
+template <class InputIterator, class Value, class UnaryOperation>
+Statistika calculateStatParam(InputIterator first, InputIterator last, Value init, UnaryOperation extractWtC) {
+Statistika stat;
+	bool f = false;
 
+	double dispersio = 0;
+	double min, max;
+	unsigned int count_offset = 0;
+	bool flStart = true;
+
+
+	for (InputIterator i = first; i < last; i++) {
+		Value temp = extractWtC(*i, f);
+		if (f) {
+			++count_offset;
+			f = !f;
+			continue;
+		}
+		else {
+			if (flStart) {
+				min = temp;
+				max = temp;
+				flStart = false;
+			}
+			else
+			{
+				if (temp < min) min = temp;
+				if (temp > max) max = temp;
+			}
+			init += temp;
+			dispersio += pow(temp, 2);
+		}
+	}
+	auto count = std::distance(first, last) - count_offset;
+	double mean = init / count;
+	dispersio  = (dispersio / count) - pow(mean, 2);
+
+	stat.mean  = mean;
+	stat.sigma = sqrtm(dispersio);
+	stat.min   = min;
+	stat.max   = max;
+	return stat;
+}
 
 #endif
