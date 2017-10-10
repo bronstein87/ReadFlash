@@ -80,6 +80,8 @@ void __fastcall TFormGraphOrient::FormCreate(TObject *Sender)
 		BlockSeries[i]->Transparency = 70;
 		BlockSeries[i]->Legend->Visible = false;
 	}
+	BlockSeries[0]->Legend->Visible = true;
+	BlockSeries[0]->Title = "строки";
 
 //InitFrameSeries
 	for (int i=0; i < MaxFrameSeries; i++) {
@@ -95,6 +97,8 @@ void __fastcall TFormGraphOrient::FormCreate(TObject *Sender)
 		FrameSeries[i]->Transparency = 70;
 		FrameSeries[i]->Legend->Visible = false;
 	}
+	FrameSeries[0]->Legend->Visible = true;
+	FrameSeries[0]->Title = "фрагменты";
 
 	InitTableWindows();
 	InitTableObjects();
@@ -339,11 +343,7 @@ void TFormGraphOrient::AddRowToStatTable(int nRow, AnsiString stringName, Statis
 	TableStatInfo->Cells[3][nRow] = FloatToStrF(_stat.min,  ffFixed, p1, p2);
 	TableStatInfo->Cells[4][nRow] = FloatToStrF(_stat.max,  ffFixed, p1, p2);
 	TableStatInfo->Cells[6][nRow] = FloatToStrF(_stat.max - _stat.min,  ffFixed, p1, p2);
-//	TableStatInfo->Cells[5][nRow] = FloatToStrF(5.,  ffFixed, p1, p2);
 }
-
-//void TFormGraphOrient::PrintTableStat()
-//{}
 
 void TFormGraphOrient::PrepareStartDraw()
 {
@@ -355,20 +355,22 @@ void TFormGraphOrient::PrepareStartDraw()
 void TFormGraphOrient::ClearAnimate(void)
 {
 //AnimateShapes
-	for (int i = 0; i < MaxBlockSeries; i++)
-		BlockSeries[i]->Visible = false;
-	for (int i = 0; i < MaxFrameSeries; i++)
-		FrameSeries[i]->Visible = false;
+//	for (int i = 0; i < MaxBlockSeries; i++)
+//		BlockSeries[i]->Visible = false;
+//	for (int i = 0; i < MaxFrameSeries; i++)
+//		FrameSeries[i]->Visible = false;
 
 //AnimatePoints
 	Series9->Clear();
 	Series1->Clear();
 	Series3->Clear();
-    Series10->Clear();
+	Series10->Clear();
+
 //WindowsBar
 	Series4->Clear();
 	Series5->Clear();
 	Series6->Clear();
+
 //ObjectsBar
 	Series7->Clear();
 	Series8->Clear();
@@ -397,6 +399,86 @@ void TFormGraphOrient::SynchronizeCharts(double Value)
 	for (unsigned int i = 0; i < Charts.size(); i++) {
 	   TColorLineTool* LineTool = dynamic_cast <TColorLineTool*> (Charts[i]->Tools->First());
 	   LineTool->Value = Value;
+	}
+}
+
+void TFormGraphOrient::DrawAnimate(const struct CadrInfo &mCadr)
+{
+	ClearAnimate();
+
+	DrawObjects(mCadr);
+	DrawBlock(mCadr);
+
+	DrawFragment(mCadr);
+
+	PrintTableWindows(mCadr);
+	PrintTableObjects(mCadr);
+}
+
+void TFormGraphOrient::DrawObjects(const struct CadrInfo &mCadr)
+{
+	double X0, Y0, X1, Y1, Dx, Dy, Ist, Nel;
+	double zoomRedArrow  = StrToFloat(EditScale->Text)*1000.;
+	double zoomBlueArrow, binCoef;
+
+	if (mCadr.IsBinary) {
+		binCoef = 0.5;
+	}
+	else {
+		binCoef = 1.;
+	}
+
+	zoomBlueArrow = mCadr.SizePixel * zoomRedArrow / binCoef;
+	EditTimeDev->Text = FloatToStrF(mCadr.Time,ffFixed, 10, 3);
+
+	for (int iObject = 0; iObject < mCadr.SizeObjectsList; iObject++) {       //!!!
+		X0  = mCadr.ObjectsList[iObject].X;
+		Y0  = mCadr.ObjectsList[iObject].Y;
+		Nel = mCadr.ObjectsList[iObject].Square;
+		Dx  = mCadr.ObjectsList[iObject].Dx;
+		Dy  = mCadr.ObjectsList[iObject].Dy;
+
+		if (!mCadr.ObjectsList[iObject].StarID && !Dx && !Dy) {
+			if (Nel) {
+				Series9->AddBubble(X0, Y0,(int)(3*sqrtm(fabs(Nel))+0.5),"",clBlue);
+			}
+			else {
+				Series9->AddXY(X0, Y0, 1, clBlue);
+			}
+		}
+		else
+		{
+			//локализованный объект
+			Series9->AddBubble(X0, Y0, (int)(3 * sqrtm(Nel) + 0.5), "", clGreen);
+
+			//остаточные рассогласования
+			X1 = X0 - mCadr.ObjectsList[iObject].Dx * zoomRedArrow;
+			Y1 = Y0 - mCadr.ObjectsList[iObject].Dy * zoomRedArrow;
+			Series3->AddArrow(X0, Y0, X1, Y1, "", clRed);
+
+			//ошибка локализации
+			double minDist = 1000, minDistX, minDistY;
+
+			for (int iStar = 0; iStar < mCadr.SizeStarsList; iStar++) {
+				double distX = mCadr.ObjectsList[iObject].X
+								  - mCadr.StarsList[iStar].X * binCoef;
+				double distY = mCadr.ObjectsList[iObject].Y
+								  - mCadr.StarsList[iStar].Y * binCoef;
+				double curDist = sqrtm(distX * distX + distY * distY);
+
+				if (curDist < minDist) {
+					minDist  = curDist;
+					minDistX = distX;
+					minDistY = distY;
+				}
+			}
+
+			X1 = X0 - minDistX * zoomBlueArrow;
+			Y1 = Y0 - minDistY * zoomBlueArrow;
+			Series10->AddArrow(X0, Y0, X1, Y1, "", clBlue);
+		}
+//		Series9->AddBubble(mCadr.StarsList[i].X,mCadr.StarsList[i].Y,
+//						(int)(sqrtm(mCadr.StarsList[i].Square)+1));
 	}
 }
 
@@ -454,7 +536,7 @@ void TFormGraphOrient::DrawBlock(const struct CadrInfo &mCadr)
 		LabelWindow.sprintf("%d) Mv = %.2f,\r\n № CAT = %ld", i+1,
 					mCadr.WindowsList[i].Mv, mCadr.WindowsList[i].StarID);
 		FrameSeries[i]->Marks->Item[1]->Text->Add(LabelWindow);
-		FrameSeries[i]->Visible = true;
+//		FrameSeries[i]->Visible = true;
 	}
 
 //DrawBarWindows()
@@ -548,82 +630,6 @@ void TFormGraphOrient::DrawBlock(const struct CadrInfo &mCadr)
 						+ " вместо " + IntToStr(mCadr.CountLines);
 
 }
-
-void TFormGraphOrient::DrawAnimate(const struct CadrInfo &mCadr)
-{
-	double X0, Y0, X1, Y1, Dx, Dy, Ist, Nel;
-	double zoomRedArrow  = StrToFloat(EditScale->Text)*1000.;
-	double zoomBlueArrow, binCoef;
-
-	if (mCadr.IsBinary) {
-		binCoef = 0.5;
-	}
-	else {
-		binCoef = 1.;
-	}
-
-	zoomBlueArrow = mCadr.SizePixel * zoomRedArrow / binCoef;
-
-	EditTimeDev->Text = FloatToStrF(mCadr.Time,ffFixed, 10, 3);
-	ClearAnimate();
-
-	for (int iObject = 0; iObject < mCadr.SizeObjectsList; iObject++) {       //!!!
-		X0  = mCadr.ObjectsList[iObject].X;
-		Y0  = mCadr.ObjectsList[iObject].Y;
-		Nel = mCadr.ObjectsList[iObject].Square;
-		Dx  = mCadr.ObjectsList[iObject].Dx;
-		Dy  = mCadr.ObjectsList[iObject].Dy;
-
-		if (!mCadr.ObjectsList[iObject].StarID && !Dx && !Dy) {
-			if (Nel) {
-				Series9->AddBubble(X0, Y0,(int)(3*sqrtm(fabs(Nel))+0.5),"",clBlue);
-			}
-			else {
-			   Series9->AddXY(X0, Y0, 1, clBlue);
-			}
-		}
-		else
-		{
-			//локализованный объект
-			Series9->AddBubble(X0, Y0, (int)(3 * sqrtm(Nel) + 0.5), "", clGreen);
-
-			//остаточные рассогласования
-			X1 = X0 - mCadr.ObjectsList[iObject].Dx * zoomRedArrow;
-			Y1 = Y0 - mCadr.ObjectsList[iObject].Dy * zoomRedArrow;
-			Series3->AddArrow(X0, Y0, X1, Y1, "", clRed);
-
-			//ошибка локализации
-			double minDist = 1000, minDistX, minDistY;
-
-			for (int iStar = 0; iStar < mCadr.SizeStarsList; iStar++) {
-				double distX = mCadr.ObjectsList[iObject].X
-								  - mCadr.StarsList[iStar].X * binCoef;
-				double distY = mCadr.ObjectsList[iObject].Y
-								  - mCadr.StarsList[iStar].Y * binCoef;
-				double curDist = sqrtm(distX * distX + distY * distY);
-
-				if (curDist < minDist) {
-					minDist  = curDist;
-					minDistX = distX;
-					minDistY = distY;
-				}
-			}
-
-			X1 = X0 - minDistX * zoomBlueArrow;
-			Y1 = Y0 - minDistY * zoomBlueArrow;
-			Series10->AddArrow(X0, Y0, X1, Y1, "", clBlue);
-		}
-//		Series9->AddBubble(mCadr.StarsList[i].X,mCadr.StarsList[i].Y,
-//						(int)(sqrtm(mCadr.StarsList[i].Square)+1));
-	}
-
-	DrawFragment(mCadr);
-	DrawBlock(mCadr);
-
-	PrintTableWindows(mCadr);
-	PrintTableObjects(mCadr);
-}
-
 
 void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 {
@@ -948,8 +954,9 @@ void  TFormGraphOrient::DrawAnimateHandler(void)
 	try
 	{
 		CadrInfo CurCadr;
-		int cnt = StrToInt(EditNumCadr->Text);
-		if (!GetCadrInfo(cnt, CurCadr))
+		int iCurrent = StrToInt(EditNumCadr->Text);
+
+		if (!GetCadrInfo(iCurrent, CurCadr))
 		{
 			if (FormAnimateSetting->CheckBoxCurrentTime) {
 				 SynchronizeCharts(CurCadr.Time);
@@ -958,7 +965,16 @@ void  TFormGraphOrient::DrawAnimateHandler(void)
 			if (CurCadr.FrameNumber != 0) {
 				LabelFrameReport->Caption = "Номер кадра из файла: " + IntToStr(CurCadr.FrameNumber);
 			}
+
 			DrawAnimate(CurCadr);
+			if (CheckBoxHistory->Checked) {
+                int cntHistory = StrToInt(EditCountHistory->Text);
+				for (int iHistory = 1; iHistory < cntHistory; iHistory++) {
+					if (!GetCadrInfo(iCurrent + iHistory, CurCadr)) {
+						DrawObjects(CurCadr);
+					}
+				}
+			}
 		}
 	}
 	catch(exception &e)
@@ -2708,4 +2724,16 @@ void __fastcall TFormGraphOrient::BOKZM601000ParseProtocolClick(TObject *Sender)
 		}
 	}
 	// ---------------------------------------------------------------------------
+
+void __fastcall TFormGraphOrient::ChartMatrixClickLegend(TCustomChart *Sender, TMouseButton Button,
+          TShiftState Shift, int X, int Y)
+{
+	for (int i = 1; i < MaxBlockSeries; i++) {
+		BlockSeries[i]->Visible = BlockSeries[0]->Visible;
+	}
+	for (int i = 1; i < MaxFrameSeries; i++) {
+		FrameSeries[i]->Visible = FrameSeries[0]->Visible;
+	}
+}
+//---------------------------------------------------------------------------
 

@@ -69,7 +69,7 @@ void TFormAnimateSetting::WriteINI(const AnsiString& fileName)
 	Ini->WriteString("CheckBox", "CheckCurrentTime", IntToStr((int)CheckBoxCurrentTime->Checked));
 
 //настройки FormGraphOrient
-    TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
+    TFormGraphOrient* FormGraphOrient = dynamic_cast<TFormGraphOrient*>(this->Owner);
 	Ini->WriteString("DrawFrag", "CheckContrast", IntToStr((int)FormGraphOrient->ContrastCheckBox->Checked));
 	Ini->WriteString("DrawFrag", "CheckPixelBright", IntToStr((int)FormGraphOrient->PixelBrightCheckBox->Checked));
 	Ini->WriteString("DrawFrag", "FragScale", FormGraphOrient->ScaleEdit->Text);

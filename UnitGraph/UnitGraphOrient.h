@@ -201,8 +201,10 @@
 	TChart *ChartFragLevel;
 	TTabSheet *TabSheetTableStat;
 	TStringGrid *TableStatInfo;
-	TLabel *Label12;
+	TEdit *EditCountHistory;
+	TCheckBox *CheckBoxHistory;
 	TEdit *EditScale;
+	TLabel *Label12;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -236,6 +238,8 @@
 			TMouseButton Button, TShiftState Shift, int X, int Y);
 		void __fastcall BOKZM601000ParseProtocolClick(TObject *Sender);
 	void __fastcall ChartFrag2ClickLegend(TCustomChart *Sender, TMouseButton Button,
+          TShiftState Shift, int X, int Y);
+	void __fastcall ChartMatrixClickLegend(TCustomChart *Sender, TMouseButton Button,
           TShiftState Shift, int X, int Y);
 
 
@@ -334,6 +338,7 @@
 		void AddRowToStatTable(int nRow, AnsiString stringName, Statistika _stat, int p1,int p2);
 		void ClearAnimate(void);
 		void DrawAnimate(const struct CadrInfo &mCadr);
+		void DrawObjects(const struct CadrInfo &mCadr);
 		void DrawBlock(const struct CadrInfo &mCadr);
 		void DrawFragment(const struct CadrInfo &mCadr);
 		void PlaceImageFragments
@@ -394,7 +399,7 @@
 		void PrintTableObjectsHandler(void);
 		void DrawAnimateHandler(void);
 		void SetVisibleLabelFrame(bool isVisible);
-        AnsiString SourceDir;
+		AnsiString SourceDir;
 
 	};
 	//---------------------------------------------------------------------------

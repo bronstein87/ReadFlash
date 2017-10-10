@@ -50,13 +50,6 @@ object FormGraphOrient: TFormGraphOrient
     Height = 13
     Anchors = [akLeft, akBottom]
   end
-  object Label12: TLabel
-    Left = 227
-    Top = 799
-    Width = 46
-    Height = 13
-    Caption = #1052#1072#1089#1096#1090#1072#1073
-  end
   object ButtonAdd: TButton
     Left = 1040
     Top = 600
@@ -142,7 +135,7 @@ object FormGraphOrient: TFormGraphOrient
     Top = 8
     Width = 1160
     Height = 777
-    ActivePage = TabSheetTableStat
+    ActivePage = TabSheetStarsMotion
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 8
     object TabSheetAngles: TTabSheet
@@ -885,7 +878,7 @@ object FormGraphOrient: TFormGraphOrient
       end
       object ChartTemp: TChart
         Left = 0
-        Top = 498
+        Top = 496
         Width = 1149
         Height = 250
         BackWall.Brush.Style = bsClear
@@ -958,11 +951,19 @@ object FormGraphOrient: TFormGraphOrient
         Height = 13
         Caption = 'Label6'
       end
+      object Label12: TLabel
+        Left = 390
+        Top = 721
+        Width = 46
+        Height = 13
+        Anchors = [akLeft, akBottom]
+        Caption = #1052#1072#1089#1096#1090#1072#1073
+      end
       object ChartMatrix: TChart
-        Left = 22
+        Left = 23
         Top = 43
         Width = 1107
-        Height = 686
+        Height = 678
         BackWall.Brush.Gradient.Direction = gdBottomTop
         BackWall.Brush.Gradient.EndColor = clWhite
         BackWall.Brush.Gradient.StartColor = 15395562
@@ -984,6 +985,7 @@ object FormGraphOrient: TFormGraphOrient
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
           #1044#1074#1080#1078#1077#1085#1080#1077' '#1079#1074#1105#1079#1076)
+        OnClickLegend = ChartMatrixClickLegend
         BottomAxis.Automatic = False
         BottomAxis.AutomaticMaximum = False
         BottomAxis.AutomaticMinimum = False
@@ -1085,7 +1087,7 @@ object FormGraphOrient: TFormGraphOrient
           Pointer.Gradient.MidColor = 16059031
           Pointer.Gradient.StartColor = 14540754
           Pointer.Gradient.Visible = True
-          Pointer.HorizSize = 16
+          Pointer.HorizSize = 13
           Pointer.InflateMargins = False
           Pointer.Pen.Color = 1358954496
           Pointer.Pen.Width = 0
@@ -1098,7 +1100,7 @@ object FormGraphOrient: TFormGraphOrient
           Pointer.Shadow.VertSize = 19
           Pointer.Shadow.Visible = True
           Pointer.Style = psCircle
-          Pointer.VertSize = 16
+          Pointer.VertSize = 13
           XValues.Name = 'X'
           XValues.Order = loAscending
           YValues.Name = 'Y'
@@ -1113,6 +1115,7 @@ object FormGraphOrient: TFormGraphOrient
           ClickableLine = False
           Pointer.InflateMargins = False
           Pointer.Style = psRectangle
+          XValues.DateTime = False
           XValues.Name = 'X'
           XValues.Order = loAscending
           YValues.Name = 'Y'
@@ -1121,6 +1124,7 @@ object FormGraphOrient: TFormGraphOrient
           EndXValues.Order = loNone
           EndYValues.Name = 'EndY'
           EndYValues.Order = loNone
+          StartXValues.DateTime = False
           StartXValues.Name = 'X'
           StartXValues.Order = loAscending
           StartYValues.Name = 'Y'
@@ -1135,6 +1139,7 @@ object FormGraphOrient: TFormGraphOrient
           Pointer.Gradient.EndColor = clRed
           Pointer.InflateMargins = False
           Pointer.Style = psRectangle
+          XValues.DateTime = False
           XValues.Name = 'X'
           XValues.Order = loAscending
           YValues.Name = 'Y'
@@ -1143,11 +1148,39 @@ object FormGraphOrient: TFormGraphOrient
           EndXValues.Order = loNone
           EndYValues.Name = 'EndY'
           EndYValues.Order = loNone
+          StartXValues.DateTime = False
           StartXValues.Name = 'X'
           StartXValues.Order = loAscending
           StartYValues.Name = 'Y'
           StartYValues.Order = loNone
         end
+      end
+      object EditCountHistory: TEdit
+        Left = 702
+        Top = 720
+        Width = 64
+        Height = 21
+        Anchors = [akLeft, akBottom]
+        TabOrder = 1
+        Text = '10'
+      end
+      object CheckBoxHistory: TCheckBox
+        Left = 542
+        Top = 720
+        Width = 154
+        Height = 17
+        Anchors = [akLeft, akBottom]
+        Caption = #1054#1090#1086#1073#1088#1072#1078#1072#1090#1100' '#1086#1073#1098#1077#1082#1090#1099' '#1087#1086' '
+        TabOrder = 2
+      end
+      object EditScale: TEdit
+        Left = 448
+        Top = 718
+        Width = 64
+        Height = 21
+        Anchors = [akLeft, akBottom]
+        TabOrder = 3
+        Text = '20'
       end
     end
     object TabSheetTableFrag: TTabSheet
@@ -2356,17 +2389,18 @@ object FormGraphOrient: TFormGraphOrient
       object TableStatInfo: TStringGrid
         Left = 19
         Top = 43
-        Width = 582
+        Width = 646
         Height = 630
         Anchors = [akLeft, akTop, akRight]
         Color = clWhite
-        ColCount = 6
+        ColCount = 7
         FixedCols = 0
         RowCount = 25
         TabOrder = 0
         OnDrawCell = TableObjectsInfoDrawCell
         ColWidths = (
           252
+          64
           64
           64
           64
@@ -2400,14 +2434,6 @@ object FormGraphOrient: TFormGraphOrient
           24)
       end
     end
-  end
-  object EditScale: TEdit
-    Left = 284
-    Top = 796
-    Width = 121
-    Height = 21
-    TabOrder = 9
-    Text = '20'
   end
   object MainMenu1: TMainMenu
     Left = 1112
