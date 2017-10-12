@@ -322,8 +322,8 @@ void TFormGraphOrient::InitTableStat()
 {
 	int k = 0;
 
-	TableStatInfo->RowCount = 25;
-	TableStatInfo->ColCount = 7;
+	TableStatInfo->RowCount  = 25;
+	TableStatInfo->ColCount  = 7;
 	TableStatInfo->FixedCols = 0;
 	TableStatInfo->FixedRows = 1;
 	TableStatInfo->Cells[k++][0] = "Параметр";
@@ -331,7 +331,6 @@ void TFormGraphOrient::InitTableStat()
 	TableStatInfo->Cells[k++][0] = "1 СКО";
 	TableStatInfo->Cells[k++][0] = "Минимум";
 	TableStatInfo->Cells[k++][0] = "Максимум";
-	TableStatInfo->Cells[k++][0] = "";
 	TableStatInfo->Cells[k++][0] = "Разброс";
 }
 
@@ -342,7 +341,7 @@ void TFormGraphOrient::AddRowToStatTable(int nRow, AnsiString stringName, Statis
 	TableStatInfo->Cells[2][nRow] = FloatToStrF(_stat.sigma, ffFixed, p1, p2);
 	TableStatInfo->Cells[3][nRow] = FloatToStrF(_stat.min,  ffFixed, p1, p2);
 	TableStatInfo->Cells[4][nRow] = FloatToStrF(_stat.max,  ffFixed, p1, p2);
-	TableStatInfo->Cells[6][nRow] = FloatToStrF(_stat.max - _stat.min,  ffFixed, p1, p2);
+	TableStatInfo->Cells[5][nRow] = FloatToStrF(_stat.max - _stat.min,  ffFixed, p1, p2);
 }
 
 void TFormGraphOrient::PrepareStartDraw()
@@ -402,8 +401,39 @@ void TFormGraphOrient::SynchronizeCharts(double Value)
 	}
 }
 
+double  saveMinX, saveMaxX, saveMinY, saveMaxY;
+void TFormGraphOrient::SaveScale()
+{
+	saveMinX = ChartMatrix->LeftAxis->Minimum;
+	saveMaxX = ChartMatrix->LeftAxis->Maximum;
+	saveMinY = ChartMatrix->BottomAxis->Minimum;
+	saveMaxY = ChartMatrix->BottomAxis->Maximum;
+}
+
+void TFormGraphOrient::ApplyScale()
+{
+	ChartMatrix->LeftAxis->Minimum = saveMinX;
+	ChartMatrix->LeftAxis->Maximum = saveMaxX;
+	ChartMatrix->BottomAxis->Minimum = saveMinY;
+	ChartMatrix->BottomAxis->Maximum = saveMaxY;
+}
+
+void TFormGraphOrient::SetDefaultScale(const struct CadrInfo &mCadr)
+{
+//		ChartMatrix->LeftAxis->Automatic = true;
+//		ChartMatrix->BottomAxis->Automatic = true;
+
+		ChartMatrix->LeftAxis->Automatic = false;
+		ChartMatrix->LeftAxis->Minimum = 0;
+		ChartMatrix->LeftAxis->Maximum = mCadr.ImageHeight;
+		ChartMatrix->BottomAxis->Automatic = false;
+		ChartMatrix->BottomAxis->Minimum = 0;
+		ChartMatrix->BottomAxis->Maximum = mCadr.ImageWidth;
+}
+
 void TFormGraphOrient::DrawAnimate(const struct CadrInfo &mCadr)
 {
+//	SaveScale();
 	ClearAnimate();
 
 	DrawObjects(mCadr);
@@ -413,6 +443,8 @@ void TFormGraphOrient::DrawAnimate(const struct CadrInfo &mCadr)
 
 	PrintTableWindows(mCadr);
 	PrintTableObjects(mCadr);
+
+//	ApplyScale();
 }
 
 void TFormGraphOrient::DrawObjects(const struct CadrInfo &mCadr)
@@ -421,35 +453,36 @@ void TFormGraphOrient::DrawObjects(const struct CadrInfo &mCadr)
 	double zoomRedArrow  = StrToFloat(EditScale->Text)*1000.;
 	double zoomBlueArrow, binCoef;
 
-	if (mCadr.IsBinary) {
-		binCoef = 0.5;
-	}
-	else {
-		binCoef = 1.;
-	}
+	if (mCadr.IsBinary) binCoef = 0.5;
+	else binCoef = 1.;
 
 	zoomBlueArrow = mCadr.SizePixel * zoomRedArrow / binCoef;
 	EditTimeDev->Text = FloatToStrF(mCadr.Time,ffFixed, 10, 3);
 
-	for (int iObject = 0; iObject < mCadr.SizeObjectsList; iObject++) {       //!!!
+	double meanDx = 0., meanDy = 0., meanDistX = 0., meanDistY = 0.;
+	int countDetObject = 0;
+
+	for (int iObject = 0; iObject < mCadr.SizeObjectsList; iObject++) {
+
 		X0  = mCadr.ObjectsList[iObject].X;
 		Y0  = mCadr.ObjectsList[iObject].Y;
 		Nel = mCadr.ObjectsList[iObject].Square;
 		Dx  = mCadr.ObjectsList[iObject].Dx;
 		Dy  = mCadr.ObjectsList[iObject].Dy;
 
+		float sizeBubble;
+		if (Nel) sizeBubble = 3 * sqrtm(fabs(Nel)) + 0.5;
+		else sizeBubble = 1.;
+
 		if (!mCadr.ObjectsList[iObject].StarID && !Dx && !Dy) {
-			if (Nel) {
-				Series9->AddBubble(X0, Y0,(int)(3*sqrtm(fabs(Nel))+0.5),"",clBlue);
-			}
-			else {
-				Series9->AddXY(X0, Y0, 1, clBlue);
-			}
+			Series9->AddBubble(X0, Y0, sizeBubble, "", clBlue);
 		}
 		else
 		{
 			//локализованный объект
-			Series9->AddBubble(X0, Y0, (int)(3 * sqrtm(Nel) + 0.5), "", clGreen);
+			Series9->AddBubble(X0, Y0, sizeBubble, "", clGreen);
+			meanDx += Dx;
+			meanDy += Dy;
 
 			//остаточные рассогласования
 			X1 = X0 - mCadr.ObjectsList[iObject].Dx * zoomRedArrow;
@@ -473,25 +506,41 @@ void TFormGraphOrient::DrawObjects(const struct CadrInfo &mCadr)
 				}
 			}
 
+			meanDistX += minDistX;
+			meanDistY += minDistY;
 			X1 = X0 - minDistX * zoomBlueArrow;
 			Y1 = Y0 - minDistY * zoomBlueArrow;
 			Series10->AddArrow(X0, Y0, X1, Y1, "", clBlue);
+			countDetObject++;
 		}
-//		Series9->AddBubble(mCadr.StarsList[i].X,mCadr.StarsList[i].Y,
-//						(int)(sqrtm(mCadr.StarsList[i].Square)+1));
 	}
+
+	//вывод средних остаточных рассогласований
+	if (countDetObject) {
+		meanDx /= countDetObject;
+		meanDy /= countDetObject;
+		meanDistX /= countDetObject;
+		meanDistY /= countDetObject;
+		float Xc = mCadr.ImageWidth  / 2.;
+		float Yc = mCadr.ImageHeight / 2.;
+//		int saveWidth = Series3->ArrowWidth = 3;
+//		Series3->ArrowWidth = 3;
+		Series3->AddArrow(Xc, Yc, Xc - meanDx * zoomRedArrow,
+								  Yc - meanDy * zoomRedArrow, "", clRed);
+//		Series3->ArrowWidth = saveWidth;
+
+//		saveWidth = Series10->ArrowWidth;
+//		Series10->ArrowWidth = 3;
+		Series10->AddArrow(Xc, Yc, Xc - meanDistX * zoomBlueArrow,
+								   Yc - meanDistY * zoomBlueArrow, "", clBlue);
+//		Series10->ArrowWidth = saveWidth;
+	}
+
 }
 
 void TFormGraphOrient::DrawBlock(const struct CadrInfo &mCadr)
 {
 	unsigned short CountLines, CountBlock, TabTakeAway[MaxBlockSeries][2];
-
-	ChartMatrix->LeftAxis->Automatic = false;
-	ChartMatrix->LeftAxis->Minimum = 0;
-	ChartMatrix->LeftAxis->Maximum = mCadr.ImageHeight;
-	ChartMatrix->BottomAxis->Automatic = false;
-	ChartMatrix->BottomAxis->Minimum = 0;
-	ChartMatrix->BottomAxis->Maximum = mCadr.ImageWidth;
 
 //DrawBlocks()
 	CountLines = 0;
@@ -966,6 +1015,14 @@ void  TFormGraphOrient::DrawAnimateHandler(void)
 				LabelFrameReport->Caption = "Номер кадра из файла: " + IntToStr(CurCadr.FrameNumber);
 			}
 
+
+			if (CheckBoxSaveScale->Checked) {
+				ApplyScale();
+			}
+			else
+			{
+                SetDefaultScale();
+			}
 			DrawAnimate(CurCadr);
 			if (CheckBoxHistory->Checked) {
                 int cntHistory = StrToInt(EditCountHistory->Text);
@@ -975,6 +1032,10 @@ void  TFormGraphOrient::DrawAnimateHandler(void)
 					}
 				}
 			}
+			if (CheckBoxSaveScale->Checked) {
+				SaveScale();
+			}
+
 		}
 	}
 	catch(exception &e)
@@ -1019,23 +1080,23 @@ void  TFormGraphOrient::PrintTableObjectsHandler(void)
 	}
 }
 
-void  TFormGraphOrient::DrawBlockHandler(void)
-{
-	try
-	{
-		CadrInfo CurCadr;
-		int cnt = StrToInt(EditNumCadr->Text);
-
-		if (!GetCadrInfo(cnt, CurCadr))
-		{
-			 DrawBlock(CurCadr);
-		}
-	}
-	catch(exception &e)
-	{
-		ShowMessage(e.what());
-	}
-}
+//void  TFormGraphOrient::DrawBlockHandler(void)
+//{
+//	try
+//	{
+//		CadrInfo CurCadr;
+//		int cnt = StrToInt(EditNumCadr->Text);
+//
+//		if (!GetCadrInfo(cnt, CurCadr))
+//		{
+//			 DrawBlock(CurCadr);
+//		}
+//	}
+//	catch(exception &e)
+//	{
+//		ShowMessage(e.what());
+//	}
+//}
 
 
 void __fastcall TFormGraphOrient::TableObjectsInfoDrawCell(TObject *Sender, int ACol,
@@ -2736,4 +2797,5 @@ void __fastcall TFormGraphOrient::ChartMatrixClickLegend(TCustomChart *Sender, T
 	}
 }
 //---------------------------------------------------------------------------
+
 

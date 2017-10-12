@@ -200,11 +200,12 @@
 	TChart *ChartFragNoise;
 	TChart *ChartFragLevel;
 	TTabSheet *TabSheetTableStat;
-	TStringGrid *TableStatInfo;
 	TEdit *EditCountHistory;
 	TCheckBox *CheckBoxHistory;
 	TEdit *EditScale;
 	TLabel *Label12;
+	TStringGrid *TableStatInfo;
+	TCheckBox *CheckBoxSaveScale;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -337,6 +338,9 @@
 		void InitTableStat();
 		void AddRowToStatTable(int nRow, AnsiString stringName, Statistika _stat, int p1,int p2);
 		void ClearAnimate(void);
+		void SaveScale();
+		void ApplyScale();
+        void SetDefaultScale(const struct CadrInfo &mCadr);
 		void DrawAnimate(const struct CadrInfo &mCadr);
 		void DrawObjects(const struct CadrInfo &mCadr);
 		void DrawBlock(const struct CadrInfo &mCadr);
@@ -363,7 +367,7 @@
 		int GetCadrInfo(int NC, struct CadrInfo &mCadr);
 
 
-		void DrawBlockHandler(void);
+//		void DrawBlockHandler(void);
 		void ResizePlot(TChart *chart, double kx, double ky, int indexX,
 			int indexY);
 

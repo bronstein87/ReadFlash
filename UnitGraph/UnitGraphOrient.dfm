@@ -1182,6 +1182,14 @@ object FormGraphOrient: TFormGraphOrient
         TabOrder = 3
         Text = '20'
       end
+      object CheckBoxSaveScale: TCheckBox
+        Left = 88
+        Top = 720
+        Width = 201
+        Height = 17
+        Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100' '#1084#1072#1089#1096#1090#1072#1073#1080#1088#1086#1074#1072#1085#1080#1077
+        TabOrder = 4
+      end
     end
     object TabSheetTableFrag: TTabSheet
       Caption = #1060#1088#1072#1075#1084#1077#1085#1090#1099
@@ -2383,50 +2391,20 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheetTableStat: TTabSheet
       Caption = #1057#1074#1086#1076#1085#1072#1103' '#1089#1090#1072#1090#1080#1089#1090#1080#1082#1072
       ImageIndex = 15
-      DesignSize = (
-        1152
-        749)
       object TableStatInfo: TStringGrid
-        Left = 19
-        Top = 43
-        Width = 646
-        Height = 630
-        Anchors = [akLeft, akTop, akRight]
-        Color = clWhite
-        ColCount = 7
+        Left = 56
+        Top = 24
+        Width = 700
+        Height = 689
         FixedCols = 0
-        RowCount = 25
         TabOrder = 0
-        OnDrawCell = TableObjectsInfoDrawCell
         ColWidths = (
-          252
-          64
-          64
-          64
+          238
+          61
           64
           64
           64)
         RowHeights = (
-          24
-          24
-          24
-          24
-          24
-          24
-          24
-          24
-          24
-          24
-          24
-          24
-          24
-          24
-          24
-          24
-          24
-          24
-          24
-          24
           24
           24
           24
