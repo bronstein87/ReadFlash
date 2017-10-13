@@ -835,6 +835,8 @@ CadrInfo convertIKIFormatToInfoCadr(IKI_img* reader, bool CompareIKIRes)
 	cadrInfo.CountDeterObj = reader->StarsData.RecognizedCount;
 	cadrInfo.SizeStarsList = reader->StarsData.SimulatedFrame.strrec;
 	cadrInfo.SizeObjectsList = cadrInfo.CountLocalObj;
+	cadrInfo.ResolutionACP = pow(2., reader->CameraSettings.ResolutionACP) - 1;
+
 	// cadrInfo.SizeObjectsList =  cadrInfo.CountDeterObj;
 	cadrInfo.SizeWindowsList = cadrInfo.CountWindows;
 
@@ -903,6 +905,26 @@ CadrInfo convertIKIFormatToInfoCadr(IKI_img* reader, bool CompareIKIRes)
 		 winInfo.Sp[0] = 0;
 		 winInfo.Sp[1] = 0;
 		 cadrInfo.WindowsList.push_back(winInfo);
+	}
+
+	for (int i = 0; i < cadrInfo.SizeWindowsList; i++)
+	{
+		if (cadrInfo.ObjectsList[i].StarID == 0 && cadrInfo.WindowsList[i].CountObj > 1)
+		{
+			cadrInfo.WindowsList[i].StarID = cadrInfo.ObjectsList[i + 1].StarID;
+			cadrInfo.WindowsList[i].Bright = cadrInfo.ObjectsList[i + 1].Bright;
+			cadrInfo.WindowsList[i].xCenter = cadrInfo.ObjectsList[i + 1].X - cadrInfo.WindowsList[i].XStart;
+			cadrInfo.WindowsList[i].yCenter = cadrInfo.ObjectsList[i + 1].Y - cadrInfo.WindowsList[i].YStart;
+			i++;
+		}  
+		else
+		{
+		   cadrInfo.WindowsList.[i].StarID = cadrInfo.ObjectsList[i].StarID;
+		   cadrInfo.WindowsList.[i].Bright = cadrInfo.ObjectsList[i].Bright;
+		   cadrInfo.WindowsList.[i].xCenter = cadrInfo.ObjectsList[i].X - cadrInfo.WindowsList[i].XStart;
+		   cadrInfo.WindowsList.[i].yCenter = cadrInfo.ObjectsList[i].Y - cadrInfo.WindowsList[i].YStart;	
+		}
+		
 	}
 
 	if (reader->ImageData.WindowsData.SizeData != 0) {

@@ -10,6 +10,8 @@
 #include "iki_img.cpp"
 #include <DateUtils.hpp>
 #include <System.IOUtils.hpp>
+#include <math.h>
+
 
 #define MAX_STAT 	   16
 #define MAX_OBJ_DTMI   15

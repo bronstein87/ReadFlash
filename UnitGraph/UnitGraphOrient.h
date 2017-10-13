@@ -389,12 +389,12 @@
 		unsigned short FontSize;
 		bool CompareIKIRes;
 
-		vector<TChart*>Charts;
-		vector<CadrInfo>vCadrInfo;
-		vector<TImage*>ImageVector;
-		vector<FragmentData>FragmentVector;
-		vector<FragmentScrollBox*>ImageScrollBoxVector;
-		vector<TImage*>FragmentsNumbers;
+		vector <TChart*> Charts;
+		vector <CadrInfo> vCadrInfo;
+		vector <TImage*> ImageVector;
+		vector <FragmentData> FragmentVector;
+		vector <FragmentScrollBox*> ImageScrollBoxVector;
+		vector <TImage*> FragmentsNumbers;
 
 	public:		// User declarations
 

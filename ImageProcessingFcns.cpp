@@ -23,12 +23,12 @@
 		AverageBrightness /= Width * Height;
 		double CorrectionCoefficient = 1.0 + ConstrastCoefficient / 100.0;
 
-		std::vector<int> Palette;
+		std::vector <int> Palette;
 
 		for (int i = 0; i < 256; i++)
 		{
 			int delta = i - AverageBrightness;  // отклонение от средней яркости
-			int temp  = AverageBrightness + CorrectionCoefficient *delta;
+			int temp  = AverageBrightness + CorrectionCoefficient * delta;
 
 			if (temp < 0)
 			temp = 0;
@@ -42,7 +42,7 @@
 		for(int i = 0;i < Height;i ++)
 		{
 			BitmapLine = (TRGBTriple*)ImageToCorrect->Picture->Bitmap->ScanLine[i];
-			for(int j = 0;j < Width;j++)
+			for(int j = 0;j < Width; j++)
 			{
 			   BitmapLine[j].rgbtBlue = Palette[BitmapLine[j].rgbtBlue]  ;
 			   BitmapLine[j].rgbtGreen = Palette[BitmapLine[j].rgbtGreen] ;
@@ -51,11 +51,9 @@
 		}
 
 		ImageToCorrect->Repaint();
-
-
   }
 
-std::unique_ptr <TBitmap> changeContrast(int ContrastCoefficient, FragmentData& FData)
+std::unique_ptr <TBitmap> changeContrast(int ContrastCoefficient, FragmentData& FData, int Limit)
   {
 	int FragmentSize = FData.SizeX * FData.SizeY;
 	if(FData.min == 0 && FData.max == 0 && FData.mean == 0)
@@ -86,6 +84,13 @@ std::unique_ptr <TBitmap> changeContrast(int ContrastCoefficient, FragmentData& 
 		BitmapLine = (TRGBTriple*) Fragment->ScanLine[currentColumn];
 		for (unsigned int currentRow = 0, adress = currentColumn * FData.SizeX; currentRow < FData.SizeX; currentRow++, adress++)
 		{
+			if (FData.RawFragment[adress] == Limit) {
+				BitmapLine[currentRow].rgbtBlue = 0;
+				BitmapLine[currentRow].rgbtGreen = 0;
+				BitmapLine[currentRow].rgbtRed = 255;
+				continue;
+			}
+
 			int ContrastValue =
 			(((FData.RawFragment[adress] - FData.mean) * ContrastCoefficient + FData.mean - FData.min) * 256) / (FData.max - FData.min);
 			if (ContrastValue < 0) ContrastValue = 0;
@@ -97,12 +102,13 @@ std::unique_ptr <TBitmap> changeContrast(int ContrastCoefficient, FragmentData& 
 		}
 	}
 
+
 	return Fragment;
   }
 
- std::unique_ptr<TBitmap> createFragmentBitmap(FragmentData& FData)
+ std::unique_ptr <TBitmap> createFragmentBitmap(FragmentData& FData, int Limit)
   {
-	  return changeContrast(1, FData);
+	  return changeContrast(1, FData, Limit);
   }
 
 
@@ -147,4 +153,11 @@ std::unique_ptr <TBitmap> changeContrast(int ContrastCoefficient, FragmentData& 
   }
 
 
-
+  void drawFragmentCenter(TBitmap* Fragment , float xCenter, float yCenter, float resizeCoef)
+  {
+		Fragment->Canvas->Brush->Color = clBlue;
+		Fragment->Canvas->Pen->Color = clBlue;
+		int xCent = xCenter - (int)(xCenter * resizeCoef) > 0.5 ? xCenter + 1 : xCenter;
+		int yCent = yCenter - (int)(yCenter * resizeCoef) > 0.5 ? yCenter + 1 : yCenter;
+        Fragment->Canvas->Ellipse(xCent, yCent, 1, 1);
+  }

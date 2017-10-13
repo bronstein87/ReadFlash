@@ -992,8 +992,8 @@ object FormGraphOrient: TFormGraphOrient
         BottomAxis.Axis.Color = 4210752
         BottomAxis.Grid.Color = 11119017
         BottomAxis.LabelsFormat.Font.Name = 'Verdana'
-        BottomAxis.Maximum = 24.036205327967800000
-        BottomAxis.Minimum = -11.975843154929570000
+        BottomAxis.Maximum = 15.050568757846450000
+        BottomAxis.Minimum = -2.990206584808225000
         BottomAxis.TicksInner.Color = 11119017
         BottomAxis.Title.Font.Name = 'Verdana'
         Chart3DPercent = 1
@@ -1014,8 +1014,8 @@ object FormGraphOrient: TFormGraphOrient
         LeftAxis.Grid.Color = 11119017
         LeftAxis.Inverted = True
         LeftAxis.LabelsFormat.Font.Name = 'Verdana'
-        LeftAxis.Maximum = 4644.079226920634000000
-        LeftAxis.Minimum = -2337.544079528345000000
+        LeftAxis.Maximum = 2902.041982606890000000
+        LeftAxis.Minimum = -595.506835214601300000
         LeftAxis.TicksInner.Color = 11119017
         LeftAxis.Title.Font.Name = 'Verdana'
         Panning.MouseWheel = pmwNone
@@ -1183,10 +1183,12 @@ object FormGraphOrient: TFormGraphOrient
         Text = '20'
       end
       object CheckBoxSaveScale: TCheckBox
-        Left = 88
-        Top = 720
+        Left = 3
+        Top = 727
         Width = 201
         Height = 17
+        Align = alCustom
+        Alignment = taLeftJustify
         Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100' '#1084#1072#1089#1096#1090#1072#1073#1080#1088#1086#1074#1072#1085#1080#1077
         TabOrder = 4
       end

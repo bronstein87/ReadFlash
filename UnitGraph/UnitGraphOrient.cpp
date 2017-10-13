@@ -734,7 +734,7 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 		int FragmentSize =  FragmentVector.back().SizeX * FragmentVector.back().SizeY;
 		FragmentVector.back().RawFragment = new unsigned short [FragmentSize];
 		fragmentFile.read((char*)FragmentVector.back().RawFragment, sizeof(unsigned short) * FragmentSize);
-		unique_ptr<TBitmap> Fragment(createFragmentBitmap(FragmentVector.back()));
+		unique_ptr<TBitmap> Fragment(createFragmentBitmap(FragmentVector.back(), mCadr.ResolutionACP));
 
 
 		ImageScrollBoxVector.push_back(new FragmentScrollBox(FragmentShowScrollBox));
@@ -761,13 +761,20 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 		ImageVector.back()->SetParentComponent(ImageScrollBoxVector.back());
 
 		resizeBitmap(FragmentVector.back().SizeX * ResizeCoef, FragmentVector.back().SizeY * ResizeCoef, ImageVector.back()->Picture->Bitmap);
+		drawFragmentCenter(ImageVector.back()->Picture->Bitmap,
+		mCadr.WindowsList [CurrentFragment].xCenter, mCadr.WindowsList [CurrentFragment].xCenter, resizeCoef);
 
 		TImage* FragmentNumber = new TImage(ImageScrollBoxVector.back());
 		FragmentNumber->Height = 15;
-		FragmentNumber->Width = 15;
+		FragmentNumber->Width = 105;
 		FragmentNumber->Canvas->Brush->Color = clWhite;
-		TRect TheRect = Rect(0, 0, 15, 15);
-		FragmentNumber->Canvas->TextRect(TheRect, 0, 0, IntToStr(CurrentFragment + 1));
+		TRect TheRect = Rect(0, 0, 105, 15);
+		UnicodeString fragInfo =
+		" L: " + IntToStr((int)mCadr.WindowsList [CurrentFragment].Level) +
+		" C: " + IntToStr(mCadr.WindowsList [CurrentFragment].CountObj) +
+		" S: " + IntToStr((int)mCadr.WindowsList [CurrentFragment].StarID) +
+		" B: " + IntToStr((int)mCadr.WindowsList [CurrentFragment].Bright) + " ";
+		FragmentNumber->Canvas-> TextRect(TheRect, 0, 0, IntToStr(CurrentFragment + 1) + fragInfo);
 		FragmentNumber->SetParentComponent(ImageScrollBoxVector.back());
 		FragmentsNumbers.push_back(FragmentNumber);
 
@@ -847,14 +854,19 @@ void __fastcall TFormGraphOrient::FragmentShowScrollBoxResize(TObject *Sender)
 
 void TFormGraphOrient::SetContrast()
 {
-	for(unsigned int currentFragment = 0;currentFragment < ImageVector.size();currentFragment ++)
+	for(unsigned int currentFragment = 0; currentFragment < ImageVector.size(); currentFragment++)
 	{
-	   unique_ptr<TBitmap> Fragment(changeContrast(Contrast, FragmentVector[currentFragment]));
+
+		CadrInfo& curCadr = vCadrInfo[StrToInt(EditNumCadr->Text)];
+	   unique_ptr <TBitmap> Fragment(changeContrast(Contrast, FragmentVector[currentFragment], vCadrInfo.back().ResolutionACP));
 	   ImageVector[currentFragment]->Picture->Bitmap->FreeImage();
 	   ImageVector[currentFragment]->Picture->Bitmap = NULL;
 	   ImageVector[currentFragment]->Canvas->
 	   StretchDraw(Rect(0, 0, ImageVector[currentFragment]->Width, ImageVector[currentFragment]->Height),Fragment.get());
-	   resizeBitmap(FragmentVector[currentFragment].SizeX * ResizeCoef, FragmentVector[currentFragment].SizeY * ResizeCoef, ImageVector[currentFragment]->Picture->Bitmap);
+	   resizeBitmap(FragmentVector[currentFragment].SizeX * ResizeCoef, FragmentVector[currentFragment].SizeY * ResizeCoef,
+	   ImageVector[currentFragment]->Picture->Bitmap);
+	   drawFragmentCenter(ImageVector[currentFragment]->Picture->Bitmap,
+	   curCadr.WindowsList[currentFragment].xCenter, curCadr.WindowsList[currentFragment].yCenter, resizeCoef);
 	}
 }
 
@@ -949,7 +961,7 @@ void __fastcall TFormGraphOrient::PixelBrightCheckBoxClick(TObject *Sender)
 {
 	if(PixelBrightCheckBox->Checked)
 	{
-		for(unsigned int i = 0; i < ImageVector.size(); i ++)
+		for(unsigned int i = 0; i < ImageVector.size(); i++)
 		{
 			writePixelValue(FragmentVector[i], ImageVector[i]->Picture->Bitmap, ResizeCoef, 2 , FontSize);
 		}
@@ -1021,7 +1033,7 @@ void  TFormGraphOrient::DrawAnimateHandler(void)
 			}
 			else
 			{
-                SetDefaultScale();
+				SetDefaultScale(CurCadr);
 			}
 			DrawAnimate(CurCadr);
 			if (CheckBoxHistory->Checked) {
@@ -2581,7 +2593,6 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 //печать статистики по серии кадров
 //			PrintReportRes(vCadrInfo);
 
-//сделать функцию CheckChartSeries
 			plotter->CheckChartSeries(ChartFragBright);
 			plotter->CheckChartSeries(ChartFragSizeEl);
 			plotter->CheckChartSeries(ChartFragErrX);
