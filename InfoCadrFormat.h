@@ -48,6 +48,9 @@ struct WindowsInfo
 	unsigned long StarID;
 	float Mv;  //temporary
 	char Sp[2]; //temporary
+	float xCenter;  // координаты центра звезды относительно начала фрагмента
+	float yCenter;  // координаты центра звезды относительно начала фрагмента
+	int Bright;
 };
 
 struct LinesInfo
@@ -62,6 +65,7 @@ struct CadrInfo
 	double Time;
 	int FrameNumber;
 	bool IsBinary, IsReverse;   //признак бинирования, признак реверса изображения
+	int ResolutionACP;
 	bool IsOrient; //признак определения ориентации
 	unsigned short CountPixFilter;       //число пикселей выше порога
 	unsigned short ImageWidth, ImageHeight;  //ширина и высота изображения

@@ -913,16 +913,16 @@ CadrInfo convertIKIFormatToInfoCadr(IKI_img* reader, bool CompareIKIRes)
 		{
 			cadrInfo.WindowsList[i].StarID = cadrInfo.ObjectsList[i + 1].StarID;
 			cadrInfo.WindowsList[i].Bright = cadrInfo.ObjectsList[i + 1].Bright;
-			cadrInfo.WindowsList[i].xCenter = cadrInfo.ObjectsList[i + 1].X - cadrInfo.WindowsList[i].XStart;
-			cadrInfo.WindowsList[i].yCenter = cadrInfo.ObjectsList[i + 1].Y - cadrInfo.WindowsList[i].YStart;
+			cadrInfo.WindowsList[i].xCenter = cadrInfo.ObjectsList[i + 1].X - cadrInfo.WindowsList[i].Xstart;
+			cadrInfo.WindowsList[i].yCenter = cadrInfo.ObjectsList[i + 1].Y - cadrInfo.WindowsList[i].Ystart;
 			i++;
 		}  
 		else
 		{
-		   cadrInfo.WindowsList.[i].StarID = cadrInfo.ObjectsList[i].StarID;
-		   cadrInfo.WindowsList.[i].Bright = cadrInfo.ObjectsList[i].Bright;
-		   cadrInfo.WindowsList.[i].xCenter = cadrInfo.ObjectsList[i].X - cadrInfo.WindowsList[i].XStart;
-		   cadrInfo.WindowsList.[i].yCenter = cadrInfo.ObjectsList[i].Y - cadrInfo.WindowsList[i].YStart;	
+		   cadrInfo.WindowsList[i].StarID = cadrInfo.ObjectsList[i].StarID;
+		   cadrInfo.WindowsList[i].Bright = cadrInfo.ObjectsList[i].Bright;
+		   cadrInfo.WindowsList[i].xCenter = cadrInfo.ObjectsList[i].X - cadrInfo.WindowsList[i].Xstart;
+		   cadrInfo.WindowsList[i].yCenter = cadrInfo.ObjectsList[i].Y - cadrInfo.WindowsList[i].Ystart;	
 		}
 		
 	}
