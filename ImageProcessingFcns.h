@@ -68,11 +68,11 @@ struct FragmentData
 
 // внести в namespace
 void changeContrast(int ConstrastCoefficient,TImage* ImageToCorrect);
-std::unique_ptr <TBitmap> changeContrast(int ContrastCoefficient, FragmentData& FData, int Limit);
-std::unique_ptr <TBitmap> createFragmentBitmap(FragmentData& FData, int Limit);
+std::unique_ptr <TBitmap> changeContrast(int ContrastCoefficient, FragmentData& FData, int Limit = -1);
+std::unique_ptr <TBitmap> createFragmentBitmap(FragmentData& FData, int Limit = -1);
 void resizeBitmap(unsigned int Width, unsigned int Height, TBitmap* BitmapToScale);
 void writePixelValue(FragmentData& FData,TBitmap* Bitmap, unsigned short PixelSize,unsigned short ToCenter, unsigned short FontSize);
-void drawFragmentCenter(TBitmap* Fragment , float xCenter, float yCenter);
+void drawFragmentCenter(TBitmap* Fragment , float xCenter, float yCenter, float ResizeCoef);
 void showFragmentLimit (int Limit, TColor color);
 
 

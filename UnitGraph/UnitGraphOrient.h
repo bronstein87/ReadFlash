@@ -147,7 +147,7 @@
 		TLabel *Label1;
 		TLabel *Label5;
 		TLabel *Label6;
-	TChart *ChartMatrix;
+		TChart *ChartMatrix;
 		TBubbleSeries *Series9;
 		TArrowSeries *Series3;
 		TLineSeries *Series1;
@@ -195,17 +195,18 @@
 		TChart *ChartBrightSize;
 		TChart *ChartBrightSp;
 		TChart *ChartSizeMv;
-	TTabSheet *TabSheetStatFrag2;
-	TChart *ChartFragMean;
-	TChart *ChartFragNoise;
-	TChart *ChartFragLevel;
-	TTabSheet *TabSheetTableStat;
-	TEdit *EditCountHistory;
-	TCheckBox *CheckBoxHistory;
-	TEdit *EditScale;
-	TLabel *Label12;
-	TStringGrid *TableStatInfo;
-	TCheckBox *CheckBoxSaveScale;
+		TTabSheet *TabSheetStatFrag2;
+		TChart *ChartFragMean;
+		TChart *ChartFragNoise;
+		TChart *ChartFragLevel;
+		TTabSheet *TabSheetTableStat;
+		TEdit *EditCountHistory;
+		TCheckBox *CheckBoxHistory;
+		TEdit *EditScale;
+		TLabel *Label12;
+		TStringGrid *TableStatInfo;
+		TCheckBox *CheckBoxSaveScale;
+		TCheckBox *CheckBoxLimit;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -242,6 +243,7 @@
           TShiftState Shift, int X, int Y);
 	void __fastcall ChartMatrixClickLegend(TCustomChart *Sender, TMouseButton Button,
           TShiftState Shift, int X, int Y);
+	void __fastcall CheckBoxLimitClick(TObject *Sender);
 
 
 	private:	// User declarations
@@ -363,7 +365,6 @@
 		void InitializeSynchronization();
 		void SynchronizeCharts(double Value);
 		void SaveGraph(TChart *Chart, AnsiString suff);
-
 		int GetCadrInfo(int NC, struct CadrInfo &mCadr);
 
 

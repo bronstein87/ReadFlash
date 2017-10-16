@@ -734,7 +734,12 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 		int FragmentSize =  FragmentVector.back().SizeX * FragmentVector.back().SizeY;
 		FragmentVector.back().RawFragment = new unsigned short [FragmentSize];
 		fragmentFile.read((char*)FragmentVector.back().RawFragment, sizeof(unsigned short) * FragmentSize);
-		unique_ptr<TBitmap> Fragment(createFragmentBitmap(FragmentVector.back(), mCadr.ResolutionACP));
+		int Limit = -1;
+		if (CheckBoxLimit->Checked)
+		{
+			Limit = mCadr.WindowsList[CurrentFragment].Level;
+		}
+		unique_ptr<TBitmap> Fragment(createFragmentBitmap(FragmentVector.back(), Limit));
 
 
 		ImageScrollBoxVector.push_back(new FragmentScrollBox(FragmentShowScrollBox));
@@ -762,13 +767,13 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 
 		resizeBitmap(FragmentVector.back().SizeX * ResizeCoef, FragmentVector.back().SizeY * ResizeCoef, ImageVector.back()->Picture->Bitmap);
 		drawFragmentCenter(ImageVector.back()->Picture->Bitmap,
-		mCadr.WindowsList [CurrentFragment].xCenter, mCadr.WindowsList [CurrentFragment].xCenter, resizeCoef);
+		mCadr.WindowsList [CurrentFragment].xCenter, mCadr.WindowsList [CurrentFragment].xCenter, ResizeCoef);
 
 		TImage* FragmentNumber = new TImage(ImageScrollBoxVector.back());
 		FragmentNumber->Height = 15;
-		FragmentNumber->Width = 105;
+		FragmentNumber->Width = 150;
 		FragmentNumber->Canvas->Brush->Color = clWhite;
-		TRect TheRect = Rect(0, 0, 105, 15);
+		TRect TheRect = Rect(0, 0, 150, 15);
 		UnicodeString fragInfo =
 		" L: " + IntToStr((int)mCadr.WindowsList [CurrentFragment].Level) +
 		" C: " + IntToStr(mCadr.WindowsList [CurrentFragment].CountObj) +
@@ -789,10 +794,16 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 	else SetContrast();
 	if(PixelBrightCheckBox->Checked)
 	{
-		for(unsigned int i = 0; i < ImageVector.size(); i ++)
+		for(unsigned int i = 0; i < ImageVector.size(); i++)
 		{
 			writePixelValue(FragmentVector[i], ImageVector[i]->Picture->Bitmap, ResizeCoef, 5, 7);
 		}
+	}
+
+	for(unsigned int i = 0; i < ImageVector.size(); i++)
+	{
+		drawFragmentCenter(ImageVector[i]->Picture->Bitmap,
+		mCadr.WindowsList[i].xCenter, mCadr.WindowsList [i].xCenter, ResizeCoef);
 	}
 }
 
@@ -857,8 +868,14 @@ void __fastcall TFormGraphOrient::FragmentShowScrollBoxResize(TObject *Sender)
 	for(unsigned int currentFragment = 0; currentFragment < ImageVector.size(); currentFragment++)
 	{
 
-		CadrInfo& curCadr = vCadrInfo[StrToInt(EditNumCadr->Text)];
-	   unique_ptr <TBitmap> Fragment(changeContrast(Contrast, FragmentVector[currentFragment], vCadrInfo.back().ResolutionACP));
+	   CadrInfo& curCadr = vCadrInfo[StrToInt(EditNumCadr->Text)];
+	   int Limit = -1;
+	   if (CheckBoxLimit->Checked)
+	   {
+			int j = StrToInt(EditNumCadr->Text);
+            Limit = vCadrInfo[j].WindowsList[currentFragment].Level;
+	   }
+	   unique_ptr <TBitmap> Fragment(changeContrast(Contrast, FragmentVector[currentFragment], Limit));
 	   ImageVector[currentFragment]->Picture->Bitmap->FreeImage();
 	   ImageVector[currentFragment]->Picture->Bitmap = NULL;
 	   ImageVector[currentFragment]->Canvas->
@@ -866,7 +883,7 @@ void __fastcall TFormGraphOrient::FragmentShowScrollBoxResize(TObject *Sender)
 	   resizeBitmap(FragmentVector[currentFragment].SizeX * ResizeCoef, FragmentVector[currentFragment].SizeY * ResizeCoef,
 	   ImageVector[currentFragment]->Picture->Bitmap);
 	   drawFragmentCenter(ImageVector[currentFragment]->Picture->Bitmap,
-	   curCadr.WindowsList[currentFragment].xCenter, curCadr.WindowsList[currentFragment].yCenter, resizeCoef);
+	   curCadr.WindowsList[currentFragment].xCenter, curCadr.WindowsList[currentFragment].yCenter, ResizeCoef);
 	}
 }
 
@@ -966,6 +983,7 @@ void __fastcall TFormGraphOrient::PixelBrightCheckBoxClick(TObject *Sender)
 			writePixelValue(FragmentVector[i], ImageVector[i]->Picture->Bitmap, ResizeCoef, 2 , FontSize);
 		}
 	}
+
 }
 //---------------------------------------------------------------------------
 
@@ -2809,4 +2827,19 @@ void __fastcall TFormGraphOrient::ChartMatrixClickLegend(TCustomChart *Sender, T
 }
 //---------------------------------------------------------------------------
 
+
+
+void __fastcall TFormGraphOrient::CheckBoxLimitClick(TObject *Sender)
+{
+	SetContrast();
+
+    int j = StrToInt(EditNumCadr->Text);
+	for(unsigned int i = 0; i < ImageVector.size(); i++)
+	{
+		drawFragmentCenter(ImageVector[i]->Picture->Bitmap,
+		vCadrInfo[j].WindowsList[i].xCenter, vCadrInfo[j].WindowsList[i].xCenter, ResizeCoef);
+	}
+    PixelBrightCheckBoxClick(this);
+}
+//---------------------------------------------------------------------------
 

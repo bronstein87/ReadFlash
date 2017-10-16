@@ -66,7 +66,7 @@ std::unique_ptr <TBitmap> changeContrast(int ContrastCoefficient, FragmentData& 
 		int sum = 0;
 		for (int i = 0; i < FragmentSize; i++)
 		{
-				sum += FData.RawFragment[i];
+			sum += FData.RawFragment[i];
 		}
 		FData.mean = sum / FragmentSize;
 	}
@@ -84,22 +84,36 @@ std::unique_ptr <TBitmap> changeContrast(int ContrastCoefficient, FragmentData& 
 		BitmapLine = (TRGBTriple*) Fragment->ScanLine[currentColumn];
 		for (unsigned int currentRow = 0, adress = currentColumn * FData.SizeX; currentRow < FData.SizeX; currentRow++, adress++)
 		{
-			if (FData.RawFragment[adress] == Limit) {
-				BitmapLine[currentRow].rgbtBlue = 0;
-				BitmapLine[currentRow].rgbtGreen = 0;
-				BitmapLine[currentRow].rgbtRed = 255;
-				continue;
-			}
 
 			int ContrastValue =
 			(((FData.RawFragment[adress] - FData.mean) * ContrastCoefficient + FData.mean - FData.min) * 256) / (FData.max - FData.min);
 			if (ContrastValue < 0) ContrastValue = 0;
 			if (ContrastValue > 255) ContrastValue = 255;
 
-			BitmapLine[currentRow].rgbtBlue = ContrastValue;
-			BitmapLine[currentRow].rgbtGreen = ContrastValue;
-			BitmapLine[currentRow].rgbtRed = ContrastValue;
+			if (Limit == -1)
+			{
+				BitmapLine[currentRow].rgbtBlue = ContrastValue;
+				BitmapLine[currentRow].rgbtGreen = ContrastValue;
+				BitmapLine[currentRow].rgbtRed = ContrastValue;
+			}
+
+			else
+			{
+				if (FData.RawFragment[adress] > Limit)
+				{
+					BitmapLine[currentRow].rgbtBlue = 0;
+					BitmapLine[currentRow].rgbtGreen = 0;
+					BitmapLine[currentRow].rgbtRed = ContrastValue;
+				}
+				else
+				{
+					BitmapLine[currentRow].rgbtBlue = 0;
+					BitmapLine[currentRow].rgbtGreen = 0;
+					BitmapLine[currentRow].rgbtRed = 0;
+				}
+			}
 		}
+
 	}
 
 
@@ -157,7 +171,9 @@ std::unique_ptr <TBitmap> changeContrast(int ContrastCoefficient, FragmentData& 
   {
 		Fragment->Canvas->Brush->Color = clBlue;
 		Fragment->Canvas->Pen->Color = clBlue;
-		int xCent = xCenter - (int)(xCenter * resizeCoef) > 0.5 ? xCenter + 1 : xCenter;
-		int yCent = yCenter - (int)(yCenter * resizeCoef) > 0.5 ? yCenter + 1 : yCenter;
-        Fragment->Canvas->Ellipse(xCent, yCent, 1, 1);
+		xCenter *= resizeCoef;
+		yCenter *= resizeCoef;
+		int xCent = xCenter - (int)(xCenter) > 0.5 ? xCenter + 1 : xCenter;
+		int yCent = yCenter - (int)(yCenter) > 0.5 ? yCenter + 1 : yCenter;
+		Fragment->Canvas->Ellipse(xCent, yCent, xCent + 3, yCent + 3);
   }
