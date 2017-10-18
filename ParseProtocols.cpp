@@ -898,12 +898,8 @@ CadrInfo convertIKIFormatToInfoCadr(IKI_img* reader, bool CompareIKIRes)
 		 winInfo.Mean =  reader->ImageData.WindowsData.Info[i].Average;
 		 winInfo.Sigma =  reader->ImageData.WindowsData.Info[i].SKO;
 		 winInfo.Level =  reader->ImageData.WindowsData.Info[i].Limit;
-		 winInfo.Mv = 0;
 		 winInfo.ZipX = reader->ImageData.WindowsData.Info[i].ZipX;
 		 winInfo.ZipY = reader->ImageData.WindowsData.Info[i].ZipY;
-		 winInfo.StarID = 0;
-		 winInfo.Sp[0] = 0;
-		 winInfo.Sp[1] = 0;
 		 cadrInfo.WindowsList.push_back(winInfo);
 	}
 

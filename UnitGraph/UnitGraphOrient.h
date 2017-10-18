@@ -207,6 +207,7 @@
 		TStringGrid *TableStatInfo;
 		TCheckBox *CheckBoxSaveScale;
 		TCheckBox *CheckBoxLimit;
+	TMenuItem *BOKZMFParseProtocol;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -244,6 +245,7 @@
 	void __fastcall ChartMatrixClickLegend(TCustomChart *Sender, TMouseButton Button,
           TShiftState Shift, int X, int Y);
 	void __fastcall CheckBoxLimitClick(TObject *Sender);
+	void __fastcall BOKZMFParseProtocolClick(TObject *Sender);
 
 
 	private:	// User declarations
@@ -307,7 +309,7 @@
 			}
 
 		};
-		class Handle1000  {
+		class Handle1000   {
 
 		public:
 			_fastcall Handle1000(TFormGraphOrient* _Form) : Form(_Form) {
@@ -326,10 +328,29 @@
 				Form->plotter->AddPoint(Form->ChartWz, 0, cadrInfo.Time,cadrInfo.OmegaOrient[2] * RTM * BOKZ1000ConvCoef, pointColor);
 			}
 
-		private:
+			protected:
 			TFormGraphOrient* Form;
 
 		};
+
+		class HandleMF : public Handle1000
+		{
+			public:
+			_fastcall HandleMF(TFormGraphOrient* _Form) : Handle1000(_Form) {
+			}
+			void operator()(CadrInfo& cadrInfo, TColor pointColor) {
+
+				Form->plotter->AddPoint(Form->ChartAl, 0, cadrInfo.Time,cadrInfo.AnglesOrient[0] * RTD, pointColor);
+				Form->plotter->AddPoint(Form->ChartDl, 0, cadrInfo.Time,cadrInfo.AnglesOrient[1] * RTD, pointColor);
+				Form->plotter->AddPoint(Form->ChartAz, 0, cadrInfo.Time,cadrInfo.AnglesOrient[2] * RTD, pointColor);
+				Form->plotter->AddPoint(Form->ChartNumFrag, 0, cadrInfo.Time,cadrInfo.CountWindows, pointColor);
+				Form->plotter->AddPoint(Form->ChartNumDet, 0, cadrInfo.Time,cadrInfo.CountDeterObj, pointColor);
+				Form->plotter->AddPoint(Form->ChartNumLoc, 0, cadrInfo.Time,cadrInfo.CountLocalObj, pointColor);
+				Form->plotter->AddPoint(Form->ChartWx, 0, cadrInfo.Time,cadrInfo.OmegaOrient[0] / 60 , pointColor);
+				Form->plotter->AddPoint(Form->ChartWy, 0, cadrInfo.Time,cadrInfo.OmegaOrient[1] / 60 , pointColor);
+				Form->plotter->AddPoint(Form->ChartWz, 0, cadrInfo.Time,cadrInfo.OmegaOrient[2] / 60 , pointColor);
+			}
+        };
 
 		void PrepareStartDraw();
 		void CheckTabSheet();

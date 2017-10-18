@@ -22,7 +22,8 @@
 using namespace std;
 using namespace add_string;
 
-namespace parse_prot {
+namespace parse_prot
+{
 
 	struct SHTMI1 {
 		string timeBOKZ;
@@ -177,12 +178,6 @@ namespace parse_prot {
 						objInfo.Y = atof (splittedLocData[1].c_str());
 						objInfo.Bright = atof (splittedLocData[2].c_str());
 						objInfo.Square = atoi(splittedLocData[3].c_str());
-						objInfo.StarID = 0;
-						objInfo.Mv = 0;
-						objInfo.Sp[0]='_';
-						objInfo.Sp[1]='_';
-						objInfo.Dx = 0;
-						objInfo.Dy = 0;
 
 						cadrInfo.ObjectsList.push_back(objInfo);
 					}
@@ -191,13 +186,7 @@ namespace parse_prot {
 				}
 				else throw logic_error(errorMessage);
 
-				cadrInfo.CountBlock = 0;
-				cadrInfo.CountWindows = 0;
-				cadrInfo.CountStars = 0;
 				cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
-				cadrInfo.SizeStarsList = 0;
-
-
 				handle(cadrInfo);
 				cadrInfoVec.push_back(cadrInfo);
 		   }
@@ -273,12 +262,6 @@ namespace parse_prot {
 						objInfo.Y = atof (splittedLocData[1].c_str());
 						objInfo.Bright = atof(splittedLocData[2].c_str());
 						objInfo.Square = atoi(splittedLocData[3].c_str());
-						objInfo.StarID = 0;
-						objInfo.Mv = 0;
-						objInfo.Sp[0]='_';
-						objInfo.Sp[1]='_';
-						objInfo.Dx = 0;
-						objInfo.Dy = 0;
 						cadrInfo.ObjectsList.push_back(objInfo);
 				}
 		   }
@@ -350,9 +333,6 @@ namespace parse_prot {
 		   }
 		   else throw logic_error(errorMessage);
 
-		   cadrInfo.CountBlock = 0;
-		   cadrInfo.CountStars = 0;
-		   cadrInfo.SizeStarsList = 0;
 		   cadrInfo.SizeWindowsList = cadrInfo.WindowsList.size();
 		   cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
 
@@ -394,7 +374,6 @@ namespace parse_prot {
 				const int maxCountLocObj = 15;
 				ObjectsInfo objInfo;
 				WindowsInfo winInfo;
-				StarsInfo starsInfo;
 
 				for(int i = 0 ; i < maxCountLocObj; i ++)
 				{
@@ -411,12 +390,6 @@ namespace parse_prot {
 						objInfo.Y = atof (splittedStr[1].c_str());
 						objInfo.Bright = atof(splittedStr[2].c_str());
 						objInfo.Square = atoi (splittedStr[3].c_str());
-						objInfo.StarID = 0;
-						objInfo.Mv = 0;
-						objInfo.Sp[0]='_';
-						objInfo.Sp[1]='_';
-						objInfo.Dx = 0;
-						objInfo.Dy = 0;
 						cadrInfo.ObjectsList.push_back(objInfo);
 
 						// заполняем всё о фрагментах
@@ -446,13 +419,14 @@ namespace parse_prot {
 							winInfo.Height = 48;
 							break;
 						}
-						winInfo.Xstart = (atof(splittedStr[4].c_str())) - winInfo.Width/2;
-						winInfo.Ystart = (atof(splittedStr[5].c_str())) - winInfo.Height/2;
+						winInfo.Xstart = (atof(splittedStr[4].c_str())) - winInfo.Width / 2;
+						winInfo.Ystart = (atof(splittedStr[5].c_str())) - winInfo.Height / 2;
 						cadrInfo.WindowsList.push_back(winInfo);
 
-						starsInfo.X = (atof(splittedStr[4].c_str()));
-						starsInfo.Y = (atof(splittedStr[5].c_str()));
-						cadrInfo.StarsList.push_back(starsInfo);
+						if (objInfo.Square < 0)  {
+							objInfo.StarID = 1;
+						}
+
 
 				}
 
@@ -473,13 +447,11 @@ namespace parse_prot {
 					objInfo.Y = atof (splittedStr[1].c_str());
 					objInfo.Bright = atof(splittedStr[2].c_str());
 					objInfo.Square = atoi (splittedStr[3].c_str());
-					objInfo.StarID = 0;
-					objInfo.Mv = 0;
-					objInfo.Sp[0] = '_';
-					objInfo.Sp[1] = '_';
-					objInfo.Dx = 0;
-					objInfo.Dy = 0;
 					cadrInfo.ObjectsList.push_back(objInfo);
+
+					if (objInfo.Square < 0)  {
+						objInfo.StarID = 1;
+					}
 				}
 		   }
 
@@ -583,7 +555,7 @@ namespace parse_prot {
 
 
 		   // число локализ. объектов
-		   if(findWord(in,"NumLoc[0]") != string::npos)
+		   if(findWord(in, "NumLoc[0]") != string::npos)
 		   {
 				in >> cadrInfo.CountLocalObj;
 				if(cadrInfo.CountLocalObj <= 0) continue;
@@ -606,10 +578,7 @@ namespace parse_prot {
 		   }
 		   else throw logic_error(errorMessage);
 
-		   cadrInfo.CountBlock = 0;
-		   cadrInfo.CountLines = 0;
-
-		   handle (cadrInfo);
+		   handle (cadrInfo);
 		   cadrInfoVec.push_back(cadrInfo);
 		}
 
@@ -693,11 +662,6 @@ namespace parse_prot {
 			cadrInfo.FrameNumber = TickNumber;
 			cadrInfo.ImageHeight = 1024;
 			cadrInfo.ImageWidth = 1024;
-			cadrInfo.CountBlock = 0;
-			cadrInfo.CountLines = 0;
-			cadrInfo.CountStars = 0;
-			cadrInfo.SizeStarsList = 0;
-			cadrInfo.SizeWindowsList = 0;
 
 			//  время привязки в секундах
 			if(findWord(in, "информации") != string::npos)
@@ -806,12 +770,6 @@ namespace parse_prot {
 						objInfo.StarID = 1;
 					}
 
-					objInfo.StarID = 0;
-					objInfo.Mv = 0;
-					objInfo.Sp[0] = '_';
-					objInfo.Sp[1] =  '_';
-					objInfo.Dx = 0;
-					objInfo.Dy = 0;
 					cadrInfo.ObjectsList.push_back(objInfo);
 				}
 				cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
@@ -918,7 +876,199 @@ namespace parse_prot {
 
 }
 
+	template <class ProtHandler>
+	void readBOKZMFProtocol(ifstream& in, vector <CadrInfo>& cadrInfoVec, ProtHandler handler)
+{
+
+	try
+	{
+		const string errorMessage = string("Cчитывание протокола завершено необычным образом.");
+		string line;
+		const string dtmi1 = "\\par \\b C\\'ee\\'f1\\'f2\\'e0\\'e2 \\'c4\\'d2\\'cc\\'c81:";
+		const string mshior = "Alfa"; // признак начала МШИ ОР слежения
+		const string matrixOrient = "\\'cc\\'e0\\'f2\\'f0\\'e8\\'f6\\'e0 \\'ee\\'f0\\'e8\\'e5\\'ed\\'f2\\'e0\\'f6\\'e8\\'e8";
+		const string codeStatus = "\\'ca\\'ee\\'e4 \\'f1\\'ee\\'f1\\'f2\\'ee\\'ff\\'ed\\'e8\\'ff"; // КС ДМТИ
+		const string CS = "Az";  // перед кодом состояния
+		const string timePrMSHIOR = "(\\'d2\\'ef\\'f0"; // время привязки   МШИ ОР
+		const string timePrDTMI = "\\'ef\\'f0\\'e8\\'e2\\'ff\\'e7\\'ea\\'e8"; // время привязки ДТМИ
+		const string objects = "\\'ee\\'e1\\'fa\\'e5\\'ea\\'f2\\'ee\\'e2";
+		const string locTable = "\\par \\b0  \\f1\\u8470?     X       Y       \\f0\\'df\\'f0\\'ea\\'ee\\'f1\\'f2\\'fc \\'d7\\'e8\\'f1\\'eb\\'ee \\'fd\\'eb.";
+		const string fragTable = "\\par \\b0  \\f1\\u8470?     X       Y  ";
+
+		while (getline(in,line))
+		{
+			CadrInfo cadrInfo;
+			cadrInfo.ImageHeight = 512;
+		    cadrInfo.ImageWidth = 512;
+			if (line.find(dtmi1) != string::npos)
+			{
+				if (findWord(in, timePrDTMI) != string::npos)
+				{
+					  in >> cadrInfo.Time;
+				}
+				else throw logic_error(errorMessage);
+				
+				if (findWord(in, objects) != string::npos)  // лок
+				{
+					  in >> cadrInfo.CountLocalObj;
+				}
+				else throw logic_error(errorMessage);
+
+				if (findWord(in, objects) != string::npos)  // расп.
+				{
+					  in >> cadrInfo.CountDeterObj;
+				}
+				else throw logic_error(errorMessage);
+
+				if(findLine(in, locTable) != string::npos)
+				{
+					ObjectsInfo objInfo;
+					while (getline(in,line) && line != "\\par ")
+					{
+						vector <string> splitted = split(line, " ");
+						objInfo.X = atof (splitted[2].c_str());
+						objInfo.Y = atof (splitted[3].c_str());
+						if (objInfo.X == 0 && objInfo.Y == 0) 
+							break;
+						objInfo.Bright = atof(splitted[4].c_str());
+						objInfo.Square = atoi (splitted[5].c_str());
+						cadrInfo.ObjectsList.push_back(objInfo);
+					}
+					cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
+				} 
+				else throw logic_error(errorMessage);
+				handler(cadrInfo, clBlue);
+				cadrInfoVec.push_back(cadrInfo);
+
+			}
+			else if (line.find(mshior) != string::npos)
+			{
+				TColor pointColor = clBlue;
+				if (findLine(in, CS) != string::npos)
+				{
+					string status1, status2;
+					getline(in, status1);
+					getline(in, status2);
+					if (!(contains(status1, "e000H") && contains(status2,"0005H")))
+					{
+						pointColor = clRed;
+					}
+				}
+				else throw logic_error(errorMessage);
+
+				if (findWord(in, timePrMSHIOR) != string::npos) 
+				{
+					in >> cadrInfo.Time;
+				}
+				else throw logic_error(errorMessage);
+
+				if (findLine(in, matrixOrient) != string::npos)
+				{
+					for (int i = 0; i < 3; i++)
+					{
+						getline(in, line);
+						vector <string> splitted = split(line, " ");
+						cadrInfo.MatrixOrient[i][0] = atof(splitted[1].c_str());
+						cadrInfo.MatrixOrient[i][1] = atof(splitted[2].c_str());
+						cadrInfo.MatrixOrient[i][2] = atof(splitted[3].c_str());
+					}
+					MatrixToEkvAngles(cadrInfo.MatrixOrient, cadrInfo.AnglesOrient);
+				}
+
+				 // число локализ. объектов
+				if(findWord(in, "NumLoc") != string::npos)
+				{
+					in >> cadrInfo.CountLocalObj;
+				}
+				else throw logic_error(errorMessage);
+
+		   		   // ищем число фрагментов
+				if(findWord(in,"NumObj") != string::npos)
+				{
+					in >> cadrInfo.CountDeterObj;
+				}
+				else throw logic_error(errorMessage);
+
+
+				//ищем число распознанных объектов
+				if(findWord(in,"NumFrag") != string::npos)
+				{
+					// общее число фрагментов
+					in >> cadrInfo.CountWindows;
+				}
+				 else throw logic_error(errorMessage);
+
+				if (findLine(in, "\\par NumSec            0044") != string::npos)
+				{
+					for (int i = 0; i < 3; i++)
+					{
+						getline(in, line);
+						vector <string> splitted = split(line, " ");
+						cadrInfo.OmegaOrient[i] = atof(splitted.back().c_str());
+					}
+				}
+				else throw logic_error(errorMessage);
+
+				if(findLine(in, locTable) != string::npos)
+				{
+					ObjectsInfo objInfo;
+					while (getline(in,line) && line != "\\par ")
+					{
+						vector <string> splitted = split(line, " ");
+						objInfo.X = atof (splitted[2].c_str());
+						objInfo.Y = atof (splitted[3].c_str());
+						if (objInfo.X == 0 && objInfo.Y == 0) 
+							break;
+						objInfo.Bright = atof(splitted[4].c_str());
+						objInfo.Square = atoi (splitted[5].c_str());
+						cadrInfo.ObjectsList.push_back(objInfo);
+					}
+					cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
+				}
+				else throw logic_error(errorMessage);
+
+				if(findLine(in, fragTable) != string::npos)
+				{
+					WindowsInfo winInfo;
+					bool checkFirstRow = false;
+					while (getline(in,line) && line != "\\par ")
+					{
+						vector <string> splitted = split(line, " ");
+						if (!checkFirstRow)
+						{
+							winInfo.Xstart = atof (splitted[3].c_str());
+							winInfo.Ystart = atof (splitted[4].c_str());
+							winInfo.CountObj = 1;
+							checkFirstRow = true;
+						}
+						else
+						{
+							winInfo.Xstart = atof (splitted[2].c_str());
+							winInfo.Ystart = atof (splitted[3].c_str());
+							winInfo.CountObj = 1;
+							cadrInfo.WindowsList.push_back(winInfo);
+						}
+					}
+					cadrInfo.SizeWindowsList = cadrInfo.WindowsList.size();
+				}
+				else throw logic_error(errorMessage);
+				handler(cadrInfo, pointColor);
+				cadrInfoVec.push_back(cadrInfo);
+				
+			}
+		}
+	}
+
+	catch (exception &e)
+	{
+		ShowMessage(e.what());
+	}
 
 }
+
+
+}
+
+
 // ---------------------------------------------------------------------------
 #endif

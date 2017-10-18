@@ -1531,7 +1531,7 @@ object FormGraphOrient: TFormGraphOrient
           OnChange = ScaleEditChange
         end
         object UpDown2: TUpDown
-          Left = 581
+          Left = 583
           Top = 9
           Width = 16
           Height = 21
@@ -1561,7 +1561,7 @@ object FormGraphOrient: TFormGraphOrient
           OnChange = PixelSizeEditChange
         end
         object UpDown3: TUpDown
-          Left = 740
+          Left = 741
           Top = 9
           Width = 16
           Height = 21
@@ -1581,7 +1581,7 @@ object FormGraphOrient: TFormGraphOrient
           OnChange = FontSizeEditChange
         end
         object UpDown4: TUpDown
-          Left = 884
+          Left = 886
           Top = 9
           Width = 16
           Height = 21
@@ -2402,6 +2402,10 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheetTableStat: TTabSheet
       Caption = #1057#1074#1086#1076#1085#1072#1103' '#1089#1090#1072#1090#1080#1089#1090#1080#1082#1072
       ImageIndex = 15
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object TableStatInfo: TStringGrid
         Left = 56
         Top = 24
@@ -2454,6 +2458,10 @@ object FormGraphOrient: TFormGraphOrient
         object BOKZM601000ParseProtocol: TMenuItem
           Caption = #1041#1054#1050#1047'-'#1052'60/1000'
           OnClick = BOKZM601000ParseProtocolClick
+        end
+        object BOKZMFParseProtocol: TMenuItem
+          Caption = #1041#1054#1050#1047'-'#1052#1060
+          OnClick = BOKZMFParseProtocolClick
         end
       end
       object ReadIKIFormat: TMenuItem

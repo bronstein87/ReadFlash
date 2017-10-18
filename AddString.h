@@ -10,7 +10,8 @@
 using namespace std;
 namespace add_string {
 
-	vector <string> split(const std::string& str, const string& delim);
+	vector <string> split(const string& str, const string& delim);
+	bool contains (const string& str, const string& strToFind);
 
 	template<typename Stream>
 	size_t findWord(Stream& in, const string& word) {

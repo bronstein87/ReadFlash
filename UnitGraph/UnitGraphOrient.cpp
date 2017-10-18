@@ -2064,30 +2064,36 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 	{
 		OpenDialog->Options.Clear();
 		OpenDialog->Filter = "txt|*.txt";
+		OpenDialog->Options << ofAllowMultiSelect;
 		if (OpenDialog->Execute()) {
 			vCadrInfo.clear();
-			FileName = OpenDialog->FileName;
-			SetCurrentDir(ExtractFileDir(FileName));
-
-			ifstream in(FileName.c_str());
-			if (!in.is_open()) {
-				ShowMessage("Не удалось открыть файл");
-				return;
-			}
 			DeleteLineGraph();
-
-			if(checkLocFile(in))
+			unique_ptr <TStringList> FileList (new TStringList());
+			FileList->Assign(OpenDialog->Files);
+			SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
+			for (int i = 0; i < FileList->Count; i++)
 			{
+				FileName = FileList->Strings[i];
+				ifstream in(FileName.c_str());
+				if (!in.is_open())
+				{
+					ShowMessage("Не удалось открыть файл");
+					return;
+				}
+				if(checkLocFile(in))
+				{
 
-				HandleLoc60 handler (this);
-				readBOKZ60LocProtocol (in, vCadrInfo, handler);
-			}
+					HandleLoc60 handler (this);
+					readBOKZ60LocProtocol (in, vCadrInfo, handler);
+				}
 
-			else
-			{
-				Handle60 handle(this);
-				readBOKZ60Protocol(in, vCadrInfo, handle);
-			}
+				else
+				{
+					Handle60 handle(this);
+					readBOKZ60Protocol(in, vCadrInfo, handle);
+				}
+
+				}
 
 			PrepareStartDraw();
 			CheckTabSheet();
@@ -2105,29 +2111,34 @@ void __fastcall TFormGraphOrient::BOKZM2VParseProtocolClick(TObject *Sender) {
 	try {
 		OpenDialog->Options.Clear();
 		OpenDialog->Filter = "txt|*.txt";
-		if (OpenDialog->Execute()) {
+		OpenDialog->Options << ofAllowMultiSelect;
+		if (OpenDialog->Execute())
+		{
 			vCadrInfo.clear();
-			FileName = OpenDialog->FileName;
-			SetCurrentDir(ExtractFileDir(FileName));
-
-			ifstream in(FileName.c_str());
-			if (!in.is_open()) {
-				ShowMessage("Не удалось открыть файл");
-				return;
-			}
-
 			DeleteLineGraph();
+			unique_ptr <TStringList> FileList (new TStringList());
+			FileList->Assign(OpenDialog->Files);
+			SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
+				for (int i = 0; i < FileList->Count; i++)
+				{
+					FileName = FileList->Strings[i];
+					ifstream in(FileName.c_str());
+					if (!in.is_open())
+					{
+						ShowMessage("Не удалось открыть файл");
+						return;
+					}
 
-			HandleM2V handle(this);
-			readmBOKZ2VProtocol(in, vCadrInfo, handle);
+					HandleM2V handle(this);
+					readmBOKZ2VProtocol(in, vCadrInfo, handle);
+				}
+		}
 			PrepareStartDraw();
 			CheckTabSheet();
 		}
-	}
-
-	catch (exception &e) {
-		ShowMessage(e.what());
-	}
+		catch (exception &e) {
+			ShowMessage(e.what());
+		}
 }
 
 
@@ -2794,7 +2805,7 @@ void __fastcall TFormGraphOrient::BOKZM601000ParseProtocolClick(TObject *Sender)
 			FileList->Assign(OpenDialog->Files);
 			SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
 			unsigned int counter = 0;
-			TDateTime startDate = TDateTime (2017,9,26,0,0,0,0);
+			TDateTime startDate = TDateTime (2017,9,26,0,0,0,0);  //  исправить
 			for (int i = 0; i < FileList->Count; i++)
 			{
 				FileName = FileList->Strings[i];
@@ -2842,4 +2853,38 @@ void __fastcall TFormGraphOrient::CheckBoxLimitClick(TObject *Sender)
     PixelBrightCheckBoxClick(this);
 }
 //---------------------------------------------------------------------------
+
+
+void __fastcall TFormGraphOrient::BOKZMFParseProtocolClick(TObject *Sender)
+{
+		 OpenDialog->Options.Clear();
+		 OpenDialog->Filter = "ip1|*.ip1 | ip2|*.ip2";
+		 OpenDialog->Options << ofAllowMultiSelect;
+		 if (OpenDialog->Execute())
+		 {
+			vCadrInfo.clear();
+			DeleteLineGraph();
+			unique_ptr <TStringList> FileList (new TStringList());
+			FileList->Assign(OpenDialog->Files);
+			SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
+			for (int i = 0; i < FileList->Count; i++)
+			{
+				FileName = FileList->Strings[i];
+				ifstream in(FileName.c_str());
+				if (!in.is_open())
+				{
+					ShowMessage("Не удалось открыть файл");
+					return;
+				}
+
+				HandleMF handle(this);
+				readBOKZMFProtocol(in, vCadrInfo, handle);
+			}
+
+			PrepareStartDraw();
+			CheckTabSheet();
+		}
+}
+//---------------------------------------------------------------------------
+
 

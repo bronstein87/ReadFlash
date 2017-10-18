@@ -60,7 +60,9 @@ struct LinesInfo
 
 struct CadrInfo
 {
-	_fastcall CadrInfo(): Time(0), FrameNumber(0) { }
+	_fastcall CadrInfo(): Time(0), FrameNumber(0), CountStars(0), CountWindows(0),
+	CountLocalObj(0), CountDeterObj(0), SizeStarsList(0), SizeWindowsList(0),
+	 CountLines(0), CountBlock(0) { }
 
 	double Time;
 	int FrameNumber;
