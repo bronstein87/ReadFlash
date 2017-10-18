@@ -8,11 +8,11 @@ using namespace std;
 
 #pragma region DEFINE
 
-#define StartWord  				0x7678D48B
-#define StartId                 0xABCD
+#define StartWord  								0x7678D48B
+#define StartId                 				0xABCD
 
 #define ROUND(N) (N<0?ceil((N)-0.5):floor((N)+0.5))
-#define VERSION_ID                              "1.03.10.17"
+#define VERSION_ID                              "1.09.10.17"
 
 #pragma region whenwhere
 #define whenwhere_id                            0xAAAA
@@ -136,6 +136,9 @@ using namespace std;
 #define rec_orient_quat_id						0x117D
 #define rec_orient_matr_id						0x118D
 #define rec_angular_vel_id                      0x119D
+#define	sizelocallist_id                        0x11AD
+#define sizestarlist_id                         0x11BD
+
 #define rezstat_name                            "Результат распознавания"
 #define epsilon_name							"Допуск на распознавание"
 #define m_X_Y_Cyr_name                          "Ошибка решения системы (мм)"
@@ -145,6 +148,8 @@ using namespace std;
 #define rec_orient_quat_name                    "Распознанный кватернион ориентации"
 #define rec_orient_matr_name                    "Распознанная матрица ориентации"
 #define rec_angular_vel_name                    "Рассчитанная угловая скорость"
+#define	sizelocallist_name                      "Количество локализованных объектов в списке"
+#define sizestarlist_name                       "Количество звезд в списке"
 #pragma end_region
 
 #pragma region videodata
@@ -178,6 +183,7 @@ using namespace std;
 #define	stringwindow_SizeData_id                0x156E
 #define	stringwindow_flag_id                    0x166E
 #define	stringwindow_info_id                    0x176E
+#define	stringwindow_sizewindowlist_id          0x186E
 
 #define	videoframe_name                         "Полный кадр"
 #define	videolines_name                         "Полосы с кадра"
@@ -198,6 +204,7 @@ using namespace std;
 #define	stringlines_width                       "Ширина блока полос"
 #define	stringlines_height                      "Высота блока полос"
 #define	stringlines_info                      	"Параметры полос"
+#define	stringwindow_sizewindowlist             "Количество окон в списке"
 
 #define	stringwindow_count                      "Количество окон"
 #define	stringwindow_type                       "Тип данных окон(0-byte, 1-ushort, 2-float)"
@@ -228,6 +235,7 @@ struct STARREC
 struct REC
 {
 	WORD strrec; // число звезд на кадре
+	WORD SizeStarList; // количество звезд в списке
 	STARREC* StarRec; // таблица сформированных звезд
 };
 
@@ -318,6 +326,7 @@ struct datawindow
 
 struct setwindow
 {
+	unsigned short SizeWindowList; // Количество окон со звездами
 	unsigned short WindowCount; // количество окон
 	unsigned int DataType; // признак типа 0-byte, 1-ushort, 2-float
 	unsigned int DegreeBinning; // степень бинирования
@@ -403,17 +412,17 @@ struct starinfo
 {
 	float BrightnessObject; // яркость объекта
 	float PixelsCount; // количество пикселей
-	float X_coordinate; // координата Х
-	float Y_coordinate; // координата У
+	float X; // координата Х
+	float Y; // координата У
 
 	WORD NumberStar; // номер звезды в каталоге
-	float StellarMagnitude; // звездная величина
-	char SpectralClass[2]; // спектральный класс
+	float Mv; // звездная величина
+	char Sp[2]; // спектральный класс
 	float DX; // ошибка по оси Х
 	float DY; // ошибка по оси У
 
 	starinfo() {
-		BrightnessObject = 0; PixelsCount = 0; X_coordinate = 0; Y_coordinate = 0; NumberStar = 0; StellarMagnitude = 0; SpectralClass[0] = '_'; SpectralClass[1] = '_'; DX = 0; DY = 0;
+		BrightnessObject = 0; PixelsCount = 0; X = 0; Y = 0; NumberStar = 0; Mv = 0; Sp[0] = '_'; Sp[1] = '_'; DX = 0; DY = 0;
 	}
 };
 
@@ -424,6 +433,7 @@ struct starsinfo
 	float m_X, m_Y, m_Cur; // ошибка решения системы (мм)
 	int LocalizedCount; // количество локализованных объектов
 	int RecognizedCount; // количество распознанных объектов
+	int SizeLocalList; // количество объектов в списке локализации
 	double RecognizedOrientationAngles[3]; // углы ориентации
 	double RecognizedOrientationQuaternion[4]; // кватернион ориентации
 	double RecognizedOrientationMatrix[3][3]; // матрица ориентации
@@ -451,10 +461,10 @@ private:
 	static void _FreeMemory(T*&point)
 	{
 		// if (point != NULL)
-		{
+		// {
 			delete point;
 			point = NULL;
-		}
+		// }
 	}
 	// ---------------------------------------------------------------------------
 
@@ -462,10 +472,10 @@ private:
 	static void _FreeMemoryArray(T*&array)
 	{
 		// if (array != NULL)
-		{
+		// {
 			delete[]array;
 			array = NULL;
-		}
+		// }
 	}
 	// ---------------------------------------------------------------------------
 
@@ -1019,6 +1029,10 @@ public:
 			PrintString(FStream, m_X_Y_Cyr_id, m_X_Y_Cyr_name, Value_String);
 		}
 #pragma end_region
+#pragma region sizelocallist
+		Value_String = FormatFloat("#####0", StarsData.SizeLocalList);
+		PrintString(FStream, sizelocallist_id, sizelocallist_name, Value_String);
+#pragma end_region
 #pragma region local_recog
 		if (StarsData.LocalizedCount != 0)
 		{
@@ -1026,32 +1040,35 @@ public:
 			Value_String += FormatFloat("#####0 ", StarsData.LocalizedCount);
 			Value_String += FormatFloat("#####0", StarsData.RecognizedCount);
 			PrintString(FStream, local_recog_id, local_recog_name, Value_String);
-			for (int i = 0; i < StarsData.LocalizedCount; i++)
+			for (int i = 0; i < StarsData.SizeLocalList; i++)
 			{
 				Value_String = "";
 				Value_String += FormatFloat("#####0.0#### ", StarsData.StarsList[i].BrightnessObject);
 				Value_String += FormatFloat("#####0.0#### ", StarsData.StarsList[i].PixelsCount);
-				Value_String += FormatFloat("#####0.0#### ", StarsData.StarsList[i].X_coordinate);
-				Value_String += FormatFloat("#####0.0#### ", StarsData.StarsList[i].Y_coordinate);
+				Value_String += FormatFloat("#####0.0#### ", StarsData.StarsList[i].X);
+				Value_String += FormatFloat("#####0.0#### ", StarsData.StarsList[i].Y);
 				if (StarsData.StarsList[i].NumberStar == 0)
 					goto endlist;
 				else
 					Value_String += FormatFloat("#####0 ", StarsData.StarsList[i].NumberStar);
-				Value_String += FormatFloat("0.0 ", StarsData.StarsList[i].StellarMagnitude);
-				Value_String += (AnsiString)StarsData.StarsList[i].SpectralClass[0] + (AnsiString)StarsData.StarsList[i].SpectralClass[1] + " ";
+				Value_String += FormatFloat("0.0 ", StarsData.StarsList[i].Mv);
+				Value_String += (AnsiString)StarsData.StarsList[i].Sp[0] + (AnsiString)StarsData.StarsList[i].Sp[1] + " ";
 				Value_String += FormatFloat("#####0.0#### ", StarsData.StarsList[i].DX);
 				Value_String += FormatFloat("#####0.0####", StarsData.StarsList[i].DY);
 			endlist: print_AnsiString(FStream, Value_String);
 			}
 		}
-
+#pragma end_region
+#pragma region sizstarlist
+		Value_String = FormatFloat("#####0", StarsData.SimulatedFrame.SizeStarList);
+		PrintString(FStream, sizestarlist_id, sizestarlist_name, Value_String);
 #pragma end_region
 #pragma region rec
-		if (StarsData.SimulatedFrame.strrec != 0)
+		if (StarsData.SimulatedFrame.SizeStarList != 0)
 		{
 			Value_String = FormatFloat("#####0", StarsData.SimulatedFrame.strrec);
 			PrintString(FStream, rec_id, rec_name, Value_String);
-			for (int i = 0; i < StarsData.SimulatedFrame.strrec; i++)
+			for (int i = 0; i < StarsData.SimulatedFrame.SizeStarList; i++)
 			{
 				Value_String = "";
 				Value_String += FormatFloat("###0 ", StarsData.SimulatedFrame.StarRec[i].Ns);
@@ -1179,9 +1196,12 @@ else
 			}
 		}
 #pragma end_region
+
 #pragma region stringwindow
-		if (ImageData.WindowsData.WindowCount != 0)
+		if (ImageData.WindowsData.SizeWindowList != 0)
 		{
+			Value_String = FormatFloat("#####0", ImageData.WindowsData.SizeWindowList);
+			PrintString(FStream, stringwindow_sizewindowlist_id, stringwindow_sizewindowlist, Value_String);
 			Value_String = FormatFloat("#####0", ImageData.WindowsData.WindowCount);
 			PrintString(FStream, stringwindow_count_id, stringwindow_count, Value_String);
 			Value_String = FormatFloat("#####0", ImageData.WindowsData.DataType);
@@ -1194,7 +1214,7 @@ else
 			PrintString(FStream, stringwindow_flag_id, stringwindow_flag, Value_String);
 			Value_String = "";
 			PrintString(FStream, stringwindow_info_id, stringwindow_info, Value_String);
-			for (int i = 0; i < ImageData.WindowsData.WindowCount; i++)
+			for (int i = 0; i < ImageData.WindowsData.SizeWindowList; i++)
 			{
 				Value_String = "";
 				Value_String += FormatFloat("#####0 ", ImageData.WindowsData.Info[i].WindowWidth);
@@ -1242,7 +1262,7 @@ else
 		}
 #pragma end_region
 #pragma region videowindow
-		if (ImageData.WindowsData.WindowCount != 0)
+		if (ImageData.WindowsData.SizeWindowList != 0)
 		{
 			AnsiString _endstr = "\r\n";
 			Value_String = "";
@@ -1434,6 +1454,7 @@ else
 					StarsData.m_Cur = (float) buf[2];
 					break;
 				}
+			case sizelocallist_id: StarsData.SizeLocalList = StrToInt(buferstr); break;
 			case local_recog_id:
 				{
 					AnsiString str;
@@ -1441,9 +1462,9 @@ else
 					StarsData.LocalizedCount = (int)buf[0];
 					StarsData.RecognizedCount = (int)buf[1];
 					_FreeMemoryArray(StarsData.StarsList);
-					StarsData.StarsList = new starinfo[StarsData.LocalizedCount];
-					memset(StarsData.StarsList, 0, sizeof(starinfo)*StarsData.LocalizedCount);
-					for (int i = 0; i < StarsData.LocalizedCount; i++)
+					StarsData.StarsList = new starinfo[StarsData.SizeLocalList];
+					memset(StarsData.StarsList, 0, sizeof(starinfo)*StarsData.SizeLocalList);
+					for (int i = 0; i < StarsData.SizeLocalList; i++)
 					{
 						FStream->Read(&sizedata, sizeof(unsigned int));
 						FStream->Read(&Data_buf[0], sizedata);
@@ -1465,14 +1486,14 @@ else
 									{
 									case 0: StarsData.StarsList[i].BrightnessObject = (float) StrToFloat(buferstr.SubString(0, pos_index - 1)); break;
 									case 1: StarsData.StarsList[i].PixelsCount = (float) StrToFloat(buferstr.SubString(0, pos_index - 1)); break;
-									case 2: StarsData.StarsList[i].X_coordinate = (float) StrToFloat(buferstr.SubString(0, pos_index - 1)); break;
-									case 3: StarsData.StarsList[i].Y_coordinate = (float) StrToFloat(buferstr.SubString(0, pos_index - 1)); break;
+									case 2: StarsData.StarsList[i].X = (float) StrToFloat(buferstr.SubString(0, pos_index - 1)); break;
+									case 3: StarsData.StarsList[i].Y = (float) StrToFloat(buferstr.SubString(0, pos_index - 1)); break;
 									case 4: StarsData.StarsList[i].NumberStar = (WORD) StrToInt(buferstr.SubString(0, pos_index - 1)); break;
-									case 5: StarsData.StarsList[i].StellarMagnitude = (float) StrToFloat(buferstr.SubString(0, pos_index - 1)); break;
+									case 5: StarsData.StarsList[i].Mv = (float) StrToFloat(buferstr.SubString(0, pos_index - 1)); break;
 									case 6:
 										{
 											str = buferstr.SubString(0, pos_index - 1);
-											Move(str.c_str(), &StarsData.StarsList[i].SpectralClass[0], 2);
+											Move(str.c_str(), &StarsData.StarsList[i].Sp[0], 2);
 											break;
 										}
 									case 7: StarsData.StarsList[i].DX = (float) StrToFloat(buferstr.SubString(0, pos_index - 1)); break;
@@ -1490,12 +1511,13 @@ else
 					}
 					break;
 				}
-			case rec_id:
+			case sizestarlist_id: StarsData.SimulatedFrame.SizeStarList = (WORD)StrToInt(buferstr); break;
+ 			case rec_id:
 				{
 					StarsData.SimulatedFrame.strrec = (WORD) StrToInt(buferstr);
 					_FreeMemoryArray(StarsData.SimulatedFrame.StarRec);
-					StarsData.SimulatedFrame.StarRec = new STARREC[StarsData.SimulatedFrame.strrec];
-					for (int i = 0; i < StarsData.SimulatedFrame.strrec; i++)
+					StarsData.SimulatedFrame.StarRec = new STARREC[StarsData.SimulatedFrame.SizeStarList];
+					for (int i = 0; i < StarsData.SimulatedFrame.SizeStarList; i++)
 					{
 						FStream->Read(&sizedata, sizeof(unsigned int));
 						FStream->Read(&Data_buf[0], sizedata);
@@ -1559,7 +1581,7 @@ else
 					}
 					break;
 				}
-
+			case stringwindow_sizewindowlist_id: ImageData.WindowsData.SizeWindowList  = (unsigned short)StrToInt(buferstr); break;
 			case stringwindow_count_id: ImageData.WindowsData.WindowCount = (unsigned short)StrToInt(buferstr); break;
 			case stringwindow_type_id: ImageData.WindowsData.DataType = (unsigned int)StrToInt(buferstr); break;
 			case stringwindow_deg_bin_id: ImageData.WindowsData.DegreeBinning = (unsigned int)StrToInt(buferstr); break;
@@ -1568,8 +1590,8 @@ else
 			case stringwindow_info_id:
 				{
 					_FreeMemoryArray(ImageData.WindowsData.Info);
-					ImageData.WindowsData.Info = new datawindow[ImageData.WindowsData.WindowCount];
-					for (int i = 0; i < ImageData.WindowsData.WindowCount; i++)
+					ImageData.WindowsData.Info = new datawindow[ImageData.WindowsData.SizeWindowList];
+					for (int i = 0; i < ImageData.WindowsData.SizeWindowList; i++)
 					{
 						FStream->Read(&sizedata, sizeof(unsigned int));
 						FStream->Read(&Data_buf[0], sizedata);
@@ -1775,7 +1797,9 @@ else
 			sizeof(StarsData.m_X)+sizeof(StarsData.m_Y)+sizeof(StarsData.m_Cur)+
 			sizeof(StarsData.LocalizedCount)+
 			sizeof(StarsData.RecognizedCount)+
+            sizeof(StarsData.SizeLocalList)+
 			sizeof(starinfo) * StarsData.LocalizedCount +
+			sizeof(StarsData.SimulatedFrame.SizeStarList) +
 			sizeof(StarsData.SimulatedFrame.strrec)+
 			sizeof(STARREC) * StarsData.SimulatedFrame.strrec +
 			sizeof(StarsData.RecognizedOrientationAngles)+
@@ -1798,12 +1822,13 @@ else
 			sizeof(dataline) * ImageData.LinesData.LinesCount +
 			(MassType[ImageData.LinesData.DataType] * ImageData.LinesData.LinesWidth * ImageData.LinesData.LinesHeight)+
 
+			sizeof(ImageData.WindowsData.SizeWindowList)+
 			sizeof(ImageData.WindowsData.WindowCount)+
 			sizeof(ImageData.WindowsData.DataType)+
 			sizeof(ImageData.WindowsData.DegreeBinning)+
 			sizeof(ImageData.WindowsData.SizeData)+
 			sizeof(ImageData.WindowsData.BottomRight) +
-			(sizeof(datawindow) * ImageData.WindowsData.WindowCount) +
+			(sizeof(datawindow) * ImageData.WindowsData.SizeWindowList) +
 			(MassType[ImageData.WindowsData.DataType] * ImageData.WindowsData.SizeData);
 
 		SizeInfo = whenwhere_size + devicetype_size + filterframe_size + starsinfo_size + videodata_size;
@@ -1883,12 +1908,15 @@ else
 		Move(&StarsData.m_X, &Array[position], sizeof(StarsData.m_X)); position += sizeof(StarsData.m_X);
 		Move(&StarsData.m_Y, &Array[position], sizeof(StarsData.m_Y)); position += sizeof(StarsData.m_Y);
 		Move(&StarsData.m_Cur, &Array[position], sizeof(StarsData.m_Cur)); position += sizeof(StarsData.m_Cur);
+
+		Move(&StarsData.SizeLocalList , &Array[position], sizeof(StarsData.SizeLocalList)); position += sizeof(StarsData.SizeLocalList);
 		Move(&StarsData.LocalizedCount, &Array[position], sizeof(StarsData.LocalizedCount)); position += sizeof(StarsData.LocalizedCount);
 		Move(&StarsData.RecognizedCount, &Array[position], sizeof(StarsData.RecognizedCount)); position += sizeof(StarsData.RecognizedCount);
-		for (int i = 0; i < StarsData.LocalizedCount; i++)
+		for (int i = 0; i < StarsData.SizeLocalList; i++)
 		{
 			Move(&StarsData.StarsList[i], &Array[position], sizeof(starinfo)); position += sizeof(starinfo);
 		}
+	    Move(&StarsData.SimulatedFrame.SizeStarList, &Array[position], sizeof(StarsData.SimulatedFrame.SizeStarList)); position += sizeof(StarsData.SimulatedFrame.SizeStarList);
 		Move(&StarsData.SimulatedFrame.strrec, &Array[position], sizeof(StarsData.SimulatedFrame.strrec)); position += sizeof(StarsData.SimulatedFrame.strrec);
 		for (int i = 0; i < StarsData.SimulatedFrame.strrec; i++)
 		{
@@ -1916,12 +1944,13 @@ else
 		}
 		Move(ImageData.LinesData.Data, &Array[position], (MassType[ImageData.LinesData.DataType] * ImageData.LinesData.LinesWidth * ImageData.LinesData.LinesHeight)); position += (MassType[ImageData.LinesData.DataType] * ImageData.LinesData.LinesWidth * ImageData.LinesData.LinesHeight);
 
+		Move(&ImageData.WindowsData.SizeWindowList, &Array[position], sizeof(ImageData.WindowsData.SizeWindowList)); position += sizeof(ImageData.WindowsData.SizeWindowList);
 		Move(&ImageData.WindowsData.WindowCount, &Array[position], sizeof(ImageData.WindowsData.WindowCount)); position += sizeof(ImageData.WindowsData.WindowCount);
 		Move(&ImageData.WindowsData.DataType, &Array[position], sizeof(ImageData.WindowsData.DataType)); position += sizeof(ImageData.WindowsData.DataType);
 		Move(&ImageData.WindowsData.DegreeBinning, &Array[position], sizeof(ImageData.WindowsData.DegreeBinning)); position += sizeof(ImageData.WindowsData.DegreeBinning);
 		Move(&ImageData.WindowsData.SizeData, &Array[position], sizeof(ImageData.WindowsData.SizeData)); position += sizeof(ImageData.WindowsData.SizeData);
 		Move(&ImageData.WindowsData.BottomRight, &Array[position], sizeof(ImageData.WindowsData.BottomRight)); position += sizeof(ImageData.WindowsData.BottomRight);
-		for (int i = 0; i < ImageData.WindowsData.WindowCount; i++)
+		for (int i = 0; i < ImageData.WindowsData.SizeWindowList; i++)
 		{
 			Move(&ImageData.WindowsData.Info[i], &Array[position], sizeof(datawindow)); position += sizeof(datawindow);
 		}
@@ -2021,18 +2050,19 @@ else
 		Move(&Array[position], &StarsData.m_X, sizeof(StarsData.m_X)); position += sizeof(StarsData.m_X);
 		Move(&Array[position], &StarsData.m_Y, sizeof(StarsData.m_Y)); position += sizeof(StarsData.m_Y);
 		Move(&Array[position], &StarsData.m_Cur, sizeof(StarsData.m_Cur)); position += sizeof(StarsData.m_Cur);
+		Move(&Array[position], &StarsData.SizeLocalList , sizeof(StarsData.SizeLocalList)); position += sizeof(StarsData.SizeLocalList);
 		Move(&Array[position], &StarsData.LocalizedCount, sizeof(StarsData.LocalizedCount)); position += sizeof(StarsData.LocalizedCount);
 		Move(&Array[position], &StarsData.RecognizedCount, sizeof(StarsData.RecognizedCount)); position += sizeof(StarsData.RecognizedCount);
 		_FreeMemoryArray(StarsData.StarsList);
-		if (StarsData.LocalizedCount > 0)
+		if (StarsData.SizeLocalList > 0)
 		{
-			StarsData.StarsList = new starinfo[StarsData.LocalizedCount];
-			for (int i = 0; i < StarsData.LocalizedCount; i++)
+			StarsData.StarsList = new starinfo[StarsData.SizeLocalList];
+			for (int i = 0; i < StarsData.SizeLocalList; i++)
 			{
 				Move(&Array[position], &StarsData.StarsList[i], sizeof(starinfo)); position += sizeof(starinfo);
 			}
 		}
-
+		Move(&Array[position], &StarsData.SimulatedFrame.SizeStarList, sizeof(StarsData.SimulatedFrame.SizeStarList)); position += sizeof(StarsData.SimulatedFrame.SizeStarList);
 		Move(&Array[position], &StarsData.SimulatedFrame.strrec, sizeof(StarsData.SimulatedFrame.strrec)); position += sizeof(StarsData.SimulatedFrame.strrec);
 		_FreeMemoryArray(StarsData.SimulatedFrame.StarRec);
 		if (StarsData.SimulatedFrame.strrec > 0)
@@ -2086,12 +2116,13 @@ else
 			}
 			Move(&Array[position], ImageData.LinesData.Data, (MassType[ImageData.LinesData.DataType] * size_id)); position += (MassType[ImageData.LinesData.DataType] * size_id);
 		}
+		Move(&Array[position], &ImageData.WindowsData.SizeWindowList, sizeof(ImageData.WindowsData.SizeWindowList)); position += sizeof(ImageData.WindowsData.SizeWindowList);
 		Move(&Array[position], &ImageData.WindowsData.WindowCount, sizeof(ImageData.WindowsData.WindowCount)); position += sizeof(ImageData.WindowsData.WindowCount);
 		Move(&Array[position], &ImageData.WindowsData.DataType, sizeof(ImageData.WindowsData.DataType)); position += sizeof(ImageData.WindowsData.DataType);
 		Move(&Array[position], &ImageData.WindowsData.DegreeBinning, sizeof(ImageData.WindowsData.DegreeBinning)); position += sizeof(ImageData.WindowsData.DegreeBinning);
 		Move(&Array[position], &ImageData.WindowsData.SizeData, sizeof(ImageData.WindowsData.SizeData)); position += sizeof(ImageData.WindowsData.SizeData);
 		Move(&Array[position], &ImageData.WindowsData.BottomRight, sizeof(ImageData.WindowsData.BottomRight)); position += sizeof(ImageData.WindowsData.BottomRight);
-		for (int i = 0; i < ImageData.WindowsData.WindowCount; i++)
+		for (int i = 0; i < ImageData.WindowsData.SizeWindowList; i++)
 		{
 			Move(&Array[position], &ImageData.WindowsData.Info[i], sizeof(datawindow)); position += sizeof(datawindow);
 		}

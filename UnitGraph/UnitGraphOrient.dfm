@@ -135,7 +135,7 @@ object FormGraphOrient: TFormGraphOrient
     Top = 8
     Width = 1160
     Height = 777
-    ActivePage = ShowFragmentTab
+    ActivePage = TabSheetImage
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 8
     object TabSheetAngles: TTabSheet
@@ -952,7 +952,7 @@ object FormGraphOrient: TFormGraphOrient
         Caption = 'Label6'
       end
       object Label12: TLabel
-        Left = 390
+        Left = 333
         Top = 721
         Width = 46
         Height = 13
@@ -1174,7 +1174,7 @@ object FormGraphOrient: TFormGraphOrient
         TabOrder = 2
       end
       object EditScale: TEdit
-        Left = 448
+        Left = 391
         Top = 718
         Width = 64
         Height = 21
@@ -1183,8 +1183,8 @@ object FormGraphOrient: TFormGraphOrient
         Text = '20'
       end
       object CheckBoxSaveScale: TCheckBox
-        Left = 3
-        Top = 727
+        Left = 23
+        Top = 719
         Width = 201
         Height = 17
         Align = alCustom
