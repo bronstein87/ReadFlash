@@ -376,6 +376,9 @@
 			int WheelDelta, const TPoint &MousePos, bool &Handled);
 		void __fastcall ChartMouseDown(TObject *Sender, TMouseButton Button,
 			TShiftState Shift, int X, int Y);
+
+        void StartPrintReport(IKI_img* reader);
+		void PrintReportRes(vector <CadrInfo>& cadrInfo);
 		void CalculateSeriesSKO();
 
 		void DeleteLineGraph();
