@@ -7,11 +7,14 @@
 #include <fstream>
 #include <iomanip>
 #include <vector>
+#include <Classes.hpp>
 using namespace std;
 namespace add_string {
 
 	vector <string> split(const string& str, const string& delim);
 	bool contains (const string& str, const string& strToFind);
+	string toStdString(UnicodeString str);
+	UnicodeString toUString(const string& str);
 
 	template<typename Stream>
 	size_t findWord(Stream& in, const string& word) {

@@ -13,7 +13,8 @@ namespace add_string {
 			pos = str.find(delim, prev);
 			if (pos == string::npos) pos = str.length();
 			string token = str.substr(prev, pos-prev);
-			if (!token.empty() && token.find(" ") == string::npos)
+			int i = token.find_first_not_of(" ");
+			if (!token.empty() && token.find_first_not_of(" ") == 0)
 				tokens.push_back(token);
 			prev = pos + delim.length();
 		}
@@ -27,6 +28,15 @@ namespace add_string {
 		if (str.find(strToFind) != string::npos)
 			return true;
 		return false;
+	}
+
+	string toStdString(UnicodeString str)
+	{
+		return string(AnsiString(str).c_str());
+	}
+	UnicodeString toUString(const string& str)
+	{
+		return UnicodeString(str.c_str());
 	}
 
 }

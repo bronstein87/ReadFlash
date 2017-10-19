@@ -31,6 +31,7 @@
 #include <exception>
 #include <string>
 #include <utility>
+#include "AddString.h"
 //---------------------------------------------------------------------------
 using namespace std;
 class TAnalyzeForm : public TForm

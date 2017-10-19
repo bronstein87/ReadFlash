@@ -166,8 +166,11 @@
             <BuildOrder>12</BuildOrder>
         </CppCompile>
         <CppCompile Include="iki_img.cpp">
-            <BuildOrder>14</BuildOrder>
+            <BuildOrder>20</BuildOrder>
         </CppCompile>
+        <None Include="iki_img.h">
+            <BuildOrder>21</BuildOrder>
+        </None>
         <CppCompile Include="ImageProcessingFcns.cpp">
             <BuildOrder>12</BuildOrder>
         </CppCompile>
@@ -183,10 +186,12 @@
         <None Include="MathM.h">
             <BuildOrder>5</BuildOrder>
         </None>
-        <CppCompile Include="ParseProtocols.cpp">
-            <DependentOn>ParseProtocols.h</DependentOn>
-            <BuildOrder>19</BuildOrder>
+        <CppCompile Include="ParseProtocol.cpp">
+            <BuildOrder>21</BuildOrder>
         </CppCompile>
+        <None Include="ParseProtocol.h">
+            <BuildOrder>22</BuildOrder>
+        </None>
         <CppCompile Include="ReadFlash.cpp">
             <BuildOrder>0</BuildOrder>
         </CppCompile>

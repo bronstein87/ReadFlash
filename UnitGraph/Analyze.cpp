@@ -8,6 +8,7 @@
 #pragma package(smart_init)
 #pragma resource "*.dfm"
 
+using namespace add_string;
 //---------------------------------------------------------------------------
 __fastcall TAnalyzeForm::TAnalyzeForm(TComponent* Owner)
 	: TForm(Owner)
@@ -114,11 +115,11 @@ void __fastcall TAnalyzeForm::ChooseDirectoriesClick(TObject *Sender)
 			{
 				if (!AnsiContainsStr(FileList->Strings[j], "Img") && AnsiContainsStr(FileList->Strings[j], ".iki"))
 				{
-					if	(reader->ReadFormat(FileList->Strings[j], false))
+					if	(reader->ReadFormat(toStdString(FileList->Strings[j]), false))
 					{
 						TStringDynArray SplittedString = SplitString(FileList->Strings[j], "\\");
 						UnicodeString ResFileName = FileOpenDialog1->Files->Strings[i] + "\\Img" + SplittedString[SplittedString.Length - 1];
-						if (reader->ReadFormat(ResFileName, false))
+						if (reader->ReadFormat(toStdString(ResFileName), false))
 						{
 							if(!reader->StarsData.RezStat) {
 								AngularSpeedErrorValues.push_back(

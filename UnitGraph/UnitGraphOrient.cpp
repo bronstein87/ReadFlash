@@ -709,7 +709,8 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
    AnsiString FragmentFileStr;
    for(int CurrentFileName = 0;CurrentFileName < FileNameList.Length;CurrentFileName++)
    {
-		if(Ansistrings::AnsiContainsStr(FileNameList[CurrentFileName], TimePrStr))
+
+		if(Strutils::AnsiContainsStr(FileNameList[CurrentFileName], TimePrStr))
 		{
 				 FragmentFileStr = FileNameList[CurrentFileName];
 				 break;
@@ -2119,6 +2120,7 @@ void __fastcall TFormGraphOrient::BOKZM2VParseProtocolClick(TObject *Sender) {
 			unique_ptr <TStringList> FileList (new TStringList());
 			FileList->Assign(OpenDialog->Files);
 			SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
+			TDateTime startDate = TDateTime (2017,9,26,0,0,0,0);
 				for (int i = 0; i < FileList->Count; i++)
 				{
 					FileName = FileList->Strings[i];
@@ -2130,7 +2132,7 @@ void __fastcall TFormGraphOrient::BOKZM2VParseProtocolClick(TObject *Sender) {
 					}
 
 					HandleM2V handle(this);
-					readmBOKZ2VProtocol(in, vCadrInfo, handle);
+					readmBOKZ2VProtocol(in, vCadrInfo, handle, startDate);
 				}
 		}
 			PrepareStartDraw();
@@ -2148,7 +2150,7 @@ void StartPrintReport(IKI_img* reader)
 	OpenWord(true);
 	AddDoc();
 	SetTextFormat(14,1,0,0,1);
-	AddParagraph("ПРОТОКОЛ проверки прибора " + reader->CameraSettings.DataSource+"\n");
+	AddParagraph("ПРОТОКОЛ проверки прибора " + AnsiString(reader->CameraSettings.DataSource.c_str())+"\n");
 
 	SetTextFormat(12,1,0,0,0);
 	AddParagraph("Параметры орбиты:");
@@ -2458,8 +2460,8 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 				DeleteLineGraph();
 
 				for (int iFrag  = 0; iFrag < maxDrawFrag; iFrag++) {
-					colorFrag[iFrag] = RGB((float)(maxDrawFrag - iFrag)/maxDrawFrag * 255,
-												200, (float)iFrag/maxDrawFrag * 255 );
+					colorFrag[iFrag] = RGB((float)(maxDrawFrag - iFrag) / maxDrawFrag * 255,
+												200, (float)iFrag / maxDrawFrag * 255 );
 					plotter->SetShowLines(true);
 					plotter->SetSeriesColor(colorFrag[iFrag]);
 					plotter->SetTitle(IntToStr(iFrag + 1));
@@ -2483,12 +2485,14 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 					unique_ptr <IKI_img> reader(new IKI_img());
 					if( !AnsiContainsStr(FileList->Strings[i], filePrefix))
 					{
-						if (reader->ReadFormat(FileList->Strings[i], false))
+						if (reader->ReadFormat(toStdString(FileList->Strings[i]), false))
 						{
+							//reader->WriteFormat(toStdString(FileList->Strings[i]));
 							TStringDynArray SplittedString = SplitString(FileList->Strings[i], "\\");
 							UnicodeString ResFileName = FileOpenDialog1->FileName + "\\" + filePrefix + SplittedString[SplittedString.Length - 1];
-							if (FileExists(ResFileName) && (reader->ReadFormat(ResFileName, false)) )
+							if (FileExists(ResFileName) && (reader->ReadFormat(toStdString(ResFileName), false)))
 							{
+								//reader->WriteFormat(toStdString(ResFileName));
 								CompareIKIRes = true;
 //								if (!i) {
 //									печать параметров модели
@@ -2862,11 +2866,13 @@ void __fastcall TFormGraphOrient::BOKZMFParseProtocolClick(TObject *Sender)
 		 OpenDialog->Options << ofAllowMultiSelect;
 		 if (OpenDialog->Execute())
 		 {
+			plotter->SetDateTimeX(FormAnimateSetting->CheckBoxDateTime->Checked);
 			vCadrInfo.clear();
 			DeleteLineGraph();
 			unique_ptr <TStringList> FileList (new TStringList());
 			FileList->Assign(OpenDialog->Files);
 			SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
+			TDateTime dt;
 			for (int i = 0; i < FileList->Count; i++)
 			{
 				FileName = FileList->Strings[i];
@@ -2878,7 +2884,7 @@ void __fastcall TFormGraphOrient::BOKZMFParseProtocolClick(TObject *Sender)
 				}
 
 				HandleMF handle(this);
-				readBOKZMFProtocol(in, vCadrInfo, handle);
+				readBOKZMFProtocol(in, vCadrInfo, handle, dt);
 			}
 
 			PrepareStartDraw();

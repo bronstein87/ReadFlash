@@ -31,9 +31,6 @@
 	#include "VCLTee.TeeEdit.hpp"
 	#include "VCLTee.ErrorBar.hpp"
 	#include "VCLTee.TeeHighLowLine.hpp"
-	#include "frxRich.hpp"
-	#include "frxClass.hpp"
-	#include "frxExportRTF.hpp"
 	#include <vector>
 	#include <Classes.hpp>
 	#include <Controls.hpp>
@@ -63,7 +60,7 @@
 	#include <algorithm>
 	#include "FragmentScrollBox.h"
 	#include "SimplePlotter.h"
-	#include "ParseProtocols.h"
+	#include "ParseProtocol.h"
 
 
 	#define MaxBlockSeries 8
@@ -207,7 +204,7 @@
 		TStringGrid *TableStatInfo;
 		TCheckBox *CheckBoxSaveScale;
 		TCheckBox *CheckBoxLimit;
-	TMenuItem *BOKZMFParseProtocol;
+		TMenuItem *BOKZMFParseProtocol;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -240,12 +237,12 @@
 		void __fastcall ChartOrientClickLegend(TCustomChart *Sender,
 			TMouseButton Button, TShiftState Shift, int X, int Y);
 		void __fastcall BOKZM601000ParseProtocolClick(TObject *Sender);
-	void __fastcall ChartFrag2ClickLegend(TCustomChart *Sender, TMouseButton Button,
-          TShiftState Shift, int X, int Y);
-	void __fastcall ChartMatrixClickLegend(TCustomChart *Sender, TMouseButton Button,
-          TShiftState Shift, int X, int Y);
-	void __fastcall CheckBoxLimitClick(TObject *Sender);
-	void __fastcall BOKZMFParseProtocolClick(TObject *Sender);
+		void __fastcall ChartFrag2ClickLegend(TCustomChart *Sender, TMouseButton Button,
+			  TShiftState Shift, int X, int Y);
+		void __fastcall ChartMatrixClickLegend(TCustomChart *Sender, TMouseButton Button,
+		 	 TShiftState Shift, int X, int Y);
+		void __fastcall CheckBoxLimitClick(TObject *Sender);
+		void __fastcall BOKZMFParseProtocolClick(TObject *Sender);
 
 
 	private:	// User declarations
@@ -332,7 +329,6 @@
 			TFormGraphOrient* Form;
 
 		};
-
 		class HandleMF : public Handle1000
 		{
 			public:

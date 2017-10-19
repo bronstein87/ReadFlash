@@ -2,7 +2,7 @@
 
 #pragma hdrstop
 
-#include "ParseProtocols.h"
+#include "ParseProtocol.h"
 using namespace add_string;
 namespace parse_prot {
 
@@ -689,6 +689,68 @@ bool checkLocFile(ifstream& in)
 	return true;
 }
 
+void writeProtocolToIKI(CadrInfo& cadrInfo, int counter, int sizeX, int sizeY)
+{
+	unique_ptr <IKI_img> writer (new IKI_img());
+	writer->Georeferencing.DateTime = cadrInfo.Time;
+	writer->Georeferencing.FrameNumber = ++counter;
+	if (cadrInfo.CountDeterObj == 0)
+	{
+	   writer->StarsData.RezStat = 1;
+	}
+	else
+	{
+		writer->StarsData.RezStat = 0;
+	}
+	writer->ImageData.FrameData.FrameHeight = sizeY;
+	writer->ImageData.FrameData.FrameWidth = sizeX;
+	writer->StarsData.SimulatedFrame.SizeStarList = cadrInfo.SizeObjectsList;
+	writer->ImageData.WindowsData.SizeWindowList = cadrInfo.SizeWindowsList;
+	writer->StarsData.LocalizedCount = cadrInfo.CountLocalObj;
+	writer->StarsData.RecognizedCount = cadrInfo.CountDeterObj;
+	writer->ImageData.WindowsData.WindowCount = cadrInfo.CountWindows;
+	writer->StarsData.Epsilon = cadrInfo.Epsilon;
+	writer->StarsData.m_Cur = cadrInfo.MeanErrorXY;
+
+	writer->ImageData.WindowsData.Info = new datawindow[cadrInfo.SizeWindowsList];s
+	for (int i = 0; i < cadrInfo.SizeWindowsList; i++)
+	{
+		writer->ImageData.WindowsData.Info[i].WindowWidth = cadrInfo.WindowsList[i].Width;
+		writer->ImageData.WindowsData.Info[i].WindowHeight = cadrInfo.WindowsList[i].Height;
+		writer->ImageData.WindowsData.Info[i].X = cadrInfo.WindowsList[i].Xstart;
+		writer->ImageData.WindowsData.Info[i].Y = cadrInfo.WindowsList[i].Ystart;
+		writer->ImageData.WindowsData.Info[i].Limit = cadrInfo.WindowsList[i].Level;
+		writer->ImageData.WindowsData.Info[i].ObjCount = cadrInfo.WindowsList[i].CountObj;
+	}
+
+
+	writer->StarsData.SimulatedFrame.StarRec = new STARREC [cadrInfo.SizeObjectsList];
+	for (int i = 0; i < cadrInfo.SizeObjectsList; i++)
+	{
+		writer->StarsData.SimulatedFrame.StarRec[i].Xs = cadrInfo.ObjectsList[i].X;
+		writer->StarsData.SimulatedFrame.StarRec[i].Ys = cadrInfo.ObjectsList[i].Y;
+		writer->StarsData.SimulatedFrame.StarRec[i].Is = cadrInfo.ObjectsList[i].Bright;
+		writer->StarsData.SimulatedFrame.StarRec[i].Ns = cadrInfo.ObjectsList[i].StarID;
+		writer->StarsData.SimulatedFrame.StarRec[i].Mv = cadrInfo.ObjectsList[i].Mv;
+		writer->StarsData.SimulatedFrame.StarRec[i].Sp[0] = cadrInfo.ObjectsList[i].Sp[0];
+		writer->StarsData.SimulatedFrame.StarRec[i].Sp[1] = cadrInfo.ObjectsList[i].Sp[1];
+	}
+
+	for (int i = 0; i < 3; i++)
+	{
+		writer->Georeferencing.OrientationAngles[i] = cadrInfo.AnglesOrient[i];
+		writer->Georeferencing.DeviceAngularVelocity[i] = cadrInfo.OmegaOrient[i];
+	}
+
+	AnsiString FileName = GetCurrentDir() + "/" + "IKI_" + TDateTime::CurrentDate().DateString() + "/";
+	TDirectory::CreateDirectory(FileName);
+	char fileNumber [2];
+	sprintf (fileNumber, "%02u", counter);
+	FileName = FileName + IntToStr((int)counter) + "_" + TDateTime::CurrentDate().DateString() + "_00-00-" + fileNumber + ".iki";
+	writer->WriteFormat(FileName.c_str());
+}
+
+
 
 
 void writeBOKZ1000ProtocolToIKI (CadrInfo& cadrInfo, bool InfoVecEmpty, TDateTime& startDate, double& timeStep, unsigned int& counter)
@@ -696,12 +758,12 @@ void writeBOKZ1000ProtocolToIKI (CadrInfo& cadrInfo, bool InfoVecEmpty, TDateTim
 	unique_ptr <IKI_img> writer (new IKI_img());
 	if (InfoVecEmpty)
 	{
-		writer->Georeferencing.DateTime = startDate;
+		writer->Georeferencing.DateTime = toStdString(DateTimeToStr(startDate));
 	}
 	else
 	{
 		startDate = IncMilliSecond(startDate, timeStep * 1000);
-		writer->Georeferencing.DateTime = startDate;
+		writer->Georeferencing.DateTime = toStdString(DateTimeToStr(startDate));
 		timeStep = 0.25;
 	}
 
@@ -709,11 +771,11 @@ void writeBOKZ1000ProtocolToIKI (CadrInfo& cadrInfo, bool InfoVecEmpty, TDateTim
 	writer->StarsData.RezStat = 0;
 	writer->ImageData.FrameData.FrameHeight = 1024;
 	writer->ImageData.FrameData.FrameWidth = 1024;
-	writer->StarsData.SimulatedFrame.strrec = cadrInfo.SizeObjectsList;
+	writer->StarsData.SimulatedFrame.SizeStarList = cadrInfo.SizeObjectsList;
 	writer->StarsData.LocalizedCount = cadrInfo.CountLocalObj;
-	//writer->StarsData.RecognizedCount = cadrInfo.CountDeterObj;
+	writer->StarsData.RecognizedCount = cadrInfo.CountDeterObj;
 	writer->StarsData.Epsilon = cadrInfo.Epsilon;
-	//writer->ImageData.WindowsData.WindowCount = cadrInfo.CountWindows;
+	writer->ImageData.WindowsData.WindowCount = cadrInfo.CountWindows;
 
 	writer->StarsData.SimulatedFrame.StarRec = new STARREC [cadrInfo.SizeObjectsList];
 	for (int i = 0; i < cadrInfo.SizeObjectsList; i++)
@@ -742,7 +804,7 @@ void writeBOKZ1000ProtocolToIKI (CadrInfo& cadrInfo, bool InfoVecEmpty, TDateTim
 	char fileNumber [2];
 	sprintf (fileNumber, "%02u", counter);
 	FileName = FileName + IntToStr((int)counter) + "_" + TDateTime::CurrentDate().DateString() + "_00-00-" + fileNumber + ".iki";
-	writer->WriteFormat(FileName);
+	writer->WriteFormat(FileName.c_str());
 
 }
 
@@ -818,7 +880,7 @@ void readBOKZ601000MKO(ifstream& in, vector <CadrInfo>& cadrInfoVec, unsigned in
 CadrInfo convertIKIFormatToInfoCadr(IKI_img* reader, bool CompareIKIRes)
 {
 	CadrInfo cadrInfo;
-	cadrInfo.Time = reader->Georeferencing.DateTime.Val;
+	cadrInfo.Time = StrToDateTime(toUString(reader->Georeferencing.DateTime)).Val;
 	cadrInfo.FrameNumber = reader->Georeferencing.FrameNumber;
 	cadrInfo.IsBinary = reader->ImageData.FrameData.DegreeBinning;
 	cadrInfo.DataType = reader->ImageData.FrameData.DataType;
@@ -830,10 +892,10 @@ CadrInfo convertIKIFormatToInfoCadr(IKI_img* reader, bool CompareIKIRes)
 	cadrInfo.SizePixel = reader->CameraSettings.PixelSize;
 	cadrInfo.StatOrient = reader->StarsData.RezStat;
 	cadrInfo.CountStars = reader->StarsData.SimulatedFrame.strrec;
-	cadrInfo.CountWindows = reader->ImageData.WindowsData.WindowCount;
-	cadrInfo.CountLocalObj = reader->StarsData.LocalizedCount;
+	cadrInfo.CountWindows = reader->ImageData.WindowsData.SizeWindowList;
+	cadrInfo.CountLocalObj = reader->StarsData.SizeLocalList;
 	cadrInfo.CountDeterObj = reader->StarsData.RecognizedCount;
-	cadrInfo.SizeStarsList = reader->StarsData.SimulatedFrame.strrec;
+	cadrInfo.SizeStarsList = reader->StarsData.SimulatedFrame.SizeStarList;
 	cadrInfo.SizeObjectsList = cadrInfo.CountLocalObj;
 	cadrInfo.ResolutionACP = pow(2., reader->CameraSettings.ResolutionACP) - 1;
 
