@@ -615,7 +615,7 @@ bool IKI_img::ReadFormat(string filename, bool Need_Erase)
 			}
 #pragma end_region
 #pragma region starsinfo
-		case rezstat_id: StarsData.RezStat = (unsigned short) atoi(buferstr.c_str()); break;
+		case rezstat_id: StarsData.RezStat = (unsigned short) strtol(buferstr.c_str(), NULL, 16); break;
 		case epsilon_id: StarsData.Epsilon = (float) atof(buferstr.c_str()); break;
 		case m_X_Y_Cyr_id:
 			{

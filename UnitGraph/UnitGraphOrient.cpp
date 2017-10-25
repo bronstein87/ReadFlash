@@ -104,6 +104,7 @@ void __fastcall TFormGraphOrient::FormCreate(TObject *Sender)
 	InitTableWindows();
 	InitTableObjects();
 	InitTableStat();
+	InitStatusInfoTable();
 
 	Series1->Selected->Hover->Hide();
 	Series3->Selected->Hover->Hide();
@@ -317,6 +318,130 @@ void TFormGraphOrient::PrintTableObjects(const struct CadrInfo &mCadr)
 			TableObjectsInfo->Cells[k][1] = "-";
         }
 	}
+}
+
+void TFormGraphOrient::InitStatusInfoTable()
+{
+	TableStatusInfo->RowCount  = 18;
+	TableStatusInfo->ColCount  = 2;
+	TableStatusInfo->FixedCols = 1;
+	TableStatusInfo->FixedRows = 1;
+	TableStatusInfo->ColWidths[0] = 200;
+	TableStatusInfo->Cells[0][0] = "Статус";
+	TableStatusInfo->Cells[1][0] = "Количество";
+	TableStatusInfo->Cells[0][1] = "Успешно СЛ 00";
+	TableStatusInfo->Cells[0][2] = "Успешно НО 00";
+	TableStatusInfo->Cells[0][3] = "Успешно НО";
+	TableStatusInfo->Cells[0][4] = "Обработан 1 кадр";
+	TableStatusInfo->Cells[0][5] = "Ориент. после 2 кадра";
+	TableStatusInfo->Cells[0][6] = "НО/ТО < 4 объектов, засветка";
+	TableStatusInfo->Cells[0][7] = "НО/ТО < 4 объектов";
+	TableStatusInfo->Cells[0][8] = "СЛ < 4 объектов, засветка";
+	TableStatusInfo->Cells[0][9] = "СЛ < 4 объектов";
+	TableStatusInfo->Cells[0][10] = "СЛ < 4 звезд, засветка";
+	TableStatusInfo->Cells[0][11] = "ТО < 4 звезд";
+	TableStatusInfo->Cells[0][12] = "НО < 4 звезд";
+	TableStatusInfo->Cells[0][13] = "Кватернион ненорма";
+	TableStatusInfo->Cells[0][14] = "Плохая переменная";
+	TableStatusInfo->Cells[0][15] = "m_cur > 2*Pix";
+	TableStatusInfo->Cells[0][16] = "Плохое расп. в слежении";
+	TableStatusInfo->Cells[0][17] = "Ошибка извл. фраг. из буфера";
+	for(int i = 1; i < 18; i++)
+	{
+		TableStatusInfo->Cells[1][i] = "0";
+	}
+}
+
+
+void TFormGraphOrient::ClearStatusInfoTable()
+{
+	for(int i = 1; i < 17; i++)
+	{
+		TableStatusInfo->Cells[1][i] = "0";
+	}
+}
+
+
+void TFormGraphOrient::AddRowToStatusTable(const CadrInfo& cadr)
+{
+	  int tempCounter = 0;
+	  switch (cadr.StatOrient)
+	  {
+			case SUCSESS:
+				if (cadr.CountWindows != 0) {
+					tempCounter =  StrToInt(TableStatusInfo->Cells[1][1]);
+					TableStatusInfo->Cells[1][1] = IntToStr(++tempCounter);
+				}
+				else {
+					tempCounter =  StrToInt(TableStatusInfo->Cells[1][2]);
+					TableStatusInfo->Cells[1][2] = IntToStr(++tempCounter);
+                }
+				break;
+			case SUCSESS_TO:
+				tempCounter =  StrToInt(TableStatusInfo->Cells[1][3]);
+				TableStatusInfo->Cells[1][3] = IntToStr(++tempCounter);
+				break;
+			case HO_first:
+				tempCounter =  StrToInt(TableStatusInfo->Cells[1][4]);
+				TableStatusInfo->Cells[1][4] = IntToStr(++tempCounter);
+				break;
+			case HO_Ornt:
+				tempCounter =  StrToInt(TableStatusInfo->Cells[1][5]);
+				TableStatusInfo->Cells[1][5] = IntToStr(++tempCounter);
+				break;
+			case BAD_Light:
+				if (cadr.CountWindows == 0) {
+					tempCounter =  StrToInt(TableStatusInfo->Cells[1][6]);
+					TableStatusInfo->Cells[1][6] = IntToStr(++tempCounter);
+				}
+				else {
+					tempCounter =  StrToInt(TableStatusInfo->Cells[1][8]);
+					TableStatusInfo->Cells[1][8] = IntToStr(++tempCounter);
+				}
+				break;
+			case BAD_NObj:
+				if (cadr.CountWindows == 0) {
+					tempCounter =  StrToInt(TableStatusInfo->Cells[1][7]);
+					TableStatusInfo->Cells[1][7] = IntToStr(++tempCounter);
+				}
+				else {
+					tempCounter =  StrToInt(TableStatusInfo->Cells[1][9]);
+					TableStatusInfo->Cells[1][9] = IntToStr(++tempCounter);
+				}
+				break;
+			case BAD_DetLt:
+				tempCounter =  StrToInt(TableStatusInfo->Cells[1][10]);
+				TableStatusInfo->Cells[1][10] = IntToStr(++tempCounter);
+				break;
+			case BAD_DetA:
+				tempCounter =  StrToInt(TableStatusInfo->Cells[1][11]);
+				TableStatusInfo->Cells[1][11] = IntToStr(++tempCounter);
+				break;
+			case BAD_DetC:
+				tempCounter =  StrToInt(TableStatusInfo->Cells[1][12]);
+				TableStatusInfo->Cells[1][12] = IntToStr(++tempCounter);
+				break;
+			case BAD_Apr:
+				tempCounter =  StrToInt(TableStatusInfo->Cells[1][13]);
+				TableStatusInfo->Cells[1][13] = IntToStr(++tempCounter);
+				break;
+			case BAD_Per:
+				tempCounter =  StrToInt(TableStatusInfo->Cells[1][14]);
+				TableStatusInfo->Cells[1][14] = IntToStr(++tempCounter);
+				break;
+			case BAD_Ornt:
+				tempCounter =  StrToInt(TableStatusInfo->Cells[1][15]);
+				TableStatusInfo->Cells[1][15] = IntToStr(++tempCounter);
+				break;
+			case BAD_DetSl:
+				tempCounter =  StrToInt(TableStatusInfo->Cells[1][16]);
+				TableStatusInfo->Cells[1][16] = IntToStr(++tempCounter);
+				break;
+			case BAD_Frag:
+				tempCounter =  StrToInt(TableStatusInfo->Cells[1][17]);
+				TableStatusInfo->Cells[1][17] = IntToStr(++tempCounter);
+				break;
+	  }
 }
 
 void TFormGraphOrient::InitTableStat()
@@ -2458,7 +2583,9 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 				}
 
 				vCadrInfo.clear();
+				ClearStatusInfoTable();
 				FileTitle = "IKI";
+
 				UnicodeString filePrefix = FormAnimateSetting->EditFilePrefix->Text;
 				unsigned short startFrom = StrToInt(FormAnimateSetting->BeginFromEdit->Text);
 				for (int i = startFrom; i < FileList->Count; i++)
@@ -2468,14 +2595,12 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 					{
 						if (reader->ReadFormat(toStdString(FileList->Strings[i]), false))
 						{
-							//reader->WriteFormat(toStdString(FileList->Strings[i]));
 							TStringDynArray SplittedString = SplitString(FileList->Strings[i], "\\");
 							UnicodeString ResFileName = FileOpenDialog1->FileName + "\\" + filePrefix + SplittedString[SplittedString.Length - 1];
 							if (FileExists(ResFileName) && (reader->ReadFormat(toStdString(ResFileName), false)))
 							{
-								//reader->WriteFormat(toStdString(ResFileName));
 								CompareIKIRes = true;
-								if ( (!i) && (FormAnimateSetting->CheckBoxPrintReport->Checked) ) {
+								if ( (!i) /* && (FormAnimateSetting->CheckBoxPrintReport->Checked)*/ ) {
 //									печать параметров модели
 									StartPrintReport(reader.get());
 								}
@@ -2492,6 +2617,7 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 					{
 						vCadrInfo.push_back(move(convertIKIFormatToInfoCadr(reader.get(), CompareIKIRes)));
 						double Time =  vCadrInfo.back().Time;
+						AddRowToStatusTable(vCadrInfo.back());
 
 						if (vCadrInfo.back().IsOrient)
 						{
@@ -2502,11 +2628,9 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 
 							plotter->AddPoint(ChartNumFrag, 0, Time, vCadrInfo.back().CountWindows);
 							plotter->AddPoint(ChartNumLoc, 0, Time, vCadrInfo.back().CountLocalObj);
-
 							plotter->AddPoint(ChartFone, 0, Time, vCadrInfo.back().MeanBright);
 							plotter->AddPoint(ChartNoise, 0, Time, vCadrInfo.back().SigmaBright);
 							//plotter->AddPoint(ChartTemp, 0, Time, vCadrInfo.back().MatrixTemp);
-
 							plotter->AddPoint(ChartNumDet, 0, Time, vCadrInfo.back().CountDeterObj);
 							plotter->AddPoint(ChartMx, 0, Time, vCadrInfo.back().MeanErrorX * 1000.);
 							plotter->AddPoint(ChartMy, 0, Time, vCadrInfo.back().MeanErrorY * 1000.);
@@ -2626,9 +2750,9 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 			PrepareStartDraw();
 
 //печать статистики по серии кадров
-			if (FormAnimateSetting->CheckBoxPrintReport->Checked) {
-				PrintReportRes(vCadrInfo);
-			}
+//			if (FormAnimateSetting->CheckBoxPrintReport->Checked) {
+//				PrintReportRes(vCadrInfo);
+//			}
 		}
 		CheckTabSheet();
 	}
@@ -2875,5 +2999,6 @@ void __fastcall TFormGraphOrient::BOKZMFParseProtocolClick(TObject *Sender)
 		}
 }
 //---------------------------------------------------------------------------
+
 
 

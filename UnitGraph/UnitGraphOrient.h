@@ -205,6 +205,7 @@
 		TCheckBox *CheckBoxSaveScale;
 		TCheckBox *CheckBoxLimit;
 		TMenuItem *BOKZMFParseProtocol;
+		TStringGrid *TableStatusInfo;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -355,11 +356,14 @@
 		void InitTableWindows(void);
 		void PrintTableWindows(const struct CadrInfo &mCadr);
 		void InitTableStat();
+		void InitStatusInfoTable();
+		void ClearStatusInfoTable();
 		void AddRowToStatTable(int nRow, AnsiString stringName, Statistika _stat, int p1,int p2);
+        void AddRowToStatusTable(const CadrInfo& cadr);
 		void ClearAnimate(void);
 		void SaveScale();
 		void ApplyScale();
-        void SetDefaultScale(const struct CadrInfo &mCadr);
+		void SetDefaultScale(const struct CadrInfo &mCadr);
 		void DrawAnimate(const struct CadrInfo &mCadr);
 		void DrawObjects(const struct CadrInfo &mCadr);
 		void DrawBlock(const struct CadrInfo &mCadr);
@@ -377,7 +381,7 @@
 		void __fastcall ChartMouseDown(TObject *Sender, TMouseButton Button,
 			TShiftState Shift, int X, int Y);
 
-        void StartPrintReport(IKI_img* reader);
+		void StartPrintReport(IKI_img* reader);
 		void PrintReportRes(vector <CadrInfo>& cadrInfo);
 		void CalculateSeriesSKO();
 
@@ -386,7 +390,6 @@
 		void SynchronizeCharts(double Value);
 		void SaveGraph(TChart *Chart, AnsiString suff);
 		int GetCadrInfo(int NC, struct CadrInfo &mCadr);
-
 
 //		void DrawBlockHandler(void);
 		void ResizePlot(TChart *chart, double kx, double ky, int indexX,

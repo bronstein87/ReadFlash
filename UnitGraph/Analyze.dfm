@@ -25,16 +25,12 @@ object AnalyzeForm: TAnalyzeForm
     Top = 0
     Width = 1217
     Height = 745
-    ActivePage = TabSheet1
+    ActivePage = TabSheet3
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 0
     object TabSheet2: TTabSheet
       Caption = #1040#1085#1072#1083#1080#1079' '#1086#1096#1080#1073#1086#1082' '#1089#1082#1086#1088#1086#1089#1090#1077#1081
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1209
         717)
@@ -137,10 +133,6 @@ object AnalyzeForm: TAnalyzeForm
     end
     object TabSheet1: TTabSheet
       Caption = #1040#1085#1072#1083#1080#1079' '#1086#1096#1080#1073#1086#1082' '#1091#1075#1083#1086#1074
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1209
         717)
@@ -211,6 +203,114 @@ object AnalyzeForm: TAnalyzeForm
       object ChartAnalyzeErrorAz: TChart
         Left = -4
         Top = 467
+        Width = 1213
+        Height = 250
+        BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
+        Legend.LegendStyle = lsSeries
+        Legend.Shadow.HorizSize = 0
+        Legend.Shadow.VertSize = 0
+        Title.Font.Height = -13
+        Title.Font.Style = [fsBold]
+        Title.Text.Strings = (
+          #1054#1096#1080#1073#1082#1072' '#1072#1079#1080#1084#1091#1090#1072', '#1091#1075#1083'. '#1089#1077#1082)
+        BottomAxis.Title.Caption = #1059#1075#1083#1086#1074#1072#1103' '#1089#1082#1086#1088#1086#1089#1090#1100', '#1075#1088#1072#1076'/c'
+        LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
+        RightAxis.Automatic = False
+        RightAxis.AutomaticMaximum = False
+        RightAxis.AutomaticMinimum = False
+        TopAxis.Automatic = False
+        TopAxis.AutomaticMaximum = False
+        TopAxis.AutomaticMinimum = False
+        View3D = False
+        Zoom.MouseWheel = pmwNormal
+        BevelOuter = bvNone
+        Color = clWhite
+        TabOrder = 2
+        Anchors = [akLeft, akRight]
+        DefaultCanvas = 'TTeeCanvas3D'
+        PrintMargins = (
+          15
+          39
+          15
+          39)
+        ColorPaletteIndex = 13
+      end
+    end
+    object TabSheet3: TTabSheet
+      Caption = #1040#1085#1072#1083#1080#1079' '#1086#1096#1080#1073#1086#1082' '#1086#1089#1077#1081' '#1055#1057#1050
+      ImageIndex = 2
+      DesignSize = (
+        1209
+        717)
+      object Chart1: TChart
+        Left = -4
+        Top = 0
+        Width = 1213
+        Height = 250
+        BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
+        Legend.LegendStyle = lsSeries
+        Legend.Shadow.HorizSize = 0
+        Legend.Shadow.VertSize = 0
+        Title.Font.Height = -13
+        Title.Font.Style = [fsBold]
+        Title.Text.Strings = (
+          #1054#1096#1080#1073#1082#1072' '#1087#1088#1103#1084#1086#1075#1086' '#1074#1086#1089#1093#1086#1078#1076#1077#1085#1080#1103', '#1091#1075#1083'. '#1089#1077#1082)
+        BottomAxis.Title.Caption = #1059#1075#1083#1086#1074#1072#1103' '#1089#1082#1086#1088#1086#1089#1090#1100', '#1075#1088#1072#1076'/c'
+        LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
+        RightAxis.Automatic = False
+        RightAxis.AutomaticMaximum = False
+        RightAxis.AutomaticMinimum = False
+        TopAxis.Automatic = False
+        TopAxis.AutomaticMaximum = False
+        TopAxis.AutomaticMinimum = False
+        View3D = False
+        Zoom.MouseWheel = pmwNormal
+        BevelOuter = bvNone
+        Color = clWhite
+        TabOrder = 0
+        Anchors = [akLeft, akRight]
+        DefaultCanvas = 'TTeeCanvas3D'
+        ColorPaletteIndex = 13
+      end
+      object Chart2: TChart
+        Left = -4
+        Top = 248
+        Width = 1213
+        Height = 250
+        BackWall.Brush.Style = bsClear
+        Legend.CheckBoxes = True
+        Legend.LegendStyle = lsSeries
+        Legend.Shadow.HorizSize = 0
+        Legend.Shadow.VertSize = 0
+        Title.Font.Height = -13
+        Title.Font.Style = [fsBold]
+        Title.Text.Strings = (
+          #1054#1096#1080#1073#1082#1072' '#1089#1082#1083#1086#1085#1077#1085#1080#1103', '#1091#1075#1083'. '#1089#1077#1082)
+        BottomAxis.Title.Caption = #1059#1075#1083#1086#1074#1072#1103' '#1089#1082#1086#1088#1086#1089#1090#1100', '#1075#1088#1072#1076'/c'
+        LeftAxis.AxisValuesFormat = '#,##0.#####'
+        Panning.MouseWheel = pmwNone
+        RightAxis.Automatic = False
+        RightAxis.AutomaticMaximum = False
+        RightAxis.AutomaticMinimum = False
+        TopAxis.Automatic = False
+        TopAxis.AutomaticMaximum = False
+        TopAxis.AutomaticMinimum = False
+        View3D = False
+        Zoom.MouseWheel = pmwNormal
+        BevelOuter = bvNone
+        Color = clWhite
+        TabOrder = 1
+        Anchors = [akLeft, akRight]
+        DefaultCanvas = 'TTeeCanvas3D'
+        ColorPaletteIndex = 13
+      end
+      object Chart3: TChart
+        Left = -4
+        Top = 459
         Width = 1213
         Height = 250
         BackWall.Brush.Style = bsClear

@@ -12,6 +12,23 @@
 #define DTR   0.0174532925
 #define BOKZ1000ConvCoef       0.098174770424681
 
+
+#define SUCSESS 0x000
+#define SUCSESS_TO 0xFF00
+#define HO_first 0x100 // First cadr is processed !
+#define HO_Ornt 0x200 // Orient is got after 2-nd cadr in HO!
+#define BAD_Light 0x500 // HO/TO/SLEZH < 4 Objects, Lightness
+#define BAD_NObj 0x600 // HO/TO/SLEZH < 4 Objects
+#define BAD_DetLt 0x700 // Bad deter SL < 4 stars with lightness
+
+#define BAD_DetA 0x800 // Bad deter TO < 4 stars
+#define BAD_DetC 0x900 // Bad deter HO < 4 stars
+#define BAD_Apr 0xA00 // sum(Quat[i]) != 1, or is absent, or ang. M_Bort^M_ornt>15gr
+#define BAD_Per 0xB00 // crash SP, invalid variable!
+#define BAD_Ornt 0xC00 // Bad Orient() m_cur >2*Pix
+#define BAD_DetSl 0xD00 // Bad deter in SLEZH()
+#define BAD_Frag 0xE00 // Error extract fragment from buffer
+
 struct PointXYZ
 {
 	_fastcall PointXYZ(double _X, double _Y, double _Z): X(_X), Y(_Y), Z(_Z){}

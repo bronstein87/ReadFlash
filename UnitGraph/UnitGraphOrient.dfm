@@ -135,7 +135,7 @@ object FormGraphOrient: TFormGraphOrient
     Top = 8
     Width = 1160
     Height = 777
-    ActivePage = TabSheetImage
+    ActivePage = TabSheetTableStat
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 8
     object TabSheetAngles: TTabSheet
@@ -952,8 +952,8 @@ object FormGraphOrient: TFormGraphOrient
         Caption = 'Label6'
       end
       object Label12: TLabel
-        Left = 333
-        Top = 721
+        Left = 568
+        Top = 720
         Width = 46
         Height = 13
         Anchors = [akLeft, akBottom]
@@ -992,8 +992,8 @@ object FormGraphOrient: TFormGraphOrient
         BottomAxis.Axis.Color = 4210752
         BottomAxis.Grid.Color = 11119017
         BottomAxis.LabelsFormat.Font.Name = 'Verdana'
-        BottomAxis.Maximum = 15.050568757846450000
-        BottomAxis.Minimum = -2.990206584808225000
+        BottomAxis.Maximum = 50.711671397499430000
+        BottomAxis.Minimum = -38.651309224461200000
         BottomAxis.TicksInner.Color = 11119017
         BottomAxis.Title.Font.Name = 'Verdana'
         Chart3DPercent = 1
@@ -1014,8 +1014,8 @@ object FormGraphOrient: TFormGraphOrient
         LeftAxis.Grid.Color = 11119017
         LeftAxis.Inverted = True
         LeftAxis.LabelsFormat.Font.Name = 'Verdana'
-        LeftAxis.Maximum = 2902.041982606890000000
-        LeftAxis.Minimum = -595.506835214601300000
+        LeftAxis.Maximum = 9815.627735467102000000
+        LeftAxis.Minimum = -7509.092588074813000000
         LeftAxis.TicksInner.Color = 11119017
         LeftAxis.Title.Font.Name = 'Verdana'
         Panning.MouseWheel = pmwNone
@@ -1156,8 +1156,8 @@ object FormGraphOrient: TFormGraphOrient
         end
       end
       object EditCountHistory: TEdit
-        Left = 702
-        Top = 720
+        Left = 911
+        Top = 715
         Width = 64
         Height = 21
         Anchors = [akLeft, akBottom]
@@ -1165,8 +1165,8 @@ object FormGraphOrient: TFormGraphOrient
         Text = '10'
       end
       object CheckBoxHistory: TCheckBox
-        Left = 542
-        Top = 720
+        Left = 758
+        Top = 715
         Width = 154
         Height = 17
         Anchors = [akLeft, akBottom]
@@ -1174,8 +1174,8 @@ object FormGraphOrient: TFormGraphOrient
         TabOrder = 2
       end
       object EditScale: TEdit
-        Left = 391
-        Top = 718
+        Left = 623
+        Top = 715
         Width = 64
         Height = 21
         Anchors = [akLeft, akBottom]
@@ -1183,12 +1183,10 @@ object FormGraphOrient: TFormGraphOrient
         Text = '20'
       end
       object CheckBoxSaveScale: TCheckBox
-        Left = 23
-        Top = 719
-        Width = 201
-        Height = 17
-        Align = alCustom
-        Alignment = taLeftJustify
+        Left = 230
+        Top = 715
+        Width = 257
+        Height = 15
         Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100' '#1084#1072#1089#1096#1090#1072#1073#1080#1088#1086#1074#1072#1085#1080#1077
         TabOrder = 4
       end
@@ -2418,6 +2416,25 @@ object FormGraphOrient: TFormGraphOrient
         RowHeights = (
           24
           24
+          24
+          24
+          24)
+      end
+      object TableStatusInfo: TStringGrid
+        Left = 771
+        Top = 24
+        Width = 378
+        Height = 689
+        TabOrder = 1
+        ColWidths = (
+          64
+          91
+          64
+          64
+          64)
+        RowHeights = (
+          24
+          29
           24
           24
           24)
