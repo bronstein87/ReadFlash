@@ -1,6 +1,6 @@
 	#include "ImageProcessingFcns.h"
 
-  void changeContrast(int ConstrastCoefficient, TImage* ImageToCorrect)
+  void FragmentPainter::changeContrast(int ConstrastCoefficient, TImage* ImageToCorrect)
   {
 		ImageToCorrect->Picture->Bitmap->PixelFormat= pf24bit;
 		int AverageBrightness = 0;
@@ -53,7 +53,7 @@
 		ImageToCorrect->Repaint();
   }
 
-std::unique_ptr <TBitmap> changeContrast(int ContrastCoefficient, FragmentData& FData, int Limit)
+std::unique_ptr <TBitmap> FragmentPainter::changeContrast(int ContrastCoefficient, FragmentData& FData)
   {
 	int FragmentSize = FData.SizeX * FData.SizeY;
 	if(FData.min == 0 && FData.max == 0 && FData.mean == 0)
@@ -115,18 +115,17 @@ std::unique_ptr <TBitmap> changeContrast(int ContrastCoefficient, FragmentData& 
 		}
 
 	}
-
-
+	resetLimit();
 	return Fragment;
   }
 
- std::unique_ptr <TBitmap> createFragmentBitmap(FragmentData& FData, int Limit)
+ std::unique_ptr <TBitmap> FragmentPainter::createFragmentBitmap(FragmentData& FData)
   {
-	  return changeContrast(1, FData, Limit);
+	  return changeContrast(1, FData);
   }
 
 
-  void resizeBitmap(unsigned int Width, unsigned int Height, TBitmap* BitmapToScale)
+  void FragmentPainter::resizeBitmap(unsigned int Width, unsigned int Height, TBitmap* BitmapToScale)
   {
 		std::unique_ptr <TBitmap> TemporaryBitmap(new TBitmap());
 		TemporaryBitmap->Width = Width;
@@ -136,7 +135,7 @@ std::unique_ptr <TBitmap> changeContrast(int ContrastCoefficient, FragmentData& 
 		BitmapToScale->Assign(TemporaryBitmap.get());
   }
 
-  void writePixelValue(FragmentData& FData,TBitmap* Bitmap, unsigned short PixelSize, unsigned short ToCenter, unsigned short FontSize)
+  void FragmentPainter::writePixelValue(FragmentData& FData, TBitmap* Bitmap, unsigned short PixelSize, unsigned short ToCenter, unsigned short FontSize)
   {
 
 	for (unsigned int currentColumn = 0, PixelY = 0; currentColumn < FData.SizeY; currentColumn++, PixelY += PixelSize)
@@ -150,7 +149,14 @@ std::unique_ptr <TBitmap> changeContrast(int ContrastCoefficient, FragmentData& 
 			if (PixelValue > 255) PixelValue = 255;
 
 			Bitmap->Canvas->Font->Size = FontSize;
-			Bitmap->Canvas->Brush->Color = (TColor)RGB(PixelValue, PixelValue, PixelValue); //PixelValue;
+			if (Limit != -1)
+			{
+			   Bitmap->Canvas->Brush->Color = (TColor) RGB(PixelValue, 0, 0);
+			}
+			else
+			{
+				Bitmap->Canvas->Brush->Color = (TColor) RGB(PixelValue, PixelValue, PixelValue);
+			}
 			if(PixelValue < 128) Bitmap->Canvas->Font->Color = clWhite;
 			else  Bitmap->Canvas->Font->Color = clBlack;
 
@@ -162,12 +168,13 @@ std::unique_ptr <TBitmap> changeContrast(int ContrastCoefficient, FragmentData& 
 
 		}
 	}
+	resetLimit();
 
 
   }
 
 
-  void drawFragmentCenter(TBitmap* Fragment , float xCenter, float yCenter, float resizeCoef)
+  void FragmentPainter::drawFragmentCenter(TBitmap* Fragment , float xCenter, float yCenter, float resizeCoef)
   {
 		Fragment->Canvas->Brush->Color = clBlue;
 		Fragment->Canvas->Pen->Color = clBlue;
@@ -175,5 +182,5 @@ std::unique_ptr <TBitmap> changeContrast(int ContrastCoefficient, FragmentData& 
 		yCenter *= resizeCoef;
 		int xCent = xCenter - (int)(xCenter) > 0.5 ? xCenter + 1 : xCenter;
 		int yCent = yCenter - (int)(yCenter) > 0.5 ? yCenter + 1 : yCenter;
-		Fragment->Canvas->Ellipse(xCent, yCent, xCent + 3, yCent + 3);
+		Fragment->Canvas->Ellipse(xCent - 3, yCent - 3, xCent + 3, yCent + 3);
   }

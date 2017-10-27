@@ -62,17 +62,27 @@ struct FragmentData
 
 	}
 
+class FragmentPainter
+{
+	public:
 
-// функция для изменения контраста изображения
-// алгоритм смотри здесь: https://habrahabr.ru/post/139428/
+	_fastcall FragmentPainter(): Limit(-1)
+	{}
 
-// внести в namespace
-void changeContrast(int ConstrastCoefficient,TImage* ImageToCorrect);
-std::unique_ptr <TBitmap> changeContrast(int ContrastCoefficient, FragmentData& FData, int Limit = -1);
-std::unique_ptr <TBitmap> createFragmentBitmap(FragmentData& FData, int Limit = -1);
-void resizeBitmap(unsigned int Width, unsigned int Height, TBitmap* BitmapToScale);
-void writePixelValue(FragmentData& FData,TBitmap* Bitmap, unsigned short PixelSize,unsigned short ToCenter, unsigned short FontSize);
-void drawFragmentCenter(TBitmap* Fragment , float xCenter, float yCenter, float ResizeCoef);
-void showFragmentLimit (int Limit, TColor color);
+	void changeContrast(int ConstrastCoefficient,TImage* ImageToCorrect);
+	std::unique_ptr <TBitmap> changeContrast(int ContrastCoefficient, FragmentData& FData);
+	std::unique_ptr <TBitmap> createFragmentBitmap(FragmentData& FData);
+	void resizeBitmap(unsigned int Width, unsigned int Height, TBitmap* BitmapToScale);
+	void writePixelValue (FragmentData& FData,TBitmap* Bitmap, unsigned short PixelSize, unsigned short ToCenter, unsigned short FontSize);
+	void drawFragmentCenter(TBitmap* Fragment , float xCenter, float yCenter, float ResizeCoef);
+	void showFragmentLimit (int Limit, TColor color);
+	void setLimit(int _Limit) {	Limit = _Limit;};
+	void resetLimit() {Limit = -1;};
+
+	private:
+	int Limit;
+
+
+};
 
 

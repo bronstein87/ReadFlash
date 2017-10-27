@@ -135,7 +135,7 @@ object FormGraphOrient: TFormGraphOrient
     Top = 8
     Width = 1160
     Height = 777
-    ActivePage = TabSheetTableStat
+    ActivePage = ShowFragmentTab
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 8
     object TabSheetAngles: TTabSheet

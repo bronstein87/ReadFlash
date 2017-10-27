@@ -31,6 +31,10 @@ object AnalyzeForm: TAnalyzeForm
     object TabSheet2: TTabSheet
       Caption = #1040#1085#1072#1083#1080#1079' '#1086#1096#1080#1073#1086#1082' '#1089#1082#1086#1088#1086#1089#1090#1077#1081
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         1209
         717)
@@ -133,6 +137,10 @@ object AnalyzeForm: TAnalyzeForm
     end
     object TabSheet1: TTabSheet
       Caption = #1040#1085#1072#1083#1080#1079' '#1086#1096#1080#1073#1086#1082' '#1091#1075#1083#1086#1074
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         1209
         717)
@@ -241,12 +249,16 @@ object AnalyzeForm: TAnalyzeForm
     object TabSheet3: TTabSheet
       Caption = #1040#1085#1072#1083#1080#1079' '#1086#1096#1080#1073#1086#1082' '#1086#1089#1077#1081' '#1055#1057#1050
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         1209
         717)
-      object Chart1: TChart
-        Left = -4
-        Top = 0
+      object ChartAnalyzeX: TChart
+        Left = 0
+        Top = 5
         Width = 1213
         Height = 250
         BackWall.Brush.Style = bsClear
@@ -257,8 +269,7 @@ object AnalyzeForm: TAnalyzeForm
         Title.Font.Height = -13
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
-          #1054#1096#1080#1073#1082#1072' '#1087#1088#1103#1084#1086#1075#1086' '#1074#1086#1089#1093#1086#1078#1076#1077#1085#1080#1103', '#1091#1075#1083'. '#1089#1077#1082)
-        BottomAxis.Title.Caption = #1059#1075#1083#1086#1074#1072#1103' '#1089#1082#1086#1088#1086#1089#1090#1100', '#1075#1088#1072#1076'/c'
+          #1054#1096#1080#1073#1082#1072' '#1087#1086' '#1086#1089#1080' OX, '#1091#1075#1083'. '#1089#1077#1082)
         LeftAxis.AxisValuesFormat = '#,##0.#####'
         Panning.MouseWheel = pmwNone
         RightAxis.Automatic = False
@@ -276,9 +287,9 @@ object AnalyzeForm: TAnalyzeForm
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
-      object Chart2: TChart
-        Left = -4
-        Top = 248
+      object ChartAnalyzeY: TChart
+        Left = 0
+        Top = 253
         Width = 1213
         Height = 250
         BackWall.Brush.Style = bsClear
@@ -289,8 +300,13 @@ object AnalyzeForm: TAnalyzeForm
         Title.Font.Height = -13
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
-          #1054#1096#1080#1073#1082#1072' '#1089#1082#1083#1086#1085#1077#1085#1080#1103', '#1091#1075#1083'. '#1089#1077#1082)
-        BottomAxis.Title.Caption = #1059#1075#1083#1086#1074#1072#1103' '#1089#1082#1086#1088#1086#1089#1090#1100', '#1075#1088#1072#1076'/c'
+          #1054#1096#1080#1073#1082#1072' '#1087#1086' '#1086#1089#1080' OY, '#1091#1075#1083'. '#1089#1077#1082)
+        BottomAxis.Automatic = False
+        BottomAxis.AutomaticMaximum = False
+        BottomAxis.AutomaticMinimum = False
+        LeftAxis.Automatic = False
+        LeftAxis.AutomaticMaximum = False
+        LeftAxis.AutomaticMinimum = False
         LeftAxis.AxisValuesFormat = '#,##0.#####'
         Panning.MouseWheel = pmwNone
         RightAxis.Automatic = False
@@ -308,9 +324,9 @@ object AnalyzeForm: TAnalyzeForm
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
-      object Chart3: TChart
+      object ChartAnalyzeZ: TChart
         Left = -4
-        Top = 459
+        Top = 488
         Width = 1213
         Height = 250
         BackWall.Brush.Style = bsClear
@@ -321,8 +337,13 @@ object AnalyzeForm: TAnalyzeForm
         Title.Font.Height = -13
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
-          #1054#1096#1080#1073#1082#1072' '#1072#1079#1080#1084#1091#1090#1072', '#1091#1075#1083'. '#1089#1077#1082)
-        BottomAxis.Title.Caption = #1059#1075#1083#1086#1074#1072#1103' '#1089#1082#1086#1088#1086#1089#1090#1100', '#1075#1088#1072#1076'/c'
+          #1054#1096#1080#1073#1082#1072' '#1087#1086' '#1086#1089#1080' OZ, '#1091#1075#1083'. '#1089#1077#1082)
+        BottomAxis.Automatic = False
+        BottomAxis.AutomaticMaximum = False
+        BottomAxis.AutomaticMinimum = False
+        LeftAxis.Automatic = False
+        LeftAxis.AutomaticMaximum = False
+        LeftAxis.AutomaticMinimum = False
         LeftAxis.AxisValuesFormat = '#,##0.#####'
         Panning.MouseWheel = pmwNone
         RightAxis.Automatic = False

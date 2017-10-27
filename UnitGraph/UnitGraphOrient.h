@@ -54,6 +54,7 @@
 	#include "ImageProcessingFcns.h"
 	#include <exception>
 	#include <unordered_map>
+	#include <map>
 	#include <limits>
 	#include <sstream>
 	#include <iterator>
@@ -356,7 +357,7 @@
 		void InitTableWindows(void);
 		void PrintTableWindows(const struct CadrInfo &mCadr);
 		void InitTableStat();
-		void InitStatusInfoTable();
+		void InitStatusInfoTable(const string& deviceName);
 		void ClearStatusInfoTable();
 		void AddRowToStatTable(int nRow, AnsiString stringName, Statistika _stat, int p1,int p2);
         void AddRowToStatusTable(const CadrInfo& cadr);
@@ -391,27 +392,26 @@
 		void SaveGraph(TChart *Chart, AnsiString suff);
 		int GetCadrInfo(int NC, struct CadrInfo &mCadr);
 
-//		void DrawBlockHandler(void);
-		void ResizePlot(TChart *chart, double kx, double ky, int indexX,
-			int indexY);
+		void ResizePlot(TChart *chart, double kx, double ky, int indexX, int indexY);
 
-		unique_ptr<TFormAnimateSetting>FormAnimateSetting;
-		TChartShape *BlockSeries[MaxBlockSeries];
-		TChartShape *FrameSeries[MaxFrameSeries];
+		unique_ptr <TFormAnimateSetting> FormAnimateSetting;
+		TChartShape *BlockSeries [MaxBlockSeries];
+		TChartShape *FrameSeries [MaxFrameSeries];
 
-		AnsiString FileName;
 		AnsiString FileTitle;
 		AnsiString CurDir;
-		AnsiString FragDir;
-		AnsiString LocDir;
 
 		std::unique_ptr <SimplePlotter> plotter;
+		std::unique_ptr <FragmentPainter> fPainter;
 		float ScaleFactorForScrollBox;
 		int ScaleFactorForImage;
 		int Contrast;
 		unsigned short ResizeCoef;
 		unsigned short FontSize;
 		bool CompareIKIRes;
+
+        vector <std::pair <unsigned short, short> > tableRows;
+		string NOAttribute;
 
 		vector <TChart*> Charts;
 		vector <CadrInfo> vCadrInfo;

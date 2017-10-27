@@ -712,7 +712,7 @@ void writeProtocolToIKI(CadrInfo& cadrInfo, int counter, int sizeX, int sizeY)
 	writer->StarsData.Epsilon = cadrInfo.Epsilon;
 	writer->StarsData.m_Cur = cadrInfo.MeanErrorXY;
 
-	writer->ImageData.WindowsData.Info = new datawindow[cadrInfo.SizeWindowsList];s
+	writer->ImageData.WindowsData.Info = new datawindow[cadrInfo.SizeWindowsList];
 	for (int i = 0; i < cadrInfo.SizeWindowsList; i++)
 	{
 		writer->ImageData.WindowsData.Info[i].WindowWidth = cadrInfo.WindowsList[i].Width;

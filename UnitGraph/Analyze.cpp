@@ -180,12 +180,12 @@ void __fastcall TAnalyzeForm::ChooseDirectoriesClick(TObject *Sender)
 				 seriesAlMean->AddXY(i, MeanSkoX.first * RTS, Label);
 				 seriesAlSKO->AddHighLow(i, (MeanSkoX.first + MeanSkoX.second) * RTS, (MeanSkoX.first - MeanSkoX.second) * RTS , Label);
 
-				 Max = std::max_element(AxisErrorValues.begin(), AxisErrorValues.end(), ComparePointX);
-				 Min = std::min_element(AxisErrorValues.begin(), AxisErrorValues.end(), ComparePointX);
-				 MeanSkoX = calculateMeanStdDv(AxisErrorValues.begin(), AxisErrorValues.end(),0.0, AddX);
-				 seriesAl->AddHighLow(i, Max->X * RTS, Min->X * RTS, Label);
-				 seriesAlMean->AddXY(i, MeanSkoX.first * RTS, Label);
-				 seriesAlSKO->AddHighLow(i, (MeanSkoX.first + MeanSkoX.second) * RTS, (MeanSkoX.first - MeanSkoX.second) * RTS , Label);
+//				 Max = std::max_element(AxisErrorValues.begin(), AxisErrorValues.end(), ComparePointX);
+//				 Min = std::min_element(AxisErrorValues.begin(), AxisErrorValues.end(), ComparePointX);
+//				 MeanSkoX = calculateMeanStdDv(AxisErrorValues.begin(), AxisErrorValues.end(),0.0, AddX);
+//				 seriesAl->AddHighLow(i, Max->X * RTS, Min->X * RTS, Label);
+//				 seriesAlMean->AddXY(i, MeanSkoX.first * RTS, Label);
+//				 seriesAlSKO->AddHighLow(i, (MeanSkoX.first + MeanSkoX.second) * RTS, (MeanSkoX.first - MeanSkoX.second) * RTS , Label);
 
 				 struct { bool operator()(const Point& a,const Point& b) { return a.Y < b.Y; } } ComparePointY;
 				 struct { float operator() (const Point& a, bool& f) {f = false;  return a.Y;} } AddY;
@@ -204,12 +204,12 @@ void __fastcall TAnalyzeForm::ChooseDirectoriesClick(TObject *Sender)
 				 seriesDlSKO->AddHighLow(i, (MeanSkoY.first + MeanSkoY.second) * RTS, (MeanSkoY.first - MeanSkoY.second) * RTS , Label);
 				 seriesDlMean->AddXY(i, MeanSkoY.first * RTS, Label);
 
-				 Max = std::max_element(AxisErrorValues.begin(), AxisErrorValues.end(), ComparePointY);
-				 Min = std::min_element(AxisErrorValues.begin(), AxisErrorValues.end(), ComparePointY);
-				 MeanSkoY = calculateMeanStdDv(AxisErrorValues.begin(), AxisErrorValues.end(),0.0, AddY);
-				 seriesDl->AddHighLow(i, Max->Y * RTS, Min->Y * RTS, Label);
-				 seriesDlMean->AddXY(i, MeanSkoY.first * RTS, Label);
-				 seriesDlSKO->AddHighLow(i, (MeanSkoY.first + MeanSkoY.second) * RTS, (MeanSkoY.first - MeanSkoY.second) * RTS , Label);
+//				 Max = std::max_element(AxisErrorValues.begin(), AxisErrorValues.end(), ComparePointY);
+//				 Min = std::min_element(AxisErrorValues.begin(), AxisErrorValues.end(), ComparePointY);
+//				 MeanSkoY = calculateMeanStdDv(AxisErrorValues.begin(), AxisErrorValues.end(),0.0, AddY);
+//				 seriesDl->AddHighLow(i, Max->Y * RTS, Min->Y * RTS, Label);
+//				 seriesDlMean->AddXY(i, MeanSkoY.first * RTS, Label);
+//				 seriesDlSKO->AddHighLow(i, (MeanSkoY.first + MeanSkoY.second) * RTS, (MeanSkoY.first - MeanSkoY.second) * RTS , Label);
 
 				 struct { bool operator() (const Point& a,const Point& b) { return a.Z < b.Z; } } ComparePointZ;
 				 struct { float operator() (const Point& a, bool& f) {f = false;  return a.Z;} } AddZ;
@@ -228,12 +228,12 @@ void __fastcall TAnalyzeForm::ChooseDirectoriesClick(TObject *Sender)
 				 seriesAzMean->AddXY(i, MeanSkoZ.first * RTS, Label);
 				 seriesAzSKO->AddHighLow(i, (MeanSkoZ.first + MeanSkoZ.second) * RTS, (MeanSkoZ.first - MeanSkoZ.second) * RTS , Label);
 
-				 Max = std::max_element(AxisErrorValues.begin(), AxisErrorValues.end(), ComparePointZ);
-				 Min = std::min_element(AxisErrorValues.begin(), AxisErrorValues.end(), ComparePointZ);
-				 MeanSkoY = calculateMeanStdDv(AxisErrorValues.begin(), AxisErrorValues.end(),0.0, AddZ);
-				 seriesDl->AddHighLow(i, Max->Z * RTS, Min->Z * RTS, Label);
-				 seriesDlMean->AddXY(i, MeanSkoZ.first * RTS, Label);
-				 seriesDlSKO->AddHighLow(i, (MeanSkoZ.first + MeanSkoZ.second) * RTS, (MeanSkoZ.first - MeanSkoZ.second) * RTS , Label);
+//				 Max = std::max_element(AxisErrorValues.begin(), AxisErrorValues.end(), ComparePointZ);
+//				 Min = std::min_element(AxisErrorValues.begin(), AxisErrorValues.end(), ComparePointZ);
+//				 MeanSkoY = calculateMeanStdDv(AxisErrorValues.begin(), AxisErrorValues.end(),0.0, AddZ);
+//				 seriesDl->AddHighLow(i, Max->Z * RTS, Min->Z * RTS, Label);
+//				 seriesDlMean->AddXY(i, MeanSkoZ.first * RTS, Label);
+//				 seriesDlSKO->AddHighLow(i, (MeanSkoZ.first + MeanSkoZ.second) * RTS, (MeanSkoZ.first - MeanSkoZ.second) * RTS , Label);
 		}
 	}
 }

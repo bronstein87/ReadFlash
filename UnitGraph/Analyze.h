@@ -52,9 +52,9 @@ __published:	// IDE-managed Components
 	TChart *ChartAnalyzeErrorDl;
 	TChart *ChartAnalyzeErrorAz;
 	TTabSheet *TabSheet3;
-	TChart *Chart1;
-	TChart *Chart2;
-	TChart *Chart3;
+	TChart *ChartAnalyzeX;
+	TChart *ChartAnalyzeY;
+	TChart *ChartAnalyzeZ;
 	void __fastcall ChooseDirectoriesClick(TObject *Sender);
 	void __fastcall SaveGraphsClick(TObject *Sender);
 	void __fastcall ClearGraphsClick(TObject *Sender);
@@ -63,7 +63,6 @@ __published:	// IDE-managed Components
 private:	// User declarations
 	vector <TChart*> Charts;
 	std::unique_ptr <SimplePlotter> plotter;
-    void plotStatistics (vector <Point>& data, THighLowSeries* minMax, THighLowSeries* sko, TPointSeries* mean, double coef);
 public:		// User declarations
 	__fastcall TAnalyzeForm(TComponent* Owner);
 };

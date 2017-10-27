@@ -26,7 +26,8 @@ __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 		: TForm(Owner),
 		FormAnimateSetting(new TFormAnimateSetting(this)),
 		plotter(new SimplePlotter()),
-		ScaleFactorForScrollBox(10.2),
+		fPainter(new FragmentPainter()),
+		ScaleFactorForScrollBox(16),
 		ScaleFactorForImage(10),
 		Contrast(1),
 		ResizeCoef(16),
@@ -104,7 +105,6 @@ void __fastcall TFormGraphOrient::FormCreate(TObject *Sender)
 	InitTableWindows();
 	InitTableObjects();
 	InitTableStat();
-	InitStatusInfoTable();
 
 	Series1->Selected->Hover->Hide();
 	Series3->Selected->Hover->Hide();
@@ -190,6 +190,7 @@ void __fastcall TFormGraphOrient::MenuClearClick(TObject *Sender)
 	{
 		DeleteLineGraph();
 	}
+
 }
 
 
@@ -265,8 +266,8 @@ void TFormGraphOrient::PrintTableWindows(const struct CadrInfo &mCadr)
 		TableWindowsInfo->RowCount = TableWindowsInfo->FixedRows+1;
 		for (int k = 0; k < TableWindowsInfo->ColCount; k ++) {
 			TableWindowsInfo->Cells[k][1] = "";
-        }
-    }
+		}
+	}
 }
 
 void TFormGraphOrient::InitTableObjects(void)
@@ -316,37 +317,54 @@ void TFormGraphOrient::PrintTableObjects(const struct CadrInfo &mCadr)
 		TableObjectsInfo->RowCount = TableObjectsInfo->FixedRows + 1;
 		for (int k = 0; k < TableObjectsInfo->ColCount; k++) {
 			TableObjectsInfo->Cells[k][1] = "-";
-        }
+		}
 	}
 }
 
-void TFormGraphOrient::InitStatusInfoTable()
+void TFormGraphOrient::InitStatusInfoTable(const string& deviceName)
 {
-	TableStatusInfo->RowCount  = 18;
-	TableStatusInfo->ColCount  = 2;
-	TableStatusInfo->FixedCols = 1;
-	TableStatusInfo->FixedRows = 1;
-	TableStatusInfo->ColWidths[0] = 200;
-	TableStatusInfo->Cells[0][0] = "Статус";
-	TableStatusInfo->Cells[1][0] = "Количество";
-	TableStatusInfo->Cells[0][1] = "Успешно СЛ 00";
-	TableStatusInfo->Cells[0][2] = "Успешно НО 00";
-	TableStatusInfo->Cells[0][3] = "Успешно НО";
-	TableStatusInfo->Cells[0][4] = "Обработан 1 кадр";
-	TableStatusInfo->Cells[0][5] = "Ориент. после 2 кадра";
-	TableStatusInfo->Cells[0][6] = "НО/ТО < 4 объектов, засветка";
-	TableStatusInfo->Cells[0][7] = "НО/ТО < 4 объектов";
-	TableStatusInfo->Cells[0][8] = "СЛ < 4 объектов, засветка";
-	TableStatusInfo->Cells[0][9] = "СЛ < 4 объектов";
-	TableStatusInfo->Cells[0][10] = "СЛ < 4 звезд, засветка";
-	TableStatusInfo->Cells[0][11] = "ТО < 4 звезд";
-	TableStatusInfo->Cells[0][12] = "НО < 4 звезд";
-	TableStatusInfo->Cells[0][13] = "Кватернион ненорма";
-	TableStatusInfo->Cells[0][14] = "Плохая переменная";
-	TableStatusInfo->Cells[0][15] = "m_cur > 2*Pix";
-	TableStatusInfo->Cells[0][16] = "Плохое расп. в слежении";
-	TableStatusInfo->Cells[0][17] = "Ошибка извл. фраг. из буфера";
-	for(int i = 1; i < 18; i++)
+	tableRows.clear();
+	string fileName = toStdString(ExtractFileDir(Application->ExeName)) + "\\" + deviceName + ".txt";
+	ifstream in (fileName.c_str());
+	if (in.is_open())
+	{
+		TableStatusInfo->ColCount  = 2;
+		TableStatusInfo->FixedCols = 1;
+		TableStatusInfo->FixedRows = 1;
+		TableStatusInfo->ColWidths[0] = 200;
+		string line;
+		getline(in, line);
+		TableStatusInfo->RowCount  = atoi(line.c_str());
+		getline(in, line);
+		vector <string> splitted = split(line, "\t");
+		NOAttribute = splitted.back();
+
+		const short NOTOSLEZHStatus = 2;
+		int currentRow = 1;
+		while (getline(in, line))
+		{
+			splitted = split(line, "\t");
+			short statusType = atoi(splitted.back().c_str());
+			unsigned short statusValue = strtol(splitted[1].c_str(), NULL, 16);
+			if (statusType == NOTOSLEZHStatus)
+			{
+				TableStatusInfo->Cells[0][currentRow++] = toUString("НО " + splitted[0]);
+				TableStatusInfo->Cells[0][currentRow++] = toUString("ТО " + splitted[0]);
+			}
+			else
+			{
+				TableStatusInfo->Cells[0][currentRow++] = toUString(splitted[0]);
+			}
+			for(int i = 0; i < statusType; i++)
+			{
+				tableRows.push_back(std::make_pair(statusValue, statusType));
+			}
+		}
+		TableStatusInfo->Cells[0][TableStatusInfo->RowCount - 1] = "Число запросов НО";
+	}
+	else throw runtime_error("Не удалось найти файл " + fileName);
+
+	for(int i = 1; i < TableStatusInfo->RowCount; i++)
 	{
 		TableStatusInfo->Cells[1][i] = "0";
 	}
@@ -355,7 +373,7 @@ void TFormGraphOrient::InitStatusInfoTable()
 
 void TFormGraphOrient::ClearStatusInfoTable()
 {
-	for(int i = 1; i < 17; i++)
+	for(int i = 1; i < TableStatusInfo->RowCount; i++)
 	{
 		TableStatusInfo->Cells[1][i] = "0";
 	}
@@ -364,83 +382,33 @@ void TFormGraphOrient::ClearStatusInfoTable()
 
 void TFormGraphOrient::AddRowToStatusTable(const CadrInfo& cadr)
 {
-	  int tempCounter = 0;
-	  switch (cadr.StatOrient)
+
+	  for (int i = 0; i < tableRows.size(); i++)
 	  {
-			case SUCSESS:
-				if (cadr.CountWindows != 0) {
-					tempCounter =  StrToInt(TableStatusInfo->Cells[1][1]);
-					TableStatusInfo->Cells[1][1] = IntToStr(++tempCounter);
+		int k = tableRows[i].first;
+			if (tableRows[i].first == cadr.StatOrient)
+			{
+				// если статус для НО и СЛЕЖ
+				if (tableRows[i].second == 2 
+				&& cadr.SizeWindowsList == 0)
+				{
+					if (cadr.SizeWindowsList == 0)
+					{
+					   TableStatusInfo->Cells[1][i + 1] =  StrToInt(TableStatusInfo->Cells[1][i + 1]) + 1;	
+					   break;
+					}
+					else
+					{
+					   TableStatusInfo->Cells[1][i + 2] =  StrToInt(TableStatusInfo->Cells[1][i + 2]) + 1;
+					   break;	
+					}
 				}
-				else {
-					tempCounter =  StrToInt(TableStatusInfo->Cells[1][2]);
-					TableStatusInfo->Cells[1][2] = IntToStr(++tempCounter);
-                }
-				break;
-			case SUCSESS_TO:
-				tempCounter =  StrToInt(TableStatusInfo->Cells[1][3]);
-				TableStatusInfo->Cells[1][3] = IntToStr(++tempCounter);
-				break;
-			case HO_first:
-				tempCounter =  StrToInt(TableStatusInfo->Cells[1][4]);
-				TableStatusInfo->Cells[1][4] = IntToStr(++tempCounter);
-				break;
-			case HO_Ornt:
-				tempCounter =  StrToInt(TableStatusInfo->Cells[1][5]);
-				TableStatusInfo->Cells[1][5] = IntToStr(++tempCounter);
-				break;
-			case BAD_Light:
-				if (cadr.CountWindows == 0) {
-					tempCounter =  StrToInt(TableStatusInfo->Cells[1][6]);
-					TableStatusInfo->Cells[1][6] = IntToStr(++tempCounter);
+				else
+				{
+					TableStatusInfo->Cells[1][i + 1] =  StrToInt(TableStatusInfo->Cells[1][i  + 1]) + 1;	
+					break;
 				}
-				else {
-					tempCounter =  StrToInt(TableStatusInfo->Cells[1][8]);
-					TableStatusInfo->Cells[1][8] = IntToStr(++tempCounter);
-				}
-				break;
-			case BAD_NObj:
-				if (cadr.CountWindows == 0) {
-					tempCounter =  StrToInt(TableStatusInfo->Cells[1][7]);
-					TableStatusInfo->Cells[1][7] = IntToStr(++tempCounter);
-				}
-				else {
-					tempCounter =  StrToInt(TableStatusInfo->Cells[1][9]);
-					TableStatusInfo->Cells[1][9] = IntToStr(++tempCounter);
-				}
-				break;
-			case BAD_DetLt:
-				tempCounter =  StrToInt(TableStatusInfo->Cells[1][10]);
-				TableStatusInfo->Cells[1][10] = IntToStr(++tempCounter);
-				break;
-			case BAD_DetA:
-				tempCounter =  StrToInt(TableStatusInfo->Cells[1][11]);
-				TableStatusInfo->Cells[1][11] = IntToStr(++tempCounter);
-				break;
-			case BAD_DetC:
-				tempCounter =  StrToInt(TableStatusInfo->Cells[1][12]);
-				TableStatusInfo->Cells[1][12] = IntToStr(++tempCounter);
-				break;
-			case BAD_Apr:
-				tempCounter =  StrToInt(TableStatusInfo->Cells[1][13]);
-				TableStatusInfo->Cells[1][13] = IntToStr(++tempCounter);
-				break;
-			case BAD_Per:
-				tempCounter =  StrToInt(TableStatusInfo->Cells[1][14]);
-				TableStatusInfo->Cells[1][14] = IntToStr(++tempCounter);
-				break;
-			case BAD_Ornt:
-				tempCounter =  StrToInt(TableStatusInfo->Cells[1][15]);
-				TableStatusInfo->Cells[1][15] = IntToStr(++tempCounter);
-				break;
-			case BAD_DetSl:
-				tempCounter =  StrToInt(TableStatusInfo->Cells[1][16]);
-				TableStatusInfo->Cells[1][16] = IntToStr(++tempCounter);
-				break;
-			case BAD_Frag:
-				tempCounter =  StrToInt(TableStatusInfo->Cells[1][17]);
-				TableStatusInfo->Cells[1][17] = IntToStr(++tempCounter);
-				break;
+			}
 	  }
 }
 
@@ -820,7 +788,6 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 	FragmentsNumbers.clear();
 	ImageScrollBoxVector.clear();
 
-
 	AnsiString NeededDirectory = GetCurrentDir() + "\\Frag_" + FileTitle;
 	if (!TDirectory::Exists(NeededDirectory))
 	{
@@ -831,22 +798,20 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
    FileNameList = TDirectory::GetFiles(NeededDirectory);
    AnsiString TimePrStr = FloatToStr(mCadr.Time);
 
-
    AnsiString FragmentFileStr;
    for(int CurrentFileName = 0;CurrentFileName < FileNameList.Length;CurrentFileName++)
    {
-
 		if(Strutils::AnsiContainsStr(FileNameList[CurrentFileName], TimePrStr))
 		{
-				 FragmentFileStr = FileNameList[CurrentFileName];
-				 break;
+			FragmentFileStr = FileNameList[CurrentFileName];
+			break;
 		}
    }
 
    if(!FragmentFileStr.IsEmpty())
    {
 
-	ifstream fragmentFile(FragmentFileStr.c_str(), ios::binary);;
+	ifstream fragmentFile(FragmentFileStr.c_str(), ios::binary);
 	if(!fragmentFile.is_open())
 	{
 		ShowMessage(AnsiString("Не удалось открыть файл ") + FragmentFileStr.c_str());
@@ -866,7 +831,8 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 		{
 			Limit = mCadr.WindowsList[CurrentFragment].Level;
 		}
-		unique_ptr<TBitmap> Fragment(createFragmentBitmap(FragmentVector.back(), Limit));
+		fPainter->setLimit(Limit);
+		unique_ptr<TBitmap> Fragment(fPainter->createFragmentBitmap(FragmentVector.back()));
 
 
 		ImageScrollBoxVector.push_back(new FragmentScrollBox(FragmentShowScrollBox));
@@ -892,9 +858,14 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 		StretchDraw(Rect(0, 0, ImageVector.back()->Width, ImageVector.back()->Height),Fragment.get());
 		ImageVector.back()->SetParentComponent(ImageScrollBoxVector.back());
 
-		resizeBitmap(FragmentVector.back().SizeX * ResizeCoef, FragmentVector.back().SizeY * ResizeCoef, ImageVector.back()->Picture->Bitmap);
-		drawFragmentCenter(ImageVector.back()->Picture->Bitmap,
-		mCadr.WindowsList [CurrentFragment].xCenter, mCadr.WindowsList [CurrentFragment].xCenter, ResizeCoef);
+		fPainter->resizeBitmap(FragmentVector.back().SizeX * ResizeCoef, 
+		FragmentVector.back().SizeY * ResizeCoef, 
+		ImageVector.back()->Picture->Bitmap);
+		
+		fPainter->drawFragmentCenter(ImageVector.back()->Picture->Bitmap,
+		mCadr.WindowsList [CurrentFragment].xCenter, 
+		mCadr.WindowsList [CurrentFragment].yCenter, 
+		ResizeCoef);
 
 		TImage* FragmentNumber = new TImage(ImageScrollBoxVector.back());
 		FragmentNumber->Height = 15;
@@ -923,14 +894,14 @@ void TFormGraphOrient::DrawFragment(const struct CadrInfo &mCadr)
 	{
 		for(unsigned int i = 0; i < ImageVector.size(); i++)
 		{
-			writePixelValue(FragmentVector[i], ImageVector[i]->Picture->Bitmap, ResizeCoef, 5, 7);
+			fPainter->writePixelValue(FragmentVector[i], ImageVector[i]->Picture->Bitmap, ResizeCoef, 5, 7);
 		}
 	}
 
 	for(unsigned int i = 0; i < ImageVector.size(); i++)
 	{
-		drawFragmentCenter(ImageVector[i]->Picture->Bitmap,
-		mCadr.WindowsList[i].xCenter, mCadr.WindowsList [i].xCenter, ResizeCoef);
+		fPainter->drawFragmentCenter(ImageVector[i]->Picture->Bitmap,
+		mCadr.WindowsList[i].xCenter, mCadr.WindowsList [i].yCenter, ResizeCoef);
 	}
 }
 
@@ -996,21 +967,24 @@ void __fastcall TFormGraphOrient::FragmentShowScrollBoxResize(TObject *Sender)
 	{
 
 	   CadrInfo& curCadr = vCadrInfo[StrToInt(EditNumCadr->Text)];
-	   int Limit = -1;
 	   if (CheckBoxLimit->Checked)
 	   {
-			int j = StrToInt(EditNumCadr->Text);
-            Limit = vCadrInfo[j].WindowsList[currentFragment].Level;
+			fPainter->setLimit(curCadr.WindowsList[currentFragment].Level);
 	   }
-	   unique_ptr <TBitmap> Fragment(changeContrast(Contrast, FragmentVector[currentFragment], Limit));
+	   unique_ptr <TBitmap> Fragment(fPainter->changeContrast(Contrast, FragmentVector[currentFragment]));
 	   ImageVector[currentFragment]->Picture->Bitmap->FreeImage();
 	   ImageVector[currentFragment]->Picture->Bitmap = NULL;
 	   ImageVector[currentFragment]->Canvas->
 	   StretchDraw(Rect(0, 0, ImageVector[currentFragment]->Width, ImageVector[currentFragment]->Height),Fragment.get());
-	   resizeBitmap(FragmentVector[currentFragment].SizeX * ResizeCoef, FragmentVector[currentFragment].SizeY * ResizeCoef,
+
+	   fPainter->resizeBitmap(FragmentVector[currentFragment].SizeX * ResizeCoef, 
+	   FragmentVector[currentFragment].SizeY * ResizeCoef,
 	   ImageVector[currentFragment]->Picture->Bitmap);
-	   drawFragmentCenter(ImageVector[currentFragment]->Picture->Bitmap,
-	   curCadr.WindowsList[currentFragment].xCenter, curCadr.WindowsList[currentFragment].yCenter, ResizeCoef);
+
+	   fPainter->drawFragmentCenter(ImageVector[currentFragment]->Picture->Bitmap,
+	   curCadr.WindowsList[currentFragment].xCenter, 
+	   curCadr.WindowsList[currentFragment].yCenter, 
+	   ResizeCoef);
 	}
 }
 
@@ -1050,7 +1024,6 @@ bool &Handled)
 	}
 
 }
-
 
 
  void __fastcall TFormGraphOrient::ImageOnClick(TObject *Sender,
@@ -1096,7 +1069,7 @@ void __fastcall TFormGraphOrient::ScaleEditChange(TObject *Sender)
 	else
 	{
 		ScaleFactorForImage = ScaleFactor;
-		ScaleFactorForScrollBox = ScaleFactor + 0.2;
+		ScaleFactorForScrollBox = ScaleFactor + 1;
 	}
 }
 
@@ -1105,15 +1078,20 @@ void __fastcall TFormGraphOrient::PixelBrightCheckBoxClick(TObject *Sender)
 {
 	if(PixelBrightCheckBox->Checked)
 	{
+	
 		for(unsigned int i = 0; i < ImageVector.size(); i++)
 		{
-			writePixelValue(FragmentVector[i], ImageVector[i]->Picture->Bitmap, ResizeCoef, 2 , FontSize);
+			CadrInfo& curCadr = vCadrInfo[StrToInt(EditNumCadr->Text)];
+			if (CheckBoxLimit->Checked)
+			{
+				fPainter->setLimit(curCadr.WindowsList[i].Level);
+			}
+			fPainter->writePixelValue(FragmentVector[i], ImageVector[i]->Picture->Bitmap, ResizeCoef, 2 , FontSize);
 		}
 	}
 
 }
 //---------------------------------------------------------------------------
-
 
 
 void __fastcall TFormGraphOrient::PixelSizeEditChange(TObject *Sender)
@@ -1146,7 +1124,6 @@ void __fastcall TFormGraphOrient::FontSizeEditChange(TObject *Sender)
 	}
 }
 //---------------------------------------------------------------------------
-
 
 
 
@@ -1326,7 +1303,7 @@ void GetFileTitles(AnsiString file_name, AnsiString *file_title)
 			   RawFlashFile = fopen(RawFileName.c_str(),"rb");
 			   if(!RawFlashFile)
 			   {
-					return "";
+					return AnsiString();
 			   }
 
 			  vector<RawFileInfo>  RawFileInfoVector;
@@ -1436,7 +1413,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
   OpenDialog->Filter = "dat|*.dat";
   if (OpenDialog->Execute()) {
 		vCadrInfo.clear();
-		FileName = OpenDialog->FileName;
+		AnsiString FileName = OpenDialog->FileName;
 		SetCurrentDir(ExtractFileDir(FileName));
 		GetFileTitles(FileName, &FileTitle);
 
@@ -1488,8 +1465,8 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 
 
 		CurDir = GetCurrentDir();
-		FragDir = CurDir + "\\Frag_" + FileTitle;
-		LocDir = CurDir + "\\Loc_" + FileTitle;
+		AnsiString FragDir = CurDir + "\\Frag_" + FileTitle;
+		AnsiString LocDir = CurDir + "\\Loc_" + FileTitle;
 		CreateDir(FragDir);
 		CreateDir(LocDir);
 
@@ -1935,7 +1912,7 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 		vCadrInfo.clear();
 		DeleteLineGraph();
 
-		FileName = OpenDialog->FileName;
+		AnsiString FileName = OpenDialog->FileName;
 		SetCurrentDir(ExtractFileDir(FileName));
 		GetFileTitles(FileName,&FileTitle);
 
@@ -1945,7 +1922,7 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 			return;
 		}
 
-		ofstream fout((FileTitle+"_decode.txt").c_str());
+		ofstream fout((FileTitle + "_decode.txt").c_str());
 
 		string line, word1, word2, word3;
 		unsigned short hex_val, dec_val;
@@ -2001,7 +1978,7 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 		vCadrInfo.clear();
 		DeleteLineGraph();
 
-		FileName = OpenDialog->FileName;
+		AnsiString FileName = OpenDialog->FileName;
 		SetCurrentDir(ExtractFileDir(FileName));
 		GetFileTitles(FileName, &FileTitle);
 
@@ -2201,7 +2178,7 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 			SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
 			for (int i = 0; i < FileList->Count; i++)
 			{
-				FileName = FileList->Strings[i];
+				AnsiString FileName = FileList->Strings[i];
 				ifstream in(FileName.c_str());
 				if (!in.is_open())
 				{
@@ -2250,7 +2227,7 @@ void __fastcall TFormGraphOrient::BOKZM2VParseProtocolClick(TObject *Sender) {
 			TDateTime startDate = TDateTime (2017,9,26,0,0,0,0);
 				for (int i = 0; i < FileList->Count; i++)
 				{
-					FileName = FileList->Strings[i];
+					AnsiString FileName = FileList->Strings[i];
 					ifstream in(FileName.c_str());
 					if (!in.is_open())
 					{
@@ -2545,7 +2522,7 @@ void TFormGraphOrient::CalculateSeriesSKO()
 void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 {
 	const int maxDrawFrag = 12;
-	TColor colorFrag[maxDrawFrag];
+	TColor colorFrag [maxDrawFrag];
 
 	try
 	{
@@ -2564,6 +2541,9 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 			{
 				plotter->ResetOptions();
 				DeleteLineGraph();
+				vCadrInfo.clear();
+				ClearStatusInfoTable();
+				FileTitle = "IKI";
 
 				for (int iFrag  = 0; iFrag < maxDrawFrag; iFrag++) {
 					colorFrag[iFrag] = RGB((float)(maxDrawFrag - iFrag) / maxDrawFrag * 255,
@@ -2582,12 +2562,9 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 					plotter->AddSeries(ChartFragLevel, iFrag, colorFrag[iFrag]);
 				}
 
-				vCadrInfo.clear();
-				ClearStatusInfoTable();
-				FileTitle = "IKI";
-
 				UnicodeString filePrefix = FormAnimateSetting->EditFilePrefix->Text;
 				unsigned short startFrom = StrToInt(FormAnimateSetting->BeginFromEdit->Text);
+				bool statusTableInited = false;
 				for (int i = startFrom; i < FileList->Count; i++)
 				{
 					unique_ptr <IKI_img> reader(new IKI_img());
@@ -2600,12 +2577,19 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 							if (FileExists(ResFileName) && (reader->ReadFormat(toStdString(ResFileName), false)))
 							{
 								CompareIKIRes = true;
+								if (!statusTableInited)
+								{
+									vector <string> splitted = split(reader->CameraSettings.DataSource, "_");
+									InitStatusInfoTable(splitted[0]);
+									statusTableInited = true;
+								}
 								if ( (!i) /* && (FormAnimateSetting->CheckBoxPrintReport->Checked)*/ ) {
 //									печать параметров модели
-									StartPrintReport(reader.get());
+									//StartPrintReport(reader.get());
 								}
 							}
-							else  {
+							else
+							{
 								CompareIKIRes = false;
 							}
 
@@ -2919,7 +2903,7 @@ void __fastcall TFormGraphOrient::BOKZM601000ParseProtocolClick(TObject *Sender)
 			TDateTime startDate = TDateTime (2017,9,26,0,0,0,0);  //  исправить
 			for (int i = 0; i < FileList->Count; i++)
 			{
-				FileName = FileList->Strings[i];
+				AnsiString FileName = FileList->Strings[i];
 				ifstream in(FileName.c_str());
 				if (!in.is_open())
 				{
@@ -2954,14 +2938,7 @@ void __fastcall TFormGraphOrient::ChartMatrixClickLegend(TCustomChart *Sender, T
 void __fastcall TFormGraphOrient::CheckBoxLimitClick(TObject *Sender)
 {
 	SetContrast();
-
-    int j = StrToInt(EditNumCadr->Text);
-	for(unsigned int i = 0; i < ImageVector.size(); i++)
-	{
-		drawFragmentCenter(ImageVector[i]->Picture->Bitmap,
-		vCadrInfo[j].WindowsList[i].xCenter, vCadrInfo[j].WindowsList[i].xCenter, ResizeCoef);
-	}
-    PixelBrightCheckBoxClick(this);
+	PixelBrightCheckBoxClick(this);
 }
 //---------------------------------------------------------------------------
 
@@ -2982,7 +2959,7 @@ void __fastcall TFormGraphOrient::BOKZMFParseProtocolClick(TObject *Sender)
 			TDateTime dt;
 			for (int i = 0; i < FileList->Count; i++)
 			{
-				FileName = FileList->Strings[i];
+				AnsiString FileName = FileList->Strings[i];
 				ifstream in(FileName.c_str());
 				if (!in.is_open())
 				{
@@ -2999,6 +2976,7 @@ void __fastcall TFormGraphOrient::BOKZMFParseProtocolClick(TObject *Sender)
 		}
 }
 //---------------------------------------------------------------------------
+
 
 
 
