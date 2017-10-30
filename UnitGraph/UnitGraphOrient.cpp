@@ -405,10 +405,15 @@ void TFormGraphOrient::AddRowToStatusTable(const CadrInfo& cadr)
 				}
 				else
 				{
-					TableStatusInfo->Cells[1][i + 1] =  StrToInt(TableStatusInfo->Cells[1][i  + 1]) + 1;	
+					TableStatusInfo->Cells[1][i + 1] =  StrToInt(TableStatusInfo->Cells[1][i  + 1]) + 1;
 					break;
 				}
 			}
+	  }
+
+	  if (cadr.DeviceInfo.find(NOAttribute) != string::npos)
+	  {
+		  TableStatusInfo->Cells[1][TableStatusInfo->RowCount] =  StrToInt(TableStatusInfo->Cells[1][TableStatusInfo->RowCount]) + 1;
 	  }
 }
 

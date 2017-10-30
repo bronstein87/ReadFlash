@@ -1,6 +1,7 @@
 #ifndef INFO_CADR_H
 #define INFO_CADR_H
 #include <vector>
+#include <string>
 #include "MathM.h"
 
 struct StarsInfo // прогнозируемые
@@ -65,6 +66,7 @@ struct CadrInfo
 	 CountLines(0), CountBlock(0) { }
 
 	double Time;
+	std::string DeviceInfo;
 	int FrameNumber;
 	bool IsBinary, IsReverse;   //признак бинирования, признак реверса изображения
 	int ResolutionACP;

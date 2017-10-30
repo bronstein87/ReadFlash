@@ -881,6 +881,7 @@ CadrInfo convertIKIFormatToInfoCadr(IKI_img* reader, bool CompareIKIRes)
 {
 	CadrInfo cadrInfo;
 	cadrInfo.Time = StrToDateTime(toUString(reader->Georeferencing.DateTime)).Val;
+	cadrInfo.DeviceInfo = reader->CameraSettings.DataSource;
 	cadrInfo.FrameNumber = reader->Georeferencing.FrameNumber;
 	cadrInfo.IsBinary = reader->ImageData.FrameData.DegreeBinning;
 	cadrInfo.DataType = reader->ImageData.FrameData.DataType;
