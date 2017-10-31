@@ -328,7 +328,6 @@ void TFormGraphOrient::InitStatusInfoTable(const string& deviceName)
 	ifstream in (fileName.c_str());
 	if (in.is_open())
 	{
-		TableStatusInfo->ColCount  = 2;
 		TableStatusInfo->FixedCols = 1;
 		TableStatusInfo->FixedRows = 1;
 		TableStatusInfo->ColWidths[0] = 200;
@@ -336,37 +335,33 @@ void TFormGraphOrient::InitStatusInfoTable(const string& deviceName)
 		getline(in, line);
 		TableStatusInfo->RowCount  = atoi(line.c_str());
 		getline(in, line);
-		vector <string> splitted = split(line, "\t");
-		NOAttribute = splitted.back();
 
-		const short NOTOSLEZHStatus = 2;
+		vector <string> splitted = split(line, "\t");
+		columnTitles = split(splitted[1], ";");
+		TableStatusInfo->ColCount  = columnTitles.size() + 1;
+		TableStatusInfo->Cells[0][0] = "Значение статуса";
+		for(int i = 0; i < columnTitles.size(); i++)
+		{
+			TableStatusInfo->Cells[i + 1][0] = toUString(columnTitles[i]);
+		}
+
 		int currentRow = 1;
 		while (getline(in, line))
 		{
 			splitted = split(line, "\t");
-			short statusType = atoi(splitted.back().c_str());
 			unsigned short statusValue = strtol(splitted[1].c_str(), NULL, 16);
-			if (statusType == NOTOSLEZHStatus)
-			{
-				TableStatusInfo->Cells[0][currentRow++] = toUString("НО " + splitted[0]);
-				TableStatusInfo->Cells[0][currentRow++] = toUString("ТО " + splitted[0]);
-			}
-			else
-			{
-				TableStatusInfo->Cells[0][currentRow++] = toUString(splitted[0]);
-			}
-			for(int i = 0; i < statusType; i++)
-			{
-				tableRows.push_back(std::make_pair(statusValue, statusType));
-			}
+			TableStatusInfo->Cells[0][currentRow++] = toUString(splitted[0] + " " + splitted[1]);
+			tableRows.push_back(statusValue);
 		}
-		TableStatusInfo->Cells[0][TableStatusInfo->RowCount - 1] = "Число запросов НО";
 	}
 	else throw runtime_error("Не удалось найти файл " + fileName);
 
 	for(int i = 1; i < TableStatusInfo->RowCount; i++)
 	{
-		TableStatusInfo->Cells[1][i] = "0";
+		for(int j = 0; j < columnTitles.size(); j++)
+		{
+			TableStatusInfo->Cells[j + 1][i] = "0";
+		}
 	}
 }
 
@@ -375,46 +370,32 @@ void TFormGraphOrient::ClearStatusInfoTable()
 {
 	for(int i = 1; i < TableStatusInfo->RowCount; i++)
 	{
-		TableStatusInfo->Cells[1][i] = "0";
+		for(int j = 0; j < columnTitles.size(); j++)
+		{
+			TableStatusInfo->Cells[j + 1][i] = "0";
+		}
 	}
 }
 
 
 void TFormGraphOrient::AddRowToStatusTable(const CadrInfo& cadr)
 {
-
 	  for (int i = 0; i < tableRows.size(); i++)
 	  {
-		int k = tableRows[i].first;
-			if (tableRows[i].first == cadr.StatOrient)
+			if (tableRows[i] == cadr.StatOrient)
 			{
-				// если статус для НО и СЛЕЖ
-				if (tableRows[i].second == 2 
-				&& cadr.SizeWindowsList == 0)
-				{
-					if (cadr.SizeWindowsList == 0)
+					for(int j = 0; j < columnTitles.size(); j++)
 					{
-					   TableStatusInfo->Cells[1][i + 1] =  StrToInt(TableStatusInfo->Cells[1][i + 1]) + 1;	
-					   break;
+						if(cadr.DeviceInfo.find(columnTitles[j]) != string::npos)
+						{
+							TableStatusInfo->Cells[j + 1][i + 1] =  StrToInt(TableStatusInfo->Cells[j + 1][i + 1]) + 1;
+							break;
+						}
 					}
-					else
-					{
-					   TableStatusInfo->Cells[1][i + 2] =  StrToInt(TableStatusInfo->Cells[1][i + 2]) + 1;
-					   break;	
-					}
-				}
-				else
-				{
-					TableStatusInfo->Cells[1][i + 1] =  StrToInt(TableStatusInfo->Cells[1][i  + 1]) + 1;
-					break;
-				}
+
 			}
 	  }
 
-	  if (cadr.DeviceInfo.find(NOAttribute) != string::npos)
-	  {
-		  TableStatusInfo->Cells[1][TableStatusInfo->RowCount] =  StrToInt(TableStatusInfo->Cells[1][TableStatusInfo->RowCount]) + 1;
-	  }
 }
 
 void TFormGraphOrient::InitTableStat()

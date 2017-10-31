@@ -111,3 +111,5 @@ old_iki_img/iki_img.cpp
 ReadFlash.stat
 .iki_img_REMOTE_4424.cpp.swp
 *.swp
+old_IKI/iki_img.cpp
+old_IKI/iki_img.h

@@ -410,8 +410,8 @@
 		unsigned short FontSize;
 		bool CompareIKIRes;
 
-        vector <std::pair <unsigned short, short> > tableRows;
-		string NOAttribute;
+        vector <unsigned short> tableRows;
+		vector<string> columnTitles;
 
 		vector <TChart*> Charts;
 		vector <CadrInfo> vCadrInfo;

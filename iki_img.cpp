@@ -206,7 +206,7 @@ void IKI_img::WriteFormat(string filename) // define_format_value = "%4x%-80.80s
 	sprintf(buffer_string, "%12.10lf %12.10lf %12.10lf", Georeferencing.DeviceAngularAcceleration[0], Georeferencing.DeviceAngularAcceleration[1], Georeferencing.DeviceAngularAcceleration[2]);
 	print_string(FStream, dev_angular_acceler_id, dev_angular_acceler_name, (const char*)buffer_string);
 	memset(&buffer_string[0], 0, 200);
-	sprintf(buffer_string, "%12.10lf %12.10lf %12.10fl", Georeferencing.ProjectionLinearVelocity[0], Georeferencing.ProjectionLinearVelocity[1], Georeferencing.ProjectionLinearVelocity[2]);
+	sprintf(buffer_string, "%12.10lf %12.10lf %12.10lf", Georeferencing.ProjectionLinearVelocity[0], Georeferencing.ProjectionLinearVelocity[1], Georeferencing.ProjectionLinearVelocity[2]);
 	print_string(FStream, proj_line_velo_id, proj_line_velo_name, (const char*)buffer_string);
 	memset(&buffer_string[0], 0, 200);
 	sprintf(buffer_string, "%12.10lf %12.10lf %12.10lf", Georeferencing.OrientationAngles[0], Georeferencing.OrientationAngles[1], Georeferencing.OrientationAngles[2]);
@@ -244,7 +244,7 @@ void IKI_img::WriteFormat(string filename) // define_format_value = "%4x%-80.80s
 	if (CameraSettings.EV_ACP != 0)
 		print_string(FStream, ev_acp_id, ev_acp_name, FormatFloatTo_string("%8.3f", CameraSettings.EV_ACP));
 	if (CameraSettings.PixelSize != 0)
-		print_string(FStream, pixel_size_id, pixel_size_name, FormatFloatTo_string("%8.5f", CameraSettings.PixelSize));
+		print_string(FStream, pixel_size_id, pixel_size_name, FormatFloatTo_string("%8.6f", CameraSettings.PixelSize));
 	if (CameraSettings.FocalLength != 0)
 		print_string(FStream, focal_length_id, focal_length_name, FormatFloatTo_string("%8.3f", CameraSettings.FocalLength));
 	if (CameraSettings.DiameterEntrancePupil != 0)
@@ -263,7 +263,7 @@ void IKI_img::WriteFormat(string filename) // define_format_value = "%4x%-80.80s
 		for (int i = 0; i < CameraSettings.DistortionFunction.CoefficientsCount; i++)
 		{
 			memset(&buffer_string[0], 0, 200);
-			sprintf(buffer_string, " %12.10f %12.10f", CameraSettings.DistortionFunction.Coefficient[i].X, CameraSettings.DistortionFunction.Coefficient[i].Y);
+			sprintf(buffer_string, "%12.10f %12.10f", CameraSettings.DistortionFunction.Coefficient[i].X, CameraSettings.DistortionFunction.Coefficient[i].Y);
 			print_data(FStream, (const char*)buffer_string);
 		}
 	}
@@ -273,7 +273,7 @@ void IKI_img::WriteFormat(string filename) // define_format_value = "%4x%-80.80s
 		for (int i = 0; i < CameraSettings.TableDeadObjects.RecordsCount; i++)
 		{
 			memset(&buffer_string[0], 0, 200);
-			sprintf(buffer_string, " %8.6f %8.6f %8.6f %u", CameraSettings.TableDeadObjects.PixelData[i].X_coordinate, CameraSettings.TableDeadObjects.PixelData[i].Y_coordinate, CameraSettings.TableDeadObjects.PixelData[i].BrightnessObj, CameraSettings.TableDeadObjects.PixelData[i].CoefficientObj);
+			sprintf(buffer_string, "%8.6f %8.6f %8.6f %u", CameraSettings.TableDeadObjects.PixelData[i].X_coordinate, CameraSettings.TableDeadObjects.PixelData[i].Y_coordinate, CameraSettings.TableDeadObjects.PixelData[i].BrightnessObj, CameraSettings.TableDeadObjects.PixelData[i].CoefficientObj);
 			print_data(FStream, (const char*)buffer_string);
 		}
 	}
@@ -290,7 +290,7 @@ void IKI_img::WriteFormat(string filename) // define_format_value = "%4x%-80.80s
 		for (int i = 0; i < FilterData.FilteredPixelsCount; i++)
 		{
 			memset(&buffer_string[0], 0, 200);
-			sprintf(buffer_string, " %u %u %u", FilterData.DataPixels[i].X_coordinate, FilterData.DataPixels[i].Y_coordinate, FilterData.DataPixels[i].BrightnessPixel);
+			sprintf(buffer_string, "%u %u %u", FilterData.DataPixels[i].X_coordinate, FilterData.DataPixels[i].Y_coordinate, FilterData.DataPixels[i].BrightnessPixel);
 			print_data(FStream, (const char*)buffer_string);
 		}
 	}
@@ -315,12 +315,12 @@ void IKI_img::WriteFormat(string filename) // define_format_value = "%4x%-80.80s
 		for (int i = 0; i < StarsData.SizeLocalList; i++)
 		{
 			memset(&buffer_string[0], 0, 200);
-			sprintf(buffer_string, " %8.5f %8.5f %8.5f %8.5f ", StarsData.StarsList[i].BrightnessObject, StarsData.StarsList[i].PixelsCount, StarsData.StarsList[i].X_coordinate, StarsData.StarsList[i].Y_coordinate);
+			sprintf(buffer_string, "%8.6f %8.6f %8.6f %8.6f ", StarsData.StarsList[i].BrightnessObject, StarsData.StarsList[i].PixelsCount, StarsData.StarsList[i].X_coordinate, StarsData.StarsList[i].Y_coordinate);
 			if (StarsData.StarsList[i].NumberStar == 0)
 				goto endlist;
 			else
 			{
-				sprintf(str, " %u %2.1f %c%c %8.5f %8.5f", StarsData.StarsList[i].NumberStar, StarsData.StarsList[i].StellarMagnitude, StarsData.StarsList[i].SpectralClass[0], StarsData.StarsList[i].SpectralClass[1], StarsData.StarsList[i].DX, StarsData.StarsList[i].DY);
+				sprintf(str, "%u %2.1f %c%c %8.6f %8.6f", StarsData.StarsList[i].NumberStar, StarsData.StarsList[i].StellarMagnitude, StarsData.StarsList[i].SpectralClass[0], StarsData.StarsList[i].SpectralClass[1], StarsData.StarsList[i].DX, StarsData.StarsList[i].DY);
 				strcat(buffer_string, str);
 			}
 		endlist: print_data(FStream, (const char*)buffer_string);
@@ -333,7 +333,7 @@ void IKI_img::WriteFormat(string filename) // define_format_value = "%4x%-80.80s
 		for (int i = 0; i < StarsData.SimulatedFrame.SizeStarList; i++)
 		{
 			memset(&buffer_string[0], 0, 200);
-			sprintf(buffer_string, " %u %lu %8.5f %8.5f %2.1f %c%c", StarsData.SimulatedFrame.StarRec[i].Ns, StarsData.SimulatedFrame.StarRec[i].Is, StarsData.SimulatedFrame.StarRec[i].Xs, StarsData.SimulatedFrame.StarRec[i].Ys, StarsData.SimulatedFrame.StarRec[i].Mv, StarsData.SimulatedFrame.StarRec[i].Sp[0], StarsData.SimulatedFrame.StarRec[i].Sp[1]);
+			sprintf(buffer_string, "%u %lu %8.6f %8.6f %2.1f %c%c", StarsData.SimulatedFrame.StarRec[i].Ns, StarsData.SimulatedFrame.StarRec[i].Is, StarsData.SimulatedFrame.StarRec[i].Xs, StarsData.SimulatedFrame.StarRec[i].Ys, StarsData.SimulatedFrame.StarRec[i].Mv, StarsData.SimulatedFrame.StarRec[i].Sp[0], StarsData.SimulatedFrame.StarRec[i].Sp[1]);
 			print_data(FStream, (const char*)buffer_string);
 		}
 	}
@@ -390,7 +390,7 @@ void IKI_img::WriteFormat(string filename) // define_format_value = "%4x%-80.80s
 		for (int i = 0; i < ImageData.LinesData.LinesCount; i++)
 		{
 			memset(&buffer_string[0], 0, 200);
-			sprintf(buffer_string, " %d %d", ImageData.LinesData.Info[i].Y_FirstString, ImageData.LinesData.Info[i].CountString);
+			sprintf(buffer_string, "%d %d", ImageData.LinesData.Info[i].Y_FirstString, ImageData.LinesData.Info[i].CountString);
 			print_data(FStream, (const char*)buffer_string);
 		}
 	}
@@ -406,7 +406,7 @@ void IKI_img::WriteFormat(string filename) // define_format_value = "%4x%-80.80s
 		for (int i = 0; i < ImageData.WindowsData.SizeWindowList; i++)
 		{
 			memset(&buffer_string[0], 0, 200);
-			sprintf(buffer_string, " %u %u %u %u %u %u %8.6f %8.6f %u %u", ImageData.WindowsData.Info[i].WindowWidth, ImageData.WindowsData.Info[i].WindowHeight, ImageData.WindowsData.Info[i].X, ImageData.WindowsData.Info[i].Y, ImageData.WindowsData.Info[i].Limit, ImageData.WindowsData.Info[i].ObjCount, ImageData.WindowsData.Info[i].SKO, ImageData.WindowsData.Info[i].Average, ImageData.WindowsData.Info[i].ZipX, ImageData.WindowsData.Info[i].ZipY);
+			sprintf(buffer_string, "%u %u %u %u %u %u %8.6f %8.6f %u %u", ImageData.WindowsData.Info[i].WindowWidth, ImageData.WindowsData.Info[i].WindowHeight, ImageData.WindowsData.Info[i].X, ImageData.WindowsData.Info[i].Y, ImageData.WindowsData.Info[i].Limit, ImageData.WindowsData.Info[i].ObjCount, ImageData.WindowsData.Info[i].SKO, ImageData.WindowsData.Info[i].Average, ImageData.WindowsData.Info[i].ZipX, ImageData.WindowsData.Info[i].ZipY);
 			print_data(FStream, (const char*)buffer_string);
 		}
 	}
