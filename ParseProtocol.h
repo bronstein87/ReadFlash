@@ -24,6 +24,26 @@ using namespace add_string;
 
 namespace parse_prot
 {
+	struct stLocal {
+		float x, y;
+		float bright, size;
+	};
+
+	struct DTMI_M2 {
+		unsigned long  timeBOKZ;
+		unsigned short status1, status2;
+		unsigned short serialNumber, POST, timeExp;
+		unsigned short nLocalObj1, nLocalObj2;
+		unsigned short nLocal[2], meanCadr[2], maxHist;
+		unsigned short maxHistX, maxHistY;
+		unsigned short nStoreObj, nDeterObj, nWindows, nSec;
+		unsigned long timeQuatLast;
+		float quatLast[4], m_cur;
+		float  omega[3], Vline[3];
+		float quatBoard[4], Epoch;
+		stLocal LocalList1[15], LocalList2[15], ResultList[12];
+		unsigned char nObjectWindow[16];
+	};
 
 	struct SHTMI1 {
 		string timeBOKZ;
@@ -117,6 +137,7 @@ namespace parse_prot
 	void ConvertDataDTMI_BOKZM(struct DTMI_BOKZM tmi, struct CadrInfo &mCadr) ;
 
 	void PrintDTMI_BOKZM(ofstream &file, struct DTMI_BOKZM tmi);
+	void PrintDTMI_M2(ofstream &file, struct DTMI_M2 tmi);
 
 	// проверяем содержит ли протокол режим локализации
 	bool checkLocFile(ifstream& in);

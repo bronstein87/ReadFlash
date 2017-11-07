@@ -207,6 +207,7 @@
 		TCheckBox *CheckBoxLimit;
 		TMenuItem *BOKZMFParseProtocol;
 		TStringGrid *TableStatusInfo;
+	TMenuItem *N21;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
@@ -245,6 +246,7 @@
 		 	 TShiftState Shift, int X, int Y);
 		void __fastcall CheckBoxLimitClick(TObject *Sender);
 		void __fastcall BOKZMFParseProtocolClick(TObject *Sender);
+	void __fastcall N21Click(TObject *Sender);
 
 
 	private:	// User declarations
