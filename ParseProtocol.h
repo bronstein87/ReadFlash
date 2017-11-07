@@ -123,7 +123,7 @@ namespace parse_prot
 
 	void writeBOKZ1000ProtocolToIKI (CadrInfo& cadrInfo, bool InfoVecEmpty, TDateTime& startDate, double& timeStep, unsigned int& counter);
 
-	void writeProtocolToIKI(CadrInfo& cadrInfo, int counter, int sizeX, int sizeY);
+	void writeProtocolToIKI(CadrInfo& cadrInfo, int counter);
 
 	void readBOKZ601000MKO(ifstream& in, vector <CadrInfo>& cadrInfoVec, unsigned int& counter);
 
@@ -197,20 +197,52 @@ namespace parse_prot
 }
 
 	template <class ProtHandler>
-	void readBOKZ60Protocol(ifstream& in, vector <CadrInfo>& cadrInfoVec,ProtHandler handle)
+	void readBOKZ60Protocol(ifstream& in, vector <CadrInfo>& cadrInfoVec, ProtHandler handle, TDateTime& startDate)
 {
+
+	try
+	{
 	string line;
 	string errorMessage = string("Cчитывание протокола завершено необычным образом. "
 				"Возможно работа прибора была остановлена.");
 	while(getline(in,line))
 	{
-		if(line.find("и) Ориентация				определена") != string::npos)
+		TColor PointColor = clBlue;
+		if(line.find("Состав МШИ ОР:") != string::npos)
 		{
 		   CadrInfo cadrInfo;
+		   cadrInfo.ImageHeight = 512;
+		   cadrInfo.ImageWidth = 512;
+
+		   if(findLine(in, "1) Код состояния 1") != string::npos)
+		   {
+				getline(in, line);
+				vector <string> splitted = split(line, "\t\t\t");
+				// проверяем, что последний УСД не 0
+				if(splitted[1][3] == '0') continue;
+				if(!contains(splitted[1], "010")
+				&& !contains(splitted[1], "020")
+				&& !contains(splitted[1], "000"))
+				{
+					   PointColor = clRed;
+				}
+
+
+		   }
+
 		   // ищем время привязки
-			if(findWord(in,"информации") != string::npos)
+			if(findWord(in, "информации") != string::npos)
 			{
 				in >> cadrInfo.Time;
+				startDate = IncMilliSecond(DateOf(startDate), cadrInfo.Time * 1000);
+				if (cadrInfoVec.size() == 0)
+				{
+					cadrInfo.Time =  startDate.Val;
+				}
+				else
+				{
+					cadrInfo.Time = cadrInfoVec.back().Time + (startDate.Val - cadrInfoVec.back().Time);
+				}
 			}
 		   else throw logic_error(errorMessage);
 
@@ -221,7 +253,7 @@ namespace parse_prot
 				for(int i = 0; i < 4; i++)
 				{
 					getline(in,line);
-					vector<string> splittedStr = split(line,"\t\t\t\t\t");
+					vector<string> splittedStr = split(line, "\t\t\t\t\t");
 					cadrInfo.QuatOrient[i] = atof(splittedStr[1].c_str());
 				}
 
@@ -236,6 +268,9 @@ namespace parse_prot
 		   if(findWord(in,"объектов") != string::npos)
 		   {
 				in >> cadrInfo.CountLocalObj;
+				if (cadrInfo.CountLocalObj == 0 || cadrInfo.CountLocalObj > 100) {
+					continue;
+				}
 		   }
 		   else throw logic_error(errorMessage);
 
@@ -247,10 +282,16 @@ namespace parse_prot
 		   }
 		   else throw logic_error(errorMessage);
 
+		   if (findWord(in, "распознавания") != string::npos)
+			{
+				in >> cadrInfo.Epsilon;
+			}
+			else throw logic_error(errorMessage);
+
 		   // ищем начало массива лок
-		   if(findLine(in,"	Х			Y			I			N") != string::npos)
+		   if(findLine(in, "	Х			Y			I			N") != string::npos)
 		   {
-				vector<string> splittedLocData;
+				vector <string> splittedLocData;
 				const int сountLocObj = cadrInfo.CountLocalObj;
 				ObjectsInfo objInfo;
 
@@ -259,21 +300,29 @@ namespace parse_prot
 						getline(in,line);
 						splittedLocData = split(line,")\t");
 						splittedLocData = split(splittedLocData[1],"\t\t");
-						objInfo.X = atof (splittedLocData[0].c_str());
-						objInfo.Y = atof (splittedLocData[1].c_str());
+
+						if(atof(splittedLocData[0].c_str()) == 0)
+						{
+							cadrInfo.CountLocalObj = i;
+							break;
+						}
+						objInfo.X = atof(splittedLocData[0].c_str());
+						objInfo.Y = atof(splittedLocData[1].c_str());
 						objInfo.Bright = atof(splittedLocData[2].c_str());
 						objInfo.Square = atoi(splittedLocData[3].c_str());
 						cadrInfo.ObjectsList.push_back(objInfo);
 				}
+
 		   }
 			else throw logic_error(errorMessage);
+
 
 		   if(findLine(in,"14) Проекции угловой скорости на оси ПСК") != string::npos)
 		   {
 				for(int i = 0; i < 3; i++)
 				{
 					getline(in,line);
-					vector<string> splittedStr = split(line,"\t");
+					vector <string> splittedStr = split(line,"\t");
 					cadrInfo.OmegaOrient[i] = atof(splittedStr[1].c_str());
 				}
 
@@ -297,8 +346,8 @@ namespace parse_prot
 						break;
 					}
 
-					winInfo.Xstart = (atof(splittedStr[1].c_str()));
-					winInfo.Ystart = (atof(splittedStr[2].c_str()));
+					winInfo.Xstart = atof(splittedStr[1].c_str());
+					winInfo.Ystart = atof(splittedStr[2].c_str());
 					winInfo.Mean = 0;
 					winInfo.Sigma = 0;
 					winInfo.Mv = 0;
@@ -336,11 +385,18 @@ namespace parse_prot
 
 		   cadrInfo.SizeWindowsList = cadrInfo.WindowsList.size();
 		   cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
+		  // cadrInfo.CountLocalObj = cadrInfo.ObjectsList.size();
 
 		   handle (cadrInfo);
 		   cadrInfoVec.push_back(cadrInfo);
+		   writeProtocolToIKI(cadrInfo, cadrInfoVec.size());
 		}
 
+	}
+	}
+	catch (exception &e)
+	{
+		ShowMessage(e.what());
 	}
 
 }
@@ -362,7 +418,7 @@ namespace parse_prot
 		   CadrInfo cadrInfo;
 		   cadrInfo.ImageHeight = 1024;
 		   cadrInfo.ImageWidth = 1024;
-		   
+
 			if (findWord(in, "состояния") != string::npos)
 			{
 				string status1;
@@ -408,7 +464,7 @@ namespace parse_prot
 				ObjectsInfo objInfo;
 				WindowsInfo winInfo;
 
-				for(int i = 0 ; i < maxCountLocObj; i ++)
+				for(int i = 0 ; i < maxCountLocObj; i++)
 				{
 						getline(in,line);
 						splittedStr = split(line,"\t");
@@ -419,17 +475,17 @@ namespace parse_prot
 							  break;
 						}
 						// заполняем все о лок
-						objInfo.X = atof (splittedStr[0].c_str());
-						objInfo.Y = atof (splittedStr[1].c_str());
+						objInfo.X = atof(splittedStr[0].c_str());
+						objInfo.Y = atof(splittedStr[1].c_str());
 						objInfo.Bright = atof(splittedStr[2].c_str());
-						objInfo.Square = atoi (splittedStr[3].c_str());
+						objInfo.Square = atoi(splittedStr[3].c_str());
 						cadrInfo.ObjectsList.push_back(objInfo);
 
 						// заполняем всё о фрагментах
 						winInfo.Mv = 0;
-						winInfo.Mean = (atof(splittedStr[6].c_str()));
-						winInfo.Sigma = (atof(splittedStr[7].c_str()));
-						winInfo.Level = (atof(splittedStr[8].c_str()));
+						winInfo.Mean = atof(splittedStr[6].c_str());
+						winInfo.Sigma = atof(splittedStr[7].c_str());
+						winInfo.Level = atof(splittedStr[8].c_str());
 						winInfo.CountObj = atoi(splittedStr[9].c_str());
 						unsigned short windowSize = atoi(splittedStr[10].c_str());
 
@@ -512,7 +568,7 @@ namespace parse_prot
 					getline(in, line);
 
 					vector <string> splittedStr = split(line, "\t");
-					msecs =  atoi (splittedStr[1].c_str());
+					msecs =  atoi(splittedStr[1].c_str());
 				}
 
 				else
@@ -623,7 +679,7 @@ namespace parse_prot
 
 		   handle (cadrInfo);
 		   cadrInfoVec.push_back(cadrInfo);
-		   writeProtocolToIKI(cadrInfo, cadrInfoVec.size(), 1024, 1024); 
+		   writeProtocolToIKI(cadrInfo, cadrInfoVec.size());
 		}
 
 	}
@@ -997,7 +1053,7 @@ namespace parse_prot
 				else throw logic_error(errorMessage);
 				handler(cadrInfo, clBlue);
 				cadrInfoVec.push_back(cadrInfo);
-				writeProtocolToIKI(cadrInfo, cadrInfoVec.size(), 512, 512);
+				writeProtocolToIKI(cadrInfo, cadrInfoVec.size());
 
 			}
 			else if (line.find(mshior) != string::npos)
@@ -1116,7 +1172,7 @@ namespace parse_prot
 				else throw logic_error(errorMessage);
 				handler(cadrInfo, pointColor);
 				cadrInfoVec.push_back(cadrInfo);
-				writeProtocolToIKI(cadrInfo, cadrInfoVec.size(), 512, 512);
+				writeProtocolToIKI(cadrInfo, cadrInfoVec.size());
 				
 			}
 		}

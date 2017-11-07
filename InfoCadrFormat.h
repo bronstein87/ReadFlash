@@ -90,7 +90,6 @@ struct CadrInfo
 	std::vector <ObjectsInfo> ObjectsList;    //список локализованных объектов
 
 	unsigned short SizeWindowsList;
-
 	std::vector <WindowsInfo> WindowsList; //список прогнозируемых окон
 
 	unsigned short CountLines, CountBlock;  //число считываемых строк и блоков с матрицы

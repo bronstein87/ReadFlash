@@ -252,7 +252,7 @@
 		class Handle {
 		public:
 			_fastcall Handle(TFormGraphOrient* _Form) : Form(_Form) {}
-			virtual void operator()(CadrInfo& cadrInfo) = 0;
+			virtual void operator()(CadrInfo& cadrInfo, TColor pointColor = clBlue) = 0;
 		protected:
 			TFormGraphOrient* Form;
 		};
@@ -260,7 +260,7 @@
 		public:
 			_fastcall HandleLoc60(TFormGraphOrient* _Form) : Handle(_Form) {}
 
-			void operator()(CadrInfo& cadrInfo) {
+			void operator()(CadrInfo& cadrInfo, TColor pointColor = clBlue) {
 				Form->plotter->AddPoint(Form->ChartNumLoc, 0, cadrInfo.Time,cadrInfo.CountLocalObj);
 				Form->plotter->AddPoint(Form->ChartNumDet, 0, cadrInfo.Time,cadrInfo.CountDeterObj);
 			}
@@ -270,16 +270,16 @@
 		public:
 			_fastcall Handle60 (TFormGraphOrient* _Form) : Handle(_Form) {}
 
-			void operator()(CadrInfo& cadrInfo) {
+			void operator()(CadrInfo& cadrInfo, TColor pointColor = clBlue) {
 
-				Form->plotter->AddPoint(Form->ChartAl, 0, cadrInfo.Time, cadrInfo.AnglesOrient[0] * RTD);
-				Form->plotter->AddPoint(Form->ChartDl, 0, cadrInfo.Time, cadrInfo.AnglesOrient[1] * RTD);
-				Form->plotter->AddPoint(Form->ChartAz, 0, cadrInfo.Time, cadrInfo.AnglesOrient[2] * RTD);
-				Form->plotter->AddPoint(Form->ChartNumLoc, 0, cadrInfo.Time,cadrInfo.CountLocalObj);
-				Form->plotter->AddPoint(Form->ChartNumDet, 0, cadrInfo.Time,cadrInfo.CountDeterObj);
-				Form->plotter->AddPoint(Form->ChartWx, 0, cadrInfo.Time,cadrInfo.OmegaOrient[0] * RTM);
-				Form->plotter->AddPoint(Form->ChartWy, 0, cadrInfo.Time,cadrInfo.OmegaOrient[1] * RTM);
-				Form->plotter->AddPoint(Form->ChartWz, 0, cadrInfo.Time,cadrInfo.OmegaOrient[2] * RTM);
+				Form->plotter->AddPoint(Form->ChartAl, 0, cadrInfo.Time, cadrInfo.AnglesOrient[0] * RTD, pointColor);
+				Form->plotter->AddPoint(Form->ChartDl, 0, cadrInfo.Time, cadrInfo.AnglesOrient[1] * RTD, pointColor);
+				Form->plotter->AddPoint(Form->ChartAz, 0, cadrInfo.Time, cadrInfo.AnglesOrient[2] * RTD, pointColor);
+				Form->plotter->AddPoint(Form->ChartNumLoc, 0, cadrInfo.Time,cadrInfo.CountLocalObj, pointColor);
+				Form->plotter->AddPoint(Form->ChartNumDet, 0, cadrInfo.Time,cadrInfo.CountDeterObj, pointColor);
+				Form->plotter->AddPoint(Form->ChartWx, 0, cadrInfo.Time,cadrInfo.OmegaOrient[0] * RTM, pointColor);
+				Form->plotter->AddPoint(Form->ChartWy, 0, cadrInfo.Time,cadrInfo.OmegaOrient[1] * RTM, pointColor);
+				Form->plotter->AddPoint(Form->ChartWz, 0, cadrInfo.Time,cadrInfo.OmegaOrient[2] * RTM, pointColor);
 				Form->plotter->AddPoint(Form->ChartNumFrag, 0, cadrInfo.Time,cadrInfo.CountWindows);
 			}
 
@@ -290,7 +290,7 @@
 			_fastcall HandleM2V(TFormGraphOrient* _Form) : Handle(_Form) {
 			}
 
-			void operator()(CadrInfo& cadrInfo) {
+			void operator()(CadrInfo& cadrInfo, TColor pointColor = clBlue) {
 
 				Form->plotter->AddPoint(Form->ChartAl, 0, cadrInfo.Time, cadrInfo.AnglesOrient[0] * RTD);
 				Form->plotter->AddPoint(Form->ChartDl, 0, cadrInfo.Time, cadrInfo.AnglesOrient[1] * RTD);

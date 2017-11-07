@@ -57,6 +57,7 @@ __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 
 	SourceDir = GetCurrentDir();
 	FormAnimateSetting->ReadINI(SourceDir+"\\options.ini");
+	
 }
 
 void __fastcall TFormGraphOrient::FormCreate(TObject *Sender)
@@ -2162,6 +2163,8 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 			unique_ptr <TStringList> FileList (new TStringList());
 			FileList->Assign(OpenDialog->Files);
 			SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
+			TDateTime startDate;
+			FileAge(FileList->Strings[0], startDate);
 			for (int i = 0; i < FileList->Count; i++)
 			{
 				AnsiString FileName = FileList->Strings[i];
@@ -2181,7 +2184,7 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 				else
 				{
 					Handle60 handle(this);
-					readBOKZ60Protocol(in, vCadrInfo, handle);
+					readBOKZ60Protocol(in, vCadrInfo, handle, startDate);
 				}
 
 				}
@@ -2210,7 +2213,8 @@ void __fastcall TFormGraphOrient::BOKZM2VParseProtocolClick(TObject *Sender) {
 			unique_ptr <TStringList> FileList (new TStringList());
 			FileList->Assign(OpenDialog->Files);
 			SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
-			TDateTime startDate = TDateTime (2017,9,26,0,0,0,0);
+			TDateTime startDate;
+			FileAge(FileList->Strings[0], startDate);
 				for (int i = 0; i < FileList->Count; i++)
 				{
 					AnsiString FileName = FileList->Strings[i];
@@ -2886,7 +2890,8 @@ void __fastcall TFormGraphOrient::BOKZM601000ParseProtocolClick(TObject *Sender)
 			FileList->Assign(OpenDialog->Files);
 			SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
 			unsigned int counter = 0;
-			TDateTime startDate = TDateTime (2017,9,26,0,0,0,0);  //  исправить
+			TDateTime startDate;
+			FileAge(FileList->Strings[0], startDate);
 			for (int i = 0; i < FileList->Count; i++)
 			{
 				AnsiString FileName = FileList->Strings[i];

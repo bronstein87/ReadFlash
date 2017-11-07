@@ -14,7 +14,7 @@ namespace add_string {
 			if (pos == string::npos) pos = str.length();
 			string token = str.substr(prev, pos-prev);
 			int i = token.find_first_not_of(" ");
-			if (!token.empty() && token.find_first_not_of(" ") == 0)
+			if (!token.empty() && token.find_last_not_of(" ") != string::npos)
 				tokens.push_back(token);
 			prev = pos + delim.length();
 		}

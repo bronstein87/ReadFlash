@@ -608,7 +608,7 @@ namespace parse_prot {
 
 
 
-    void ConvertDataDTMI_BOKZM(struct DTMI_BOKZM tmi, struct CadrInfo &mCadr)
+void ConvertDataDTMI_BOKZM(struct DTMI_BOKZM tmi, struct CadrInfo &mCadr)
 {
 	mCadr.IsBinary = true;
 //	mCadr.IsReverse=true;
@@ -689,21 +689,16 @@ bool checkLocFile(ifstream& in)
 	return true;
 }
 
-void writeProtocolToIKI(CadrInfo& cadrInfo, int counter, int sizeX, int sizeY)
+void writeProtocolToIKI(CadrInfo& cadrInfo, int counter)
 {
 	unique_ptr <IKI_img> writer (new IKI_img());
-	writer->Georeferencing.DateTime = cadrInfo.Time;
+	TDateTime dt = cadrInfo.Time;
+	writer->Georeferencing.DateTime = toStdString(DateTimeToStr(dt));
 	writer->Georeferencing.FrameNumber = ++counter;
-	if (cadrInfo.CountDeterObj == 0)
-	{
-	   writer->StarsData.RezStat = 1;
-	}
-	else
-	{
-		writer->StarsData.RezStat = 0;
-	}
-	writer->ImageData.FrameData.FrameHeight = sizeY;
-	writer->ImageData.FrameData.FrameWidth = sizeX;
+    writer->CameraSettings.ResolutionACP = 12;
+
+	writer->ImageData.FrameData.FrameHeight = cadrInfo.ImageHeight;
+	writer->ImageData.FrameData.FrameWidth = cadrInfo.ImageWidth;
 	writer->StarsData.SimulatedFrame.SizeStarList = cadrInfo.SizeObjectsList;
 	writer->ImageData.WindowsData.SizeWindowList = cadrInfo.SizeWindowsList;
 	writer->StarsData.LocalizedCount = cadrInfo.CountLocalObj;
