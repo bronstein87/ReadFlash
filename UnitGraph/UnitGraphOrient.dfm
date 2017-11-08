@@ -2518,6 +2518,9 @@ object FormGraphOrient: TFormGraphOrient
           Caption = #1041#1054#1050#1047'-'#1052#1060
           OnClick = BOKZMFParseProtocolClick
         end
+        object BOKZM2ParseProtocol: TMenuItem
+          Caption = #1041#1054#1050#1047'-'#1052'2'
+        end
       end
       object ReadIKIFormat: TMenuItem
         Caption = #1044#1072#1085#1085#1099#1077' '#1080#1079' '#1092#1086#1088#1084#1072#1090#1072' '#1048#1050#1048

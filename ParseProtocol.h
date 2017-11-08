@@ -130,7 +130,7 @@ namespace parse_prot
 	CadrInfo convertIKIFormatToInfoCadr(IKI_img* reader, bool CompareIKIRes = false);
 
 	template <class ProtHandler>
-	void readBOKZ60LocProtocol(ifstream& in, vector <CadrInfo>& cadrInfoVec, ProtHandler handle)
+	void readBOKZ60LocProtocol(ifstream& in, vector <CadrInfo>& cadrInfoVec, ProtHandler handle, TDateTime& startDate)
 {
 	string line;
 	string errorMessage = string("Cчитывание протокола завершено необычным образом. "
@@ -145,7 +145,18 @@ namespace parse_prot
 				// считываем время привязки
 				if(findWord(in,"информации") != string::npos)
 				{
+
 					in >> cadrInfo.Time;
+					startDate = IncMilliSecond(DateOf(startDate), cadrInfo.Time * 1000);
+					if (cadrInfoVec.size() == 0)
+					{
+						cadrInfo.Time =  startDate.Val;
+					}
+					else
+					{
+						cadrInfo.Time = cadrInfoVec.back().Time + (startDate.Val - cadrInfoVec.back().Time);
+					}
+
 				}
 				else throw logic_error(errorMessage);
 
@@ -191,6 +202,7 @@ namespace parse_prot
 				cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
 				handle(cadrInfo);
 				cadrInfoVec.push_back(cadrInfo);
+				writeProtocolToIKI(cadrInfo, cadrInfoVec.size());
 		   }
 
 	}
@@ -226,8 +238,6 @@ namespace parse_prot
 				{
 					   PointColor = clRed;
 				}
-
-
 		   }
 
 		   // ищем время привязки
@@ -938,9 +948,8 @@ namespace parse_prot
 					cadrInfo.QuatOrient[i] = atof(splittedStr[1].c_str());
 				}
 
-				double matrixOfOrientation [3][3];
-				quatToMatr(cadrInfo.QuatOrient, matrixOfOrientation);
-				MatrixToEkvAngles(matrixOfOrientation, cadrInfo.AnglesOrient);
+				quatToMatr(cadrInfo.QuatOrient, cadrInfo.MatrixOrient);
+				MatrixToEkvAngles(cadrInfo.MatrixOrient, cadrInfo.AnglesOrient);
 		   }
 		   else throw logic_error(errorMessage);// протоколы кончаются на ДТМИ
 
@@ -1185,7 +1194,70 @@ namespace parse_prot
 
 }
 
+	template <class ProtHandler>
+	void readBOKZM2Protocol(ifstream& in, vector <CadrInfo>& cadrInfoVec, ProtHandler handler, TDateTime& dt)
+	{
+		while (getline(in,line))
+		{
+			TColor pointColor = clBlue;
+			if (contains(line, ";;ДТМИ;;;"))
+			{
+				CadrInfo cadrInfo;
+				vector <string> splitted = split(line, ";");
+				struct rmv {operator()(string& str){return str == ";";}};
+				auto delFrom = remove_if(splitted.begin(), splitted.end(), rmv);
+				splitted.erase(delFrom, splitted.end());
+				UnicodeString date = toUString(splitted[0]);
+				UnicodeString time = toUString(splitted[1]);
+				cadrInfo.Time = StrToDateTime(date + " " + time).Val;
+				if(!constains(splitted[6], "000")
+				|| !constains(splitted[6], "010")
+				|| !constains(splitted[6], "020"))
+				{
+					TColor pointColor = clBlue;
+				}
+				cadrInfo.CountLocalObj = atoi(splitted[20].c_str());
+				cadrInfo.CountDeterObj = atoi(splitted[21]c_str());
+				cadrInfo.CountWindows = atoi(splitted[22]c_str());
+				for	(int i = 25; i < 29; i++)
+				{
+					cadrInfo.QuatOrient[i - 24] = atof(splitted[i]);
+				}
 
+				quatToMatr(cadrInfo.QuatOrient, cadrInfo.MatrixOrient);
+				MatrixToEkvAngles(cadrInfo.MatrixOrient, cadrInfo.AnglesOrient);
+
+				cadrInfo.MeanErrorXY = atof(splitted[29]);
+				for	(int i = 30; i < 33; i++)
+				{
+					vector <string> splittedOmega = split(splitted[i], "'");
+					cadrInfo.OmegaOrient[i - 29] = atof(splittedOmega.last());
+				}
+
+				const int objCount = 14;
+				for	(int i = 0; i < objCount; i++)
+				{
+					ObjectsInfo objInfo;
+					getline(in, line);
+					splitted = split(line, ";;");
+					delFrom = remove_if(splitted[3].begin(), splitted.end(), rmv);
+					splitted.erase(delFrom, splitted.end());
+					vector <string> splittedObj = split(splitted[3], ";");
+					objInfo.X = atof(splittedObj[0]);
+					if(objInfo.X == 0) break;
+					objInfo.Y = atof(splittedObj[1]);
+					objInfo.Bright = atof(splittedObj[2]);
+					objInfo.Square = atoi(splittedObj[3]);
+					cadrInfo.ObjectsList.push_back(objInfo);
+				}
+				cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
+
+				handle (cadrInfo);
+				cadrInfoVec.push_back(cadrInfo);
+				writeProtocolToIKI(cadrInfo, cadrInfoVec.size());
+			}
+		}
+	}
 }
 
 

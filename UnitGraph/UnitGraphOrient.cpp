@@ -2178,7 +2178,7 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 				{
 
 					HandleLoc60 handler (this);
-					readBOKZ60LocProtocol (in, vCadrInfo, handler);
+					readBOKZ60LocProtocol (in, vCadrInfo, handler, startDate);
 				}
 
 				else
@@ -2967,6 +2967,8 @@ void __fastcall TFormGraphOrient::BOKZMFParseProtocolClick(TObject *Sender)
 		}
 }
 //---------------------------------------------------------------------------
+
+
 
 
 

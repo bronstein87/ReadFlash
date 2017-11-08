@@ -207,6 +207,7 @@
 		TCheckBox *CheckBoxLimit;
 		TMenuItem *BOKZMFParseProtocol;
 		TStringGrid *TableStatusInfo;
+	TMenuItem *BOKZM2ParseProtocol;
 
 		void __fastcall MenuSaveClick(TObject *Sender);
 		void __fastcall MenuClearClick(TObject *Sender);
