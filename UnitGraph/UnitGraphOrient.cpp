@@ -2290,14 +2290,14 @@ void TFormGraphOrient::CalculateSeriesSKO()
 	int numberRow = 1;
 
 	if (ChartFone->SeriesCount()) {
-		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.MeanBright;} } GetMeanBright;
+		struct { double operator() (const CadrInfo& a, bool& f) {f = false; return a.MeanBright;} } GetMeanBright;
 		statParam = calculateStatParam(vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMeanBright);
 		AddRowToStatTable(numberRow++, "Уровень фона, ЕМР", statParam, 8, 2);
 		ChartFone->Series[0]->Title += " CКО: " + FloatToStrF(statParam.sigma, ffFixed, 8, 4);
 	}
 
 	if (ChartNoise->SeriesCount()) {
-		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.SigmaBright;} } GetSigmaBright;
+		struct { double operator() (const CadrInfo& a, bool& f) {f = false; return a.SigmaBright;} } GetSigmaBright;
 		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetSigmaBright);
 		AddRowToStatTable(numberRow++, "СКО фона, ЕМР", statParam, 8, 2);
 		ChartNoise->Series[0]->Title += " CКО: " + FloatToStrF(statParam.sigma, ffFixed, 8, 4);
@@ -2593,18 +2593,28 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 						double Time =  vCadrInfo.back().Time;
 						AddRowToStatusTable(vCadrInfo.back());
 
+						plotter->SetTitle("модель");
+						plotter->SetSeriesColor(clLime);
+						plotter->AddPoint(ChartAl, 1, Time, vCadrInfo.back().AnglesModel[0] * RTD);
+						plotter->AddPoint(ChartDl, 1, Time, vCadrInfo.back().AnglesModel[1] * RTD);
+						plotter->AddPoint(ChartAz, 1, Time, vCadrInfo.back().AnglesModel[2] * RTD);
+						plotter->AddPoint(ChartWx, 1, Time, vCadrInfo.back().OmegaModel[0] * RTM);
+						plotter->AddPoint(ChartWy, 1, Time, vCadrInfo.back().OmegaModel[1] * RTM);
+						plotter->AddPoint(ChartWz, 1, Time, vCadrInfo.back().OmegaModel[2] * RTM);
+
+						plotter->SetShowLines(false);
+						plotter->SetTitle("измерения");
+						plotter->SetSeriesColor(clBlue);
+						plotter->SetDateTimeX(FormAnimateSetting->CheckBoxDateTime->Checked);
+
+						plotter->AddPoint(ChartNumFrag, 0, Time, vCadrInfo.back().CountWindows);
+						plotter->AddPoint(ChartNumLoc, 0, Time, vCadrInfo.back().CountLocalObj);
+						plotter->AddPoint(ChartFone, 0, Time, vCadrInfo.back().MeanBright);
+						plotter->AddPoint(ChartNoise, 0, Time, vCadrInfo.back().SigmaBright);
+						//plotter->AddPoint(ChartTemp, 0, Time, vCadrInfo.back().MatrixTemp);
+
 						if (vCadrInfo.back().IsOrient)
 						{
-                            plotter->SetShowLines(false);
-							plotter->SetTitle("измерения");
-							plotter->SetSeriesColor(clBlue);
-							plotter->SetDateTimeX(FormAnimateSetting->CheckBoxDateTime->Checked);
-
-							plotter->AddPoint(ChartNumFrag, 0, Time, vCadrInfo.back().CountWindows);
-							plotter->AddPoint(ChartNumLoc, 0, Time, vCadrInfo.back().CountLocalObj);
-							plotter->AddPoint(ChartFone, 0, Time, vCadrInfo.back().MeanBright);
-							plotter->AddPoint(ChartNoise, 0, Time, vCadrInfo.back().SigmaBright);
-							//plotter->AddPoint(ChartTemp, 0, Time, vCadrInfo.back().MatrixTemp);
 							plotter->AddPoint(ChartNumDet, 0, Time, vCadrInfo.back().CountDeterObj);
 							plotter->AddPoint(ChartMx, 0, Time, vCadrInfo.back().MeanErrorX * 1000.);
 							plotter->AddPoint(ChartMy, 0, Time, vCadrInfo.back().MeanErrorY * 1000.);
@@ -2625,14 +2635,6 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 							plotter->AddPoint(ChartWy, 0, Time, vCadrInfo.back().OmegaOrient[1] * RTM);
 							plotter->AddPoint(ChartWz, 0, Time, vCadrInfo.back().OmegaOrient[2] * RTM);
 
-							plotter->SetTitle("модель");
-							plotter->SetSeriesColor(clLime);
-							plotter->AddPoint(ChartAl, 1, Time, vCadrInfo.back().AnglesModel[0] * RTD);
-							plotter->AddPoint(ChartDl, 1, Time, vCadrInfo.back().AnglesModel[1] * RTD);
-							plotter->AddPoint(ChartAz, 1, Time, vCadrInfo.back().AnglesModel[2] * RTD);
-							plotter->AddPoint(ChartWx, 1, Time, vCadrInfo.back().OmegaModel[0] * RTM);
-							plotter->AddPoint(ChartWy, 1, Time, vCadrInfo.back().OmegaModel[1] * RTM);
-							plotter->AddPoint(ChartWz, 1, Time, vCadrInfo.back().OmegaModel[2] * RTM);
 
 							//статистика по фрагментам
 							int iObject = 0;
@@ -2967,9 +2969,130 @@ void __fastcall TFormGraphOrient::BOKZMFParseProtocolClick(TObject *Sender)
 		}
 }
 //---------------------------------------------------------------------------
+void __fastcall TFormGraphOrient::N21Click(TObject *Sender)
+{
+	OpenDialog->Options.Clear();
+	OpenDialog->Filter = "txt|*.txt";
+	if (OpenDialog->Execute()) {
+		SetCurrentDir(ExtractFileDir(OpenDialog->FileName));
+		FILE *fbin;
+		unsigned short bufShort1, bufShort2;
+		unsigned char  bufC1, bufC2;
+		unsigned short bufDec;
+		fbin = fopen("Telem_M2.bin", "wb");
+		std::ifstream finp (AnsiString(OpenDialog->FileName).c_str());
+		if (finp.is_open()) {
+			for (int j = 0; j < 64; j++) {
+				finp >> dec;
+				finp>>bufDec>>" - ";
 
+				finp >> uppercase >> hex;
+				for (int i = 0; i < 8; i++) {
+					finp >> bufShort2 >> bufShort1;
+					bufC1 = bufShort1;
+					bufC2 = bufShort2;
+					fwrite(&bufC1, 1, 1, fbin);
+					fwrite(&bufC2, 1, 1, fbin);
+				}
+			}
+		}
 
+		finp.close();
+		fclose(fbin);
 
+		fbin = fopen("Telem_M2.bin", "rb");
+		unsigned short buf;
+		DTMI_M2 dtmi;
+		char *ptr;
+		int addr;
+		while(!feof(fbin)) {
+			fread(&buf, 2, 1, fbin);
+			if (buf == 0x42C3) {
+				fread(&buf, 2, 1, fbin);
+				switch (buf) {
+					case 0x7AAA: {
+						fread(&dtmi, 2, 29, fbin);
+						break;
+					}
+					case 0x8AAA: {
+						ptr  = (char*) (&dtmi.quatLast[3]);
+						addr = (int)(ptr)+2;
+						fread((int *)addr, 2, 29, fbin);
+						break;
+					}
+					case 0x9AAA: {
+						fread(&dtmi.LocalList1[0].bright, 2, 29, fbin);
+						break;
+					}
+					case 0xAAAA: {
+						ptr  = (char*) (&dtmi.LocalList1[4].x);
+						addr = (int)(ptr)+2;
+						fread((int *)addr, 2, 29, fbin);
+						break;
+					}
+					case 0xBAAA: {
+						fread(&dtmi.LocalList1[7].size, 2, 29, fbin);
+						break;
+					}
+					case 0xCAAA: {
+						ptr  = (char*) (&dtmi.LocalList1[11].y);
+						addr = (int)(ptr)+2;
+						fread((int *)addr, 2, 29, fbin);
+						break;
+					}
+					case 0xDAAA: {
+						fread(&dtmi.LocalList2[0].x, 2, 29, fbin);
+						break;
+					}
+					case 0xEAAA: {
+						ptr  = (char*) (&dtmi.LocalList2[3].bright);
+						addr = (int)(ptr)+2;
+						fread((int *)addr, 2, 29, fbin);
+						break;
+					}
+					case 0xFAAA: {
+						fread(&dtmi.LocalList2[7].y, 2, 29, fbin);
+						break;
+					}
+					case 0xFAAB: {
+						ptr  = (char*) (&dtmi.LocalList2[10].size);
+						addr = (int)(ptr)+2;
+						fread((int *)addr, 2, 29, fbin);
+						break;
+					}
+					case 0xFAAC: {
+						fread(&dtmi.LocalList2[14].bright, 2, 29, fbin);
+						break;
+					}
+					case 0xFAAD: {
+						ptr  = (char*) (&dtmi.ResultList[3].x);
+						addr = (int)(ptr)+2;
+						fread((int *)addr, 2, 29, fbin);
+						break;
+					}
+					case 0xFAAE: {
+						fread(&dtmi.ResultList[6].size, 2, 29, fbin);
+						break;
+					}
+					case 0xFAAF: {
+						ptr  = (char*) (&dtmi.ResultList[10].y);
+						addr = (int)(ptr)+2;
+						fread((int *)addr, 2, 29, fbin);
+						break;
+					}
+					default: break;
+				}
+			}
+		}
+		fclose(fbin);
+
+		std::ofstream fout ("Telem_M2.txt");
+		PrintDTMI_M2(fout, dtmi);
+		fout.close();
+	}
+
+}
+//---------------------------------------------------------------------------
 
 
 

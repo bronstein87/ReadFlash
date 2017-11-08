@@ -669,7 +669,73 @@ void PrintDTMI_BOKZM(ofstream &file, struct DTMI_BOKZM tmi)
 	file<<flush;
 }
 
+void PrintDTMI_M2(ofstream &file, struct DTMI_M2 tmi) {
+	file << "____________________________________" << "\n";
+	file << "Массив ДТМИ" << "\n";
+	file << "Tpr\t" << tmi.timeBOKZ << "\n";
+	file << uppercase << hex << setfill('0');
+	file << "КС1\t" << "0x" << setw(4) << tmi.status1 << "\n";
+	file << "КС2\t" << "0x" << setw(4) << tmi.status2 << "\n";
+	file << "POST\t" << "0x" << setw(4) << tmi.POST << "\n";
+	file << dec << setfill(' ');
+	file << "Зав. №\t" << tmi.serialNumber << "\n";
+	file << "Texp, мс:\t" << tmi.timeExp << "\n";
+	file << "Mean: \t" << tmi.meanCadr[0] << "\n";
+	file << "Sigma: \t" << tmi.meanCadr[1] << "\n";
+	file << "NumLoc1: \t" << tmi.nLocalObj1 << "\n";
+	file << "NumLoc2: \t" << tmi.nLocalObj2 << "\n";
+	file << "NumAll1: \t" << tmi.nLocal[0] << "\n";
+	file << "NumAll2: \t" << tmi.nLocal[1] << "\n";
+	file << "NumStore: \t" << tmi.nStoreObj << "\n";
+	file << "NumDet: \t" << tmi.nDeterObj << "\n";
+	file << "NumFrag:\t" << tmi.nWindows << "\n";
+	file << "Sector:\t" << tmi.nSec << "\n";
 
+	file << setw(6) << "№" << " X, pix" << " Y, pix" << " Bright" <<
+			" Nel" << "\n";
+	for (int i = 0; i < 15; i++) {
+		file << setw(6) << (i + 1) << "\t";
+		file << tmi.LocalList1[i].x << "\t" << tmi.LocalList1[i].y << "\t";
+		file << tmi.LocalList1[i].bright << "\t" << tmi.LocalList1[i].size << "\n";
+	}
+
+	file << setw(6) << "№" << " X, pix" << " Y, pix" << " Bright" <<
+			" Nel" << "\n";
+	for (int i = 0; i < 15; i++) {
+		file << setw(6) << (i + 1) << "\t";
+		file << tmi.LocalList2[i].x << "\t" << tmi.LocalList2[i].y << "\t";
+		file << tmi.LocalList2[i].bright << "\t" << tmi.LocalList2[i].size << "\n";
+	}
+
+	file << setw(6) << "№" << " X, pix" << " Y, pix" << " Bright" <<
+			" Nel" << "\n";
+	for (int i = 0; i < 12; i++) {
+		file << setw(6) << (i + 1) << "\t";
+		file << tmi.ResultList[i].x << "\t" << tmi.ResultList[i].y << "\t";
+		file << tmi.ResultList[i].bright << "\t" << tmi.ResultList[i].size << "\n";
+	}
+	file << setw(6) << "№" << " X, pix" << " Y, pix" << "\n";
+	for (int i = 0; i < 16; i++) {
+		file << setw(6) << (i + 1) << "\t";
+		file << tmi.nObjectWindow[i] << "\n";
+	}
+	for (int i = 0; i < 3; i++) {
+		file << "Wop[" << i << "]:\t" << tmi.omega[i] << "\n";
+	}
+	for (int i = 0; i < 3; i++) {
+		file << "Vline[" << i << "]:\t" << tmi.Vline[i] << "\n";
+	}
+	file << "Tlst:\t" << GetTimeString(tmi.timeQuatLast).c_str() << "\n";
+	for (int i = 0; i < 4; i++) {
+		file << "Qlst[" << i << "]:\t" << tmi.quatLast[i] << "\n";
+	}
+	file << "Эпоха: \t" << tmi.Epoch << "\n";
+	file << "MaxHist: \t" << tmi.maxHist << "\n";
+	file << "MaxHistX: \t" << tmi.maxHistX << "\n";
+	file << "MaxHistY: \t" << tmi.maxHistY << "\n";
+	file << "____________________________________" << "\n";
+	file << flush;
+}
 
 // проверяем содержит ли протокол режим локализации
 bool checkLocFile(ifstream& in)
@@ -1044,7 +1110,7 @@ CadrInfo convertIKIFormatToInfoCadr(IKI_img* reader, bool CompareIKIRes)
 		}
 	}
 
-	if (CompareIKIRes)
+	if ((CompareIKIRes) && (!cadrInfo.StatOrient))
 	{
 		for (int i = 0; i < 3; i++)
 		{

@@ -3,7 +3,7 @@ object FormGraphOrient: TFormGraphOrient
   Top = 48
   Caption = #1055#1072#1088#1072#1084#1077#1090#1088#1099' '#1086#1088#1080#1077#1085#1090#1072#1094#1080#1080
   ClientHeight = 825
-  ClientWidth = 1454
+  ClientWidth = 1440
   Color = clBtnFace
   Constraints.MinWidth = 825
   Font.Charset = DEFAULT_CHARSET
@@ -21,7 +21,7 @@ object FormGraphOrient: TFormGraphOrient
   OnMouseWheelUp = FormMouseWheelUp
   OnResize = FormResize
   DesignSize = (
-    1454
+    1440
     825)
   PixelsPerInch = 96
   TextHeight = 13
@@ -137,7 +137,7 @@ object FormGraphOrient: TFormGraphOrient
     Top = 8
     Width = 1430
     Height = 777
-    ActivePage = TabSheetTableStat
+    ActivePage = TabSheetStarsMotion
     Anchors = [akLeft, akTop, akRight, akBottom]
     TabOrder = 8
     object TabSheetAngles: TTabSheet
@@ -175,7 +175,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 0
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1149
         DefaultCanvas = 'TTeeCanvas3D'
         PrintMargins = (
           15
@@ -214,7 +213,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 1
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1149
         DefaultCanvas = 'TTeeCanvas3D'
         PrintMargins = (
           15
@@ -253,7 +251,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 2
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1144
         DefaultCanvas = 'TTeeCanvas3D'
         PrintMargins = (
           15
@@ -292,7 +289,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 0
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1138
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -319,7 +315,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 1
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1141
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -346,7 +341,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 2
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1146
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -386,7 +380,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 0
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1150
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -419,7 +412,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 1
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1150
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -452,7 +444,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 2
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1150
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -487,7 +478,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 0
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1149
         DefaultCanvas = 'TTeeCanvas3D'
         PrintMargins = (
           15
@@ -520,7 +510,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 1
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1149
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -548,7 +537,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 2
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1153
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -588,7 +576,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 0
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1146
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -621,7 +608,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 1
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1146
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -654,7 +640,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 2
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1150
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -688,7 +673,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 0
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1153
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -715,7 +699,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 1
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1149
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -742,7 +725,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 2
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1149
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -776,7 +758,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 0
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1146
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -803,7 +784,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 1
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1150
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -836,7 +816,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 2
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1146
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -870,7 +849,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 0
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1149
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -897,7 +875,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 1
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1153
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -924,7 +901,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 2
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1149
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -1012,14 +988,9 @@ object FormGraphOrient: TFormGraphOrient
         Title.Text.Strings = (
           #1044#1074#1080#1078#1077#1085#1080#1077' '#1079#1074#1105#1079#1076)
         OnClickLegend = ChartMatrixClickLegend
-        BottomAxis.Automatic = False
-        BottomAxis.AutomaticMaximum = False
-        BottomAxis.AutomaticMinimum = False
         BottomAxis.Axis.Color = 4210752
         BottomAxis.Grid.Color = 11119017
         BottomAxis.LabelsFormat.Font.Name = 'Verdana'
-        BottomAxis.Maximum = 50.711671397499430000
-        BottomAxis.Minimum = -38.651309224461200000
         BottomAxis.TicksInner.Color = 11119017
         BottomAxis.Title.Font.Name = 'Verdana'
         Chart3DPercent = 1
@@ -1033,15 +1004,10 @@ object FormGraphOrient: TFormGraphOrient
         DepthTopAxis.LabelsFormat.Font.Name = 'Verdana'
         DepthTopAxis.TicksInner.Color = 11119017
         DepthTopAxis.Title.Font.Name = 'Verdana'
-        LeftAxis.Automatic = False
-        LeftAxis.AutomaticMaximum = False
-        LeftAxis.AutomaticMinimum = False
         LeftAxis.Axis.Color = 4210752
         LeftAxis.Grid.Color = 11119017
         LeftAxis.Inverted = True
         LeftAxis.LabelsFormat.Font.Name = 'Verdana'
-        LeftAxis.Maximum = 9815.627735467102000000
-        LeftAxis.Minimum = -7509.092588074813000000
         LeftAxis.TicksInner.Color = 11119017
         LeftAxis.Title.Font.Name = 'Verdana'
         Panning.MouseWheel = pmwNone
@@ -1070,7 +1036,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 0
         Anchors = [akLeft, akTop, akRight, akBottom]
-        ExplicitWidth = 1107
         DefaultCanvas = 'TTeeCanvas3D'
         PrintMargins = (
           15
@@ -1214,6 +1179,7 @@ object FormGraphOrient: TFormGraphOrient
         Top = 715
         Width = 257
         Height = 15
+        Anchors = [akLeft, akBottom]
         Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100' '#1084#1072#1089#1096#1090#1072#1073#1080#1088#1086#1074#1072#1085#1080#1077
         TabOrder = 4
       end
@@ -1334,7 +1300,6 @@ object FormGraphOrient: TFormGraphOrient
         RowCount = 30
         TabOrder = 3
         OnDrawCell = TableWindowsInfoDrawCell
-        ExplicitWidth = 577
         ColWidths = (
           64
           64
@@ -1449,7 +1414,6 @@ object FormGraphOrient: TFormGraphOrient
         RowCount = 30
         TabOrder = 2
         OnDrawCell = TableObjectsInfoDrawCell
-        ExplicitWidth = 577
         ColWidths = (
           64
           64
@@ -1495,10 +1459,6 @@ object FormGraphOrient: TFormGraphOrient
     object ShowFragmentTab: TTabSheet
       Caption = #1054#1090#1086#1073#1088#1072#1078#1077#1085#1080#1077' '#1092#1088#1072#1075#1084#1077#1085#1090#1086#1074
       ImageIndex = 8
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 1152
-      ExplicitHeight = 0
       object FragmentShowScrollBox: TScrollBox
         Left = 0
         Top = 33
@@ -1507,7 +1467,6 @@ object FormGraphOrient: TFormGraphOrient
         Align = alClient
         TabOrder = 0
         OnResize = FragmentShowScrollBoxResize
-        ExplicitWidth = 1152
       end
       object GroupBox1: TGroupBox
         Left = 0
@@ -1517,7 +1476,6 @@ object FormGraphOrient: TFormGraphOrient
         Align = alTop
         TabOrder = 1
         StyleElements = [seFont, seClient]
-        ExplicitWidth = 1152
         object Label8: TLabel
           Left = 405
           Top = 12
@@ -1846,7 +1804,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 2
         Anchors = [akTop, akRight]
-        ExplicitLeft = 575
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -1917,7 +1874,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 3
         Anchors = [akRight, akBottom]
-        ExplicitLeft = 575
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -1998,7 +1954,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 0
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1149
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -2072,7 +2027,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 1
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1153
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -2146,7 +2100,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 2
         Anchors = [akLeft, akRight]
-        ExplicitWidth = 1149
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -2293,7 +2246,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 1
         Anchors = [akTop, akRight]
-        ExplicitLeft = 583
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -2364,7 +2316,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 2
         Anchors = [akRight, akBottom]
-        ExplicitLeft = 583
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
@@ -2525,6 +2476,10 @@ object FormGraphOrient: TFormGraphOrient
       object ReadIKIFormat: TMenuItem
         Caption = #1044#1072#1085#1085#1099#1077' '#1080#1079' '#1092#1086#1088#1084#1072#1090#1072' '#1048#1050#1048
         OnClick = ReadIKIFormatClick
+      end
+      object N21: TMenuItem
+        Caption = #1058#1077#1083#1077#1084#1077#1090#1088#1080#1103' '#1041#1054#1050#1047'-'#1052'2 ('#1042#1086#1089#1090#1086#1095#1085#1099#1081')'
+        OnClick = N21Click
       end
     end
     object MenuSave: TMenuItem
