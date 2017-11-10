@@ -957,16 +957,14 @@ CadrInfo convertIKIFormatToInfoCadr(IKI_img* reader, bool CompareIKIRes)
 	cadrInfo.ImageHeight = reader->ImageData.FrameData.FrameHeight;
 	cadrInfo.ImageWidth = reader->ImageData.FrameData.FrameWidth;
 	cadrInfo.SizePixel = reader->CameraSettings.PixelSize;
+	cadrInfo.ResolutionACP = pow(2., reader->CameraSettings.ResolutionACP) - 1;
 	cadrInfo.StatOrient = reader->StarsData.RezStat;
 	cadrInfo.CountStars = reader->StarsData.SimulatedFrame.strrec;
 	cadrInfo.CountWindows = reader->ImageData.WindowsData.SizeWindowList;
-	cadrInfo.CountLocalObj = reader->StarsData.SizeLocalList;
+	cadrInfo.CountLocalObj = reader->StarsData.LocalizedCount;  //.SizeLocalList;
 	cadrInfo.CountDeterObj = reader->StarsData.RecognizedCount;
 	cadrInfo.SizeStarsList = reader->StarsData.SimulatedFrame.SizeStarList;
-	cadrInfo.SizeObjectsList = cadrInfo.CountLocalObj;
-	cadrInfo.ResolutionACP = pow(2., reader->CameraSettings.ResolutionACP) - 1;
-
-	// cadrInfo.SizeObjectsList =  cadrInfo.CountDeterObj;
+	cadrInfo.SizeObjectsList = reader->StarsData.SizeLocalList; //cadrInfo.CountLocalObj;
 	cadrInfo.SizeWindowsList = cadrInfo.CountWindows;
 
 	for (int i = 0; i < cadrInfo.SizeStarsList; i++) {

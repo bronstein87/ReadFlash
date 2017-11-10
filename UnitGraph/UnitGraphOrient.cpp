@@ -2414,7 +2414,7 @@ void TFormGraphOrient::CalculateSeriesSKO()
 		statParam.mean *= RTM; 		statParam.sigma *= RTM;
 		statParam.min *= RTM;		statParam.max *= RTM;
 		AddRowToStatTable(numberRow++, "Угловая скорость по оси OX, угл. мин/с (угл. сек/с)", statParam, 8, 4);
-		ChartWx->Series[0]->Title += " CКО: " + FloatToStrF(statParam.sigma, ffFixed, 8, 4);
+		ChartWx->Series[1]->Title += " CКО: " + FloatToStrF(statParam.sigma, ffFixed, 8, 4);
 	}
 
 	if (ChartWy->SeriesCount()) {
@@ -2423,7 +2423,7 @@ void TFormGraphOrient::CalculateSeriesSKO()
 		statParam.mean *= RTM; 		statParam.sigma *= RTM;
 		statParam.min *= RTM;		statParam.max *= RTM;
 		AddRowToStatTable(numberRow++, "Угловая скорость по оси OY, угл. мин/с (угл. сек/с)", statParam, 8, 4);
-		ChartWy->Series[0]->Title += " CКО: " + FloatToStrF(statParam.sigma, ffFixed, 8, 4);
+		ChartWy->Series[1]->Title += " CКО: " + FloatToStrF(statParam.sigma, ffFixed, 8, 4);
 	}
 
 	if (ChartWz->SeriesCount()) {
@@ -2432,7 +2432,7 @@ void TFormGraphOrient::CalculateSeriesSKO()
 		statParam.mean *= RTM; 		statParam.sigma *= RTM;
 		statParam.min *= RTM;		statParam.max *= RTM;
 		AddRowToStatTable(numberRow++, "Угловая скорость по оси OZ, угл. мин/с (угл. сек/с)", statParam, 8, 4);
-		ChartWz->Series[0]->Title += " CКО: " + FloatToStrF(statParam.sigma, ffFixed, 8, 4);
+		ChartWz->Series[1]->Title += " CКО: " + FloatToStrF(statParam.sigma, ffFixed, 8, 4);
 	}
 
 	if (ChartWxError->SeriesCount()) {
@@ -2592,21 +2592,20 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 						vCadrInfo.push_back(move(convertIKIFormatToInfoCadr(reader.get(), CompareIKIRes)));
 						double Time =  vCadrInfo.back().Time;
 						AddRowToStatusTable(vCadrInfo.back());
-
-						plotter->SetTitle("модель");
-						plotter->SetSeriesColor(clLime);
-						plotter->AddPoint(ChartAl, 1, Time, vCadrInfo.back().AnglesModel[0] * RTD);
-						plotter->AddPoint(ChartDl, 1, Time, vCadrInfo.back().AnglesModel[1] * RTD);
-						plotter->AddPoint(ChartAz, 1, Time, vCadrInfo.back().AnglesModel[2] * RTD);
-						plotter->AddPoint(ChartWx, 1, Time, vCadrInfo.back().OmegaModel[0] * RTM);
-						plotter->AddPoint(ChartWy, 1, Time, vCadrInfo.back().OmegaModel[1] * RTM);
-						plotter->AddPoint(ChartWz, 1, Time, vCadrInfo.back().OmegaModel[2] * RTM);
-
-						plotter->SetShowLines(false);
-						plotter->SetTitle("измерения");
-						plotter->SetSeriesColor(clBlue);
 						plotter->SetDateTimeX(FormAnimateSetting->CheckBoxDateTime->Checked);
 
+						plotter->SetShowLines(false);
+						plotter->SetTitle("модель");
+						plotter->SetSeriesColor(clLime);
+						plotter->AddPoint(ChartAl, 0, Time, vCadrInfo.back().AnglesModel[0] * RTD);
+						plotter->AddPoint(ChartDl, 0, Time, vCadrInfo.back().AnglesModel[1] * RTD);
+						plotter->AddPoint(ChartAz, 0, Time, vCadrInfo.back().AnglesModel[2] * RTD);
+						plotter->AddPoint(ChartWx, 0, Time, vCadrInfo.back().OmegaModel[0] * RTM);
+						plotter->AddPoint(ChartWy, 0, Time, vCadrInfo.back().OmegaModel[1] * RTM);
+						plotter->AddPoint(ChartWz, 0, Time, vCadrInfo.back().OmegaModel[2] * RTM);
+
+						plotter->SetTitle("измерения");
+						plotter->SetSeriesColor(clBlue);
 						plotter->AddPoint(ChartNumFrag, 0, Time, vCadrInfo.back().CountWindows);
 						plotter->AddPoint(ChartNumLoc, 0, Time, vCadrInfo.back().CountLocalObj);
 						plotter->AddPoint(ChartFone, 0, Time, vCadrInfo.back().MeanBright);
@@ -2628,12 +2627,12 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 							plotter->AddPoint(ChartWxError, 0, Time, vCadrInfo.back().OmegaDiff[0] * RTS);
 							plotter->AddPoint(ChartWyError, 0, Time, vCadrInfo.back().OmegaDiff[1] * RTS);
 							plotter->AddPoint(ChartWzError, 0, Time, vCadrInfo.back().OmegaDiff[2] * RTS);
-							plotter->AddPoint(ChartAl, 0, Time, vCadrInfo.back().AnglesOrient[0] * RTD);
-							plotter->AddPoint(ChartDl, 0, Time, vCadrInfo.back().AnglesOrient[1] * RTD);
-							plotter->AddPoint(ChartAz, 0, Time, vCadrInfo.back().AnglesOrient[2] * RTD);
-							plotter->AddPoint(ChartWx, 0, Time, vCadrInfo.back().OmegaOrient[0] * RTM);
-							plotter->AddPoint(ChartWy, 0, Time, vCadrInfo.back().OmegaOrient[1] * RTM);
-							plotter->AddPoint(ChartWz, 0, Time, vCadrInfo.back().OmegaOrient[2] * RTM);
+							plotter->AddPoint(ChartAl, 1, Time, vCadrInfo.back().AnglesOrient[0] * RTD);
+							plotter->AddPoint(ChartDl, 1, Time, vCadrInfo.back().AnglesOrient[1] * RTD);
+							plotter->AddPoint(ChartAz, 1, Time, vCadrInfo.back().AnglesOrient[2] * RTD);
+							plotter->AddPoint(ChartWx, 1, Time, vCadrInfo.back().OmegaOrient[0] * RTM);
+							plotter->AddPoint(ChartWy, 1, Time, vCadrInfo.back().OmegaOrient[1] * RTM);
+							plotter->AddPoint(ChartWz, 1, Time, vCadrInfo.back().OmegaOrient[2] * RTM);
 
 
 							//статистика по фрагментам
