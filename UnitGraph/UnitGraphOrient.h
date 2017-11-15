@@ -249,7 +249,7 @@
 		void __fastcall CheckBoxLimitClick(TObject *Sender);
 		void __fastcall BOKZMFParseProtocolClick(TObject *Sender);
 	void __fastcall N21Click(TObject *Sender);
-
+	void __fastcall BOKZM2ParseProtocolClick(TObject *Sender);
 
 	private:	// User declarations
 
@@ -309,6 +309,28 @@
 				Form->plotter->AddPoint(Form->ChartTemp, 0, cadrInfo.Time, cadrInfo.MatrixTemp);
 				Form->plotter->AddPoint(Form->ChartFone, 0, cadrInfo.Time,cadrInfo.MeanBright);
 				Form->plotter->AddPoint(Form->ChartNoise, 0, cadrInfo.Time,cadrInfo.SigmaBright);
+			}
+
+		};
+
+		class HandleM2 : public Handle {
+
+		public:
+			_fastcall HandleM2(TFormGraphOrient* _Form) : Handle(_Form) {
+			}
+
+			void operator()(CadrInfo& cadrInfo, TColor pointColor = clBlue) {
+
+				Form->plotter->AddPoint(Form->ChartAl, 0, cadrInfo.Time, cadrInfo.AnglesOrient[0] * RTD);
+				Form->plotter->AddPoint(Form->ChartDl, 0, cadrInfo.Time, cadrInfo.AnglesOrient[1] * RTD);
+				Form->plotter->AddPoint(Form->ChartAz, 0, cadrInfo.Time, cadrInfo.AnglesOrient[2] * RTD);
+				Form->plotter->AddPoint(Form->ChartWx, 0, cadrInfo.Time,cadrInfo.OmegaOrient[0] / 60);
+				Form->plotter->AddPoint(Form->ChartWy, 0, cadrInfo.Time,cadrInfo.OmegaOrient[1] / 60);
+				Form->plotter->AddPoint(Form->ChartWz, 0, cadrInfo.Time,cadrInfo.OmegaOrient[2] / 60);
+				Form->plotter->AddPoint(Form->ChartNumFrag, 0, cadrInfo.Time,cadrInfo.CountWindows);
+				Form->plotter->AddPoint(Form->ChartNumLoc, 0, cadrInfo.Time,cadrInfo.CountLocalObj);
+				Form->plotter->AddPoint(Form->ChartNumDet, 0, cadrInfo.Time,cadrInfo.CountDeterObj);
+				Form->plotter->AddPoint(Form->ChartMxy, 0, cadrInfo.Time, cadrInfo.MeanErrorXY);
 			}
 
 		};

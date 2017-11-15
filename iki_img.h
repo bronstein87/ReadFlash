@@ -2,7 +2,7 @@
 #define IKI_IMG_H
 #include <fstream>
 #include <stdio.h>
-//#include <Classes.hpp>
+// #include <Classes.hpp>
 #include <string.h>
 #include <iostream>   // std::cout
 #include <sstream>
@@ -454,12 +454,6 @@ struct videoframe
 	setwindow WindowsData; // окна
 };
 
-
-
-
-
-
-
 #pragma end_region
 
 const int MassType[3] = {1, 2, 4};
@@ -467,71 +461,71 @@ const int MassType[3] = {1, 2, 4};
 class IKI_img
 {
 private:
-    template <typename T>
-    static void _FreeMemory(T*&point)
-    {
-        delete point;
-        point = NULL;
-    }
-    // ---------------------------------------------------------------------------
-
-    template <typename T>
-    static void _FreeMemoryArray (T*&array)
-    {
-        delete[]array;
-        array = NULL;
-    }
-    // ---------------------------------------------------------------------------
-
-    template <typename T>
-    string toString(T val)
-    {
-        ostringstream oss;
-        oss << val;
-        return oss.str();
-    }
-    // ---------------------------------------------------------------------------
-
-    template <typename T>
-    string FormatFloatTo_string(string Format, T val)
-    {
-        string bufer_str;
-        char * st_buf = new char[100];
-        sprintf(st_buf, Format.c_str(), val);
-        bufer_str = st_buf;
-        delete[]st_buf;
-        return bufer_str;
-    }
+	template<typename T>
+	inline static void _FreeMemory(T*&point)
+	{
+		delete point;
+		point = NULL;
+	}
 	// ---------------------------------------------------------------------------
-	void print_string(FILE* FStream, unsigned int ID, string name, string value);
-	void print_data(FILE* FStream, string value);
 
-    const string BoolToString(bool b);
+	template<typename T>
+	inline static void _FreeMemoryArray(T*&array)
+	{
+		delete[]array;
+		array = NULL;
+	}
+	// ---------------------------------------------------------------------------
 
-    const bool StringToBool(string b);
+	template<typename T>
+	inline string toString(T val)
+	{
+		ostringstream oss;
+		oss << val;
+		return oss.str();
+	}
+	// ---------------------------------------------------------------------------
 
-    string ArcsecToStr(double arcsec);
+	template<typename T>
+	inline string FormatFloatTo_string(string Format, T val)
+	{
+		string bufer_str;
+		char * st_buf = new char[100];
+		sprintf(st_buf, Format.c_str(), val);
+		bufer_str = st_buf;
+		delete[]st_buf;
+		return bufer_str;
+	}
+	// ---------------------------------------------------------------------------
+	inline void print_string(FILE* FStream, unsigned int ID, string name, string value);
+	inline void print_data(FILE* FStream, string value);
 
-    double StrToArcsec(string _str);
+	const string BoolToString(bool b);
 
-    void StringToFloatMass(double(*mass), unsigned int N, string _str);
+	const bool StringToBool(string b);
 
-    void StringToFloatMass3D(double(*mas3d)[3], unsigned int N, unsigned int M, string _str);
+	string ArcsecToStr(double arcsec);
+
+	double StrToArcsec(string _str);
+
+	void StringToFloatMass(double(*mass), unsigned int N, string _str);
+
+	void StringToFloatMass3D(double(*mas3d)[3], unsigned int N, unsigned int M, string _str);
 
 public:
 
-    whenwhere Georeferencing; // когда? где?
-    devicetype CameraSettings; // параметры камеры
-    filterframe FilterData; // фильтрованное изображение
-    starsinfo StarsData; // локализованные/распознанные объекты
-    videoframe ImageData; // структура данных изображения
+	whenwhere Georeferencing; // когда? где?
+	devicetype CameraSettings; // параметры камеры
+	filterframe FilterData; // фильтрованное изображение
+	starsinfo StarsData; // локализованные/распознанные объекты
+	videoframe ImageData; // структура данных изображения
 
 	IKI_img(void);
 	~IKI_img();
-    void WriteFormat(string filename);
-    void Clear_Memory(void);
-    bool ReadFormat(string filename, bool Need_Erase);
-    unsigned char* ZipStructure(unsigned int &SizeInfo);
-    void UnZipStructure(unsigned char* Array, unsigned int SizeInfo);
+	void WriteFormat(string filename);
+	void Clear_Memory(void);
+	bool ReadFormat(string filename, bool Need_Erase, bool Skeep_Frame);
+	unsigned char* ZipStructure(unsigned int &SizeInfo);
+	void UnZipStructure(unsigned char* Array);
 };
 #endif

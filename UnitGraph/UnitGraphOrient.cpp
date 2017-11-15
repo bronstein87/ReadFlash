@@ -56,8 +56,7 @@ __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 		}
 
 	SourceDir = GetCurrentDir();
-	FormAnimateSetting->ReadINI(SourceDir+"\\options.ini");
-	
+	FormAnimateSetting->ReadINI(SourceDir + "\\options.ini");
 }
 
 void __fastcall TFormGraphOrient::FormCreate(TObject *Sender)
@@ -2202,7 +2201,7 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 // ---------------------------------------------------------------------------
 
 void __fastcall TFormGraphOrient::BOKZM2VParseProtocolClick(TObject *Sender) {
-	try {
+		try {
 		OpenDialog->Options.Clear();
 		OpenDialog->Filter = "txt|*.txt";
 		OpenDialog->Options << ofAllowMultiSelect;
@@ -2555,16 +2554,17 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 				UnicodeString filePrefix = FormAnimateSetting->EditFilePrefix->Text;
 				unsigned short startFrom = StrToInt(FormAnimateSetting->BeginFromEdit->Text);
 				bool statusTableInited = false;
+				bool skipFrame = FormAnimateSetting->SkipFrameCheckBox->Checked;
 				for (int i = startFrom; i < FileList->Count; i++)
 				{
 					unique_ptr <IKI_img> reader(new IKI_img());
 					if( !AnsiContainsStr(FileList->Strings[i], filePrefix))
 					{
-						if (reader->ReadFormat(toStdString(FileList->Strings[i]), false))
+						if (reader->ReadFormat(toStdString(FileList->Strings[i]), false, skipFrame))
 						{
 							TStringDynArray SplittedString = SplitString(FileList->Strings[i], "\\");
 							UnicodeString ResFileName = FileOpenDialog1->FileName + "\\" + filePrefix + SplittedString[SplittedString.Length - 1];
-							if (FileExists(ResFileName) && (reader->ReadFormat(toStdString(ResFileName), false)))
+							if (FileExists(ResFileName) && (reader->ReadFormat(toStdString(ResFileName), false, skipFrame)))
 							{
 								CompareIKIRes = true;
 								if (!statusTableInited)
@@ -3092,6 +3092,59 @@ void __fastcall TFormGraphOrient::N21Click(TObject *Sender)
 
 }
 //---------------------------------------------------------------------------
+
+
+
+void __fastcall TFormGraphOrient::BOKZM2ParseProtocolClick(TObject *Sender)
+{
+		try {
+		OpenDialog->Options.Clear();
+		OpenDialog->Filter = "csv|*.csv";
+		OpenDialog->Options << ofAllowMultiSelect;
+		if (OpenDialog->Execute())
+		{
+			vCadrInfo.clear();
+			DeleteLineGraph();
+			unique_ptr <TStringList> FileList (new TStringList());
+			FileList->Assign(OpenDialog->Files);
+			SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
+			TDateTime startDate;
+			FileAge(FileList->Strings[0], startDate);
+				for (int i = 0; i < FileList->Count; i++)
+				{
+					AnsiString FileName = FileList->Strings[i];
+					ifstream in(FileName.c_str());
+					if (!in.is_open())
+					{
+						ShowMessage("Не удалось открыть файл");
+						return;
+					}
+
+
+					bool isLoc = checkM2Loc(in);
+					if (isLoc)
+					{
+						 HandleLoc60 handle(this);
+						 readBOKZM2LocProtocol(in, vCadrInfo, handle, startDate);
+					}
+					else
+					{
+                        HandleM2 handle(this);
+					   readBOKZM2Protocol(in, vCadrInfo, handle, startDate);
+					}
+
+				}
+		}
+			PrepareStartDraw();
+			CheckTabSheet();
+		}
+		catch (exception &e) {
+			ShowMessage(e.what());
+		}
+}
+//---------------------------------------------------------------------------
+
+
 
 
 

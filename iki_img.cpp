@@ -1,34 +1,32 @@
 #include "iki_img.h"
 
-const string IKI_img::BoolToString(bool b)
+inline const string IKI_img::BoolToString(bool b)
 {
 	return b ? "true" : "false";
 }
 // ---------------------------------------------------------------------------
 
-const bool IKI_img::StringToBool(string b)
+inline const bool IKI_img::StringToBool(string b)
 {
 	return (strcmp(b.c_str(), "true") == 0) ? true : false;
 }
 // ---------------------------------------------------------------------------
 
-string IKI_img::ArcsecToStr(double arcsec)
+inline string IKI_img::ArcsecToStr(double arcsec)
 {
-	int deg, min, sec, msc, rem, arc;
-	double arf;
+	int arf = (int)ROUND(1000.0 * arcsec); // in msec
+	int arc = abs(arf);
+	int deg = arc / 3600000;
+	int rem = arc % 3600000;
+	int min = rem / 60000;
+	int sec = (rem - min * 60000) / 1000;
+	int msc = arc - deg * 3600000 - min * 60000 - sec * 1000;
 	char * st_buf = new char[100];
-	string str;
-	arf = 1000.0 * arcsec; // in msec
-	arc = ROUND(arf);
-	arc = abs(arc);
-	deg = arc / 3600000; rem = arc % 3600000;
-	min = rem / 60000; sec = (rem - min * 60000) / 1000;
-	msc = arc - deg * 3600000 - min * 60000 - sec * 1000;
 	if (arf >= 0)
 		sprintf(st_buf, "%d\°%02d'%02d\".%03d", deg, min, sec, msc);
 	else
 		sprintf(st_buf, "-%d\°%02d'%02d\".%03d", deg, min, sec, msc);
-	str = st_buf;
+	string str = (const char*)st_buf;
 	delete[]st_buf;
 	return str;
 }
@@ -39,7 +37,7 @@ double IKI_img::StrToArcsec(string _str)
 	string _strbuf;
 	double arcsec;
 	bool negative = false;
-	int deg, min, sec, msc, rem, arc;
+	int deg, min, sec, msc;
 	int pos_index;
 	if ((pos_index = _str.find("{")) >= 0)
 		_str = _str.substr(pos_index + 1, _str.size());
@@ -153,30 +151,29 @@ IKI_img::~IKI_img()
 }
 // ---------------------------------------------------------------------------
 
-void IKI_img::print_string(FILE* FStream, unsigned int ID, string name, string value)
+inline void IKI_img::print_string(FILE* FStream, unsigned int ID, string name, string value)
 {
 	char buffer_string[4];
 	unsigned int sizedata = value.size();
-	memmove(&buffer_string[0], &ID, 4); fwrite(&buffer_string[0], 1, 4, FStream);
-	fprintf(FStream, "%-80s", name.data());
-	memmove(&buffer_string[0], &sizedata, 4); fwrite(&buffer_string[0], 1, 4, FStream);
-	fprintf(FStream, "%s\r\n", value.data());
+	memmove(&buffer_string[0], &ID, 4); fwrite(&buffer_string[0], 1, 4, FStream); // ID
+	fprintf(FStream, "%-80s", name.data()); // Name
+	memmove(&buffer_string[0], &sizedata, 4); fwrite(&buffer_string[0], 1, 4, FStream); // Length
+	fprintf(FStream, "%s\r\n", value.data()); // Data
 	fflush(FStream);
 }
 // ---------------------------------------------------------------------------
 
-void IKI_img::print_data(FILE* FStream, string value)
+inline void IKI_img::print_data(FILE* FStream, string value)
 {
 	char buffer_string[4];
 	unsigned int sizedata = value.size();
-	memmove(&buffer_string[0], &sizedata, 4); fwrite(&buffer_string[0], 1, 4, FStream);
-	fprintf(FStream, "%s\r\n", value.data());
+	memmove(&buffer_string[0], &sizedata, 4); fwrite(&buffer_string[0], 1, 4, FStream); // Length
+	fprintf(FStream, "%s\r\n", value.data()); // Data
 }
 // ---------------------------------------------------------------------------
 
 void IKI_img::WriteFormat(string filename) // define_format_value = "%4x%-80.80s%4x%s\r\n"
 {
-	unsigned int sizedata = 0;
 	char buffer_string[200] = {0};
 	FILE* FStream = fopen(filename.c_str(), "wb+");
 #pragma region Georeferencing
@@ -394,9 +391,9 @@ void IKI_img::WriteFormat(string filename) // define_format_value = "%4x%-80.80s
 			print_data(FStream, (const char*)buffer_string);
 		}
 	}
+	print_string(FStream, stringwindow_count_id, stringwindow_count, toString(ImageData.WindowsData.WindowCount));
 	if (ImageData.WindowsData.SizeWindowList != 0)
 	{
-		print_string(FStream, stringwindow_count_id, stringwindow_count, toString(ImageData.WindowsData.WindowCount));
 		print_string(FStream, stringwindow_sizewindowlist_id, stringwindow_sizewindowlist, toString(ImageData.WindowsData.SizeWindowList));
 		print_string(FStream, stringwindow_type_id, stringwindow_type, toString(ImageData.WindowsData.DataType));
 		print_string(FStream, stringwindow_deg_bin_id, stringwindow_deg_bin, toString(ImageData.WindowsData.DegreeBinning));
@@ -471,7 +468,7 @@ void IKI_img::Clear_Memory(void)
 }
 // ---------------------------------------------------------------------------
 
-bool IKI_img::ReadFormat(string filename, bool Need_Erase)
+bool IKI_img::ReadFormat(string filename, bool Need_Erase = false, bool Skeep_Frame = false)
 {
 	int count_find_pos = 0;
 	int pos_index = 0;
@@ -847,15 +844,28 @@ bool IKI_img::ReadFormat(string filename, bool Need_Erase)
 			{
 				if (ImageData.FrameData.SizeData != 0)
 				{
-					_FreeMemoryArray(ImageData.FrameData.Data);
-					switch (ImageData.FrameData.DataType)
+					if (Skeep_Frame)
 					{
-					case 0: ImageData.FrameData.Data = (void*)new unsigned char[ImageData.FrameData.SizeData]; break;
-					case 1: ImageData.FrameData.Data = (void*)new unsigned short[ImageData.FrameData.SizeData]; break;
-					case 2: ImageData.FrameData.Data = (void*)new float[ImageData.FrameData.SizeData]; break;
+						long int offset = 0;
+						switch (ImageData.FrameData.DataType)
+						{
+						case 0: offset = sizeof(char) * ImageData.FrameData.SizeData; break;
+						case 1: offset = sizeof(short) * ImageData.FrameData.SizeData; break;
+						case 2: offset = sizeof(float) * ImageData.FrameData.SizeData; break;
+						}
+						fseek(FStream, offset, SEEK_CUR);
 					}
-					fread(ImageData.FrameData.Data, MassType[ImageData.FrameData.DataType], ImageData.FrameData.SizeData, FStream);
-
+					else
+					{
+						_FreeMemoryArray(ImageData.FrameData.Data);
+						switch (ImageData.FrameData.DataType)
+						{
+						case 0: ImageData.FrameData.Data = (void*)new unsigned char[ImageData.FrameData.SizeData]; break;
+						case 1: ImageData.FrameData.Data = (void*)new unsigned short[ImageData.FrameData.SizeData]; break;
+						case 2: ImageData.FrameData.Data = (void*)new float[ImageData.FrameData.SizeData]; break;
+						}
+						fread(ImageData.FrameData.Data, MassType[ImageData.FrameData.DataType], ImageData.FrameData.SizeData, FStream);
+					}
 				}
 				fread(&end_str[0], 1, 2, FStream);
 				break;
@@ -864,15 +874,28 @@ bool IKI_img::ReadFormat(string filename, bool Need_Erase)
 			{
 				if (ImageData.LinesData.SizeData != 0)
 				{
-					_FreeMemoryArray(ImageData.LinesData.Data);
-					switch (ImageData.LinesData.DataType)
+					if (Skeep_Frame)
 					{
-					case 0: ImageData.LinesData.Data = (void*)new unsigned char[ImageData.LinesData.SizeData]; break;
-					case 1: ImageData.LinesData.Data = (void*)new unsigned short[ImageData.LinesData.SizeData]; break;
-					case 2: ImageData.LinesData.Data = (void*)new float[ImageData.LinesData.SizeData]; break;
+						long int offset = 0;
+						switch (ImageData.FrameData.DataType)
+						{
+						case 0: offset = sizeof(char) * ImageData.LinesData.SizeData; break;
+						case 1: offset = sizeof(short) * ImageData.LinesData.SizeData; break;
+						case 2: offset = sizeof(float) * ImageData.LinesData.SizeData; break;
+						}
+						fseek(FStream, offset, SEEK_CUR);
 					}
-					fread(ImageData.LinesData.Data, MassType[ImageData.LinesData.DataType], ImageData.LinesData.SizeData, FStream);
-
+					else
+					{
+						_FreeMemoryArray(ImageData.LinesData.Data);
+						switch (ImageData.LinesData.DataType)
+						{
+						case 0: ImageData.LinesData.Data = (void*)new unsigned char[ImageData.LinesData.SizeData]; break;
+						case 1: ImageData.LinesData.Data = (void*)new unsigned short[ImageData.LinesData.SizeData]; break;
+						case 2: ImageData.LinesData.Data = (void*)new float[ImageData.LinesData.SizeData]; break;
+						}
+						fread(ImageData.LinesData.Data, MassType[ImageData.LinesData.DataType], ImageData.LinesData.SizeData, FStream);
+					}
 				}
 				fread(&end_str[0], 1, 2, FStream);
 				break;
@@ -881,15 +904,28 @@ bool IKI_img::ReadFormat(string filename, bool Need_Erase)
 			{
 				if (ImageData.WindowsData.SizeData != 0)
 				{
-					_FreeMemoryArray(ImageData.WindowsData.Data);
-					switch (ImageData.WindowsData.DataType)
+					if (Skeep_Frame)
 					{
-					case 0: ImageData.WindowsData.Data = (void*)new unsigned char[ImageData.WindowsData.SizeData]; break;
-					case 1: ImageData.WindowsData.Data = (void*)new unsigned short[ImageData.WindowsData.SizeData]; break;
-					case 2: ImageData.WindowsData.Data = (void*)new float[ImageData.WindowsData.SizeData]; break;
+						long int offset = 0;
+						switch (ImageData.FrameData.DataType)
+						{
+						case 0: offset = sizeof(char) * ImageData.WindowsData.SizeData; break;
+						case 1: offset = sizeof(short) * ImageData.WindowsData.SizeData; break;
+						case 2: offset = sizeof(float) * ImageData.WindowsData.SizeData; break;
+						}
+						fseek(FStream, offset, SEEK_CUR);
 					}
-					fread(ImageData.WindowsData.Data, MassType[ImageData.WindowsData.DataType], ImageData.WindowsData.SizeData, FStream);
-
+					else
+					{
+						_FreeMemoryArray(ImageData.WindowsData.Data);
+						switch (ImageData.WindowsData.DataType)
+						{
+						case 0: ImageData.WindowsData.Data = (void*)new unsigned char[ImageData.WindowsData.SizeData]; break;
+						case 1: ImageData.WindowsData.Data = (void*)new unsigned short[ImageData.WindowsData.SizeData]; break;
+						case 2: ImageData.WindowsData.Data = (void*)new float[ImageData.WindowsData.SizeData]; break;
+						}
+						fread(ImageData.WindowsData.Data, MassType[ImageData.WindowsData.DataType], ImageData.WindowsData.SizeData, FStream);
+					}
 				}
 				fread(&end_str[0], 1, 2, FStream);
 				break;
@@ -975,7 +1011,9 @@ unsigned char* IKI_img::ZipStructure(unsigned int &SizeInfo)
 		sizeof(StarsData.m_X)+sizeof(StarsData.m_Y)+sizeof(StarsData.m_Cur)+
 		sizeof(StarsData.LocalizedCount)+
 		sizeof(StarsData.RecognizedCount)+
+		sizeof(StarsData.SizeLocalList)+
 		sizeof(starinfo) * StarsData.LocalizedCount +
+		sizeof(StarsData.SimulatedFrame.SizeStarList)+
 		sizeof(StarsData.SimulatedFrame.strrec)+
 		sizeof(STARREC) * StarsData.SimulatedFrame.strrec +
 		sizeof(StarsData.RecognizedOrientationAngles)+
@@ -998,319 +1036,193 @@ unsigned char* IKI_img::ZipStructure(unsigned int &SizeInfo)
 		sizeof(dataline) * ImageData.LinesData.LinesCount +
 		(MassType[ImageData.LinesData.DataType] * ImageData.LinesData.LinesWidth * ImageData.LinesData.LinesHeight)+
 
+		sizeof(ImageData.WindowsData.SizeWindowList)+
 		sizeof(ImageData.WindowsData.WindowCount)+
 		sizeof(ImageData.WindowsData.DataType)+
 		sizeof(ImageData.WindowsData.DegreeBinning)+
 		sizeof(ImageData.WindowsData.SizeData)+
 		sizeof(ImageData.WindowsData.BottomRight) +
-		(sizeof(datawindow) * ImageData.WindowsData.WindowCount) +
+		(sizeof(datawindow) * ImageData.WindowsData.SizeWindowList) +
 		(MassType[ImageData.WindowsData.DataType] * ImageData.WindowsData.SizeData);
 
 	SizeInfo = whenwhere_size + devicetype_size + filterframe_size + starsinfo_size + videodata_size;
 	unsigned char* Array = new unsigned char[SizeInfo];
 	memset(Array, 0, SizeInfo);
 
-	// Move(&Georeferencing.DateTime, &Array[position], sizeof(Georeferencing.DateTime));
 	memmove(&Array[position], &Georeferencing.DateTime, sizeof(Georeferencing.DateTime)); position += sizeof(Georeferencing.DateTime);
 	size_id = Georeferencing.SoftwareVersion.size();
-	// Move(&size_id, &Array[position], sizeof(size_id));
 	memmove(&Array[position], &size_id, sizeof(size_id)); position += sizeof(size_id); // запись длины текста
-	// Move(Georeferencing.SoftwareVersion.c_str(), &Array[position], size_id);
 	memmove(&Array[position], Georeferencing.SoftwareVersion.c_str(), size_id); position += size_id;
-	// Move(&Georeferencing.FrameNumber, &Array[position], sizeof(Georeferencing.FrameNumber));
 	memmove(&Array[position], &Georeferencing.FrameNumber, sizeof(Georeferencing.FrameNumber)); position += sizeof(Georeferencing.FrameNumber);
-	// Move(&Georeferencing.ProtonsDensity, &Array[position], sizeof(Georeferencing.ProtonsDensity));
 	memmove(&Array[position], &Georeferencing.ProtonsDensity, sizeof(Georeferencing.ProtonsDensity)); position += sizeof(Georeferencing.ProtonsDensity);
-	// Move(&Georeferencing.TracksBrightness, &Array[position], sizeof(Georeferencing.TracksBrightness));
 	memmove(&Array[position], &Georeferencing.TracksBrightness, sizeof(Georeferencing.TracksBrightness)); position += sizeof(Georeferencing.TracksBrightness);
-	// Move(&Georeferencing.MoonVelocity, &Array[position], sizeof(Georeferencing.MoonVelocity));
 	memmove(&Array[position], &Georeferencing.MoonVelocity, sizeof(Georeferencing.MoonVelocity)); position += sizeof(Georeferencing.MoonVelocity);
-	// Move(&Georeferencing.MoonBrightness, &Array[position], sizeof(Georeferencing.MoonBrightness));
 	memmove(&Array[position], &Georeferencing.MoonBrightness, sizeof(Georeferencing.MoonBrightness)); position += sizeof(Georeferencing.MoonBrightness);
-	// Move(&Georeferencing.BrightnessLeft, &Array[position], sizeof(Georeferencing.BrightnessLeft));
 	memmove(&Array[position], &Georeferencing.BrightnessLeft, sizeof(Georeferencing.BrightnessLeft)); position += sizeof(Georeferencing.BrightnessLeft);
-	// Move(&Georeferencing.BrightnessRight, &Array[position], sizeof(Georeferencing.BrightnessRight));
 	memmove(&Array[position], &Georeferencing.BrightnessRight, sizeof(Georeferencing.BrightnessRight)); position += sizeof(Georeferencing.BrightnessRight);
-	// Move(&Georeferencing.Era, &Array[position], sizeof(Georeferencing.Era));
 	memmove(&Array[position], &Georeferencing.Era, sizeof(Georeferencing.Era)); position += sizeof(Georeferencing.Era);
-	// Move(&Georeferencing.OrbitEccentricity, &Array[position], sizeof(Georeferencing.OrbitEccentricity));
 	memmove(&Array[position], &Georeferencing.OrbitEccentricity, sizeof(Georeferencing.OrbitEccentricity)); position += sizeof(Georeferencing.OrbitEccentricity);
-	// Move(&Georeferencing.LengthSemiaxis, &Array[position], sizeof(Georeferencing.LengthSemiaxis));
 	memmove(&Array[position], &Georeferencing.LengthSemiaxis, sizeof(Georeferencing.LengthSemiaxis)); position += sizeof(Georeferencing.LengthSemiaxis);
-	// Move(&Georeferencing.LengthRadiusVector, &Array[position], sizeof(Georeferencing.LengthRadiusVector));
 	memmove(&Array[position], &Georeferencing.LengthRadiusVector, sizeof(Georeferencing.LengthRadiusVector)); position += sizeof(Georeferencing.LengthRadiusVector);
-	// Move(&Georeferencing.LongitudeAscendingNode, &Array[position], sizeof(Georeferencing.LongitudeAscendingNode));
 	memmove(&Array[position], &Georeferencing.LongitudeAscendingNode, sizeof(Georeferencing.LongitudeAscendingNode)); position += sizeof(Georeferencing.LongitudeAscendingNode);
-	// Move(&Georeferencing.InclinationOrbit, &Array[position], sizeof(Georeferencing.InclinationOrbit));
 	memmove(&Array[position], &Georeferencing.InclinationOrbit, sizeof(Georeferencing.InclinationOrbit)); position += sizeof(Georeferencing.InclinationOrbit);
-	// Move(&Georeferencing.ArgumentPerigee, &Array[position], sizeof(Georeferencing.ArgumentPerigee));
 	memmove(&Array[position], &Georeferencing.ArgumentPerigee, sizeof(Georeferencing.ArgumentPerigee)); position += sizeof(Georeferencing.ArgumentPerigee);
-	// Move(&Georeferencing.ArgumentLatitude, &Array[position], sizeof(Georeferencing.ArgumentLatitude));
 	memmove(&Array[position], &Georeferencing.ArgumentLatitude, sizeof(Georeferencing.ArgumentLatitude)); position += sizeof(Georeferencing.ArgumentLatitude);
-	// Move(&Georeferencing.DeviceAngularVelocity, &Array[position], sizeof(Georeferencing.DeviceAngularVelocity));
 	memmove(&Array[position], &Georeferencing.DeviceAngularVelocity, sizeof(Georeferencing.DeviceAngularVelocity)); position += sizeof(Georeferencing.DeviceAngularVelocity);
-	// Move(&Georeferencing.DeviceAngularAcceleration, &Array[position], sizeof(Georeferencing.DeviceAngularAcceleration));
 	memmove(&Array[position], &Georeferencing.DeviceAngularAcceleration, sizeof(Georeferencing.DeviceAngularAcceleration)); position += sizeof(Georeferencing.DeviceAngularAcceleration);
-	// Move(&Georeferencing.ProjectionLinearVelocity, &Array[position], sizeof(Georeferencing.ProjectionLinearVelocity));
 	memmove(&Array[position], &Georeferencing.ProjectionLinearVelocity, sizeof(Georeferencing.ProjectionLinearVelocity)); position += sizeof(Georeferencing.ProjectionLinearVelocity);
-	// Move(&Georeferencing.OrientationAngles, &Array[position], sizeof(Georeferencing.OrientationAngles));
 	memmove(&Array[position], &Georeferencing.OrientationAngles, sizeof(Georeferencing.OrientationAngles)); position += sizeof(Georeferencing.OrientationAngles);
-	// Move(&Georeferencing.OrientationQuaternion, &Array[position], sizeof(Georeferencing.OrientationQuaternion));
 	memmove(&Array[position], &Georeferencing.OrientationQuaternion, sizeof(Georeferencing.OrientationQuaternion)); position += sizeof(Georeferencing.OrientationQuaternion);
-	// Move(&Georeferencing.OrientationMatrix, &Array[position], sizeof(Georeferencing.OrientationMatrix));
 	memmove(&Array[position], &Georeferencing.OrientationMatrix, sizeof(Georeferencing.OrientationMatrix)); position += sizeof(Georeferencing.OrientationMatrix);
-	// Move(&Georeferencing.YearAberrationApply, &Array[position], sizeof(Georeferencing.YearAberrationApply));
 	memmove(&Array[position], &Georeferencing.YearAberrationApply, sizeof(Georeferencing.YearAberrationApply)); position += sizeof(Georeferencing.YearAberrationApply);
-	// Move(&Georeferencing.SatelliteAberrationApply, &Array[position], sizeof(Georeferencing.SatelliteAberrationApply));
 	memmove(&Array[position], &Georeferencing.SatelliteAberrationApply, sizeof(Georeferencing.SatelliteAberrationApply)); position += sizeof(Georeferencing.SatelliteAberrationApply);
-	// Move(&Georeferencing.PrecessionNutationApply, &Array[position], sizeof(Georeferencing.PrecessionNutationApply));
 	memmove(&Array[position], &Georeferencing.PrecessionNutationApply, sizeof(Georeferencing.PrecessionNutationApply)); position += sizeof(Georeferencing.PrecessionNutationApply);
-	// Move(&Georeferencing.PhotonNoiseApply, &Array[position], sizeof(Georeferencing.PhotonNoiseApply));
 	memmove(&Array[position], &Georeferencing.PhotonNoiseApply, sizeof(Georeferencing.PhotonNoiseApply)); position += sizeof(Georeferencing.PhotonNoiseApply);
-	// Move(&Georeferencing.DistortionApply, &Array[position], sizeof(Georeferencing.DistortionApply));
 	memmove(&Array[position], &Georeferencing.DistortionApply, sizeof(Georeferencing.DistortionApply)); position += sizeof(Georeferencing.DistortionApply);
 
 	size_id = CameraSettings.DataSource.size();
-	// Move(&size_id, &Array[position], sizeof(size_id));
 	memmove(&Array[position], &size_id, sizeof(size_id)); position += sizeof(size_id); // запись длины текста
-	// Move(CameraSettings.DataSource.c_str(), &Array[position], size_id);
 	memmove(&Array[position], CameraSettings.DataSource.c_str(), size_id); position += size_id;
-	// Move(&CameraSettings.SNDevice, &Array[position], sizeof(CameraSettings.SNDevice));
 	memmove(&Array[position], &CameraSettings.SNDevice, sizeof(CameraSettings.SNDevice)); position += sizeof(CameraSettings.SNDevice);
-	// Move(&CameraSettings.InnerRadius, &Array[position], sizeof(CameraSettings.InnerRadius));
 	memmove(&Array[position], &CameraSettings.InnerRadius, sizeof(CameraSettings.InnerRadius)); position += sizeof(CameraSettings.InnerRadius);
-	// Move(&CameraSettings.OuterRadius, &Array[position], sizeof(CameraSettings.OuterRadius));
 	memmove(&Array[position], &CameraSettings.OuterRadius, sizeof(CameraSettings.OuterRadius)); position += sizeof(CameraSettings.OuterRadius);
-	// Move(&CameraSettings.ResolutionACP, &Array[position], sizeof(CameraSettings.ResolutionACP));
 	memmove(&Array[position], &CameraSettings.ResolutionACP, sizeof(CameraSettings.ResolutionACP)); position += sizeof(CameraSettings.ResolutionACP);
-	// Move(&CameraSettings.EV_ACP, &Array[position], sizeof(CameraSettings.EV_ACP));
 	memmove(&Array[position], &CameraSettings.EV_ACP, sizeof(CameraSettings.EV_ACP)); position += sizeof(CameraSettings.EV_ACP);
-	// Move(&CameraSettings.PixelSize, &Array[position], sizeof(CameraSettings.PixelSize));
 	memmove(&Array[position], &CameraSettings.PixelSize, sizeof(CameraSettings.PixelSize)); position += sizeof(CameraSettings.PixelSize);
-	// Move(&CameraSettings.FocalLength, &Array[position], sizeof(CameraSettings.FocalLength));
 	memmove(&Array[position], &CameraSettings.FocalLength, sizeof(CameraSettings.FocalLength)); position += sizeof(CameraSettings.FocalLength);
-	// Move(&CameraSettings.DiameterEntrancePupil, &Array[position], sizeof(CameraSettings.DiameterEntrancePupil));
 	memmove(&Array[position], &CameraSettings.DiameterEntrancePupil, sizeof(CameraSettings.DiameterEntrancePupil)); position += sizeof(CameraSettings.DiameterEntrancePupil);
-	// Move(&CameraSettings.DarkLevel, &Array[position], sizeof(CameraSettings.DarkLevel));
 	memmove(&Array[position], &CameraSettings.DarkLevel, sizeof(CameraSettings.DarkLevel)); position += sizeof(CameraSettings.DarkLevel);
-	// Move(&CameraSettings.DarkSKO, &Array[position], sizeof(CameraSettings.DarkSKO));
 	memmove(&Array[position], &CameraSettings.DarkSKO, sizeof(CameraSettings.DarkSKO)); position += sizeof(CameraSettings.DarkSKO);
-	// Move(&CameraSettings.LimitingMagnitude, &Array[position], sizeof(CameraSettings.LimitingMagnitude));
 	memmove(&Array[position], &CameraSettings.LimitingMagnitude, sizeof(CameraSettings.LimitingMagnitude)); position += sizeof(CameraSettings.LimitingMagnitude);
-	// Move(&CameraSettings.StarsDistribution, &Array[position], sizeof(CameraSettings.StarsDistribution));
 	memmove(&Array[position], &CameraSettings.StarsDistribution, sizeof(CameraSettings.StarsDistribution)); position += sizeof(CameraSettings.StarsDistribution);
-	// Move(&CameraSettings.DistortionFunction.PolynomialDegree, &Array[position], sizeof(CameraSettings.DistortionFunction.PolynomialDegree));
 	memmove(&Array[position], &CameraSettings.DistortionFunction.PolynomialDegree, sizeof(CameraSettings.DistortionFunction.PolynomialDegree)); position += sizeof(CameraSettings.DistortionFunction.PolynomialDegree);
-	// Move(&CameraSettings.DistortionFunction.CoefficientsCount, &Array[position], sizeof(CameraSettings.DistortionFunction.CoefficientsCount));
 	memmove(&Array[position], &CameraSettings.DistortionFunction.CoefficientsCount, sizeof(CameraSettings.DistortionFunction.CoefficientsCount)); position += sizeof(CameraSettings.DistortionFunction.CoefficientsCount);
 	for (int i = 0; i < CameraSettings.DistortionFunction.CoefficientsCount; i++)
 	{
-		// Move(&CameraSettings.DistortionFunction.Coefficient[i], &Array[position], sizeof(coefonaxis));
 		memmove(&Array[position], &CameraSettings.DistortionFunction.Coefficient[i], sizeof(coefonaxis)); position += sizeof(coefonaxis);
 	}
-	// Move(&CameraSettings.TableDeadObjects.RecordsCount, &Array[position], sizeof(CameraSettings.TableDeadObjects.RecordsCount));
 	memmove(&Array[position], &CameraSettings.TableDeadObjects.RecordsCount, sizeof(CameraSettings.TableDeadObjects.RecordsCount)); position += sizeof(CameraSettings.TableDeadObjects.RecordsCount);
 	for (int i = 0; i < CameraSettings.TableDeadObjects.RecordsCount; i++)
 	{
-		// Move(&CameraSettings.TableDeadObjects.PixelData[i], &Array[position], sizeof(infopix));
 		memmove(&Array[position], &CameraSettings.TableDeadObjects.PixelData[i], sizeof(infopix)); position += sizeof(infopix);
 	}
 
 	size_id = FilterData.TagFilter.size();
-	// Move(&size_id, &Array[position], sizeof(size_id));
 	memmove(&Array[position], &size_id, sizeof(size_id)); position += sizeof(size_id); // запись длины текста
-	// Move(FilterData.TagFilter.c_str(), &Array[position], size_id);
 	memmove(&Array[position], FilterData.TagFilter.c_str(), size_id); position += size_id;
-	// Move(&FilterData.FilteredPixelsCount, &Array[position], sizeof(FilterData.FilteredPixelsCount));
 	memmove(&Array[position], &FilterData.FilteredPixelsCount, sizeof(FilterData.FilteredPixelsCount)); position += sizeof(FilterData.FilteredPixelsCount);
-	// Move(&FilterData.BottomRight, &Array[position], sizeof(FilterData.BottomRight));
 	memmove(&Array[position], &FilterData.BottomRight, sizeof(FilterData.BottomRight)); position += sizeof(FilterData.BottomRight);
 	for (int i = 0; i < FilterData.FilteredPixelsCount; i++)
 	{
-		// Move(&FilterData.DataPixels[i], &Array[position], sizeof(filterdata));
 		memmove(&Array[position], &FilterData.DataPixels[i], sizeof(filterdata)); position += sizeof(filterdata);
 	}
 
-	// Move(&StarsData.RezStat, &Array[position], sizeof(StarsData.RezStat));
 	memmove(&Array[position], &StarsData.RezStat, sizeof(StarsData.RezStat)); position += sizeof(StarsData.RezStat);
-	// Move(&StarsData.Epsilon, &Array[position], sizeof(StarsData.Epsilon));
 	memmove(&Array[position], &StarsData.Epsilon, sizeof(StarsData.Epsilon)); position += sizeof(StarsData.Epsilon);
-	// Move(&StarsData.m_X, &Array[position], sizeof(StarsData.m_X));
 	memmove(&Array[position], &StarsData.m_X, sizeof(StarsData.m_X)); position += sizeof(StarsData.m_X);
-	// Move(&StarsData.m_Y, &Array[position], sizeof(StarsData.m_Y));
 	memmove(&Array[position], &StarsData.m_Y, sizeof(StarsData.m_Y)); position += sizeof(StarsData.m_Y);
-	// Move(&StarsData.m_Cur, &Array[position], sizeof(StarsData.m_Cur));
 	memmove(&Array[position], &StarsData.m_Cur, sizeof(StarsData.m_Cur)); position += sizeof(StarsData.m_Cur);
-	// Move(&StarsData.LocalizedCount, &Array[position], sizeof(StarsData.LocalizedCount));
+
+	memmove(&Array[position], &StarsData.SizeLocalList, sizeof(StarsData.SizeLocalList)); position += sizeof(StarsData.SizeLocalList);
 	memmove(&Array[position], &StarsData.LocalizedCount, sizeof(StarsData.LocalizedCount)); position += sizeof(StarsData.LocalizedCount);
-	// Move(&StarsData.RecognizedCount, &Array[position], sizeof(StarsData.RecognizedCount));
 	memmove(&Array[position], &StarsData.RecognizedCount, sizeof(StarsData.RecognizedCount)); position += sizeof(StarsData.RecognizedCount);
-	for (int i = 0; i < StarsData.LocalizedCount; i++)
+	for (int i = 0; i < StarsData.SizeLocalList; i++)
 	{
-		// Move(&StarsData.StarsList[i], &Array[position], sizeof(starinfo));
 		memmove(&Array[position], &StarsData.StarsList[i], sizeof(starinfo)); position += sizeof(starinfo);
 	}
-	// Move(&StarsData.SimulatedFrame.strrec, &Array[position], sizeof(StarsData.SimulatedFrame.strrec));
+	memmove(&Array[position], &StarsData.SimulatedFrame.SizeStarList, sizeof(StarsData.SimulatedFrame.SizeStarList)); position += sizeof(StarsData.SimulatedFrame.SizeStarList);
 	memmove(&Array[position], &StarsData.SimulatedFrame.strrec, sizeof(StarsData.SimulatedFrame.strrec)); position += sizeof(StarsData.SimulatedFrame.strrec);
 	for (int i = 0; i < StarsData.SimulatedFrame.strrec; i++)
 	{
-		// Move(&StarsData.SimulatedFrame.StarRec[i], &Array[position], sizeof(starinfo));
 		memmove(&Array[position], &StarsData.SimulatedFrame.StarRec[i], sizeof(starinfo)); position += sizeof(STARREC);
 	}
-	// Move(&StarsData.RecognizedOrientationAngles, &Array[position], sizeof(StarsData.RecognizedOrientationAngles));
 	memmove(&Array[position], &StarsData.RecognizedOrientationAngles, sizeof(StarsData.RecognizedOrientationAngles)); position += sizeof(StarsData.RecognizedOrientationAngles);
-	// Move(&StarsData.RecognizedOrientationQuaternion, &Array[position], sizeof(StarsData.RecognizedOrientationQuaternion));
 	memmove(&Array[position], &StarsData.RecognizedOrientationQuaternion, sizeof(StarsData.RecognizedOrientationQuaternion)); position += sizeof(StarsData.RecognizedOrientationQuaternion);
-	// Move(&StarsData.RecognizedOrientationMatrix, &Array[position], sizeof(StarsData.RecognizedOrientationMatrix));
 	memmove(&Array[position], &StarsData.RecognizedOrientationMatrix, sizeof(StarsData.RecognizedOrientationMatrix)); position += sizeof(StarsData.RecognizedOrientationMatrix);
 
-	// Move(&ImageData.ExposureTime, &Array[position], sizeof(ImageData.ExposureTime));
 	memmove(&Array[position], &ImageData.ExposureTime, sizeof(ImageData.ExposureTime)); position += sizeof(ImageData.ExposureTime);
-	// Move(&ImageData.FrameData.DataType, &Array[position], sizeof(ImageData.FrameData.DataType));
 	memmove(&Array[position], &ImageData.FrameData.DataType, sizeof(ImageData.FrameData.DataType)); position += sizeof(ImageData.FrameData.DataType);
-	// Move(&ImageData.FrameData.DegreeBinning, &Array[position], sizeof(ImageData.FrameData.DegreeBinning));
 	memmove(&Array[position], &ImageData.FrameData.DegreeBinning, sizeof(ImageData.FrameData.DegreeBinning)); position += sizeof(ImageData.FrameData.DegreeBinning);
-	// Move(&ImageData.FrameData.FrameWidth, &Array[position], sizeof(ImageData.FrameData.FrameWidth));
 	memmove(&Array[position], &ImageData.FrameData.FrameWidth, sizeof(ImageData.FrameData.FrameWidth)); position += sizeof(ImageData.FrameData.FrameWidth);
-	// Move(&ImageData.FrameData.FrameHeight, &Array[position], sizeof(ImageData.FrameData.FrameHeight));
 	memmove(&Array[position], &ImageData.FrameData.FrameHeight, sizeof(ImageData.FrameData.FrameHeight)); position += sizeof(ImageData.FrameData.FrameHeight);
-	// Move(ImageData.FrameData.Data, &Array[position], (MassType[ImageData.FrameData.DataType] * ImageData.FrameData.FrameWidth * ImageData.FrameData.FrameHeight));
 	memmove(&Array[position], &ImageData.FrameData.Data, (MassType[ImageData.FrameData.DataType] * ImageData.FrameData.FrameWidth * ImageData.FrameData.FrameHeight)); position += (MassType[ImageData.FrameData.DataType] * ImageData.FrameData.FrameWidth * ImageData.FrameData.FrameHeight);
 
-	// Move(&ImageData.LinesData.LinesCount, &Array[position], sizeof(ImageData.LinesData.LinesCount));
 	memmove(&Array[position], &ImageData.LinesData.LinesCount, sizeof(ImageData.LinesData.LinesCount)); position += sizeof(ImageData.LinesData.LinesCount);
-	// Move(&ImageData.LinesData.DataType, &Array[position], sizeof(ImageData.LinesData.DataType));
 	memmove(&Array[position], &ImageData.LinesData.DataType, sizeof(ImageData.LinesData.DataType)); position += sizeof(ImageData.LinesData.DataType);
-	// Move(&ImageData.LinesData.DegreeBinning, &Array[position], sizeof(ImageData.LinesData.DegreeBinning));
 	memmove(&Array[position], &ImageData.LinesData.DegreeBinning, sizeof(ImageData.LinesData.DegreeBinning)); position += sizeof(ImageData.LinesData.DegreeBinning);
-	// Move(&ImageData.LinesData.LinesWidth, &Array[position], sizeof(ImageData.LinesData.LinesWidth));
 	memmove(&Array[position], &ImageData.LinesData.LinesWidth, sizeof(ImageData.LinesData.LinesWidth)); position += sizeof(ImageData.LinesData.LinesWidth);
-	// Move(&ImageData.LinesData.LinesHeight, &Array[position], sizeof(ImageData.LinesData.LinesHeight));
 	memmove(&Array[position], &ImageData.LinesData.LinesHeight, sizeof(ImageData.LinesData.LinesHeight)); position += sizeof(ImageData.LinesData.LinesHeight);
 	for (int i = 0; i < ImageData.LinesData.LinesCount; i++)
 	{
-		// Move(&ImageData.LinesData.Info[i], &Array[position], sizeof(dataline));
 		memmove(&Array[position], &ImageData.LinesData.Info[i], sizeof(dataline)); position += sizeof(dataline);
 	}
-	// Move(ImageData.LinesData.Data, &Array[position], (MassType[ImageData.LinesData.DataType] * ImageData.LinesData.LinesWidth * ImageData.LinesData.LinesHeight));
 	memmove(&Array[position], ImageData.LinesData.Data, (MassType[ImageData.LinesData.DataType] * ImageData.LinesData.LinesWidth * ImageData.LinesData.LinesHeight)); position += (MassType[ImageData.LinesData.DataType] * ImageData.LinesData.LinesWidth * ImageData.LinesData.LinesHeight);
 
-	// Move(&ImageData.WindowsData.WindowCount, &Array[position], sizeof(ImageData.WindowsData.WindowCount));
+	memmove(&Array[position], &ImageData.WindowsData.SizeWindowList, sizeof(ImageData.WindowsData.SizeWindowList)); position += sizeof(ImageData.WindowsData.SizeWindowList);
 	memmove(&Array[position], &ImageData.WindowsData.WindowCount, sizeof(ImageData.WindowsData.WindowCount)); position += sizeof(ImageData.WindowsData.WindowCount);
-	// Move(&ImageData.WindowsData.DataType, &Array[position], sizeof(ImageData.WindowsData.DataType));
 	memmove(&Array[position], &ImageData.WindowsData.DataType, sizeof(ImageData.WindowsData.DataType)); position += sizeof(ImageData.WindowsData.DataType);
-	// Move(&ImageData.WindowsData.DegreeBinning, &Array[position], sizeof(ImageData.WindowsData.DegreeBinning));
 	memmove(&Array[position], &ImageData.WindowsData.DegreeBinning, sizeof(ImageData.WindowsData.DegreeBinning)); position += sizeof(ImageData.WindowsData.DegreeBinning);
-	// Move(&ImageData.WindowsData.SizeData, &Array[position], sizeof(ImageData.WindowsData.SizeData));
 	memmove(&Array[position], &ImageData.WindowsData.SizeData, sizeof(ImageData.WindowsData.SizeData)); position += sizeof(ImageData.WindowsData.SizeData);
-	// Move(&ImageData.WindowsData.BottomRight, &Array[position], sizeof(ImageData.WindowsData.BottomRight));
 	memmove(&Array[position], &ImageData.WindowsData.BottomRight, sizeof(ImageData.WindowsData.BottomRight)); position += sizeof(ImageData.WindowsData.BottomRight);
-	for (int i = 0; i < ImageData.WindowsData.WindowCount; i++)
+	for (int i = 0; i < ImageData.WindowsData.SizeWindowList; i++)
 	{
-		// Move(&ImageData.WindowsData.Info[i], &Array[position], sizeof(datawindow));
 		memmove(&Array[position], &ImageData.WindowsData.Info[i], sizeof(datawindow)); position += sizeof(datawindow);
 	}
-	// Move(ImageData.WindowsData.Data, &Array[position], (MassType[ImageData.WindowsData.DataType] * ImageData.WindowsData.SizeData));
 	memmove(&Array[position], ImageData.WindowsData.Data, (MassType[ImageData.WindowsData.DataType] * ImageData.WindowsData.SizeData)); position += (MassType[ImageData.WindowsData.DataType] * ImageData.WindowsData.SizeData);
 	return Array;
 }
 // ---------------------------------------------------------------------------
 
-void IKI_img::UnZipStructure(unsigned char* Array, unsigned int SizeInfo)
+void IKI_img::UnZipStructure(unsigned char* Array)
 {
 	unsigned int position = 0;
 	unsigned int size_id; // размер пакета, без размера признака
 
-	// Move(&Array[position], &Georeferencing.DateTime, sizeof(Georeferencing.DateTime));
 	memmove(&Georeferencing.DateTime, &Array[position], sizeof(Georeferencing.DateTime)); position += sizeof(Georeferencing.DateTime);
-	// Move(&Array[position], &size_id, sizeof(size_id));
 	memmove(&size_id, &Array[position], sizeof(size_id)); position += sizeof(size_id); // запись длины текста
-	// Move(&Array[position], &Georeferencing.SoftwareVersion[0], size_id);
 	memmove(&Georeferencing.SoftwareVersion[0], &Array[position], size_id); position += size_id;
-	// Move(&Array[position], &Georeferencing.FrameNumber, sizeof(Georeferencing.FrameNumber));
 	memmove(&Georeferencing.FrameNumber, &Array[position], sizeof(Georeferencing.FrameNumber)); position += sizeof(Georeferencing.FrameNumber);
-	// Move(&Array[position], &Georeferencing.ProtonsDensity, sizeof(Georeferencing.ProtonsDensity));
 	memmove(&Georeferencing.ProtonsDensity, &Array[position], sizeof(Georeferencing.ProtonsDensity)); position += sizeof(Georeferencing.ProtonsDensity);
-	// Move(&Array[position], &Georeferencing.TracksBrightness, sizeof(Georeferencing.TracksBrightness));
 	memmove(&Georeferencing.TracksBrightness, &Array[position], sizeof(Georeferencing.TracksBrightness)); position += sizeof(Georeferencing.TracksBrightness);
-	// Move(&Array[position], &Georeferencing.MoonVelocity, sizeof(Georeferencing.MoonVelocity));
 	memmove(&Georeferencing.MoonVelocity, &Array[position], sizeof(Georeferencing.MoonVelocity)); position += sizeof(Georeferencing.MoonVelocity);
-	// Move(&Array[position], &Georeferencing.MoonBrightness, sizeof(Georeferencing.MoonBrightness));
 	memmove(&Georeferencing.MoonBrightness, &Array[position], sizeof(Georeferencing.MoonBrightness)); position += sizeof(Georeferencing.MoonBrightness);
-	// Move(&Array[position], &Georeferencing.BrightnessLeft, sizeof(Georeferencing.BrightnessLeft));
 	memmove(&Georeferencing.BrightnessLeft, &Array[position], sizeof(Georeferencing.BrightnessLeft)); position += sizeof(Georeferencing.BrightnessLeft);
-	// Move(&Array[position], &Georeferencing.BrightnessRight, sizeof(Georeferencing.BrightnessRight));
 	memmove(&Georeferencing.BrightnessRight, &Array[position], sizeof(Georeferencing.BrightnessRight)); position += sizeof(Georeferencing.BrightnessRight);
-	// Move(&Array[position], &Georeferencing.Era, sizeof(Georeferencing.Era));
 	memmove(&Georeferencing.Era, &Array[position], sizeof(Georeferencing.Era)); position += sizeof(Georeferencing.Era);
-	// Move(&Array[position], &Georeferencing.OrbitEccentricity, sizeof(Georeferencing.OrbitEccentricity));
 	memmove(&Georeferencing.OrbitEccentricity, &Array[position], sizeof(Georeferencing.OrbitEccentricity)); position += sizeof(Georeferencing.OrbitEccentricity);
-	// Move(&Array[position], &Georeferencing.LengthSemiaxis, sizeof(Georeferencing.LengthSemiaxis));
 	memmove(&Georeferencing.LengthSemiaxis, &Array[position], sizeof(Georeferencing.LengthSemiaxis)); position += sizeof(Georeferencing.LengthSemiaxis);
-	// Move(&Array[position], &Georeferencing.LengthRadiusVector, sizeof(Georeferencing.LengthRadiusVector));
 	memmove(&Georeferencing.LengthRadiusVector, &Array[position], sizeof(Georeferencing.LengthRadiusVector)); position += sizeof(Georeferencing.LengthRadiusVector);
-	// Move(&Array[position], &Georeferencing.LongitudeAscendingNode, sizeof(Georeferencing.LongitudeAscendingNode));
 	memmove(&Georeferencing.LongitudeAscendingNode, &Array[position], sizeof(Georeferencing.LongitudeAscendingNode)); position += sizeof(Georeferencing.LongitudeAscendingNode);
-	// Move(&Array[position], &Georeferencing.InclinationOrbit, sizeof(Georeferencing.InclinationOrbit));
 	memmove(&Georeferencing.InclinationOrbit, &Array[position], sizeof(Georeferencing.InclinationOrbit)); position += sizeof(Georeferencing.InclinationOrbit);
-	// Move(&Array[position], &Georeferencing.ArgumentPerigee, sizeof(Georeferencing.ArgumentPerigee));
 	memmove(&Georeferencing.ArgumentPerigee, &Array[position], sizeof(Georeferencing.ArgumentPerigee)); position += sizeof(Georeferencing.ArgumentPerigee);
-	// Move(&Array[position], &Georeferencing.ArgumentLatitude, sizeof(Georeferencing.ArgumentLatitude));
 	memmove(&Georeferencing.ArgumentLatitude, &Array[position], sizeof(Georeferencing.ArgumentLatitude)); position += sizeof(Georeferencing.ArgumentLatitude);
-	// Move(&Array[position], &Georeferencing.DeviceAngularVelocity, sizeof(Georeferencing.DeviceAngularVelocity));
 	memmove(&Georeferencing.DeviceAngularVelocity, &Array[position], sizeof(Georeferencing.DeviceAngularVelocity)); position += sizeof(Georeferencing.DeviceAngularVelocity);
-	// Move(&Array[position], &Georeferencing.DeviceAngularAcceleration, sizeof(Georeferencing.DeviceAngularAcceleration));
 	memmove(&Georeferencing.DeviceAngularAcceleration, &Array[position], sizeof(Georeferencing.DeviceAngularAcceleration)); position += sizeof(Georeferencing.DeviceAngularAcceleration);
-	// Move(&Array[position], &Georeferencing.ProjectionLinearVelocity, sizeof(Georeferencing.ProjectionLinearVelocity));
 	memmove(&Georeferencing.ProjectionLinearVelocity, &Array[position], sizeof(Georeferencing.ProjectionLinearVelocity)); position += sizeof(Georeferencing.ProjectionLinearVelocity);
-	// Move(&Array[position], &Georeferencing.OrientationAngles, sizeof(Georeferencing.OrientationAngles));
 	memmove(&Georeferencing.OrientationAngles, &Array[position], sizeof(Georeferencing.OrientationAngles)); position += sizeof(Georeferencing.OrientationAngles);
-	// Move(&Array[position], &Georeferencing.OrientationQuaternion, sizeof(Georeferencing.OrientationQuaternion));
 	memmove(&Georeferencing.OrientationQuaternion, &Array[position], sizeof(Georeferencing.OrientationQuaternion)); position += sizeof(Georeferencing.OrientationQuaternion);
-	// Move(&Array[position], &Georeferencing.OrientationMatrix, sizeof(Georeferencing.OrientationMatrix));
 	memmove(&Georeferencing.OrientationMatrix, &Array[position], sizeof(Georeferencing.OrientationMatrix)); position += sizeof(Georeferencing.OrientationMatrix);
-	// Move(&Array[position], &Georeferencing.YearAberrationApply, sizeof(Georeferencing.YearAberrationApply));
 	memmove(&Georeferencing.YearAberrationApply, &Array[position], sizeof(Georeferencing.YearAberrationApply)); position += sizeof(Georeferencing.YearAberrationApply);
-	// Move(&Array[position], &Georeferencing.SatelliteAberrationApply, sizeof(Georeferencing.SatelliteAberrationApply));
 	memmove(&Georeferencing.SatelliteAberrationApply, &Array[position], sizeof(Georeferencing.SatelliteAberrationApply)); position += sizeof(Georeferencing.SatelliteAberrationApply);
-	// Move(&Array[position], &Georeferencing.PrecessionNutationApply, sizeof(Georeferencing.PrecessionNutationApply));
 	memmove(&Georeferencing.PrecessionNutationApply, &Array[position], sizeof(Georeferencing.PrecessionNutationApply)); position += sizeof(Georeferencing.PrecessionNutationApply);
-	// Move(&Array[position], &Georeferencing.PhotonNoiseApply, sizeof(Georeferencing.PhotonNoiseApply));
 	memmove(&Georeferencing.PhotonNoiseApply, &Array[position], sizeof(Georeferencing.PhotonNoiseApply)); position += sizeof(Georeferencing.PhotonNoiseApply);
-	// Move(&Array[position], &Georeferencing.DistortionApply, sizeof(Georeferencing.DistortionApply));
 	memmove(&Georeferencing.DistortionApply, &Array[position], sizeof(Georeferencing.DistortionApply)); position += sizeof(Georeferencing.DistortionApply);
 
-	// Move(&Array[position], &size_id, sizeof(size_id));
 	memmove(&size_id, &Array[position], sizeof(size_id)); position += sizeof(size_id); // запись длины текста
-	// Move(&Array[position], &CameraSettings.DataSource[0], size_id);
 	memmove(&CameraSettings.DataSource[0], &Array[position], size_id); position += size_id;
-	// Move(&Array[position], &CameraSettings.SNDevice, sizeof(CameraSettings.SNDevice));
 	memmove(&CameraSettings.SNDevice, &Array[position], sizeof(CameraSettings.SNDevice)); position += sizeof(CameraSettings.SNDevice);
-	// Move(&Array[position], &CameraSettings.InnerRadius, sizeof(CameraSettings.InnerRadius));
 	memmove(&CameraSettings.InnerRadius, &Array[position], sizeof(CameraSettings.InnerRadius)); position += sizeof(CameraSettings.InnerRadius);
-	// Move(&Array[position], &CameraSettings.OuterRadius, sizeof(CameraSettings.OuterRadius));
 	memmove(&CameraSettings.OuterRadius, &Array[position], sizeof(CameraSettings.OuterRadius)); position += sizeof(CameraSettings.OuterRadius);
-	// Move(&Array[position], &CameraSettings.ResolutionACP, sizeof(CameraSettings.ResolutionACP));
 	memmove(&CameraSettings.ResolutionACP, &Array[position], sizeof(CameraSettings.ResolutionACP)); position += sizeof(CameraSettings.ResolutionACP);
-	// Move(&Array[position], &CameraSettings.EV_ACP, sizeof(CameraSettings.EV_ACP));
 	memmove(&CameraSettings.EV_ACP, &Array[position], sizeof(CameraSettings.EV_ACP)); position += sizeof(CameraSettings.EV_ACP);
-	// Move(&Array[position], &CameraSettings.PixelSize, sizeof(CameraSettings.PixelSize));
 	memmove(&CameraSettings.PixelSize, &Array[position], sizeof(CameraSettings.PixelSize)); position += sizeof(CameraSettings.PixelSize);
-	// Move(&Array[position], &CameraSettings.FocalLength, sizeof(CameraSettings.FocalLength));
 	memmove(&CameraSettings.FocalLength, &Array[position], sizeof(CameraSettings.FocalLength)); position += sizeof(CameraSettings.FocalLength);
-	// Move(&Array[position], &CameraSettings.DiameterEntrancePupil, sizeof(CameraSettings.DiameterEntrancePupil));
 	memmove(&CameraSettings.DiameterEntrancePupil, &Array[position], sizeof(CameraSettings.DiameterEntrancePupil)); position += sizeof(CameraSettings.DiameterEntrancePupil);
-	// Move(&Array[position], &CameraSettings.DarkLevel, sizeof(CameraSettings.DarkLevel));
 	memmove(&CameraSettings.DarkLevel, &Array[position], sizeof(CameraSettings.DarkLevel)); position += sizeof(CameraSettings.DarkLevel);
-	// Move(&Array[position], &CameraSettings.DarkSKO, sizeof(CameraSettings.DarkSKO));
 	memmove(&CameraSettings.DarkSKO, &Array[position], sizeof(CameraSettings.DarkSKO)); position += sizeof(CameraSettings.DarkSKO);
-	// Move(&Array[position], &CameraSettings.LimitingMagnitude, sizeof(CameraSettings.LimitingMagnitude));
 	memmove(&CameraSettings.LimitingMagnitude, &Array[position], sizeof(CameraSettings.LimitingMagnitude)); position += sizeof(CameraSettings.LimitingMagnitude);
-	// Move(&Array[position], &CameraSettings.StarsDistribution, sizeof(CameraSettings.StarsDistribution));
 	memmove(&CameraSettings.StarsDistribution, &Array[position], sizeof(CameraSettings.StarsDistribution)); position += sizeof(CameraSettings.StarsDistribution);
-	// Move(&Array[position], &CameraSettings.DistortionFunction.PolynomialDegree, sizeof(CameraSettings.DistortionFunction.PolynomialDegree));
 	memmove(&CameraSettings.DistortionFunction.PolynomialDegree, &Array[position], sizeof(CameraSettings.DistortionFunction.PolynomialDegree)); position += sizeof(CameraSettings.DistortionFunction.PolynomialDegree);
-	// Move(&Array[position], &CameraSettings.DistortionFunction.CoefficientsCount, sizeof(CameraSettings.DistortionFunction.CoefficientsCount));
 	memmove(&CameraSettings.DistortionFunction.CoefficientsCount, &Array[position], sizeof(CameraSettings.DistortionFunction.CoefficientsCount)); position += sizeof(CameraSettings.DistortionFunction.CoefficientsCount);
 	_FreeMemoryArray(CameraSettings.DistortionFunction.Coefficient);
 	if (CameraSettings.DistortionFunction.CoefficientsCount > 0)
@@ -1318,12 +1230,10 @@ void IKI_img::UnZipStructure(unsigned char* Array, unsigned int SizeInfo)
 		CameraSettings.DistortionFunction.Coefficient = new coefonaxis[CameraSettings.DistortionFunction.CoefficientsCount];
 		for (int i = 0; i < CameraSettings.DistortionFunction.CoefficientsCount; i++)
 		{
-			// Move(&Array[position], &CameraSettings.DistortionFunction.Coefficient[i], sizeof(coefonaxis));
 			memmove(&CameraSettings.DistortionFunction.Coefficient[i], &Array[position], sizeof(coefonaxis)); position += sizeof(coefonaxis);
 		}
 	}
 
-	// Move(&Array[position], &CameraSettings.TableDeadObjects.RecordsCount, sizeof(CameraSettings.TableDeadObjects.RecordsCount));
 	memmove(&CameraSettings.TableDeadObjects.RecordsCount, &Array[position], sizeof(CameraSettings.TableDeadObjects.RecordsCount)); position += sizeof(CameraSettings.TableDeadObjects.RecordsCount);
 	_FreeMemoryArray(CameraSettings.TableDeadObjects.PixelData);
 	if (CameraSettings.TableDeadObjects.RecordsCount > 0)
@@ -1331,18 +1241,13 @@ void IKI_img::UnZipStructure(unsigned char* Array, unsigned int SizeInfo)
 		CameraSettings.TableDeadObjects.PixelData = new infopix[CameraSettings.TableDeadObjects.RecordsCount];
 		for (int i = 0; i < CameraSettings.TableDeadObjects.RecordsCount; i++)
 		{
-			// Move(&Array[position], &CameraSettings.TableDeadObjects.PixelData[i], sizeof(infopix));
 			memmove(&CameraSettings.TableDeadObjects.PixelData[i], &Array[position], sizeof(infopix)); position += sizeof(infopix);
 		}
 	}
 
-	// Move(&Array[position], &size_id, sizeof(size_id));
 	memmove(&size_id, &Array[position], sizeof(size_id)); position += sizeof(size_id); // запись длины текста
-	// Move(&Array[position], &FilterData.TagFilter[0], size_id);
 	memmove(&FilterData.TagFilter[0], &Array[position], size_id); position += size_id;
-	// Move(&Array[position], &FilterData.FilteredPixelsCount, sizeof(FilterData.FilteredPixelsCount));
 	memmove(&FilterData.FilteredPixelsCount, &Array[position], sizeof(FilterData.FilteredPixelsCount)); position += sizeof(FilterData.FilteredPixelsCount);
-	// Move(&Array[position], &FilterData.BottomRight, sizeof(FilterData.BottomRight));
 	memmove(&FilterData.BottomRight, &Array[position], sizeof(FilterData.BottomRight)); position += sizeof(FilterData.BottomRight);
 	_FreeMemoryArray(FilterData.DataPixels);
 	if (FilterData.FilteredPixelsCount > 0)
@@ -1350,37 +1255,28 @@ void IKI_img::UnZipStructure(unsigned char* Array, unsigned int SizeInfo)
 		FilterData.DataPixels = new filterdata[FilterData.FilteredPixelsCount];
 		for (int i = 0; i < FilterData.FilteredPixelsCount; i++)
 		{
-			// Move(&Array[position], &FilterData.DataPixels[i], sizeof(filterdata));
 			memmove(&FilterData.DataPixels[i], &Array[position], sizeof(filterdata)); position += sizeof(filterdata);
 		}
 	}
 
-	// Move(&Array[position], &StarsData.RezStat, sizeof(StarsData.RezStat));
 	memmove(&StarsData.RezStat, &Array[position], sizeof(StarsData.RezStat)); position += sizeof(StarsData.RezStat);
-	// Move(&Array[position], &StarsData.Epsilon, sizeof(StarsData.Epsilon));
 	memmove(&StarsData.Epsilon, &Array[position], sizeof(StarsData.Epsilon)); position += sizeof(StarsData.Epsilon);
-	// Move(&Array[position], &StarsData.m_X, sizeof(StarsData.m_X));
 	memmove(&StarsData.m_X, &Array[position], sizeof(StarsData.m_X)); position += sizeof(StarsData.m_X);
-	// Move(&Array[position], &StarsData.m_Y, sizeof(StarsData.m_Y));
 	memmove(&StarsData.m_Y, &Array[position], sizeof(StarsData.m_Y)); position += sizeof(StarsData.m_Y);
-	// Move(&Array[position], &StarsData.m_Cur, sizeof(StarsData.m_Cur));
 	memmove(&StarsData.m_Cur, &Array[position], sizeof(StarsData.m_Cur)); position += sizeof(StarsData.m_Cur);
-	// Move(&Array[position], &StarsData.LocalizedCount, sizeof(StarsData.LocalizedCount));
+	memmove(&StarsData.SizeLocalList, &Array[position], sizeof(StarsData.SizeLocalList)); position += sizeof(StarsData.SizeLocalList);
 	memmove(&StarsData.LocalizedCount, &Array[position], sizeof(StarsData.LocalizedCount)); position += sizeof(StarsData.LocalizedCount);
-	// Move(&Array[position], &StarsData.RecognizedCount, sizeof(StarsData.RecognizedCount));
 	memmove(&StarsData.RecognizedCount, &Array[position], sizeof(StarsData.RecognizedCount)); position += sizeof(StarsData.RecognizedCount);
 	_FreeMemoryArray(StarsData.StarsList);
-	if (StarsData.LocalizedCount > 0)
+	if (StarsData.SizeLocalList > 0)
 	{
-		StarsData.StarsList = new starinfo[StarsData.LocalizedCount];
-		for (int i = 0; i < StarsData.LocalizedCount; i++)
+		StarsData.StarsList = new starinfo[StarsData.SizeLocalList];
+		for (int i = 0; i < StarsData.SizeLocalList; i++)
 		{
-			// Move(&Array[position], &StarsData.StarsList[i], sizeof(starinfo));
 			memmove(&StarsData.StarsList[i], &Array[position], sizeof(starinfo)); position += sizeof(starinfo);
 		}
 	}
-
-	// Move(&Array[position], &StarsData.SimulatedFrame.strrec, sizeof(StarsData.SimulatedFrame.strrec));
+	memmove(&StarsData.SimulatedFrame.SizeStarList, &Array[position], sizeof(StarsData.SimulatedFrame.SizeStarList)); position += sizeof(StarsData.SimulatedFrame.SizeStarList);
 	memmove(&StarsData.SimulatedFrame.strrec, &Array[position], sizeof(StarsData.SimulatedFrame.strrec)); position += sizeof(StarsData.SimulatedFrame.strrec);
 	_FreeMemoryArray(StarsData.SimulatedFrame.StarRec);
 	if (StarsData.SimulatedFrame.strrec > 0)
@@ -1388,82 +1284,58 @@ void IKI_img::UnZipStructure(unsigned char* Array, unsigned int SizeInfo)
 		StarsData.SimulatedFrame.StarRec = new STARREC[StarsData.SimulatedFrame.strrec];
 		for (int i = 0; i < StarsData.SimulatedFrame.strrec; i++)
 		{
-			// Move(&Array[position], &StarsData.SimulatedFrame.StarRec[i], sizeof(starinfo));
 			memmove(&StarsData.SimulatedFrame.StarRec[i], &Array[position], sizeof(starinfo)); position += sizeof(STARREC);
 		}
 	}
-	// Move(&Array[position], &StarsData.RecognizedOrientationAngles, sizeof(StarsData.RecognizedOrientationAngles));
 	memmove(&StarsData.RecognizedOrientationAngles, &Array[position], sizeof(StarsData.RecognizedOrientationAngles)); position += sizeof(StarsData.RecognizedOrientationAngles);
-	// Move(&Array[position], &StarsData.RecognizedOrientationQuaternion, sizeof(StarsData.RecognizedOrientationQuaternion));
 	memmove(&StarsData.RecognizedOrientationQuaternion, &Array[position], sizeof(StarsData.RecognizedOrientationQuaternion)); position += sizeof(StarsData.RecognizedOrientationQuaternion);
-	// Move(&Array[position], &StarsData.RecognizedOrientationMatrix, sizeof(StarsData.RecognizedOrientationMatrix));
 	memmove(&StarsData.RecognizedOrientationMatrix, &Array[position], sizeof(StarsData.RecognizedOrientationMatrix)); position += sizeof(StarsData.RecognizedOrientationMatrix);
 
-	// Move(&Array[position], &ImageData.ExposureTime, sizeof(ImageData.ExposureTime));
 	memmove(&ImageData.ExposureTime, &Array[position], sizeof(ImageData.ExposureTime)); position += sizeof(ImageData.ExposureTime);
-	// Move(&Array[position], &ImageData.FrameData.DataType, sizeof(ImageData.FrameData.DataType));
 	memmove(&ImageData.FrameData.DataType, &Array[position], sizeof(ImageData.FrameData.DataType)); position += sizeof(ImageData.FrameData.DataType);
-	// Move(&Array[position], &ImageData.FrameData.DegreeBinning, sizeof(ImageData.FrameData.DegreeBinning));
 	memmove(&ImageData.FrameData.DegreeBinning, &Array[position], sizeof(ImageData.FrameData.DegreeBinning)); position += sizeof(ImageData.FrameData.DegreeBinning);
-	// Move(&Array[position], &ImageData.FrameData.FrameWidth, sizeof(ImageData.FrameData.FrameWidth));
 	memmove(&ImageData.FrameData.FrameWidth, &Array[position], sizeof(ImageData.FrameData.FrameWidth)); position += sizeof(ImageData.FrameData.FrameWidth);
-	// Move(&Array[position], &ImageData.FrameData.FrameHeight, sizeof(ImageData.FrameData.FrameHeight));
 	memmove(&ImageData.FrameData.FrameHeight, &Array[position], sizeof(ImageData.FrameData.FrameHeight)); position += sizeof(ImageData.FrameData.FrameHeight);
 
 	_FreeMemoryArray(ImageData.FrameData.Data);
-	size_id = ImageData.FrameData.FrameWidth * ImageData.FrameData.FrameHeight;
-	if (size_id > 0)
+	if (ImageData.FrameData.SizeData > 0)
 	{
 		switch (ImageData.FrameData.DataType)
 		{
-		case 0: ImageData.FrameData.Data = (void*)new unsigned char[size_id]; break;
-		case 1: ImageData.FrameData.Data = (void*)new unsigned short[size_id]; break;
-		case 2: ImageData.FrameData.Data = (void*)new float[size_id]; break;
+		case 0: ImageData.FrameData.Data = (void*)new unsigned char[ImageData.FrameData.SizeData]; break;
+		case 1: ImageData.FrameData.Data = (void*)new unsigned short[ImageData.FrameData.SizeData]; break;
+		case 2: ImageData.FrameData.Data = (void*)new float[ImageData.FrameData.SizeData]; break;
 		}
-		// Move(&Array[position], ImageData.FrameData.Data, (MassType[ImageData.FrameData.DataType] * size_id));
-		memmove(&ImageData.FrameData.Data, &Array[position], (MassType[ImageData.FrameData.DataType] * size_id)); position += (MassType[ImageData.FrameData.DataType] * size_id);
+		memmove(&ImageData.FrameData.Data, &Array[position], (MassType[ImageData.FrameData.DataType] * ImageData.FrameData.SizeData)); position += (MassType[ImageData.FrameData.DataType] * size_id);
 	}
-	// Move(&Array[position], &ImageData.LinesData.LinesCount, sizeof(ImageData.LinesData.LinesCount));
 	memmove(&ImageData.LinesData.LinesCount, &Array[position], sizeof(ImageData.LinesData.LinesCount)); position += sizeof(ImageData.LinesData.LinesCount);
-	// Move(&Array[position], &ImageData.LinesData.DataType, sizeof(ImageData.LinesData.DataType));
 	memmove(&ImageData.LinesData.DataType, &Array[position], sizeof(ImageData.LinesData.DataType)); position += sizeof(ImageData.LinesData.DataType);
-	// Move(&Array[position], &ImageData.LinesData.DegreeBinning, sizeof(ImageData.LinesData.DegreeBinning));
 	memmove(&ImageData.LinesData.DegreeBinning, &Array[position], sizeof(ImageData.LinesData.DegreeBinning)); position += sizeof(ImageData.LinesData.DegreeBinning);
-	// Move(&Array[position], &ImageData.LinesData.LinesWidth, sizeof(ImageData.LinesData.LinesWidth));
 	memmove(&ImageData.LinesData.LinesWidth, &Array[position], sizeof(ImageData.LinesData.LinesWidth)); position += sizeof(ImageData.LinesData.LinesWidth);
-	// Move(&Array[position], &ImageData.LinesData.LinesHeight, sizeof(ImageData.LinesData.LinesHeight));
 	memmove(&ImageData.LinesData.LinesHeight, &Array[position], sizeof(ImageData.LinesData.LinesHeight)); position += sizeof(ImageData.LinesData.LinesHeight);
 	for (int i = 0; i < ImageData.LinesData.LinesCount; i++)
 	{
-		// Move(&Array[position], &ImageData.LinesData.Info[i], sizeof(dataline));
 		memmove(&ImageData.LinesData.Info[i], &Array[position], sizeof(dataline)); position += sizeof(dataline);
 	}
 	_FreeMemoryArray(ImageData.LinesData.Data);
-	size_id = ImageData.LinesData.LinesWidth * ImageData.LinesData.LinesHeight;
-	if (size_id > 0)
+	if (ImageData.LinesData.SizeData > 0)
 	{
 		switch (ImageData.LinesData.DataType)
 		{
-		case 0: ImageData.LinesData.Data = (void*)new unsigned char[size_id]; break;
-		case 1: ImageData.LinesData.Data = (void*)new unsigned short[size_id]; break;
-		case 2: ImageData.LinesData.Data = (void*)new float[size_id]; break;
+		case 0: ImageData.LinesData.Data = (void*)new unsigned char[ImageData.LinesData.SizeData]; break;
+		case 1: ImageData.LinesData.Data = (void*)new unsigned short[ImageData.LinesData.SizeData]; break;
+		case 2: ImageData.LinesData.Data = (void*)new float[ImageData.LinesData.SizeData]; break;
 		}
-		// Move(&Array[position], ImageData.LinesData.Data, (MassType[ImageData.LinesData.DataType] * size_id));
-		memmove(&ImageData.LinesData.Data, &Array[position], (MassType[ImageData.LinesData.DataType] * size_id)); position += (MassType[ImageData.LinesData.DataType] * size_id);
+		memmove(&ImageData.LinesData.Data, &Array[position], (MassType[ImageData.LinesData.DataType] * ImageData.LinesData.SizeData)); position += (MassType[ImageData.LinesData.DataType] * size_id);
 	}
-	// Move(&Array[position], &ImageData.WindowsData.WindowCount, sizeof(ImageData.WindowsData.WindowCount));
+	memmove(&ImageData.WindowsData.SizeWindowList, &Array[position], sizeof(ImageData.WindowsData.SizeWindowList)); position += sizeof(ImageData.WindowsData.SizeWindowList);
 	memmove(&ImageData.WindowsData.WindowCount, &Array[position], sizeof(ImageData.WindowsData.WindowCount)); position += sizeof(ImageData.WindowsData.WindowCount);
-	// Move(&Array[position], &ImageData.WindowsData.DataType, sizeof(ImageData.WindowsData.DataType));
 	memmove(&ImageData.WindowsData.DataType, &Array[position], sizeof(ImageData.WindowsData.DataType)); position += sizeof(ImageData.WindowsData.DataType);
-	// Move(&Array[position], &ImageData.WindowsData.DegreeBinning, sizeof(ImageData.WindowsData.DegreeBinning));
 	memmove(&ImageData.WindowsData.DegreeBinning, &Array[position], sizeof(ImageData.WindowsData.DegreeBinning)); position += sizeof(ImageData.WindowsData.DegreeBinning);
-	// Move(&Array[position], &ImageData.WindowsData.SizeData, sizeof(ImageData.WindowsData.SizeData));
 	memmove(&ImageData.WindowsData.SizeData, &Array[position], sizeof(ImageData.WindowsData.SizeData)); position += sizeof(ImageData.WindowsData.SizeData);
-	// Move(&Array[position], &ImageData.WindowsData.BottomRight, sizeof(ImageData.WindowsData.BottomRight));
 	memmove(&ImageData.WindowsData.BottomRight, &Array[position], sizeof(ImageData.WindowsData.BottomRight)); position += sizeof(ImageData.WindowsData.BottomRight);
-	for (int i = 0; i < ImageData.WindowsData.WindowCount; i++)
+	for (int i = 0; i < ImageData.WindowsData.SizeWindowList; i++)
 	{
-		// Move(&Array[position], &ImageData.WindowsData.Info[i], sizeof(datawindow));
 		memmove(&ImageData.WindowsData.Info[i], &Array[position], sizeof(datawindow)); position += sizeof(datawindow);
 	}
 	_FreeMemoryArray(ImageData.WindowsData.Data);
@@ -1475,7 +1347,6 @@ void IKI_img::UnZipStructure(unsigned char* Array, unsigned int SizeInfo)
 		case 1: ImageData.WindowsData.Data = (void*)new unsigned short[ImageData.WindowsData.SizeData]; break;
 		case 2: ImageData.WindowsData.Data = (void*)new float[ImageData.WindowsData.SizeData]; break;
 		}
-		// Move(&Array[position], ImageData.WindowsData.Data, (MassType[ImageData.WindowsData.DataType] * ImageData.WindowsData.SizeData));
 		memmove(&ImageData.WindowsData.Data, &Array[position], (MassType[ImageData.WindowsData.DataType] * ImageData.WindowsData.SizeData)); position += (MassType[ImageData.WindowsData.DataType] * ImageData.WindowsData.SizeData);
 	}
 }

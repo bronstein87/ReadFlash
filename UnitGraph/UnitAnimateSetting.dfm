@@ -276,6 +276,14 @@ object FormAnimateSetting: TFormAnimateSetting
       NumbersOnly = True
       TabOrder = 1
     end
+    object SkipFrameCheckBox: TCheckBox
+      Left = 231
+      Top = 16
+      Width = 106
+      Height = 17
+      Caption = #1055#1088#1086#1087#1091#1089#1082#1072#1090#1100' '#1082#1072#1076#1088
+      TabOrder = 2
+    end
   end
   object ColorDialog1: TColorDialog
     Left = 392

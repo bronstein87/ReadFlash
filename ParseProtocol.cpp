@@ -755,6 +755,17 @@ bool checkLocFile(ifstream& in)
 	return true;
 }
 
+bool checkM2Loc(ifstream& in)
+{
+	bool isLoc = false;
+	if (findLine(in, ";;ƒ“Ã» ÀÓÍ;") != string::npos)
+	{
+	   isLoc = true;
+	}
+	in.seekg(0);
+    return isLoc;
+}
+
 void writeProtocolToIKI(CadrInfo& cadrInfo, int counter)
 {
 	unique_ptr <IKI_img> writer (new IKI_img());
@@ -765,11 +776,10 @@ void writeProtocolToIKI(CadrInfo& cadrInfo, int counter)
 
 	writer->ImageData.FrameData.FrameHeight = cadrInfo.ImageHeight;
 	writer->ImageData.FrameData.FrameWidth = cadrInfo.ImageWidth;
-	writer->StarsData.SimulatedFrame.SizeStarList = cadrInfo.SizeObjectsList;
 	writer->ImageData.WindowsData.SizeWindowList = cadrInfo.SizeWindowsList;
 	writer->StarsData.LocalizedCount = cadrInfo.CountLocalObj;
 	writer->StarsData.RecognizedCount = cadrInfo.CountDeterObj;
-	writer->ImageData.WindowsData.WindowCount = cadrInfo.CountWindows;
+	writer->ImageData.WindowsData.WindowCount = cadrInfo.SizeWindowsList;
 	writer->StarsData.Epsilon = cadrInfo.Epsilon;
 	writer->StarsData.m_Cur = cadrInfo.MeanErrorXY;
 
@@ -784,20 +794,37 @@ void writeProtocolToIKI(CadrInfo& cadrInfo, int counter)
 		writer->ImageData.WindowsData.Info[i].ObjCount = cadrInfo.WindowsList[i].CountObj;
 	}
 
-	writer->StarsData.StarsList = new starinfo [cadrInfo.SizeObjectsList];
+
+
+    writer->StarsData.SimulatedFrame.SizeStarList = cadrInfo.SizeObjectsList;
+	writer->StarsData.SimulatedFrame.StarRec = new STARREC [cadrInfo.SizeObjectsList];
 	for (int i = 0; i < cadrInfo.SizeObjectsList; i++)
 	{
-		writer->StarsData.StarsList[i].X_coordinate = cadrInfo.ObjectsList[i].X;
-		writer->StarsData.StarsList[i].Y_coordinate = cadrInfo.ObjectsList[i].Y;
-		writer->StarsData.StarsList[i].BrightnessObject = cadrInfo.ObjectsList[i].Bright;
-		writer->StarsData.StarsList[i].NumberStar = cadrInfo.ObjectsList[i].StarID;
-		writer->StarsData.StarsList[i].StellarMagnitude = cadrInfo.ObjectsList[i].Mv;
-		writer->StarsData.StarsList[i].PixelsCount = cadrInfo.ObjectsList[i].Square;
-		writer->StarsData.StarsList[i].DX = cadrInfo.ObjectsList[i].Dx;
-		writer->StarsData.StarsList[i].DY = cadrInfo.ObjectsList[i].Dy;
-		writer->StarsData.StarsList[i].SpectralClass[0] = cadrInfo.ObjectsList[i].Sp[0];
-		writer->StarsData.StarsList[i].SpectralClass[1] = cadrInfo.ObjectsList[i].Sp[1];
+		writer->StarsData.SimulatedFrame.StarRec[i].Xs = cadrInfo.ObjectsList[i].X;
+		writer->StarsData.SimulatedFrame.StarRec[i].Ys = cadrInfo.ObjectsList[i].Y;
+		writer->StarsData.SimulatedFrame.StarRec[i].Is = cadrInfo.ObjectsList[i].Bright;
+		writer->StarsData.SimulatedFrame.StarRec[i].Ns = cadrInfo.ObjectsList[i].StarID;
+		writer->StarsData.SimulatedFrame.StarRec[i].Mv = cadrInfo.ObjectsList[i].Mv;
+		writer->StarsData.SimulatedFrame.StarRec[i].Sp[0] = cadrInfo.ObjectsList[i].Sp[0];
+		writer->StarsData.SimulatedFrame.StarRec[i].Sp[1] = cadrInfo.ObjectsList[i].Sp[1];
 	}
+
+
+//	writer->StarsData.SizeLocalList = cadrInfo.SizeObjectsList;
+//	writer->StarsData.StarsList = new starinfo [cadrInfo.SizeObjectsList];
+//	for (int i = 0; i < cadrInfo.SizeObjectsList; i++)
+//	{
+//		writer->StarsData.StarsList[i].X_coordinate = cadrInfo.ObjectsList[i].X;
+//		writer->StarsData.StarsList[i].Y_coordinate = cadrInfo.ObjectsList[i].Y;
+//		writer->StarsData.StarsList[i].BrightnessObject = cadrInfo.ObjectsList[i].Bright;
+//		writer->StarsData.StarsList[i].NumberStar = cadrInfo.ObjectsList[i].StarID;
+//		writer->StarsData.StarsList[i].StellarMagnitude = cadrInfo.ObjectsList[i].Mv;
+//		writer->StarsData.StarsList[i].PixelsCount = cadrInfo.ObjectsList[i].Square;
+//		writer->StarsData.StarsList[i].DX = cadrInfo.ObjectsList[i].Dx;
+//		writer->StarsData.StarsList[i].DY = cadrInfo.ObjectsList[i].Dy;
+//		writer->StarsData.StarsList[i].SpectralClass[0] = cadrInfo.ObjectsList[i].Sp[0];
+//		writer->StarsData.StarsList[i].SpectralClass[1] = cadrInfo.ObjectsList[i].Sp[1];
+//	}
 
 	for (int i = 0; i < 3; i++)
 	{
