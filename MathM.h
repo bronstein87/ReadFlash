@@ -39,6 +39,8 @@ struct PointXYZ
 
 struct Statistika
 {
+	Statistika(): mean(0), sigma(0), min(0), max(0)
+	{}
 	double mean, sigma;
 	double min, max;
 };
@@ -116,6 +118,10 @@ Statistika stat;
 		}
 	}
 	auto count = std::distance(first, last) - count_offset;
+	if (count == 0) {
+        return stat;
+
+	}
 	double mean = init / count;
 	dispersio  = (dispersio / count) - pow(mean, 2);
 

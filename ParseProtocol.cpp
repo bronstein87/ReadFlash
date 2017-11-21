@@ -979,7 +979,7 @@ CadrInfo convertIKIFormatToInfoCadr(IKI_img* reader, bool CompareIKIRes)
 	cadrInfo.IsBinary = reader->ImageData.FrameData.DegreeBinning;
 	cadrInfo.DataType = reader->ImageData.FrameData.DataType;
 	cadrInfo.IsReverse = false;
-	cadrInfo.IsOrient = !reader->StarsData.RezStat;
+	cadrInfo.IsOrient = !reader->StarsData.RezStat;//(reader->StarsData.RezStat == 0xFF00 || reader->StarsData.RezStat == 0x0000) ? 1 : 0;//
 	cadrInfo.CountPixFilter = reader->FilterData.FilteredPixelsCount;
 	cadrInfo.ImageHeight = reader->ImageData.FrameData.FrameHeight;
 	cadrInfo.ImageWidth = reader->ImageData.FrameData.FrameWidth;
@@ -1135,7 +1135,7 @@ CadrInfo convertIKIFormatToInfoCadr(IKI_img* reader, bool CompareIKIRes)
 		}
 	}
 
-	if ((CompareIKIRes) && (!cadrInfo.StatOrient))
+	if ((CompareIKIRes) && (cadrInfo.IsOrient))
 	{
 		for (int i = 0; i < 3; i++)
 		{

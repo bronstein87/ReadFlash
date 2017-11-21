@@ -3120,18 +3120,18 @@ void __fastcall TFormGraphOrient::BOKZM2ParseProtocolClick(TObject *Sender)
 						return;
 					}
 
-
-					bool isLoc = checkM2Loc(in);
-					if (isLoc)
-					{
-						 HandleLoc60 handle(this);
-						 readBOKZM2LocProtocol(in, vCadrInfo, handle, startDate);
-					}
-					else
-					{
+//
+//					bool isLoc = checkM2Loc(in);
+//					if (isLoc)
+//					{
+//						 HandleLoc60 handle(this);
+//						 readBOKZM2LocProtocol(in, vCadrInfo, handle, startDate);
+//					}
+//					else
+//					{
                         HandleM2 handle(this);
 					   readBOKZM2Protocol(in, vCadrInfo, handle, startDate);
-					}
+ //					}
 
 				}
 		}
