@@ -165,6 +165,8 @@ namespace parse_prot
 				CadrInfo cadrInfo;
 				cadrInfo.CountBlock = 0;
 				cadrInfo.CountStars = 0;
+				cadrInfo.ImageHeight = 512;
+		   		cadrInfo.ImageWidth = 512;
 				// ñ÷èòûâàåì âðåìÿ ïðèâÿçêè
 				if(findWord(in,"èíôîðìàöèè") != string::npos)
 				{
@@ -211,6 +213,7 @@ namespace parse_prot
 						splittedLocData = split(splittedLocData[1], "\t");
 
 						objInfo.X = atof (splittedLocData[0].c_str());
+                        if(objInfo.X == 0) break;
 						objInfo.Y = atof (splittedLocData[1].c_str());
 						objInfo.Bright = atof (splittedLocData[2].c_str());
 						objInfo.Square = atoi(splittedLocData[3].c_str());
@@ -1281,12 +1284,12 @@ namespace parse_prot
 					objInfo.Y = atof(splittedObj[1].c_str());
 
 					// òóò íåïðîñòîé ïðîáåë, À ÍÅÐÀÇÐÛÂÍÛÉ ÏÐÎÁÅË (ÇÀ ×ÒÎ??)
-					if(splittedObj[2].size() > 7)
+					if(contains(splittedObj[2], " "))
 					{
 						delStr = remove(splittedObj[2].begin(), splittedObj[2].end(), ' ');
 						splittedObj[2].erase(delStr, splittedObj[2].end());
 					}
-					objInfo.Bright = atof(string(splittedObj[2]).c_str());
+					objInfo.Bright = atoi(splittedObj[2].c_str());
 					objInfo.Square = atoi(splittedObj[3].c_str());
 					cadrInfo.ObjectsList.push_back(objInfo);
 				}
@@ -1311,7 +1314,7 @@ namespace parse_prot
 		while (getline(in, line))
 		{
 			TColor pointColor = clBlue;
-			if (contains(line, "Ðàñøèôðîâêà;ÌÏÈ;;ÄÒÌÈ Ëîê;"))
+			if (contains(line, "Ðàñøèôðîâêà;ÌÏÈ;;ÄÒÌÈ Ëîê;") && !contains(line, "Òàáëèöà"))
 			{
 				CadrInfo cadrInfo;
 				cadrInfo.ImageHeight = 512;
@@ -1343,12 +1346,12 @@ namespace parse_prot
 					objInfo.Y = atof(splittedObj[3].c_str());
 
 					// òóò íåïðîñòîé ïðîáåë, À ÍÅÐÀÇÐÛÂÍÛÉ ÏÐÎÁÅË (ÇÀ ×ÒÎ??)
-					if(splittedObj[4].size() > 7)
+					if(contains(splittedObj[4], " "))
 					{
 						string::iterator delStr = remove(splittedObj[4].begin(), splittedObj[4].end(), ' ');
 						splittedObj[4].erase(delStr, splittedObj[4].end());
 					}
-					objInfo.Bright = atof(string(splittedObj[4]).c_str());
+					objInfo.Bright = atof(splittedObj[4].c_str());
 					objInfo.Square = atoi(splittedObj[5].c_str());
 					cadrInfo.ObjectsList.push_back(objInfo);
 				}

@@ -26,7 +26,8 @@ struct ObjectsInfo  // фактические объекты
 		 Sp[0] = '_';
 		 Sp[1] = '_';
 	}
-	float X, Y, Bright;
+	float X, Y;
+	unsigned short Bright;
 	short Square;
 	unsigned long StarID;
 	float Mv;
@@ -63,7 +64,9 @@ struct CadrInfo
 {
 	_fastcall CadrInfo(): Time(0), FrameNumber(0), CountStars(0), CountWindows(0),
 	CountLocalObj(0), CountDeterObj(0), SizeStarsList(0), SizeWindowsList(0),
-	 CountLines(0), CountBlock(0) { }
+	 CountLines(0), CountBlock(0), QuatOrient(), AnglesOrient(), AnglesModel(), //кватернион, матрица и углы ориентации
+	 AnglesDiff(),  OmegaOrient(), OmegaModel(), //угловая скорость, прогнозируемая матрица ориентации
+	 OmegaDiff(), AxesDiff() { }
 
 	double Time;
 	std::string DeviceInfo;
