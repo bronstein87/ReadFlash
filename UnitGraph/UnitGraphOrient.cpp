@@ -46,6 +46,7 @@ __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 		Charts.push_back(ChartFragBright); Charts.push_back(ChartFragSizeEl);
 		Charts.push_back(ChartFragMean); Charts.push_back(ChartFragBright); Charts.push_back(ChartFragLevel);
 
+
 //может быть здесь вызывать функцию синхронизации по времени - ?
 		Charts.push_back(ChartBrightMv);  Charts.push_back(ChartSizeMv);
 		Charts.push_back(ChartBrightSize); Charts.push_back(ChartBrightSp);
@@ -196,8 +197,22 @@ void __fastcall TFormGraphOrient::MenuClearClick(TObject *Sender)
 
 void __fastcall TFormGraphOrient::MenuSaveClick(TObject *Sender)
 {
-	UnicodeString ScreenFolderName = "\\" + FormatDateTime("yyyy-mm-dd hh.mm.ss", Now()) + " " + "Cкриншоты\\";
-	TDirectory::CreateDirectoryW(GetCurrentDir() + ScreenFolderName);
+	SaveScreenShots();
+}
+
+UnicodeString TFormGraphOrient::SaveScreenShots(UnicodeString folder)
+{
+	UnicodeString ScreenFolderName;
+	if (folder.Length() == 0)
+	{
+		ScreenFolderName = GetCurrentDir() + "\\" + FormatDateTime("yyyy-mm-dd hh.mm.ss", Now()) + " " + "Cкриншоты\\";
+		TDirectory::CreateDirectoryW(ScreenFolderName);
+	}
+	else
+	{
+	   ScreenFolderName = folder + "\\" + FormatDateTime("yyyy-mm-dd hh.mm.ss", Now()) + " " + "Cкриншоты\\";	
+	   TDirectory::CreateDirectoryW(ScreenFolderName);
+	}
 	for (unsigned int i = 0; i < Charts.size(); i ++)
 	{
 		UnicodeString Title = IntToStr(int(i + 1)) + " - " + Charts[i]->Title->Text->Text;
@@ -210,12 +225,13 @@ void __fastcall TFormGraphOrient::MenuSaveClick(TObject *Sender)
 			Title = LeftStr(Title, PosEx("\r", Title, 1) - 1);
 		}
 
-		Title = GetCurrentDir() + ScreenFolderName + Title;
+		Title = ScreenFolderName + Title;
 
 		if (Charts[i]->SeriesCount()) {
 			plotter->SaveChart(Charts[i], Title, 500, 1100);
 		}
 	}
+	return ScreenFolderName;
 }
 
 void TFormGraphOrient::InitTableWindows(void)
@@ -2164,6 +2180,7 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 			SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
 			TDateTime startDate;
 			FileAge(FileList->Strings[0], startDate);
+			InitStatusInfoTable("BM60");
 			for (int i = 0; i < FileList->Count; i++)
 			{
 				AnsiString FileName = FileList->Strings[i];
@@ -2186,10 +2203,12 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 					readBOKZ60Protocol(in, vCadrInfo, handle, startDate);
 				}
 
-				}
+			}
 
+			FillStatusTable();
 			PrepareStartDraw();
 			CheckTabSheet();
+			CalculateSeriesSKO();
 		}
 	}
 
@@ -2198,6 +2217,29 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 	}
 }
 
+
+void TFormGraphOrient::FillStatusTable()
+{
+	for (int i = 0; i < vCadrInfo.size(); i++)
+	{
+		AddRowToStatusTable(vCadrInfo[i]);
+	}
+
+	int div = 0;
+	for (int i = 1; i < TableStatusInfo->RowCount; i++)
+	{
+		div += StrToInt(TableStatusInfo->Cells[1][i]);
+	}
+
+	if (div == 0) 
+	   return;
+	else
+	{ 
+		statusInfo.NoOneCount = div;
+		statusInfo.NoFourCount = StrToFloat(TableStatusInfo->Cells[4][1]); 
+		RatioEdit->Text = FloatToStr((statusInfo.NoFourCount / statusInfo.NoOneCount) * 100) ;
+	}
+}
 // ---------------------------------------------------------------------------
 
 void __fastcall TFormGraphOrient::BOKZM2VParseProtocolClick(TObject *Sender) {
@@ -2317,7 +2359,7 @@ void TFormGraphOrient::CalculateSeriesSKO()
 	}
 
 	if (ChartNumDet->SeriesCount()) {
-		struct { double operator() (const CadrInfo& a, bool& f) {f = false; return a.CountDeterObj;} } GetCountDeterObj;
+		struct { double operator() (const CadrInfo& a, bool& f) {f = (a.CountDeterObj < 4); return a.CountDeterObj;} } GetCountDeterObj;
 		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetCountDeterObj);
 		AddRowToStatTable(numberRow++, "Число звезд", statParam, 8, 2);
 		ChartNumDet->Series[0]->Title += " CКО: " + FloatToStrF(statParam.sigma, ffFixed, 8, 4);
@@ -2516,7 +2558,7 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 	try
 	{
 		OpenDialog->Filter = "iki|*.iki";
-		FileOpenDialog1->Options << fdoPickFolders;
+		FileOpenDialog1->Options << fdoPickFolders << fdoAllowMultiSelect;
 		OpenDialog->Options << ofAllowMultiSelect;
 		if (OpenDialog->Execute())
 		{
@@ -2526,14 +2568,10 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 			FileOpenDialog1->FileName = GetCurrentDir();
 			FileList->Sort();
 
+
 			if (FileOpenDialog1->Execute())
 			{
-				plotter->ResetOptions();
-				DeleteLineGraph();
-				vCadrInfo.clear();
-				ClearStatusInfoTable();
 				FileTitle = "IKI";
-
 				for (int iFrag  = 0; iFrag < maxDrawFrag; iFrag++) {
 					colorFrag[iFrag] = RGB((float)(maxDrawFrag - iFrag) / maxDrawFrag * 255,
 												200, (float)iFrag / maxDrawFrag * 255 );
@@ -2555,187 +2593,215 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 				unsigned short startFrom = StrToInt(FormAnimateSetting->BeginFromEdit->Text);
 				bool statusTableInited = false;
 				bool skipFrame = FormAnimateSetting->SkipFrameCheckBox->Checked;
-				for (int i = startFrom; i < FileList->Count; i++)
+				unique_ptr <TStringList> FoldersList (new TStringList());
+				FoldersList->Assign(FileOpenDialog1->Files);
+				bool fewFolders = (FileOpenDialog1->Files->Count > 1);
+
+				for (int curFolder = 0; curFolder < FoldersList->Count; curFolder++)
 				{
-					unique_ptr <IKI_img> reader(new IKI_img());
-					if( !AnsiContainsStr(FileList->Strings[i], filePrefix))
+					vCadrInfo.clear();
+					plotter->ResetOptions();
+					DeleteLineGraph();
+					ClearStatusInfoTable();
+					
+					for (int i = startFrom; i < FileList->Count; i++)
 					{
-						if (reader->ReadFormat(toStdString(FileList->Strings[i]), false, skipFrame))
+						unique_ptr <IKI_img> reader(new IKI_img());
+						if(!AnsiContainsStr(FileList->Strings[i], filePrefix))
 						{
-							TStringDynArray SplittedString = SplitString(FileList->Strings[i], "\\");
-							UnicodeString ResFileName = FileOpenDialog1->FileName + "\\" + filePrefix + SplittedString[SplittedString.Length - 1];
-							if (FileExists(ResFileName) && (reader->ReadFormat(toStdString(ResFileName), false, skipFrame)))
+							if (reader->ReadFormat(toStdString(FileList->Strings[i]), false, skipFrame))
 							{
-								CompareIKIRes = true;
-								if (!statusTableInited)
+								TStringDynArray SplittedString = SplitString(FileList->Strings[i], "\\");
+								UnicodeString ResFileName = FoldersList->Strings[curFolder] + "\\" + filePrefix + SplittedString[SplittedString.Length - 1];
+								if (FileExists(ResFileName) && (reader->ReadFormat(toStdString(ResFileName), false, skipFrame)))
 								{
-									vector <string> splitted = split(reader->CameraSettings.DataSource, "_");
-									InitStatusInfoTable(splitted[0]);
-									statusTableInited = true;
-								}
-								if ( (!i) /* && (FormAnimateSetting->CheckBoxPrintReport->Checked)*/ ) {
+									CompareIKIRes = true;
+									if (!statusTableInited)
+									{
+										vector <string> splitted = split(reader->CameraSettings.DataSource, "_");
+										InitStatusInfoTable(splitted[0]);
+										statusTableInited = true;
+									}
+									if ( (!i) /* && (FormAnimateSetting->CheckBoxPrintReport->Checked)*/ ) {
 //									печать параметров модели
 									//StartPrintReport(reader.get());
+									}
 								}
-							}
-							else
-							{
-								CompareIKIRes = false;
-							}
+								else
+								{
+									CompareIKIRes = false;
+								}
 
+							}
+							else ShowMessage("Не удалось считать " + AnsiString(FileList->Strings[i]));
 						}
-						else ShowMessage("Не удалось считать " + AnsiString(FileList->Strings[i]));
-					}
 
-					if (CompareIKIRes)
-					{
-						vCadrInfo.push_back(move(convertIKIFormatToInfoCadr(reader.get(), CompareIKIRes)));
-						double Time =  vCadrInfo.back().Time;
-						AddRowToStatusTable(vCadrInfo.back());
-						plotter->SetDateTimeX(FormAnimateSetting->CheckBoxDateTime->Checked);
-
-						plotter->SetShowLines(false);
-						plotter->SetTitle("модель");
-						plotter->SetSeriesColor(clLime);
-						plotter->AddPoint(ChartAl, 0, Time, vCadrInfo.back().AnglesModel[0] * RTD);
-						plotter->AddPoint(ChartDl, 0, Time, vCadrInfo.back().AnglesModel[1] * RTD);
-						plotter->AddPoint(ChartAz, 0, Time, vCadrInfo.back().AnglesModel[2] * RTD);
-						plotter->AddPoint(ChartWx, 0, Time, vCadrInfo.back().OmegaModel[0] * RTM);
-						plotter->AddPoint(ChartWy, 0, Time, vCadrInfo.back().OmegaModel[1] * RTM);
-						plotter->AddPoint(ChartWz, 0, Time, vCadrInfo.back().OmegaModel[2] * RTM);
-
-						plotter->SetTitle("измерения");
-						plotter->SetSeriesColor(clBlue);
-						plotter->AddPoint(ChartNumFrag, 0, Time, vCadrInfo.back().CountWindows);
-						plotter->AddPoint(ChartNumLoc, 0, Time, vCadrInfo.back().CountLocalObj);
-						plotter->AddPoint(ChartFone, 0, Time, vCadrInfo.back().MeanBright);
-						plotter->AddPoint(ChartNoise, 0, Time, vCadrInfo.back().SigmaBright);
-						//plotter->AddPoint(ChartTemp, 0, Time, vCadrInfo.back().MatrixTemp);
-
-						if (vCadrInfo.back().IsOrient)
+						if (CompareIKIRes)
 						{
-							plotter->AddPoint(ChartNumDet, 0, Time, vCadrInfo.back().CountDeterObj);
-							plotter->AddPoint(ChartMx, 0, Time, vCadrInfo.back().MeanErrorX * 1000.);
-							plotter->AddPoint(ChartMy, 0, Time, vCadrInfo.back().MeanErrorY * 1000.);
-							plotter->AddPoint(ChartMxy, 0, Time, vCadrInfo.back().MeanErrorXY * 1000.);
-							plotter->AddPoint(ChartErrorOX, 0, Time, vCadrInfo.back().AxesDiff[0] * RTS);
-							plotter->AddPoint(ChartErrorOY, 0, Time, vCadrInfo.back().AxesDiff[1] * RTS);
-							plotter->AddPoint(ChartErrorOZ, 0, Time, vCadrInfo.back().AxesDiff[2] * RTS);
-							plotter->AddPoint(ChartAlError, 0, Time, vCadrInfo.back().AnglesDiff[0] * RTS);
-							plotter->AddPoint(ChartDlError, 0, Time, vCadrInfo.back().AnglesDiff[1] * RTS);
-							plotter->AddPoint(ChartAzError, 0, Time, vCadrInfo.back().AnglesDiff[2] * RTS);
-							plotter->AddPoint(ChartWxError, 0, Time, vCadrInfo.back().OmegaDiff[0] * RTS);
-							plotter->AddPoint(ChartWyError, 0, Time, vCadrInfo.back().OmegaDiff[1] * RTS);
-							plotter->AddPoint(ChartWzError, 0, Time, vCadrInfo.back().OmegaDiff[2] * RTS);
-							plotter->AddPoint(ChartAl, 1, Time, vCadrInfo.back().AnglesOrient[0] * RTD);
-							plotter->AddPoint(ChartDl, 1, Time, vCadrInfo.back().AnglesOrient[1] * RTD);
-							plotter->AddPoint(ChartAz, 1, Time, vCadrInfo.back().AnglesOrient[2] * RTD);
-							plotter->AddPoint(ChartWx, 1, Time, vCadrInfo.back().OmegaOrient[0] * RTM);
-							plotter->AddPoint(ChartWy, 1, Time, vCadrInfo.back().OmegaOrient[1] * RTM);
-							plotter->AddPoint(ChartWz, 1, Time, vCadrInfo.back().OmegaOrient[2] * RTM);
+							vCadrInfo.push_back(move(convertIKIFormatToInfoCadr(reader.get(), CompareIKIRes)));
+							double Time =  vCadrInfo.back().Time;
+							plotter->SetDateTimeX(FormAnimateSetting->CheckBoxDateTime->Checked);
+
+							plotter->SetShowLines(false);
+							plotter->SetTitle("модель");
+							plotter->SetSeriesColor(clLime);
+							plotter->AddPoint(ChartAl, 0, Time, vCadrInfo.back().AnglesModel[0] * RTD);
+							plotter->AddPoint(ChartDl, 0, Time, vCadrInfo.back().AnglesModel[1] * RTD);
+							plotter->AddPoint(ChartAz, 0, Time, vCadrInfo.back().AnglesModel[2] * RTD);
+							plotter->AddPoint(ChartWx, 0, Time, vCadrInfo.back().OmegaModel[0] * RTM);
+							plotter->AddPoint(ChartWy, 0, Time, vCadrInfo.back().OmegaModel[1] * RTM);
+							plotter->AddPoint(ChartWz, 0, Time, vCadrInfo.back().OmegaModel[2] * RTM);
+
+							plotter->SetTitle("измерения");
+							plotter->SetSeriesColor(clBlue);
+							plotter->AddPoint(ChartNumFrag, 0, Time, vCadrInfo.back().CountWindows);
+							plotter->AddPoint(ChartNumLoc, 0, Time, vCadrInfo.back().CountLocalObj);
+							plotter->AddPoint(ChartFone, 0, Time, vCadrInfo.back().MeanBright);
+							plotter->AddPoint(ChartNoise, 0, Time, vCadrInfo.back().SigmaBright);
+							//plotter->AddPoint(ChartTemp, 0, Time, vCadrInfo.back().MatrixTemp);
+
+							if (vCadrInfo.back().IsOrient)
+							{
+								plotter->AddPoint(ChartNumDet, 0, Time, vCadrInfo.back().CountDeterObj);
+								plotter->AddPoint(ChartMx, 0, Time, vCadrInfo.back().MeanErrorX * 1000.);
+								plotter->AddPoint(ChartMy, 0, Time, vCadrInfo.back().MeanErrorY * 1000.);
+								plotter->AddPoint(ChartMxy, 0, Time, vCadrInfo.back().MeanErrorXY * 1000.);
+								plotter->AddPoint(ChartErrorOX, 0, Time, vCadrInfo.back().AxesDiff[0] * RTS);
+								plotter->AddPoint(ChartErrorOY, 0, Time, vCadrInfo.back().AxesDiff[1] * RTS);
+								plotter->AddPoint(ChartErrorOZ, 0, Time, vCadrInfo.back().AxesDiff[2] * RTS);
+								plotter->AddPoint(ChartAlError, 0, Time, vCadrInfo.back().AnglesDiff[0] * RTS);
+								plotter->AddPoint(ChartDlError, 0, Time, vCadrInfo.back().AnglesDiff[1] * RTS);
+								plotter->AddPoint(ChartAzError, 0, Time, vCadrInfo.back().AnglesDiff[2] * RTS);
+								plotter->AddPoint(ChartWxError, 0, Time, vCadrInfo.back().OmegaDiff[0] * RTS);
+								plotter->AddPoint(ChartWyError, 0, Time, vCadrInfo.back().OmegaDiff[1] * RTS);
+								plotter->AddPoint(ChartWzError, 0, Time, vCadrInfo.back().OmegaDiff[2] * RTS);
+
+								if(!FormAnimateSetting->CheckBoxModelOnly->Checked)
+								{
+									plotter->AddPoint(ChartAl, 1, Time, vCadrInfo.back().AnglesOrient[0] * RTD);
+									plotter->AddPoint(ChartDl, 1, Time, vCadrInfo.back().AnglesOrient[1] * RTD);
+									plotter->AddPoint(ChartAz, 1, Time, vCadrInfo.back().AnglesOrient[2] * RTD);
+									plotter->AddPoint(ChartWx, 1, Time, vCadrInfo.back().OmegaOrient[0] * RTM);
+									plotter->AddPoint(ChartWy, 1, Time, vCadrInfo.back().OmegaOrient[1] * RTM);
+									plotter->AddPoint(ChartWz, 1, Time, vCadrInfo.back().OmegaOrient[2] * RTM);
+								}
 
 
 							//статистика по фрагментам
-							int iObject = 0;
-							for (int iFrag  = 0; iFrag < vCadrInfo.back().SizeWindowsList; iFrag++) {
-								plotter->SetSeriesColor(colorFrag[iFrag]);
-								plotter->AddPoint(ChartFragMean, iFrag, Time,
+								int iObject = 0;
+								for (int iFrag  = 0; iFrag < vCadrInfo.back().SizeWindowsList; iFrag++) {
+									plotter->SetSeriesColor(colorFrag[iFrag]);
+									plotter->AddPoint(ChartFragMean, iFrag, Time,
 												  				vCadrInfo.back().WindowsList[iFrag].Mean);
-								plotter->AddPoint(ChartFragNoise, iFrag, Time,
+									plotter->AddPoint(ChartFragNoise, iFrag, Time,
 																vCadrInfo.back().WindowsList[iFrag].Sigma);
-								plotter->AddPoint(ChartFragLevel, iFrag, Time,
+									plotter->AddPoint(ChartFragLevel, iFrag, Time,
 																vCadrInfo.back().WindowsList[iFrag].Level);
-								for (int iObjFrag = 0; iObjFrag < vCadrInfo.back().WindowsList[iFrag].CountObj; iObjFrag++) {
-									if (iFrag < maxDrawFrag) {
-										plotter->AddPoint(ChartFragBright, iFrag, Time,
+									for (int iObjFrag = 0; iObjFrag < vCadrInfo.back().WindowsList[iFrag].CountObj; iObjFrag++) {
+										if (iFrag < maxDrawFrag) {
+											plotter->AddPoint(ChartFragBright, iFrag, Time,
 																vCadrInfo.back().ObjectsList[iObject].Bright);
-										if (vCadrInfo.back().ObjectsList[iObject].Square) {
-											plotter->AddPoint(ChartFragSizeEl, iFrag, Time,
-																	vCadrInfo.back().ObjectsList[iObject].Square);
-										}
-										if (vCadrInfo.back().ObjectsList[iObject].StarID) {
-											plotter->AddPoint(ChartFragErrX, iFrag, Time,
+											if (vCadrInfo.back().ObjectsList[iObject].Square) {
+												plotter->AddPoint(ChartFragSizeEl, iFrag, Time,
+																		vCadrInfo.back().ObjectsList[iObject].Square);
+											}
+											if (vCadrInfo.back().ObjectsList[iObject].StarID) {
+												plotter->AddPoint(ChartFragErrX, iFrag, Time,
 																	vCadrInfo.back().ObjectsList[iObject].Dx*1000.);
-											plotter->AddPoint(ChartFragErrY, iFrag, Time,
+												plotter->AddPoint(ChartFragErrY, iFrag, Time,
 																	vCadrInfo.back().ObjectsList[iObject].Dy*1000.);
+											}
 										}
+										iObject++;
 									}
-									iObject++;
 								}
-							}
 
-							//статистика по звездам
-							plotter->SetShowLines(false);
-							plotter->SetDateTimeX(false);
-							if (vCadrInfo.back().IsBinary) {
-								plotter->SetSeriesColor(clLime);
-							}
-							else plotter->SetSeriesColor(clBlue);
+								//статистика по звездам
+								plotter->SetShowLines(false);
+								plotter->SetDateTimeX(false);
+								if (vCadrInfo.back().IsBinary) {
+									plotter->SetSeriesColor(clLime);
+								}
+								else plotter->SetSeriesColor(clBlue);
 
-							for (int iObject = 0; iObject < vCadrInfo.back().SizeObjectsList; iObject++) {
-								if (vCadrInfo.back().ObjectsList[iObject].StarID /* && Dx && Dy */) {
-									plotter->AddPoint(ChartBrightMv,   0, vCadrInfo.back().ObjectsList[iObject].Mv,
+								for (int iObject = 0; iObject < vCadrInfo.back().SizeObjectsList; iObject++) {
+									if (vCadrInfo.back().ObjectsList[iObject].StarID /* && Dx && Dy */) {
+										plotter->AddPoint(ChartBrightMv,   0, vCadrInfo.back().ObjectsList[iObject].Mv,
+																			  vCadrInfo.back().ObjectsList[iObject].Bright);
+										if (vCadrInfo.back().ObjectsList[iObject].Square) {
+											plotter->AddPoint(ChartSizeMv,     0, vCadrInfo.back().ObjectsList[iObject].Mv,
+																			  vCadrInfo.back().ObjectsList[iObject].Square);
+											plotter->AddPoint(ChartBrightSize, 0, vCadrInfo.back().ObjectsList[iObject].Square,
 																		  vCadrInfo.back().ObjectsList[iObject].Bright);
-									if (vCadrInfo.back().ObjectsList[iObject].Square) {
-										plotter->AddPoint(ChartSizeMv,     0, vCadrInfo.back().ObjectsList[iObject].Mv,
-																		  vCadrInfo.back().ObjectsList[iObject].Square);
-										plotter->AddPoint(ChartBrightSize, 0, vCadrInfo.back().ObjectsList[iObject].Square,
-																		  vCadrInfo.back().ObjectsList[iObject].Bright);
-									}
+										}
 
-									if (vCadrInfo.back().ObjectsList[iObject].Sp!="__") {
-										float tempSpec = GetTempSpec(vCadrInfo.back().ObjectsList[iObject].Sp);
-										float brightMv0 = vCadrInfo.back().ObjectsList[iObject].Bright *
-															pow ((float)2.512, (float)vCadrInfo.back().ObjectsList[iObject].Mv);
-										plotter->AddPoint(ChartBrightSp, 0, tempSpec, brightMv0);
+										if (vCadrInfo.back().ObjectsList[iObject].Sp!="__") {
+											float tempSpec = GetTempSpec(vCadrInfo.back().ObjectsList[iObject].Sp);
+											float brightMv0 = vCadrInfo.back().ObjectsList[iObject].Bright *
+																pow ((float)2.512, (float)vCadrInfo.back().ObjectsList[iObject].Mv);
+											plotter->AddPoint(ChartBrightSp, 0, tempSpec, brightMv0);
 
+										}
 									}
 								}
 							}
 						}
+
+						if (i % 100 == 0)
+						{
+							Application->ProcessMessages();
+							LabelFrameReport->Caption = "Cчитано " + IntToStr(i) + " файлов из " + IntToStr(FileList->Count);
+						}
 					}
 
-					if (i % 100 == 0)
-					{
-						Application->ProcessMessages();
-						LabelFrameReport->Caption = "Cчитано " + IntToStr(i) + " файлов из " + IntToStr(FileList->Count);
-					}
-				}
-			}
+					plotter->CheckChartSeries(ChartFragBright);
+					plotter->CheckChartSeries(ChartFragSizeEl);
+					plotter->CheckChartSeries(ChartFragErrX);
+					plotter->CheckChartSeries(ChartFragErrY);
+					plotter->CheckChartSeries(ChartFragMean);
+					plotter->CheckChartSeries(ChartFragNoise);
+					plotter->CheckChartSeries(ChartFragLevel);
 
-			plotter->CheckChartSeries(ChartFragBright);
-			plotter->CheckChartSeries(ChartFragSizeEl);
-			plotter->CheckChartSeries(ChartFragErrX);
-			plotter->CheckChartSeries(ChartFragErrY);
-			plotter->CheckChartSeries(ChartFragMean);
-			plotter->CheckChartSeries(ChartFragNoise);
-			plotter->CheckChartSeries(ChartFragLevel);
+					struct {
+						bool operator()(const CadrInfo& a,const CadrInfo& b)
+						{
+							return a.Time < b.Time;
+						}
+					} CadrCompare ;
 
-			struct {
+					sort(vCadrInfo.begin(), vCadrInfo.end(), CadrCompare);
+					CalculateSeriesSKO();
+					FillStatusTable();
+					PrepareStartDraw();
 
-				bool operator()(const CadrInfo& a,const CadrInfo& b)
-				{
-					return a.Time < b.Time;
-				}
-
-			} CadrCompare ;
-
-			sort(vCadrInfo.begin(), vCadrInfo.end(), CadrCompare);
-			CalculateSeriesSKO();
-			PrepareStartDraw();
-
-//печать статистики по серии кадров
+                    				//печать статистики по серии кадров
 //			if (FormAnimateSetting->CheckBoxPrintReport->Checked) {
 //				PrintReportRes(vCadrInfo);
-//			}
+//			}	
+					if (fewFolders) 
+					{
+					   UnicodeString folder = SaveScreenShots(FoldersList->Strings[curFolder]);
+					   SaveTableToFile(TableStatInfo, TableStatInfo->RowCount, TableStatInfo->ColCount, 
+					   toStdString(folder + "\\table_stat.txt"));
+					   SaveTableToFile(TableStatusInfo, TableStatusInfo->RowCount, TableStatusInfo->ColCount, 
+					   toStdString(folder + "\\table_status.txt"));
+					   ofstream out(string(toStdString(folder) + "\\table_status.txt").c_str(), std::ofstream::out | std::ofstream::app);
+					   out << toStdString(RatioEdit->Text) <<"\t"<< statusInfo.NoOneCount <<"\t"<< statusInfo.NoFourCount; 
+					}
+				}
 		}
-		CheckTabSheet();
 	}
-	catch (exception &e)
+	CheckTabSheet();
+
+}
+   	catch (exception &e)
 	{
 		ShowMessage(e.what());
 	}
+
 }
+
+
 
 
  void __fastcall TFormGraphOrient::ChartMouseWheel(TObject *Sender, TShiftState Shift,
@@ -2893,6 +2959,7 @@ void __fastcall TFormGraphOrient::BOKZM601000ParseProtocolClick(TObject *Sender)
 			unsigned int counter = 0;
 			TDateTime startDate;
 			FileAge(FileList->Strings[0], startDate);
+		 	InitStatusInfoTable("M1000");
 			for (int i = 0; i < FileList->Count; i++)
 			{
 				AnsiString FileName = FileList->Strings[i];
@@ -2907,6 +2974,10 @@ void __fastcall TFormGraphOrient::BOKZM601000ParseProtocolClick(TObject *Sender)
 				readBOKZ601000Protocol(in, vCadrInfo, counter, startDate, handle);
 			}
 
+			for (int i = 0; i < vCadrInfo.size(); i++)
+			{
+				AddRowToStatusTable(vCadrInfo[i]);
+			}
 			PrepareStartDraw();
 			CheckTabSheet();
 		}
@@ -3110,6 +3181,7 @@ void __fastcall TFormGraphOrient::BOKZM2ParseProtocolClick(TObject *Sender)
 			SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
 			TDateTime startDate;
 			FileAge(FileList->Strings[0], startDate);
+			InitStatusInfoTable("M2");
 				for (int i = 0; i < FileList->Count; i++)
 				{
 					AnsiString FileName = FileList->Strings[i];
@@ -3133,6 +3205,9 @@ void __fastcall TFormGraphOrient::BOKZM2ParseProtocolClick(TObject *Sender)
 					}
 
 				}
+
+			FillStatusTable();
+			CalculateSeriesSKO();
 		}
 			PrepareStartDraw();
 			CheckTabSheet();
@@ -3142,6 +3217,25 @@ void __fastcall TFormGraphOrient::BOKZM2ParseProtocolClick(TObject *Sender)
 		}
 }
 //---------------------------------------------------------------------------
+
+ void TFormGraphOrient::SaveTableToFile(TStringGrid* table, short rowCount, short columnCount, string filename)
+ {
+	ofstream out(filename.c_str(), std::ofstream::out);
+	if(out.is_open())
+	{
+		for (int i = 0; i < rowCount; i++)
+		{
+			string row;
+			for (int j = 0; j < columnCount; j++)
+			{
+				row.append(toStdString(table->Cells[j][i]) + "\t");
+			}
+			row.append("\n");
+			out << row; 
+		}
+	}
+	else throw logic_error("Неверный путь к директории");
+ }
 
 
 

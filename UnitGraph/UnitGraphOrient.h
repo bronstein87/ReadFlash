@@ -76,6 +76,11 @@
 		int SecuenceCounter;
 	};
 
+	struct StatusInfo
+	{
+	  float NoOneCount;
+	  float NoFourCount;
+	};
 
 
 	class TFormAnimateSetting;
@@ -209,6 +214,9 @@
 		TStringGrid *TableStatusInfo;
 		TMenuItem *BOKZM2ParseProtocol;
 		TMenuItem *N21;
+	TEdit *RatioEdit;
+	TLabel *Label13;
+	TLabel *Label14;
 
 
 		void __fastcall MenuSaveClick(TObject *Sender);
@@ -411,6 +419,9 @@
 		void StartPrintReport(IKI_img* reader);
 		void PrintReportRes(vector <CadrInfo>& cadrInfo);
 		void CalculateSeriesSKO();
+		void SaveTableToFile(TStringGrid* table, short rowCount, short columnCount, string filename);
+		void FillStatusTable();
+        UnicodeString SaveScreenShots(UnicodeString folder = "");
 
 		void DeleteLineGraph();
 		void InitializeSynchronization();
@@ -435,6 +446,7 @@
 		unsigned short ResizeCoef;
 		unsigned short FontSize;
 		bool CompareIKIRes;
+		StatusInfo statusInfo;
 
         vector <unsigned short> tableRows;
 		vector<string> columnTitles;

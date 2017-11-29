@@ -251,12 +251,32 @@ namespace parse_prot
 		   cadrInfo.ImageHeight = 512;
 		   cadrInfo.ImageWidth = 512;
 
+           							   // ищем время привязки
+			if(findWord(in, "информации") != string::npos)
+			{
+				in >> cadrInfo.Time;
+				if(cadrInfo.Time == 0 || cadrInfo.Time > 10000)
+				cadrInfo.Time = 0;
+				startDate = IncMilliSecond(DateOf(startDate), cadrInfo.Time * 1000);
+				if (cadrInfoVec.size() == 0)
+				{
+					cadrInfo.Time =  startDate.Val;
+				}
+				else
+				{
+					cadrInfo.Time = cadrInfoVec.back().Time + (startDate.Val - cadrInfoVec.back().Time);
+				}
+			}
+		   else throw logic_error(errorMessage);
+
 		   if(findLine(in, "4) Код состояния 1") != string::npos)
 		   {
 				getline(in, line);
 				vector <string> splitted = split(line, "\t\t\t");
+				cadrInfo.StatOrient = strtoul (string(splitted[1].substr(2, 3) + "0").c_str(), NULL, 16);
 				// проверяем, что последний УСД не 0
-				if(splitted[1][3] == '0') continue;
+
+				//if(splitted[1][3] == '0') continue;
 				if(!contains(splitted[1], "010")
 				&& !contains(splitted[1], "020")
 				&& !contains(splitted[1], "000"))
@@ -270,9 +290,6 @@ namespace parse_prot
 		   if(findWord(in,"объектов") != string::npos)
 		   {
 				in >> cadrInfo.CountLocalObj;
-				if (cadrInfo.CountLocalObj == 0 || cadrInfo.CountLocalObj > 100) {
-					continue;
-				}
 		   }
 		   else throw logic_error(errorMessage);
 
@@ -297,7 +314,7 @@ namespace parse_prot
 		   if(findLine(in, "	Х			Y			I			N") != string::npos)
 		   {
 				vector <string> splittedLocData;
-				const int сountLocObj = cadrInfo.CountLocalObj;
+				const int сountLocObj = 16;
 				ObjectsInfo objInfo;
 
 				for(int i = 0 ; i < сountLocObj; i ++)
@@ -384,28 +401,11 @@ namespace parse_prot
 				for(int i = 0; i < cadrInfo.CountWindows; i++)
 				{
 					getline(in,line);
-					vector<string> splittedStr = split(line,"\t");
+					vector<string> splittedStr = split(line, "\t");
 					cadrInfo.WindowsList[i].CountObj = atoi(splittedStr[1].c_str());
 				}
 
 		   }
-		   else throw logic_error(errorMessage);
-
-		              		   // ищем время привязки
-			if(findWord(in, "привязки") != string::npos)
-			{
-				in >> cadrInfo.Time;
-				if(cadrInfo.Time == 0 || cadrInfo.Time > 10000) continue;
-				startDate = IncMilliSecond(DateOf(startDate), cadrInfo.Time * 1000);
-				if (cadrInfoVec.size() == 0)
-				{
-					cadrInfo.Time =  startDate.Val;
-				}
-				else
-				{
-					cadrInfo.Time = cadrInfoVec.back().Time + (startDate.Val - cadrInfoVec.back().Time);
-				}
-			}
 		   else throw logic_error(errorMessage);
 
 
@@ -425,6 +425,34 @@ namespace parse_prot
 
 		   }
 		   else throw logic_error(errorMessage);
+
+
+			int pos = in.tellg();
+		   if(findLine(in, "Состав МШИ ОР") != string::npos)
+		   {
+				getline(in, line);
+				vector <string> splitted = split(line, "\t\t\t");
+				int status1 = strtoul (string(string("0x") + splitted[1].c_str()).c_str(), NULL, 16);
+				getline(in, line);
+				splitted = split(line, "\t\t\t");
+				cadrInfo.StatOrient = strtoul (string(string("0x") + splitted[1].substr(0, 3) + "0").c_str(), NULL, 16);
+				if (!((status1 >> 11) & 1))   // если 12 бит не установлен, то это НО
+				{
+					if(contains(splitted[1], "000"))
+					cadrInfo.DeviceInfo = "HO 4";
+					else if (contains(splitted[1], "010")) cadrInfo.DeviceInfo = "HO 1";
+					else if(contains(splitted[1], "020")) {
+						if(cadrInfoVec.back().DeviceInfo == "HO 1")
+						cadrInfo.DeviceInfo = "HO 2";
+						else cadrInfo.DeviceInfo = "HO 3";
+					}
+				}
+				else {
+					 cadrInfo.DeviceInfo = "SLEZH";
+				}
+		   }
+		   else in.seekg(pos);
+
 
 		   cadrInfo.SizeWindowsList = cadrInfo.WindowsList.size();
 		   cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
@@ -824,6 +852,7 @@ namespace parse_prot
 					in >> status2 >> status2;
 
 					 // ТО
+                    cadrInfo.StatOrient = strtoul (status2.c_str(), NULL, 16);
 					if (status == "ec00")
 					{
 						if (status2.substr(0, 2) != "00")
@@ -1244,9 +1273,26 @@ namespace parse_prot
 				UnicodeString date = toUString(splitted[0]);
 				UnicodeString time = toUString(splitted[1]);
 				cadrInfo.Time = StrToDateTime(date + " " + time).Val;
-				if(!contains(splitted[6], "000")
-				|| !contains(splitted[6], "010")
-				|| !contains(splitted[6], "020"))
+				int status1 =  strtoul (string(splitted[6]).c_str() , NULL, 16);
+				if (!((status1 >> 15) & 1))   // если 16 бит не установлен, то это НО
+				{
+
+					if(contains(splitted[7], "000")) cadrInfo.DeviceInfo = "HO 4";
+					else if (contains(splitted[7], "010")) cadrInfo.DeviceInfo = "HO 1";
+					else if(contains(splitted[7], "020")) {
+						if(cadrInfoVec.back().DeviceInfo == "HO 1")
+						cadrInfo.DeviceInfo = "HO 2";
+						else cadrInfo.DeviceInfo = "HO 3";
+					}
+				}
+				else {
+					 cadrInfo.DeviceInfo = "SLEZH";
+				}
+
+				cadrInfo.StatOrient = strtoul (string(splitted[7].substr(2, 3) + "0").c_str() , NULL, 16);
+				if(!contains(splitted[7], "000")
+				|| !contains(splitted[7], "010")
+				|| !contains(splitted[7], "020"))
 				{
 					TColor pointColor = clRed;
 				}
@@ -1293,12 +1339,7 @@ namespace parse_prot
 					objInfo.Square = atoi(splittedObj[3].c_str());
 					cadrInfo.ObjectsList.push_back(objInfo);
 				}
-				if (cadrInfo.ObjectsList.size() < 4)
-				{
-					continue;
-				}
 				cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
-
 				handler (cadrInfo);
 				cadrInfoVec.push_back(cadrInfo);
 				writeProtocolToIKI(cadrInfo, cadrInfoVec.size());
@@ -1376,3 +1417,7 @@ namespace parse_prot
 
 // ---------------------------------------------------------------------------
 #endif
+
+
+
+
