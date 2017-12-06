@@ -241,9 +241,9 @@ object FormAnimateSetting: TFormAnimateSetting
     object CheckBoxModelOnly: TCheckBox
       Left = 18
       Top = 71
-      Width = 97
+      Width = 119
       Height = 17
-      Caption = #1058#1086#1083#1100#1082#1086' '#1084#1086#1076#1077#1083#1100
+      Caption = #1058#1086#1083#1100#1082#1086' '#1080#1079#1084#1077#1088#1077#1085#1080#1103
       TabOrder = 4
     end
   end

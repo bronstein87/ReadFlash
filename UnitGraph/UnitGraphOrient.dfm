@@ -146,7 +146,7 @@ object FormGraphOrient: TFormGraphOrient
     Top = 8
     Width = 1430
     Height = 777
-    ActivePage = TabSheetTableStat
+    ActivePage = TabSheetStatStars
     Anchors = [akLeft, akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 8
@@ -2150,7 +2150,7 @@ object FormGraphOrient: TFormGraphOrient
         Title.Font.Name = 'Verdana'
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
-          #1047#1072#1074#1080#1089#1080#1084#1086#1089#1090#1100' '#1080#1085#1090#1077#1075#1088#1072#1083#1100#1085#1086#1081' '#1103#1088#1082#1086#1089#1090#1080' '#1086#1090' '#1079#1074#1077#1079#1076#1085#1086#1081' '#1074#1077#1083#1080#1095#1080#1085#1099)
+          #1047#1072#1074'-'#1090#1100' '#1080#1085#1090#1077#1075#1088'. '#1103#1088#1082#1086#1089#1090#1080' '#1086#1090' '#1079#1074'. '#1074#1077#1083'.')
         OnClickLegend = ChartsFragClickLegend
         BottomAxis.Axis.Color = 4210752
         BottomAxis.Grid.Color = 11119017
@@ -2219,7 +2219,7 @@ object FormGraphOrient: TFormGraphOrient
         Title.Font.Name = 'Verdana'
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
-          #1047#1072#1074#1080#1089#1080#1084#1086#1089#1090#1100' '#1080#1085#1090#1077#1075#1088#1072#1083#1100#1085#1086#1081' '#1103#1088#1082#1086#1089#1090#1080' '#1086#1090' '#1095#1080#1089#1083#1072' '#1101#1083#1077#1084#1077#1085#1090#1086#1074)
+          ' '#1048#1085#1090#1077#1075#1088'. '#1103#1088#1082#1086#1089#1090#1100' '#1086#1090' '#1095#1080#1089#1083#1072' '#1101#1083'-'#1090#1086#1074)
         OnClickLegend = ChartsFragClickLegend
         BottomAxis.Axis.Color = 4210752
         BottomAxis.Grid.Color = 11119017
@@ -2289,7 +2289,7 @@ object FormGraphOrient: TFormGraphOrient
         Title.Font.Name = 'Verdana'
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
-          #1047#1072#1074#1080#1089#1080#1084#1086#1089#1090#1100' '#1080#1085#1090#1077#1075#1088#1072#1083#1100#1085#1086#1081' '#1103#1088#1082#1086#1089#1090#1080' '#1086#1090' '#1089#1087#1077#1082#1090#1088#1072#1083#1100#1085#1086#1075#1086' '#1082#1083#1072#1089#1089#1072)
+          #1047#1072#1074'-'#1090#1100' '#1080#1085#1090#1077#1075#1088'. '#1103#1088#1082#1086#1089#1090#1080' '#1086#1090' '#1089#1087#1077#1082#1090#1088'. '#1082#1083#1072#1089#1089#1072)
         OnClickLegend = ChartsFragClickLegend
         BottomAxis.Axis.Color = 4210752
         BottomAxis.Grid.Color = 11119017
@@ -2359,7 +2359,7 @@ object FormGraphOrient: TFormGraphOrient
         Title.Font.Name = 'Verdana'
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
-          #1047#1072#1074#1080#1089#1080#1084#1086#1089#1090#1100' '#1095#1080#1089#1083#1072' '#1101#1083#1077#1084#1077#1085#1090#1086#1074' '#1086#1090' '#1079#1074#1077#1079#1076#1085#1086#1081' '#1074#1077#1083#1080#1095#1080#1085#1099)
+          #1047#1072#1074'-'#1090#1100' '#1095#1080#1089#1083#1072' '#1101#1083'-'#1090#1086#1074' '#1086#1090' '#1079#1074'. '#1074#1077#1083'.')
         OnClickLegend = ChartsFragClickLegend
         BottomAxis.Axis.Color = 4210752
         BottomAxis.Grid.Color = 11119017
@@ -2404,8 +2404,6 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheetTableStat: TTabSheet
       Caption = #1057#1074#1086#1076#1085#1072#1103' '#1089#1090#1072#1090#1080#1089#1090#1080#1082#1072
       ImageIndex = 15
-      ExplicitLeft = -20
-      ExplicitTop = 47
       object Label13: TLabel
         Left = 1190
         Top = 715
