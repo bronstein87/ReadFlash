@@ -54,7 +54,7 @@ __published:	// IDE-managed Components
 	TEdit *BeginFromEdit;
 	TCheckBox *CheckBoxDateTime;
 	TCheckBox *SkipFrameCheckBox;
-	TCheckBox *CheckBoxModelOnly;
+	TCheckBox *CheckBoxResultOnly;
 	void __fastcall ShapeColorLocObjTableMouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y);
 	void __fastcall ShapeColorZeroObjTableMouseDown(TObject *Sender, TMouseButton Button,

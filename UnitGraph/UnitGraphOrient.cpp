@@ -1899,13 +1899,17 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 }
 
 
-
-
 void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 {
-	struct DTMI_BOKZM tmi;
-	const DTMISize = 290;
+
+	const int DTMISize = 290;
+	const int MSHISize = 22;
+	const int SHTMI1Size = 32;
+	const int SHTMI2Size = 32;
 	unsigned short ArrayDTMI[DTMISize];
+	unsigned short ArrayMSHI[MSHISize];
+	unsigned short ArraySHTMI1[SHTMI1Size];
+	unsigned short ArraySHTMI2[SHTMI2Size];
 
     OpenDialog->Options.Clear();
 	OpenDialog->Filter = "txt|*.txt";
@@ -1925,6 +1929,38 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 		}
 
 		ofstream fout((FileTitle + "_decode.txt").c_str());
+		ofstream fmshi((FileTitle + "_mshi.txt").c_str());
+		ofstream fshtmi1((FileTitle + "_shtmi1.txt").c_str());
+		ofstream fshtmi2((FileTitle + "_shtmi2.txt").c_str());
+		ofstream fdtmi((FileTitle + "_dtmi.txt").c_str());
+
+		fmshi/* << "Date&Time\t" */<< "Tbokz\t";
+		fmshi << "KC1\t" << "KC2\t";
+		fmshi << "\n";
+
+		fshtmi1/* << "Date&Time\t" */<< "Tbokz\t";
+		fshtmi1 << "KC1\t" << "KC2\t" << "POST\t" << "№\t" << "Texp\t";
+		fshtmi1 << "Foc\t" << "Xg\t" << "Yg\t";
+		fshtmi1 << "Mean\t" << "Sigma\t";
+		fshtmi1 << "Ndef\t" << "Date\t";
+		fshtmi1 << "verXCF\t" << "verProg\t";
+		fshtmi1 << "\n";
+
+		fshtmi2/* << "Date&Time\t" */<< "Tbokz\t";
+		fshtmi2 << "KC1\t" << "KC2\t" << "POST\t" << "№\t" << "Texp\t";
+		fshtmi2 << "Foc\t" << "Xg\t" << "Yg\t";
+		fshtmi2 << "Mean\t" << "Sigma\t";
+		fshtmi2 << "Ndef\t" << "НО\t" << "TО\t";
+		for (int i = 0; i < 12; i++) {
+			fshtmi2 << "EC" << (i+1) << "\t";
+		}
+		fshtmi2 << "\n";
+
+		fdtmi/* << "Date&Time\t" */<< "Tbokz\t";
+		fdtmi << "KC1\t" << "KC2\t" <<  "№\t" << "Texp\t";
+		fdtmi << "Foc\t" << "Xg\t" << "Yg\t";
+		fdtmi << "NumLoc\t" << "NumFix\t";
+		fdtmi << "\n";
 
 		string line, word1, word2, word3;
 		unsigned short hex_val, dec_val;
@@ -1932,42 +1968,182 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 		while (!finp.eof())
 		{
 			getline(finp, line, '\n' );
-			if (line.find("ТМОС") != string::npos) {
-				struct CadrInfo mCadr;
 
-				for (int i = 0; i < DTMISize; i++) {
-					finp >> word1 >> word2 >> dec_val;
-					sscanf(word1.c_str(),"[%d]", &ind);
-					sscanf(word2.c_str(),"0X%x", &hex_val);
-					if (i == ind && hex_val == dec_val) {
-						ArrayDTMI[i] = hex_val;
+//чтение массива МШИОР
+			if (line.find("МШИОР") != std::string::npos) {
+				getline(finp, line, '\n' );
+				if (line.find("ТМОС") != std::string::npos) {
+
+					int errorMSHI = ReadTMIArray(finp, "CISO_MSHIOR", ArrayMSHI, MSHISize);
+
+					if (!errorMSHI) {
+						char _date[10], _time[10];
+						sscanf(line.c_str(), "ТМОС %s %s", &_date, &_time);
+						fout<<"\n"<<line<<"\n";
+
+						struct MSHI_BOKZM mshi;
+						memcpy(&mshi, ArrayMSHI, MSHISize * sizeof(short));
+						PrintMSHI_BOKZM(fout, mshi);
+
+						double ang[3], MorntT[3][3];
+
+						for (int i = 0; i < 3; i++) {
+							for (int j = 0; j < 3; j++) {
+								MorntT[i][j] =  mshi.Mornt[j][i];
+							}
+						}
+
+						MatrixToEkvAngles(MorntT, ang);
+
+						if (mshi.status1 == 0xE004) {
+							plotter->AddPoint(ChartAl, 0, mshi.timeBOKZ, ang[0] * RTD);
+							plotter->AddPoint(ChartDl, 0, mshi.timeBOKZ, ang[1] * RTD);
+							plotter->AddPoint(ChartAz, 0, mshi.timeBOKZ, ang[2] * RTD);
+						}
+
+						fmshi << std::setprecision(8);
+						fmshi << mshi.timeBOKZ << "\t";
+						fmshi << uppercase<<hex<<setfill('0');
+						fmshi << "0x" << setw(4) << mshi.status1 << "\t";
+						fmshi << "0x" << setw(4) << mshi.status2 << "\t";
+						fmshi << dec<<setfill(' ');
+
+						fmshi << ang[0] * RTD << "\t";
+						fmshi << ang[1] * RTD << "\t";
+						fmshi << ang[2] * RTD << "\n";
 					}
 				}
-				memcpy(&tmi.timeBOKZ, &ArrayDTMI[2], 30 * sizeof(short));
-				memcpy(&tmi.LocalList[2][0], &ArrayDTMI[36], 28 * sizeof(short));
-				memcpy(&tmi.LocalList[5][2], &ArrayDTMI[68], 28 * sizeof(short));
-				memcpy(&tmi.LocalList[9][0], &ArrayDTMI[100],28 * sizeof(short));
-				memcpy(&tmi.LocalList[12][2], &ArrayDTMI[132],28 * sizeof(short));
-				memcpy(&tmi.LocalList[16][0], &ArrayDTMI[164],28 * sizeof(short));
-				memcpy(&tmi.LocalList[19][2], &ArrayDTMI[196],28 * sizeof(short));
-				memcpy(&tmi.LocalList[23][0], &ArrayDTMI[228],28 * sizeof(short));
-				memcpy(&tmi.LocalList[26][2], &ArrayDTMI[260],28 * sizeof(short));
-				fout << "\n" << line << "\n";
+			}
 
-				PrintDTMI_BOKZM(fout, tmi);
-				ConvertDataDTMI_BOKZM(tmi, mCadr);
-				vCadrInfo.push_back(mCadr);
+//чтение массива ШТМИ1
+			if (line.find("ШТМИ1") != std::string::npos) {
+				getline(finp, line, '\n' );
+				if (line.find("ТМОС") != std::string::npos) {
+
+					int errorSHTMI1 = ReadTMIArray(finp, "CISO_SHTMI1", ArraySHTMI1, SHTMI1Size);
+					if (!errorSHTMI1) {
+//						string _date, _time;
+//						sscanf(line.c_str(), "ТМОС %s %s");
+						fout << "\n" << line << "\n";
+
+						struct SHTMI1_BOKZM shtmi1;
+						memcpy(&shtmi1, &ArraySHTMI1[2], SHTMI1Size * sizeof(short));
+						PrintSHTMI1_BOKZM(fout, shtmi1);
+
+//						fshtmi1 << _date << " " << _time<< "\t";
+						fshtmi1 << shtmi1.timeBOKZ << "\t";
+						fshtmi1 << uppercase << hex << setfill('0');
+						fshtmi1 << "0x" << setw(4) << shtmi1.status1 << "\t";
+						fshtmi1 << "0x" << setw(4) << shtmi1.status2 << "\t";
+						fshtmi1 << "0x" << setw(4) << shtmi1.post << "\t";
+						fshtmi1 << dec << setfill(' ');
+						fshtmi1 << shtmi1.serialNumber << "\t";
+						fshtmi1 << shtmi1.timeExp << "\t" << shtmi1.Foc << "\t";
+						fshtmi1 << shtmi1.Xg << "\t" << shtmi1.Yg << "\t";
+						fshtmi1 << shtmi1.Mean << "\t" << shtmi1.Sigma << "\t";
+						fshtmi1 << shtmi1.countDefect << "\t" << shtmi1.Date << "\t";
+						fshtmi1 << shtmi1.verXCF << "\t" << shtmi1.verProg << "\n";
+					}
+				}
+			}
+
+//чтение массива ШТМИ2
+			if (line.find("ШТМИ2") != std::string::npos) {
+				getline(finp, line, '\n' );
+				if (line.find("ТМОС") != std::string::npos) {
+
+					int errorSHTMI2 = ReadTMIArray(finp, "CISO_SHTMI2", ArraySHTMI2, SHTMI1Size);
+					if (!errorSHTMI2) {
+//						char _date[10], _time[10];
+//						sscanf(line.c_str(), "ТМОС %s %s", &_date, &_time);
+						fout << "\n" << line << "\n";
+
+						struct SHTMI2_BOKZM shtmi2;
+						memcpy(&shtmi2, &ArraySHTMI2[2], SHTMI2Size * sizeof(short));
+						PrintSHTMI2_BOKZM(fout, shtmi2);
+
+//						fshtmi2 << _date << " " << _time<< "\t";
+						fshtmi2 << shtmi2.timeBOKZ << "\t";
+						fshtmi2 << uppercase << hex << setfill('0');
+						fshtmi2 << "0x" << setw(4) << shtmi2.status1 << "\t";
+						fshtmi2 << "0x" << setw(4) << shtmi2.status2 << "\t";
+						fshtmi2 << "0x" << setw(4) << shtmi2.post << "\t";
+						fshtmi2 << dec << setfill(' ');
+						fshtmi2 << shtmi2.serialNumber << "\t";
+						fshtmi2 << shtmi2.timeExp << "\t" << shtmi2.Foc << "\t";
+						fshtmi2 << shtmi2.Xg << "\t" << shtmi2.Yg << "\t";
+						fshtmi2 << shtmi2.Mean << "\t" << shtmi2.Sigma << "\t";
+						fshtmi2 << shtmi2.countDefect << "\t";
+						fshtmi2 << shtmi2.cntCallNO << "\t";
+						fshtmi2 << shtmi2.cntCallTO << "\n";
+						for (int i = 0; i < 12; i++) {
+                            fshtmi2 << shtmi2.cntStatOrient[i] << "\t";
+						}
+					}
+				}
+			}
+
+//чтение массива ДТМИ
+			if (line.find("ДТМИ") != std::string::npos) {
+				getline(finp, line, '\n' );
+				if (line.find("ТМОС") != std::string::npos) {
+//					char _date[10], _time[10];
+//					sscanf(line.c_str(), "ТМОС %s %s", &_date, &_time);
+					fout<<"\n"<<line<<"\n";
+
+					for (int i = 0; i < 290; i++) {
+						finp>>word1>>word2>>dec_val;
+						int n1 = sscanf(word1.c_str(),"[%d]", &ind);
+						int n2 = sscanf(word2.c_str(),"0X%x", &hex_val);
+						if ((i == ind)&&(hex_val == dec_val)) {
+							ArrayDTMI[i] = hex_val;
+						}
+						else break;
+					}
+
+					struct DTMI_BOKZM dtmi;
+					memcpy(&dtmi.timeBOKZ, &ArrayDTMI[2], 30*sizeof(short));
+					memcpy(&dtmi.LocalList[2][0], &ArrayDTMI[36], 28*sizeof(short));
+					memcpy(&dtmi.LocalList[5][2], &ArrayDTMI[68], 28*sizeof(short));
+					memcpy(&dtmi.LocalList[9][0], &ArrayDTMI[100],28*sizeof(short));
+					memcpy(&dtmi.LocalList[12][2], &ArrayDTMI[132],28*sizeof(short));
+					memcpy(&dtmi.LocalList[16][0], &ArrayDTMI[164],28*sizeof(short));
+					memcpy(&dtmi.LocalList[19][2], &ArrayDTMI[196],28*sizeof(short));
+					memcpy(&dtmi.LocalList[23][0], &ArrayDTMI[228],28*sizeof(short));
+					memcpy(&dtmi.LocalList[26][2], &ArrayDTMI[260],28*sizeof(short));
+
+					PrintDTMI_BOKZM(fout, dtmi);
+					PrintLocalDTMI_BOKZM(dtmi);
+
+//					fdtmi << _date << " " << _time<< "\t";
+					fdtmi << dtmi.timeBOKZ << "\t";
+					fdtmi << uppercase << hex << setfill('0');
+					fdtmi << "0x" << setw(4) << dtmi.status1 << "\t";
+					fdtmi << "0x" << setw(4) << dtmi.status2 << "\t";
+					fdtmi << dec << setfill(' ');
+					fdtmi << dtmi.serialNumber << "\t";
+					fdtmi << dtmi.timeExp << "\t" << dtmi.Foc << "\t";
+					fdtmi << dtmi.Xg << "\t" << dtmi.Yg << "\t";
+                    fdtmi << dtmi.nLocalObj << "\t" << dtmi.nDeterObj << "\n";
+
+					struct CadrInfo mCadr;
+					ConvertDataDTMI_BOKZM(dtmi, mCadr);
+					vCadrInfo.push_back(mCadr);
+					plotter->AddPoint(ChartNumLoc, 0, mCadr.Time, mCadr.CountLocalObj);
+				}
 			}
 		}
 		finp.close();
 		fout.close();
+		fmshi.close();
+		fshtmi1.close();
+		fshtmi2.close();
+		fdtmi.close();
 
 		PrepareStartDraw();
 		CheckTabSheet();
 	}
 }
-
-
  //---------------------------------------------------------------------------
 
 
@@ -2645,7 +2821,7 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 							plotter->SetShowLines(false);
 							plotter->SetTitle("модель");
 							plotter->SetSeriesColor(clLime);
-							if(!FormAnimateSetting->CheckBoxModelOnly->Checked)
+							if(!FormAnimateSetting->CheckBoxResultOnly->Checked)
 							{
 								plotter->AddPoint(ChartAl, 0, Time, vCadrInfo.back().AnglesModel[0] * RTD);
 								plotter->AddPoint(ChartDl, 0, Time, vCadrInfo.back().AnglesModel[1] * RTD);
@@ -2654,7 +2830,6 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 								plotter->AddPoint(ChartWy, 0, Time, vCadrInfo.back().OmegaModel[1] * RTM);
 								plotter->AddPoint(ChartWz, 0, Time, vCadrInfo.back().OmegaModel[2] * RTM);
 							}
-
 
 							plotter->SetTitle("измерения");
 							plotter->SetSeriesColor(clBlue);

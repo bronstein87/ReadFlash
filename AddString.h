@@ -17,7 +17,6 @@ namespace add_string {
 	UnicodeString toUString(const string& str);
 
 
-
 	template<typename Stream>
 	size_t findWord(Stream& in, const string& word) {
 		string lineToWrite;

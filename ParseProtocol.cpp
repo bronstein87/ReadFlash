@@ -6,7 +6,6 @@
 using namespace add_string;
 namespace parse_prot {
 
-
 	unsigned int ReadBinaryString(string binaryString) {
 		string test_str;
 		double sum = 0;
@@ -36,6 +35,7 @@ namespace parse_prot {
 		return sTime;
 	}
 
+//-------------Функции для чтения протоколов РКЦ "Прогресс"-------------------//
 	int TryReadSHTMI1(ifstream &finp, struct SHTMI1 &tmi) {
 		string line, word;
 
@@ -49,7 +49,7 @@ namespace parse_prot {
 				finp >> word;
 				tmi.status2 = ReadBinaryString(word);
 			}
-			else if ((word == "СЕР") || (word == "CEP")) {
+			else if ((word == "СЕР") || (word == "CEP") || (word == "СEP")) {
 				finp >> word;
 				if ((word == "НОМ") || (word == "HOM")) {
 					finp >> tmi.serialNumber;
@@ -66,15 +66,15 @@ namespace parse_prot {
 				else
 					tmi.timeBOKZ = word; // finp>>tmi.timeBOKZ;
 			}
-			else if (word == "ФOK")
+			else if ((word == "ФOK") || (word == "ФOК"))
 				finp >> tmi.Foc;
-			else if (word == "Х0")
+			else if ((word == "Х0") || (word == "X0"))
 				finp >> tmi.Xg;
-			else if (word == "У0")
+			else if ((word == "У0") || (word == "Y0"))
 				finp >> tmi.Yg;
 			else if ((word == "МТ") || (word == "MT"))
 				finp >> tmi.Mean;
-			else if ((word == "СТ") || (word == "CT"))
+			else if ((word == "СТ") || (word == "CT") || (word == "СT"))
 				finp >> tmi.Sigma;
 			else if ((word == "НАМ") || (word == "HAM")) {
 				finp >> word;
@@ -315,8 +315,6 @@ namespace parse_prot {
 				finp >> tmi.maxHistY;
 				return 1;
 			}
-			// else if ((word=="ДТМИ1")||(word=="ШТМИ1")||(word=="ШТМИ2"))
-			// return 0;
 		}
 		return 0;
 	}
@@ -606,68 +604,210 @@ namespace parse_prot {
 		mCadr.SizeStarsList = 0;
 	}
 
-
-
-void ConvertDataDTMI_BOKZM(struct DTMI_BOKZM tmi, struct CadrInfo &mCadr)
-{
-	mCadr.IsBinary = true;
-//	mCadr.IsReverse=true;
-	mCadr.ImageHeight = 512;
-	mCadr.ImageWidth = 512;
-//	mCadr.Time=data.Tpr_sec+data.Tpr_msec/1000.;
-	mCadr.CountLocalObj = tmi.nLocalObj;
-
-	if (tmi.nLocalObj < MAX_OBJ_BOKZM) mCadr.SizeObjectsList = tmi.nLocalObj;
-	else mCadr.SizeObjectsList = MAX_OBJ_BOKZM;
-
-	ObjectsInfo objInfo;
-	for (int i = 0; i < mCadr.SizeObjectsList; i++) {
-		objInfo.X = tmi.LocalList[i][0];
-		objInfo.Y = tmi.LocalList[i][1];
-		objInfo.Bright = tmi.LocalList[i][2];
-		objInfo.Square = tmi.LocalList[i][3];
-		objInfo.Dx = 0;
-		objInfo.Dy = 0;
-		objInfo.StarID = 0;
-		objInfo.Mv = 0;
-		objInfo.Sp[0] = '_';
-		objInfo.Sp[1] = '_';
-		mCadr.ObjectsList.push_back(objInfo);
+//-------------Функции для чтения протоколов РКК "Энергия"--------------------//
+	int ReadTMIArray(ifstream &_inp, string _keyWord, unsigned short *arrayTMI, const int _sizeArray)
+	{
+		string line, readWord;
+		string format = _keyWord + "[%ld].W[%d] %d";
+		unsigned short nWord = 0;
+		do
+		{
+			getline(_inp, line, '\n' );
+			if (line.find(_keyWord) != std::string::npos) {
+				int nBOKZ = -1;
+				unsigned short word, buf;
+				if (sscanf(line.c_str(), format.c_str(), &nBOKZ, &buf, &word) == 3) {
+					if ((nWord >= 0) && (nWord < _sizeArray)) {
+						arrayTMI[nWord] =  word;
+						nWord++;
+					}
+				}
+			}
+		} while (line.find("CIS1_DSP.TMOS") == std::string::npos);
+		if (nWord == _sizeArray) return 0;
+		else return -1;
 	}
 
-	mCadr.CountBlock = 0;
-	mCadr.CountWindows = 0;
-	mCadr.SizeWindowsList = 0;
-	mCadr.CountDeterObj = 0;
-	mCadr.CountStars = 0;
-	mCadr.SizeStarsList = 0;
-}
+	void ConvertDataDTMI_BOKZM(struct DTMI_BOKZM tmi, struct CadrInfo &mCadr)
+	{
+		mCadr.IsBinary = true;
+	//	mCadr.IsReverse=true;
+		mCadr.ImageHeight = 512;
+		mCadr.ImageWidth = 512;
+	//	mCadr.Time=data.Tpr_sec+data.Tpr_msec/1000.;
+    	mCadr.Time = tmi.timeBOKZ;
+		mCadr.CountLocalObj = tmi.nLocalObj;
 
-void PrintDTMI_BOKZM(ofstream &file, struct DTMI_BOKZM tmi)
-{
-	file<<"____________________________________"<<"\n";
-	file<<"Массив ДТМИ"<<"\n";
-	file<<"Tpr\t"<<tmi.timeBOKZ<<"\n";
-	file<<uppercase<<hex<<setfill('0');
-	file<<"КС1\t"<<"0x"<<setw(4)<<tmi.status1<<"\n";
-	file<<"КС2\t"<<"0x"<<setw(4)<<tmi.status2<<"\n";
-	file<<dec<<setfill(' ');
-	file<<"Зав. №\t"<<tmi.serialNumber<<"\n";
-	file<<"Foc, мм:\t"<<tmi.foc<<"\n";
-	file<<"X0, мм:\t"<<tmi.X0<<"\n";
-	file<<"Y0, мм:\t"<<tmi.Y0<<"\n";
-	file<<"Texp, мс:\t"<<tmi.timeExp<<"\n";
-	file<<"NumLoc: \t"<<tmi.nLocalObj<<"\n";
-	file<<"NumFix: \t"<<tmi.nDeterObj<<"\n";
-	file<<setw(6)<<"№"<<" X, pix"<<" Y, pix"<<" Bright"<<" Nel"<<"\n";
-	for (int i = 0; i < MAX_OBJ_BOKZM; i++) {
-		file<<setw(6)<<(i+1)<<"\t";
-		file<<tmi.LocalList[i][0]<<"\t"<<tmi.LocalList[i][1]<<"\t";
-		file<<tmi.LocalList[i][2]<<"\t"<<tmi.LocalList[i][3]<<"\n";
+		if (tmi.nLocalObj < MAX_OBJ_BOKZM) mCadr.SizeObjectsList = tmi.nLocalObj;
+		else mCadr.SizeObjectsList = MAX_OBJ_BOKZM;
+
+		ObjectsInfo objInfo;
+		for (int i = 0; i < mCadr.SizeObjectsList; i++) {
+			objInfo.X = tmi.LocalList[i][0];
+			objInfo.Y = tmi.LocalList[i][1];
+			objInfo.Bright = tmi.LocalList[i][2];
+			objInfo.Square = tmi.LocalList[i][3];
+			objInfo.Dx = 0;
+			objInfo.Dy = 0;
+			objInfo.StarID = 0;
+			objInfo.Mv = 0;
+			objInfo.Sp[0] = '_';
+			objInfo.Sp[1] = '_';
+			mCadr.ObjectsList.push_back(objInfo);
+		}
+
+		mCadr.CountBlock = 0;
+		mCadr.CountWindows = 0;
+		mCadr.SizeWindowsList = 0;
+		mCadr.CountDeterObj = 0;
+		mCadr.CountStars = 0;
+		mCadr.SizeStarsList = 0;
 	}
-	file<<"____________________________________"<<"\n";
-	file<<flush;
-}
+
+	void PrintMSHI_BOKZM(ofstream &file, struct MSHI_BOKZM tmi)
+	{
+		file<<"____________________________________"<<"\n";
+		file<<"Массив МШИОР"<<"\n";
+		file<<"Tpr\t"<<tmi.timeBOKZ<<"\n";
+		file<<uppercase<<hex<<setfill('0');
+		file<<"КС1\t"<<"0x"<<setw(4)<<tmi.status1<<"\n";
+		file<<"КС2\t"<<"0x"<<setw(4)<<tmi.status2<<"\n";
+		file<<dec<<setfill(' ');
+		file<<"Матрица ориентации:\n";
+		file<<std::setprecision(8);
+		for (int i = 0; i < 3; i++) {
+			file<<std::setw(12)<<tmi.Mornt[i][0];
+			file<<std::setw(12)<<tmi.Mornt[i][1];
+			file<<std::setw(12)<<tmi.Mornt[i][2]<<"\n";
+		}
+
+	//	double ang[3], MorntT[3][3];
+	//
+	//	for (int i = 0; i < 3; i++) {
+	//		for (int j = 0; j < 3; j++) {
+	//            MorntT[i][j] =  tmi.Mornt[j][i];
+	//		}
+	//	}
+	//	MatrixToEkvAngles(MorntT, ang);
+	//	file<<"Углы ориентации:\n";
+	//	file<<"Al = "<<ang[0]*RTD<<"\t";
+	//	file<<"Dl = "<<ang[1]*RTD<<"\t";
+	//	file<<"Az = "<<ang[2]*RTD<<"\n";
+		file<<"____________________________________"<<"\n";
+		file<<flush;
+	}
+
+	void PrintSHTMI1_BOKZM(ofstream &file, struct SHTMI1_BOKZM tmi) {
+		file << "____________________________________" << "\n";
+		file << "Массив ШТМИ1" << "\n";
+		file << "Tpr\t" << tmi.timeBOKZ << "\n";
+		file << uppercase << hex << setfill('0');
+		file << "КС1:\t" << "0x" << setw(4) << tmi.status1 << "\n";
+		file << "КС2:\t" << "0x" << setw(4) << tmi.status2 << "\n";
+		file << "POST:\t" << "0x" << setw(4) << tmi.post << "\n";
+		file << dec << setfill(' ');
+		file << "Зав. №\t" << tmi.serialNumber << "\n";
+		file << "Texp, мс:\t" << tmi.timeExp << "\n";
+		file << "Foc, мм:\t" << tmi.Foc << "\n";
+		file << "X0, мм:\t" << tmi.Xg << "\n";
+		file << "Y0, мм:\t" << tmi.Yg << "\n";
+		file << "Среднее, е.м.р.:\t" << tmi.Mean << "\n";
+		file << "СКО, е.м.р.:\t" << tmi.Sigma << "\n";
+		file << "Число дефектов:\t" << tmi.countDefect << "\n";
+		file << "Дата:\t" << tmi.Date << "\n";
+		file << "Версия XCF:\t" << tmi.verXCF << "\n";
+		file << "Версия ПО:\t" << tmi.verProg << "\n";
+		file << "____________________________________" << "\n";
+		file << flush;
+	}
+
+	void PrintSHTMI2_BOKZM(ofstream &file, struct SHTMI2_BOKZM tmi) {
+		file << "____________________________________" << "\n";
+		file << "Массив ШТМИ2" << "\n";
+		file << "Tpr\t" << tmi.timeBOKZ << "\n";
+		file << uppercase << hex << setfill('0');
+		file << "КС1:\t" << "0x" << setw(4) << tmi.status1 << "\n";
+		file << "КС2:\t" << "0x" << setw(4) << tmi.status2 << "\n";
+		file << "POST:\t" << "0x" << setw(4) << tmi.post << "\n";
+		file << dec << setfill(' ');
+		file << "Зав. №\t" << tmi.serialNumber << "\n";
+		file << "Texp, мс:\t" << tmi.timeExp << "\n";
+		file << "Foc, мм:\t" << tmi.Foc << "\n";
+		file << "X0, мм:\t" << tmi.Xg << "\n";
+		file << "Y0, мм:\t" << tmi.Yg << "\n";
+		file << "Среднее, е.м.р.:\t" << tmi.Mean << "\n";
+		file << "СКО, е.м.р.:\t" << tmi.Sigma << "\n";
+		file << "Число дефектов:\t" << tmi.countDefect << "\n";
+		file << "Число НО:\t" << tmi.cntCallNO << "\n";
+		file << "Число TО:\t" << tmi.cntCallTO << "\n";
+
+		for (int i = 0; i < 12; i++) {
+			file << "Счетчик № " << (i + 1) << ":\t" << tmi.cntStatOrient[i]
+				<< "\n";
+		}
+		file << "____________________________________" << "\n";
+		file << flush;
+	}
+
+	void PrintDTMI_BOKZM(ofstream &file, struct DTMI_BOKZM tmi)
+	{
+		file<<"____________________________________"<<"\n";
+		file<<"Массив ДТМИ"<<"\n";
+		file<<"Tpr\t"<<tmi.timeBOKZ<<"\n";
+		file<<uppercase<<hex<<setfill('0');
+		file<<"КС1\t"<<"0x"<<setw(4)<<tmi.status1<<"\n";
+		file<<"КС2\t"<<"0x"<<setw(4)<<tmi.status2<<"\n";
+		file<<dec<<setfill(' ');
+		file<<"Зав. №\t"<<tmi.serialNumber<<"\n";
+		file<<"Foc, мм:\t"<<tmi.Foc<<"\n";
+		file<<"X0, мм:\t"<<tmi.Xg<<"\n";
+		file<<"Y0, мм:\t"<<tmi.Yg<<"\n";
+		file<<"Texp, мс:\t"<<tmi.timeExp<<"\n";
+		file<<"NumLoc: \t"<<tmi.nLocalObj<<"\n";
+		file<<"NumFix: \t"<<tmi.nDeterObj<<"\n";
+		file<<setw(6)<<"№"<<" X, pix"<<" Y, pix"<<" Bright"<<" Nel"<<"\n";
+		for (int i = 0; i < MAX_OBJ_BOKZM; i++) {
+			file<<setw(6)<<(i+1)<<"\t";
+			file<<tmi.LocalList[i][0]<<"\t"<<tmi.LocalList[i][1]<<"\t";
+			file<<tmi.LocalList[i][2]<<"\t"<<tmi.LocalList[i][3]<<"\n";
+		}
+		file<<"____________________________________"<<"\n";
+		file<<flush;
+	}
+
+	void PrintLocalDTMI_BOKZM(struct DTMI_BOKZM tmi)
+	{
+		AnsiString fileName;
+
+		fileName.printf("BOKZ_№%d_%.2f", tmi.serialNumber, tmi.timeBOKZ);
+		fileName += "_MLOC_LOC.txt";
+
+		for (int i = 1; i < fileName.Length() + 1; i++) {
+			if ((fileName[i] == ':') || (fileName[i] == ';') ||
+				(fileName[i] == '?') || (fileName[i] == '>') ||
+				(fileName[i] == '<') || (fileName[i] == '=') ||
+				(fileName[i] == '/') || (fileName[i] == '\\')) {
+					fileName[i] = '_';
+			}
+		}
+
+		ofstream file(fileName.c_str());
+
+		file << setw(6) << "№" << " X, pix" << " Y, pix" << " Bright" <<
+				" Nel" << "\n";
+		int cntLocal;
+		if (tmi.nLocalObj < MAX_OBJ_BOKZM)
+			cntLocal = tmi.nLocalObj;
+		else
+			cntLocal = MAX_OBJ_BOKZM;
+		for (int i = 0; i < cntLocal; i++) {
+			file << setw(6) << (i + 1) << "\t";
+			file << tmi.LocalList[i][0] << "\t" << tmi.LocalList[i][1] << "\t";
+			file << tmi.LocalList[i][2] << "\t" << tmi.LocalList[i][3] << "\n";
+		}
+		file.close();
+	}
+//----------------------------------------------------------------------------//
 
 void PrintDTMI_M2(ofstream &file, struct DTMI_M2 tmi) {
 	file << "____________________________________" << "\n";

@@ -78,12 +78,37 @@ namespace parse_prot
 		unsigned short test_short, Reserved[10];
 	};
 
+	struct MSHI_BOKZM {
+		unsigned short status1, status2;
+		float timeBOKZ;
+		float Mornt[3][3];
+	};
+
+	struct SHTMI1_BOKZM {
+		float timeBOKZ;
+		unsigned short status1, status2;
+		unsigned short serialNumber, post;
+		float Foc, Xg, Yg;
+		unsigned short timeExp, Mean, Sigma, countDefect;
+		unsigned short reserved[11];
+		unsigned short Date, verXCF, verProg;
+	};
+
+	struct SHTMI2_BOKZM {
+		float timeBOKZ;
+		unsigned short status1, status2;
+		unsigned short serialNumber, post;
+		float Foc, Xg, Yg;
+		unsigned short timeExp, Mean, Sigma, countDefect;
+		unsigned short cntCallNO, cntCallTO;
+		unsigned short cntStatOrient[12];
+	};
 
 	struct DTMI_BOKZM {
 		float timeBOKZ;
 		unsigned short status1, status2;
 		unsigned short serialNumber;
-		float foc, X0, Y0;
+		float Foc, Xg, Yg;
 		unsigned short timeExp;
 		unsigned short nLocalObj, nDeterObj;
 		float LocalList[MAX_OBJ_BOKZM][4];
@@ -134,9 +159,21 @@ namespace parse_prot
 
 	void ConvertDataLOC(struct LOC tmi, struct CadrInfo &mCadr);
 
+	int ReadTMIArray(ifstream &_inp, string _keyWord,
+					 unsigned short *arrayTMI, const int _sizeArray);
+
 	void ConvertDataDTMI_BOKZM(struct DTMI_BOKZM tmi, struct CadrInfo &mCadr) ;
 
+	void PrintMSHI_BOKZM(ofstream &file, struct MSHI_BOKZM tmi);
+
+	void PrintSHTMI1_BOKZM(ofstream &file, struct SHTMI1_BOKZM tmi);
+
+	void PrintSHTMI2_BOKZM(ofstream &file, struct SHTMI2_BOKZM tmi);
+
 	void PrintDTMI_BOKZM(ofstream &file, struct DTMI_BOKZM tmi);
+
+	void PrintLocalDTMI_BOKZM(struct DTMI_BOKZM tmi);
+
 	void PrintDTMI_M2(ofstream &file, struct DTMI_M2 tmi);
 
 	// проверяем содержит ли протокол режим локализации
