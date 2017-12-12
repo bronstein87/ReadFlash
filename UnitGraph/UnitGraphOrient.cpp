@@ -1901,7 +1901,6 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 
 void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 {
-
 	const int DTMISize = 290;
 	const int MSHISize = 22;
 	const int SHTMI1Size = 32;
@@ -1933,12 +1932,14 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 		ofstream fshtmi1((FileTitle + "_shtmi1.txt").c_str());
 		ofstream fshtmi2((FileTitle + "_shtmi2.txt").c_str());
 		ofstream fdtmi((FileTitle + "_dtmi.txt").c_str());
+		ofstream ftemp((FileTitle + "_temp.txt").c_str());
+		ofstream fpow((FileTitle  + "_power.txt").c_str());
 
-		fmshi/* << "Date&Time\t" */<< "Tbokz\t";
+		fmshi << "Date&Time\t" << "Tbokz\t";
 		fmshi << "KC1\t" << "KC2\t";
 		fmshi << "\n";
 
-		fshtmi1/* << "Date&Time\t" */<< "Tbokz\t";
+		fshtmi1 << "Date&Time\t" << "Tbokz\t";
 		fshtmi1 << "KC1\t" << "KC2\t" << "POST\t" << "№\t" << "Texp\t";
 		fshtmi1 << "Foc\t" << "Xg\t" << "Yg\t";
 		fshtmi1 << "Mean\t" << "Sigma\t";
@@ -1946,7 +1947,7 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 		fshtmi1 << "verXCF\t" << "verProg\t";
 		fshtmi1 << "\n";
 
-		fshtmi2/* << "Date&Time\t" */<< "Tbokz\t";
+		fshtmi2 << "Date&Time\t" << "Tbokz\t";
 		fshtmi2 << "KC1\t" << "KC2\t" << "POST\t" << "№\t" << "Texp\t";
 		fshtmi2 << "Foc\t" << "Xg\t" << "Yg\t";
 		fshtmi2 << "Mean\t" << "Sigma\t";
@@ -1956,15 +1957,16 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 		}
 		fshtmi2 << "\n";
 
-		fdtmi/* << "Date&Time\t" */<< "Tbokz\t";
+		fdtmi << "Date&Time\t" << "Tbokz\t";
 		fdtmi << "KC1\t" << "KC2\t" <<  "№\t" << "Texp\t";
 		fdtmi << "Foc\t" << "Xg\t" << "Yg\t";
 		fdtmi << "NumLoc\t" << "NumFix\t";
 		fdtmi << "\n";
 
-		string line, word1, word2, word3;
-		unsigned short hex_val, dec_val;
-		int cntRecDTMI = 0, ind;
+		ftemp << "Date&Time\t" <<"ТЕМП-1\t" << "ТЕМП-2\t" << "ТЕМП-3\n";
+		fpow << "Date&Time\t" <<"КП-1\t" << "КП-2\t" << "КП-3\n";
+
+		string line;
 		while (!finp.eof())
 		{
 			getline(finp, line, '\n' );
@@ -1973,16 +1975,15 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 			if (line.find("МШИОР") != std::string::npos) {
 				getline(finp, line, '\n' );
 				if (line.find("ТМОС") != std::string::npos) {
+					char cdate[20], ctime[20];
+					sscanf(line.c_str(), "ТМОС %s %s", &cdate, &ctime);
 
 					int errorMSHI = ReadTMIArray(finp, "CISO_MSHIOR", ArrayMSHI, MSHISize);
 
 					if (!errorMSHI) {
-						char _date[10], _time[10];
-						sscanf(line.c_str(), "ТМОС %s %s", &_date, &_time);
-						fout<<"\n"<<line<<"\n";
-
 						struct MSHI_BOKZM mshi;
-						memcpy(&mshi, ArrayMSHI, MSHISize * sizeof(short));
+						memcpy(&mshi, ArrayMSHI, sizeof(mshi));
+						fout<<"\n"<<line<<"\n";
 						PrintMSHI_BOKZM(fout, mshi);
 
 						double ang[3], MorntT[3][3];
@@ -2001,6 +2002,7 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 							plotter->AddPoint(ChartAz, 0, mshi.timeBOKZ, ang[2] * RTD);
 						}
 
+						fmshi << cdate << " " << ctime << "\t";
 						fmshi << std::setprecision(8);
 						fmshi << mshi.timeBOKZ << "\t";
 						fmshi << uppercase<<hex<<setfill('0');
@@ -2019,18 +2021,17 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 			if (line.find("ШТМИ1") != std::string::npos) {
 				getline(finp, line, '\n' );
 				if (line.find("ТМОС") != std::string::npos) {
+					char cdate[20], ctime[20];
+					sscanf(line.c_str(), "ТМОС %s %s", &cdate, &ctime);
 
 					int errorSHTMI1 = ReadTMIArray(finp, "CISO_SHTMI1", ArraySHTMI1, SHTMI1Size);
 					if (!errorSHTMI1) {
-//						string _date, _time;
-//						sscanf(line.c_str(), "ТМОС %s %s");
-						fout << "\n" << line << "\n";
-
 						struct SHTMI1_BOKZM shtmi1;
-						memcpy(&shtmi1, &ArraySHTMI1[2], SHTMI1Size * sizeof(short));
+						memcpy(&shtmi1, &ArraySHTMI1[2], sizeof(shtmi1));
+						fout << "\n" << line << "\n";
 						PrintSHTMI1_BOKZM(fout, shtmi1);
 
-//						fshtmi1 << _date << " " << _time<< "\t";
+						fshtmi1 << cdate << " " << ctime << "\t";
 						fshtmi1 << shtmi1.timeBOKZ << "\t";
 						fshtmi1 << uppercase << hex << setfill('0');
 						fshtmi1 << "0x" << setw(4) << shtmi1.status1 << "\t";
@@ -2051,6 +2052,8 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 			if (line.find("ШТМИ2") != std::string::npos) {
 				getline(finp, line, '\n' );
 				if (line.find("ТМОС") != std::string::npos) {
+					char cdate[20], ctime[20];
+					sscanf(line.c_str(), "ТМОС %s %s", &cdate, &ctime);
 
 					int errorSHTMI2 = ReadTMIArray(finp, "CISO_SHTMI2", ArraySHTMI2, SHTMI1Size);
 					if (!errorSHTMI2) {
@@ -2059,10 +2062,10 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 						fout << "\n" << line << "\n";
 
 						struct SHTMI2_BOKZM shtmi2;
-						memcpy(&shtmi2, &ArraySHTMI2[2], SHTMI2Size * sizeof(short));
+						memcpy(&shtmi2, &ArraySHTMI2[2], sizeof(shtmi2));
 						PrintSHTMI2_BOKZM(fout, shtmi2);
 
-//						fshtmi2 << _date << " " << _time<< "\t";
+						fshtmi2 << cdate << " " << ctime << "\t";
 						fshtmi2 << shtmi2.timeBOKZ << "\t";
 						fshtmi2 << uppercase << hex << setfill('0');
 						fshtmi2 << "0x" << setw(4) << shtmi2.status1 << "\t";
@@ -2075,21 +2078,24 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 						fshtmi2 << shtmi2.Mean << "\t" << shtmi2.Sigma << "\t";
 						fshtmi2 << shtmi2.countDefect << "\t";
 						fshtmi2 << shtmi2.cntCallNO << "\t";
-						fshtmi2 << shtmi2.cntCallTO << "\n";
+						fshtmi2 << shtmi2.cntCallTO << "\t";
 						for (int i = 0; i < 12; i++) {
                             fshtmi2 << shtmi2.cntStatOrient[i] << "\t";
 						}
+						fshtmi2 <<"\n";
 					}
 				}
 			}
 
 //чтение массива ДТМИ
 			if (line.find("ДТМИ") != std::string::npos) {
+				string word1, word2, word3;
+				unsigned short hex_val, dec_val;
+				int cntRecDTMI = 0, ind;
 				getline(finp, line, '\n' );
 				if (line.find("ТМОС") != std::string::npos) {
-//					char _date[10], _time[10];
-//					sscanf(line.c_str(), "ТМОС %s %s", &_date, &_time);
-					fout<<"\n"<<line<<"\n";
+					char cdate[20], ctime[20];
+					sscanf(line.c_str(), "ТМОС %s %s", &cdate, &ctime);
 
 					for (int i = 0; i < 290; i++) {
 						finp>>word1>>word2>>dec_val;
@@ -2112,10 +2118,11 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 					memcpy(&dtmi.LocalList[23][0], &ArrayDTMI[228],28*sizeof(short));
 					memcpy(&dtmi.LocalList[26][2], &ArrayDTMI[260],28*sizeof(short));
 
+					fout<<"\n"<<line<<"\n";
 					PrintDTMI_BOKZM(fout, dtmi);
 					PrintLocalDTMI_BOKZM(dtmi);
 
-//					fdtmi << _date << " " << _time<< "\t";
+					fdtmi << cdate << " " << ctime << "\t";
 					fdtmi << dtmi.timeBOKZ << "\t";
 					fdtmi << uppercase << hex << setfill('0');
 					fdtmi << "0x" << setw(4) << dtmi.status1 << "\t";
@@ -2132,6 +2139,61 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 					plotter->AddPoint(ChartNumLoc, 0, mCadr.Time, mCadr.CountLocalObj);
 				}
 			}
+//чтение температуры
+			if (line.find("температур") != std::string::npos) {
+				getline(finp, line, '\n' );
+				if (line.find("ТМОС") != std::string::npos) {
+					char cdate[20], ctime[20];
+					sscanf(line.c_str(), "ТМОС %s %s", &cdate, &ctime);
+
+					float temp, ArrayTemp[3]={0, 0, 0};
+					int ind, countTemp = 0;
+					for (int i = 0; i < 3; i++) {
+						getline(finp, line, '\n' );
+						int n = sscanf(line.c_str(),"CSUH_VHT[%d] %f", &ind, &temp);
+						if (( (i+6) == ind) && (n==2)) {
+							ArrayTemp[i] = temp;
+							countTemp++;
+						}
+						else break;
+					}
+					if (countTemp) {
+						ftemp << cdate << " " << ctime << "\t";
+						for (int i = 0; i < 3; i++) {
+							ftemp << ArrayTemp[i] << "\t";
+						}
+						ftemp << "\n";
+					}
+				}
+			}
+//чтение признака наличия питания
+			if (line.find("дискрет") != std::string::npos) {
+				getline(finp, line, '\n' );
+				if (line.find("ТМОС") != std::string::npos) {
+					char cdate[20], ctime[20];
+					sscanf(line.c_str(), "ТМОС %s %s", &cdate, &ctime);
+
+					int power, ArrayPower[3] = {0, 0, 0};
+					int ind, countPower = 0;
+					int keyPower[3] = {98, 106, 114};
+					for (int i = 0; i < 3; i++) {
+						getline(finp, line, '\n' );
+						int n = sscanf(line.c_str(),"CSAH.D.VHD%d %d", &ind, &power);
+						if (( ind == keyPower[i]) && (n == 2)) {
+							ArrayPower[i] = abs(1 - power);
+							countPower++;
+						}
+						else break;
+					}
+					if (countPower) {
+						fpow << cdate << " " << ctime << "\t";
+						for (int i = 0; i < 3; i++) {
+							fpow << ArrayPower[i] << "\t";
+						}
+						fpow << "\n";
+					}
+				}
+			}
 		}
 		finp.close();
 		fout.close();
@@ -2139,6 +2201,8 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 		fshtmi1.close();
 		fshtmi2.close();
 		fdtmi.close();
+		ftemp.close();
+		fpow.close();
 
 		PrepareStartDraw();
 		CheckTabSheet();
