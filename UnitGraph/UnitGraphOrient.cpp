@@ -2808,7 +2808,6 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 			FileOpenDialog1->FileName = GetCurrentDir();
 			FileList->Sort();
 
-
 			if (FileOpenDialog1->Execute())
 			{
 				FileTitle = "IKI";
@@ -2835,7 +2834,6 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 				bool skipFrame = FormAnimateSetting->SkipFrameCheckBox->Checked;
 				unique_ptr <TStringList> FoldersList (new TStringList());
 				FoldersList->Assign(FileOpenDialog1->Files);
-				bool fewFolders = (FileOpenDialog1->Files->Count > 1);
 
 				for (int curFolder = 0; curFolder < FoldersList->Count; curFolder++)
 				{
@@ -3019,16 +3017,15 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 //			if (FormAnimateSetting->CheckBoxPrintReport->Checked) {
 //				PrintReportRes(vCadrInfo);
 //			}	
-					if (fewFolders) 
-					{
-					   UnicodeString folder = SaveScreenShots(FoldersList->Strings[curFolder]);
-					   SaveTableToFile(TableStatInfo, TableStatInfo->RowCount, TableStatInfo->ColCount, 
-					   toStdString(folder + "\\table_stat.txt"));
-					   SaveTableToFile(TableStatusInfo, TableStatusInfo->RowCount, TableStatusInfo->ColCount, 
-					   toStdString(folder + "\\table_status.txt"));
-					   ofstream out(string(toStdString(folder) + "\\table_status.txt").c_str(), std::ofstream::out | std::ofstream::app);
-					   out << toStdString(RatioEdit->Text) <<"\t"<< statusInfo.NoOneCount <<"\t"<< statusInfo.NoFourCount; 
-					}
+
+					UnicodeString folder = SaveScreenShots(FoldersList->Strings[curFolder]);
+					SaveTableToFile(TableStatInfo, TableStatInfo->RowCount, TableStatInfo->ColCount,
+									toStdString(folder + "\\table_stat.txt"));
+					SaveTableToFile(TableStatusInfo, TableStatusInfo->RowCount, TableStatusInfo->ColCount,
+									toStdString(folder + "\\table_status.txt"));
+					ofstream out(string(toStdString(folder) + "\\table_status.txt").c_str(), std::ofstream::out | std::ofstream::app);
+					out << toStdString(RatioEdit->Text) <<"\t"<< statusInfo.NoOneCount <<"\t"<< statusInfo.NoFourCount;
+
 				}
 		}
 	}
