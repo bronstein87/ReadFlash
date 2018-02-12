@@ -46,32 +46,37 @@ namespace parse_prot
 	};
 
 	struct SHTMI1 {
-		string timeBOKZ;
-		unsigned short status1, status2, post;
-		int serialNumber;
+//		string timeBOKZ;
+		unsigned int timeBOKZ;
+		unsigned short status1, status2;
+		unsigned short serialNumber, post;
 		float Foc, Xg, Yg;
 		unsigned short timeExp, Mean, Sigma, countDefect;
+		unsigned short reserved[11];
 		unsigned short CRC, Date, Version;
 	};
 
 	struct SHTMI2 {
-		string timeBOKZ;
-		unsigned short status1, status2, post;
-		int serialNumber, timeExp;
-		int cntCommandWord, cntCallNO, cntNOtoSLEZH;
-		int cntCallTO, cntTOtoSLEZH, cntSLEZH;
-		int cntStatOrient[MAX_STAT];
+//		string timeBOKZ;
+		unsigned int timeBOKZ;
+		unsigned short status1, status2;
+		unsigned short serialNumber, post, timeExp;
+		unsigned short cntCommandWord, cntCallNO, cntNOtoSLEZH;
+		unsigned short cntCallTO, cntTOtoSLEZH;
+		unsigned int   cntSLEZH;
+		unsigned short cntStatOrient[MAX_STAT];
 	};
 
 	struct DTMI {
-		string timeBOKZ;
+//		string timeBOKZ;
+		unsigned int timeBOKZ;
 		unsigned short status1, status2;
 		unsigned short serialNumber, timeExp;
 		unsigned short nLocalObj, nDeterObj, nWindows, epsillon;
 		float dTimeBOKZ, LocalList[MAX_OBJ_DTMI][4];
 		float quatBoard[4], omega[3], centrWindow[MAX_WINDOW][2];
 		unsigned short levelWindow[MAX_WINDOW], nObjectWindow[MAX_WINDOW];
-		unsigned long timeQuatLast;
+		unsigned int timeQuatLast;
 		float quatLast[4], Epoch;
 		unsigned short nLocal[2], maxHist;
 		unsigned short maxHistX, maxHistY;
@@ -115,7 +120,8 @@ namespace parse_prot
 	};
 
 	struct LOC {
-		string timeBOKZ;
+//		string timeBOKZ;
+		unsigned int timeBOKZ;
 		unsigned short status1, status2;
 		unsigned short serialNumber, timeExp;
 		unsigned short nLocalObj, nFixedObj;
@@ -134,8 +140,13 @@ namespace parse_prot
 		{"ея9"}, {"ея10"}, {"ея11"}, {"ея12"}, {"ея13"}, {"ея14"}, {"ея15"},
 		{"ея16"}};
 
+	void SwapShort(short *word1, short *word2);
+
 	unsigned int ReadBinaryString(string binaryString);
-	AnsiString GetTimeString(unsigned long time);
+
+	unsigned int StringToDayTime(string _line);
+
+	AnsiString DayTimeToString(unsigned int time);
 
 	int TryReadSHTMI1(ifstream &finp, struct SHTMI1 &tmi);
 

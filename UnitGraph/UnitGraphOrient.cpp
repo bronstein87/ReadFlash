@@ -13,14 +13,6 @@ extern int NumDoc, NumPar, NumTab, NumImage;
 
 using namespace parse_prot;
 
-void SwapShort(short *word1, short *word2)
-{
-	short buf;
-	buf = *word1;
-	*word1 = *word2;
-	*word2 = buf;
-}
-
 //---------------------------------------------------------------------------
 __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 		: TForm(Owner),
@@ -2275,9 +2267,9 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 		{
 			getline(finp, line, '\n' );
 			if (line.find("ШТМИ1")!=string::npos) {
-				if(TryReadSHTMI1(finp,mSHTMI1)) {
-					PrintSHTMI1(fout,mSHTMI1);
-					fshtmi1<<mSHTMI1.timeBOKZ<<"\t";
+				if(TryReadSHTMI1(finp, mSHTMI1)) {
+					PrintSHTMI1(fout, mSHTMI1);
+					fshtmi1<<DayTimeToString(mSHTMI1.timeBOKZ).c_str()<<"\t";
 					fshtmi1<<uppercase<<hex<<setfill('0');
 					fshtmi1<<"0x"<<setw(4)<<mSHTMI1.status1<<"\t";
 					fshtmi1<<"0x"<<setw(4)<<mSHTMI1.status2<<"\t";
@@ -2298,9 +2290,9 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 				}
 			}
 			else if (line.find("ШТМИ2") != string::npos) {
-				if(TryReadSHTMI2(finp,mSHTMI2)) {
-					PrintSHTMI2(fout,mSHTMI2);
-					fshtmi2<<mSHTMI2.timeBOKZ<<"\t";
+				if(TryReadSHTMI2(finp, mSHTMI2)) {
+					PrintSHTMI2(fout, mSHTMI2);
+					fshtmi2<<DayTimeToString(mSHTMI2.timeBOKZ).c_str()<<"\t";
 					fshtmi2<<uppercase<<hex<<setfill('0');
 					fshtmi2<<"0x"<<setw(4)<<mSHTMI2.status1<<"\t";
 					fshtmi2<<"0x"<<setw(4)<<mSHTMI2.status2<<"\t";
@@ -2326,9 +2318,9 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 					struct CadrInfo mCadr;
 
 					if (mDTMI.status2 == 0x0005) {
-						mDTMI.test_short=0;
+						mDTMI.test_short = 0;
 						SwapShort((short*)&mDTMI.nWindows, (short*)&mDTMI.epsillon);
-						for (int i = 0; i < MAX_WINDOW; i=i+2) {
+						for (int i = 0; i < MAX_WINDOW; i = i + 2) {
 
 							SwapShort((short*)&mDTMI.levelWindow[i],
 									  (short*)&mDTMI.levelWindow[i+1]);
@@ -2343,7 +2335,7 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 						PrintLOC(fout,mLOC);
 						PrintLocalMLOC(mLOC);
 
-						fmloc<<mLOC.timeBOKZ<<"\t";
+						fmloc<<DayTimeToString(mLOC.timeBOKZ).c_str()<<"\t";
 						fmloc<<uppercase<<hex<<setfill('0');
 						fmloc<<"0x"<<setw(4)<<mLOC.status1<<"\t";
 						fmloc<<"0x"<<setw(4)<<mLOC.status2<<"\t";
@@ -2360,7 +2352,7 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 						mCadr.Time = cntRecDTMI++;
 					}
 					else {
-						PrintDTMI(fout,mDTMI);
+						PrintDTMI(fout, mDTMI);
 						PrintLocalDTMI(mDTMI);
 
 						fdtmi<<mDTMI.timeBOKZ<<"\t";
@@ -2375,7 +2367,7 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 						fdtmi<<setw(6)<<mDTMI.nWindows<<"\t";
 						fdtmi<<setw(6)<<mDTMI.epsillon<<"\t";
 						fdtmi<<setw(6)<<mDTMI.dTimeBOKZ<<"\t";
-						fdtmi<<setw(6)<<GetTimeString(mDTMI.timeQuatLast)<<"\t";
+						fdtmi<<setw(6)<<DayTimeToString(mDTMI.timeQuatLast)<<"\t";
 						fdtmi<<"\n";
 
 						ConvertDataDTMI(mDTMI, mCadr);

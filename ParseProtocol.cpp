@@ -6,6 +6,14 @@
 using namespace add_string;
 namespace parse_prot {
 
+	void SwapShort(short *word1, short *word2)
+	{
+		short buf;
+		buf = *word1;
+		*word1 = *word2;
+		*word2 = buf;
+	}
+
 	unsigned int ReadBinaryString(string binaryString) {
 		string test_str;
 		double sum = 0;
@@ -17,11 +25,30 @@ namespace parse_prot {
 		return (unsigned int) sum;
 	}
 
-	AnsiString GetTimeString(unsigned long time)
+//-------------‘ÛÌÍˆËË ‰Îˇ ˜ÚÂÌËˇ ÔÓÚÓÍÓÎÓ‚ – ÷ "œÓ„ÂÒÒ"-------------------//
+	unsigned int StringToDayTime(string _line)
+	{
+		float mday, mhour, mmin, msec;
+		unsigned int dayTime;
+
+		if (sscanf(_line.c_str(), " %f/ %f:%f:%f", &mday, &mhour,
+						&mmin, &msec) == 4) {
+			dayTime = mday * 86400 + mhour * 3600 +  mmin * 60 + msec;
+		}
+		else if (sscanf(_line.c_str(), "%f:%f:%f", &mhour,
+						&mmin, &msec) == 3) {
+			dayTime = mhour * 3600 + mmin * 60 + msec;
+		}
+		else  dayTime = 0;
+//		dayTime *= 8;
+		return dayTime;
+	}
+
+	AnsiString DayTimeToString(unsigned int time)
 	{
 		AnsiString str, sTime = " ";
 		int day, hour, min, sec;
-		double day_double = time/86400./8.;
+		double day_double = time/86400.;///8.;
 
 		day = (int)day_double;
 		hour = (day_double - (int)day) * 24 + 1e-7;
@@ -30,17 +57,17 @@ namespace parse_prot {
 		if (day > 0) {
 			sTime  = IntToStr(day) + "/";
 		}
-		str.sprintf("%02d:%02d:%02d", hour, min, sec);
+		str.sprintf(" %02d:%02d:%02d", hour, min, sec);
 		sTime += str;
 		return sTime;
 	}
 
-//-------------‘ÛÌÍˆËË ‰Îˇ ˜ÚÂÌËˇ ÔÓÚÓÍÓÎÓ‚ – ÷ "œÓ„ÂÒÒ"-------------------//
 	int TryReadSHTMI1(ifstream &finp, struct SHTMI1 &tmi) {
-		string line, word;
+		string line, word = "";
 
-		while (!finp.eof()) {
+		while ((!finp.eof()) && (word.find("-----") == string::npos)) {
 			finp >> word;
+
 			if ((word == " —1") || (word == "KC1")) {
 				finp >> word;
 				tmi.status1 = ReadBinaryString(word);
@@ -63,8 +90,11 @@ namespace parse_prot {
 				finp >> word;
 				if (word == "› —œ")
 					finp >> tmi.timeExp;
-				else
-					tmi.timeBOKZ = word; // finp>>tmi.timeBOKZ;
+				else {
+					getline(finp, line, '\n');
+					word = word + line;
+					tmi.timeBOKZ = StringToDayTime(word);
+				}
 			}
 			else if ((word == "‘OK") || (word == "‘O "))
 				finp >> tmi.Foc;
@@ -89,15 +119,36 @@ namespace parse_prot {
 				finp >> tmi.Version;
 				return 1;
 			}
+			else
+			{
+				unsigned short testArr[32];
+				int cntWord = 0;
+				while ((cntWord < 32) && (word.find("-----") == string::npos)) {
+					int highByte = ReadBinaryString(word);
+					finp >> word;
+					int lowByte = ReadBinaryString(word);
+					finp >> word;
+					testArr[cntWord] = (highByte << 8) | (lowByte);
+					cntWord++;
+				}
+				if ( (cntWord == 32) && (testArr[0] == 0x42C3) && (testArr[1] == 0x5AAA) ){
+					SwapShort((short *)&testArr[2],  (short *)&testArr[3]);
+					SwapShort((short *)&testArr[8],  (short *)&testArr[9]);
+					SwapShort((short *)&testArr[10], (short *)&testArr[11]);
+					SwapShort((short *)&testArr[12], (short *)&testArr[13]);
+					memcpy(&tmi, &testArr[2], sizeof(tmi));
+					return 1;
+				}
+			}
 			getline(finp, line, '\n');
 		}
 		return 0;
 	}
 
 	int TryReadSHTMI2(ifstream &finp, struct SHTMI2 &tmi) {
-		string line, word;
+		string line, word = "";
 
-		while (!finp.eof()) {
+		while ((!finp.eof()) && (word.find("-----") == string::npos)) {
 			finp >> word;
 			if ((word == " —1") || (word == "KC1")) {
 				finp >> word;
@@ -122,8 +173,9 @@ namespace parse_prot {
 				if (word == "› —œ")
 					finp >> tmi.timeExp;
 				else {
-					finp >> tmi.timeBOKZ; // ReadTimeBOKZ(word)
-					tmi.timeBOKZ = word + tmi.timeBOKZ;
+					getline(finp, line, '\n');
+					word = word + line;
+					tmi.timeBOKZ = StringToDayTime(word);
 				}
 			}
 			else if (word == "Õ¿Ã") {
@@ -150,21 +202,41 @@ namespace parse_prot {
 					tmi.cntSLEZH *= 2;
 				}
 			}
-			else {
-				int i = 0, fl_find = 0;
-				while ((i < MAX_STAT) && (!fl_find)) {
-					if ((word == arrStatErrorRus[i]) ||
-						(word == arrStatErrorEng[i])) {
-						finp >> tmi.cntStatOrient[i];
-						fl_find = 1;
+			else if ( (word.find("EC") != string::npos)
+					  || (word.find("≈—") != string::npos) ) {
+					int i = 0, fl_find = 0;
+					while ((i < MAX_STAT) && (!fl_find)) {
+						if ((word == arrStatErrorRus[i]) ||
+							(word == arrStatErrorEng[i])) {
+							finp >> tmi.cntStatOrient[i];
+							fl_find = 1;
+						}
+						i++;
 					}
-					i++;
+					if ((word == arrStatErrorRus[MAX_STAT - 1]) ||
+						(word == arrStatErrorEng[MAX_STAT - 1])) {
+						return 1;
+					}
+			}
+			else {
+				unsigned short testArr[32];
+				int cntWord = 0;
+				while ((cntWord < 32) && (word.find("-----") == string::npos)) {
+					int highByte = ReadBinaryString(word);
+					finp >> word;
+					int lowByte = ReadBinaryString(word);
+                    finp >> word;
+					testArr[cntWord] = (highByte << 8) | (lowByte);
+					cntWord++;
+				}
+				if ( (cntWord == 32) && (testArr[0] == 0x42C3) && (testArr[1] == 0x6AAA) ){
+					SwapShort((short *)&testArr[2],  (short *)&testArr[3]);
+					SwapShort((short *)&testArr[14], (short *)&testArr[15]);
+					memcpy(&tmi, &testArr[2], sizeof(tmi));
+                    return 1;
 				}
 			}
-			if ((word == arrStatErrorRus[MAX_STAT - 1]) ||
-				(word == arrStatErrorEng[MAX_STAT - 1])) {
-				return 1;
-			}
+
 			getline(finp, line, '\n');
 		}
 		return 0;
@@ -175,7 +247,6 @@ namespace parse_prot {
 		int indexObject = 0, indexParam = 0, intVal, flLow = 1;
 		float fl1, fl2, fl3, sum;
 		int Stat1, Stat2;
-		float mday, mhour, mmin, msec;
 
 		while (!finp.eof()) {
 			finp >> word;
@@ -218,24 +289,11 @@ namespace parse_prot {
 					finp >> tmi.timeExp;
 				else if (word == "œ’Œ ") {
 					getline(finp, line, '\n');
-
-					if (sscanf(line.c_str(), " %f/ %f:%f:%f", &mday, &mhour,
-						&mmin, &msec) == 4) {
-						tmi.timeQuatLast = mday * 86400 + mhour * 3600 +
-							mmin * 60 + msec;
-					}
-					else if (sscanf(line.c_str(), "%f:%f:%f", &mhour,
-						&mmin, &msec) == 3) {
-						tmi.timeQuatLast = mhour * 3600 +
-							mmin * 60 + msec;
-					}
-					else  tmi.timeQuatLast = 0;
-					tmi.timeQuatLast *= 8;
-					// finp>>tmi.timeQuatLast;
+					tmi.timeQuatLast = StringToDayTime(line);
 				}
 				else {
-					finp >> tmi.timeBOKZ;
-					tmi.timeBOKZ = word + tmi.timeBOKZ;
+					getline(finp, line, '\n');
+					tmi.timeQuatLast = StringToDayTime(line);
 				}
 			}
 			else if (word == "ÀŒ ") {
@@ -243,7 +301,7 @@ namespace parse_prot {
 				int nread = sscanf(line.c_str(), "%f%f%f", &fl1, &fl2, &fl3);
 				if (nread == 3) {
 					indexObject = (short)fl1;
-					indexParam = (short)fl2;
+					indexParam  = (short)fl2;
 					tmi.LocalList[indexObject][indexParam] = fl3;
 				}
 				else if (nread == 2) {
@@ -315,6 +373,37 @@ namespace parse_prot {
 				finp >> tmi.maxHistY;
 				return 1;
 			}
+			else {
+				unsigned short testArr[32];
+				int cntWord = 0;
+				while ((cntWord < 32) && (word.find("-----") == string::npos)) {
+					int highByte = ReadBinaryString(word);
+					finp >> word;
+					int lowByte = ReadBinaryString(word);
+                    finp >> word;
+					testArr[cntWord] = (highByte << 8) | (lowByte);
+					cntWord++;
+				}
+				if ( (cntWord == 32) && (testArr[0] == 0x42C3) && (testArr[1] == 0x7AAA) ){
+					for (int iWord = 12; iWord <= 30; iWord = iWord + 2) {
+						SwapShort((short *)&testArr[iWord],  (short *)&testArr[iWord+1]);
+					}
+					memcpy(&tmi, &testArr[2], 30 * sizeof(short));
+				}
+
+				while ((line.find("ƒ“Ã»")==string::npos) && (!finp.eof())) {
+					getline(finp, line, '\n' );
+				}
+				finp >> word;
+					if ( (cntWord == 32) && (testArr[0] == 0x42C3) && (testArr[1] == 0x8AAA) ){
+						for (int iWord = 2; iWord <= 30; iWord = iWord + 2) {
+							SwapShort((short *)&testArr[iWord],  (short *)&testArr[iWord+1]);
+						}
+						memcpy(&tmi.LocalList[2][1], &testArr[2], 30 * sizeof(short));
+						return 1;
+					}
+
+            }
 		}
 		return 0;
 	}
@@ -322,7 +411,7 @@ namespace parse_prot {
 	void PrintSHTMI1(ofstream &file, struct SHTMI1 tmi) {
 		file << "____________________________________" << "\n";
 		file << "Ã‡ÒÒË‚ ÿ“Ã»1" << "\n";
-		file << "Tpr\t" << tmi.timeBOKZ << "\n";
+		file << "Tpr\t" << DayTimeToString(tmi.timeBOKZ).c_str() << "\n";
 		file << uppercase << hex << setfill('0');
 		file << " —1:\t" << "0x" << setw(4) << tmi.status1 << "\n";
 		file << " —2:\t" << "0x" << setw(4) << tmi.status2 << "\n";
@@ -346,7 +435,7 @@ namespace parse_prot {
 	void PrintSHTMI2(ofstream &file, struct SHTMI2 tmi) {
 		file << "____________________________________" << "\n";
 		file << "Ã‡ÒÒË‚ ÿ“Ã»2" << "\n";
-		file << "Tpr\t" << tmi.timeBOKZ << "\n";
+		file << "Tpr\t" << DayTimeToString(tmi.timeBOKZ).c_str() << "\n";
 		file << uppercase << hex << setfill('0');
 		file << " —1:\t" << "0x" << setw(4) << tmi.status1 << "\n";
 		file << " —2:\t" << "0x" << setw(4) << tmi.status2 << "\n";
@@ -372,7 +461,7 @@ namespace parse_prot {
 	void PrintDTMI(ofstream &file, struct DTMI tmi) {
 		file << "____________________________________" << "\n";
 		file << "Ã‡ÒÒË‚ ƒ“Ã»" << "\n";
-		file << "Tpr\t" << tmi.timeBOKZ << "\n";
+		file << "Tpr\t" << DayTimeToString(tmi.timeBOKZ).c_str() << "\n";
 		file << uppercase << hex << setfill('0');
 		file << " —1\t" << "0x" << setw(4) << tmi.status1 << "\n";
 		file << " —2\t" << "0x" << setw(4) << tmi.status2 << "\n";
@@ -403,8 +492,7 @@ namespace parse_prot {
 			file << "Wop[" << i << "]:\t" << tmi.omega[i] << "\n";
 		}
 
-
-		file << "Tlst:\t" << GetTimeString(tmi.timeQuatLast).c_str() << "\n";
+		file << "Tlst:\t" << DayTimeToString(tmi.timeQuatLast).c_str() << "\n";
 		for (int i = 0; i < 4; i++) {
 			file << "Qlst[" << i << "]:\t" << tmi.quatLast[i] << "\n";
 		}
@@ -421,7 +509,7 @@ namespace parse_prot {
 	void PrintLOC(ofstream &file, struct LOC tmi) {
 		file << "____________________________________" << "\n";
 		file << "Ã‡ÒÒË‚ ÃÀŒ " << "\n";
-		file << "Tpr\t" << tmi.timeBOKZ << "\n";
+		file << "Tpr\t" << DayTimeToString(tmi.timeBOKZ) << "\n";
 		file << uppercase << hex << setfill('0');
 		file << " —1\t" << "0x" << setw(4) << tmi.status1 << "\n";
 		file << " —2\t" << "0x" << setw(4) << tmi.status2 << "\n";
@@ -447,8 +535,7 @@ namespace parse_prot {
 	void PrintLocalDTMI(struct DTMI tmi) {
 		AnsiString fileName;
 
-		fileName.printf("BOKZ_π%d_%s", tmi.serialNumber,
-			(tmi.timeBOKZ).c_str());
+		fileName.printf("BOKZ_π%d_%s", tmi.serialNumber, DayTimeToString(tmi.timeBOKZ).c_str());
 		fileName += "_DTMI_LOC.txt";
 
 		for (int i = 1; i < fileName.Length() + 1; i++) {
@@ -472,7 +559,14 @@ namespace parse_prot {
 		for (int i = 0; i < cntLocal; i++) {
 			file << setw(6) << (i + 1) << "\t";
 			file << tmi.LocalList[i][0] << "\t" << tmi.LocalList[i][1] << "\t";
-			file << tmi.LocalList[i][2] << "\t" << tmi.LocalList[i][3] << "\n";
+			file << tmi.LocalList[i][2] << "\t";
+			if (tmi.LocalList[i][3] < 1) {
+				short *level, *size;
+				size = (short *)(&tmi.LocalList[i][3]);
+				level = (short *)(size + 1);
+				file << *size << "\t" << *level << "\n";
+			}
+			else file << tmi.LocalList[i][3] << "\n";
 		}
 		file.close();
 	}
@@ -481,7 +575,7 @@ namespace parse_prot {
 		AnsiString fileName;
 
 		fileName.printf("BOKZ_π%d_%s", tmi.serialNumber,
-			(tmi.timeBOKZ).c_str());
+			DayTimeToString(tmi.timeBOKZ).c_str());
 		fileName += "_MLOC_LOC.txt";
 
 		for (int i = 1; i < fileName.Length() + 1; i++) {
@@ -505,7 +599,14 @@ namespace parse_prot {
 		for (int i = 0; i < cntLocal; i++) {
 			file << setw(6) << (i + 1) << "\t";
 			file << tmi.LocalList[i][0] << "\t" << tmi.LocalList[i][1] << "\t";
-			file << tmi.LocalList[i][2] << "\t" << tmi.LocalList[i][3] << "\n";
+			file << tmi.LocalList[i][2] << "\t";
+			if (tmi.LocalList[i][3] < 1) {
+				short *level, *size;
+				size = (short *)(&tmi.LocalList[i][3]);
+				level = (short *)(size + 1);
+				file << *size << "\t" << *level << "\n";
+			}
+			else file << tmi.LocalList[i][3] << "\n";
 		}
 		file.close();
 	}
@@ -865,7 +966,7 @@ void PrintDTMI_M2(ofstream &file, struct DTMI_M2 tmi) {
 	for (int i = 0; i < 3; i++) {
 		file << "Vline[" << i << "]:\t" << tmi.Vline[i] << "\n";
 	}
-	file << "Tlst:\t" << GetTimeString(tmi.timeQuatLast).c_str() << "\n";
+	file << "Tlst:\t" << DayTimeToString(tmi.timeQuatLast).c_str() << "\n";
 	for (int i = 0; i < 4; i++) {
 		file << "Qlst[" << i << "]:\t" << tmi.quatLast[i] << "\n";
 	}
