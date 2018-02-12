@@ -37,9 +37,10 @@ void TFormAnimateSetting::ReadINI(const AnsiString& fileName)
 	BeginFromEdit->Text = Ini->ReadString("File", "BeginFrom", "0");
 	SkipFrameCheckBox->Checked = StrToInt(Ini->ReadString("File", "SkipFrame", "1"));
 
-	CheckBoxDateTime->Checked = TColor(StrToInt(Ini->ReadString("CheckBox", "CheckDateTime", "1")));
-	CheckBoxCurrentTime->Checked = TColor(StrToInt(Ini->ReadString("CheckBox", "CheckCurrentTime", "1")));
-	CheckBoxResultOnly->Checked = TColor(StrToInt(Ini->ReadString("CheckBox", "ResultOnly", "1")));
+	CheckBoxDateTime->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckDateTime", "1")));
+	CheckBoxCurrentTime->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckCurrentTime", "1")));
+	CheckBoxResultOnly->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "ResultOnly", "1")));
+	CheckBoxOnlySummary->Checked =  (int)StrToInt(Ini->ReadString("CheckBox", "PlotStarGraphs", "0"));
 
 //настройки FormGraphOrient
 	TFormGraphOrient* FormGraphOrient =  dynamic_cast<TFormGraphOrient*>(this->Owner);
@@ -73,14 +74,17 @@ void TFormAnimateSetting::WriteINI(const AnsiString& fileName)
 	Ini->WriteString("CheckBox", "DateTime", IntToStr((int)CheckBoxDateTime->Checked));
 	Ini->WriteString("CheckBox", "CheckCurrentTime", IntToStr((int)CheckBoxCurrentTime->Checked));
 	Ini->WriteString("CheckBox", "ResultOnly", IntToStr((int)CheckBoxResultOnly->Checked));
+	Ini->WriteString("CheckBox", "PlotStarGraphs", IntToStr((int)CheckBoxOnlySummary->Checked));
 
 //настройки FormGraphOrient
-    TFormGraphOrient* FormGraphOrient = dynamic_cast<TFormGraphOrient*>(this->Owner);
+	TFormGraphOrient* FormGraphOrient = dynamic_cast<TFormGraphOrient*>(this->Owner);
 	Ini->WriteString("DrawFrag", "CheckContrast", IntToStr((int)FormGraphOrient->ContrastCheckBox->Checked));
 	Ini->WriteString("DrawFrag", "CheckPixelBright", IntToStr((int)FormGraphOrient->PixelBrightCheckBox->Checked));
 	Ini->WriteString("DrawFrag", "FragScale", FormGraphOrient->ScaleEdit->Text);
 	Ini->WriteString("DrawFrag", "PixelSize", FormGraphOrient->PixelSizeEdit->Text);
 	Ini->WriteString("DrawFrag", "FontSize",  FormGraphOrient->FontSizeEdit->Text);
+
+
 }
 //---------------------------------------------------------------------------
 void __fastcall TFormAnimateSetting::ShapeColorLocObjTableMouseDown(TObject *Sender, TMouseButton Button,

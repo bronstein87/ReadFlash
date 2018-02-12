@@ -481,8 +481,7 @@ void TFormGraphOrient::SetVisibleLabelFrame(bool isVisible)
 
 void DrawOneScroll(double _Time, TChart *_Chart, TLineSeries *_Series)
 {
- 	double minLeftAxis, maxLeftAxis;
-
+	double minLeftAxis, maxLeftAxis;
 	_Chart->LeftAxis->CalcMinMax(minLeftAxis, maxLeftAxis);
 	_Series->Clear();
 	_Series->AddXY(_Time, minLeftAxis, "", clRed);
@@ -1465,7 +1464,6 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 		ftxt=fopen((FileTitle + ".txt").c_str(), "wt");
 
 
-
 		CurDir = GetCurrentDir();
 		AnsiString FragDir = CurDir + "\\Frag_" + FileTitle;
 		AnsiString LocDir = CurDir + "\\Loc_" + FileTitle;
@@ -1535,10 +1533,10 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 			  ChangeWordPix(mDataPixHdr);
 			  PrintDataPix(ftxt, mDataPixHdr,2);
 
-			  NumPixH=mDataPixHdr.NumPix;
-			  if (mDataPixHdr.NumPix%2) NumPixH++;
+			  NumPixH = mDataPixHdr.NumPix;
+			  if (mDataPixHdr.NumPix % 2) NumPixH++;
 
-			  for (int i=0; i<NumPixH; i=i+2)
+			  for (int i=0; i < NumPixH; i = i+2)
 			  {
 				fread(PixMas, sizeof (int),3, fflesh);
 				fprintf(ftxt,"%6d %6d %6d %6d\n",i+1, PixMas[0]>>16,PixMas[0]&0x0000FFFF, PixMas[1]>>16);
@@ -1571,7 +1569,7 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 			  ConvertDataNO(mDataNO, mCadrInfo,0);
 			  vCadrInfo.push_back(mCadrInfo);
 
-			  ConvertDataNO(mDataNO, mCadrInfo,1);
+			  ConvertDataNO(mDataNO, mCadrInfo, 1);
 
 			  if (mCadrInfo.IsOrient) {
 				  MatrixToEkvAngles(mCadrInfo.MatrixOrient, mCadrInfo.AnglesOrient);
@@ -1589,7 +1587,6 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 						plotter->AddPoint(ChartWx, 0, mCadrInfo.Time, mCadrInfo.OmegaOrient[0] * RTM);
 						plotter->AddPoint(ChartWy, 0, mCadrInfo.Time, mCadrInfo.OmegaOrient[1] * RTM);
 						plotter->AddPoint(ChartWz, 0, mCadrInfo.Time, mCadrInfo.OmegaOrient[2] * RTM);
-
 
 			  }
 			  plotter->AddPoint(ChartTemp, 0, mCadrInfo.Time, mCadrInfo.MatrixTemp);
@@ -1834,11 +1831,11 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 			case FRAG_MARKER:
 			{
 			  DataFragHeader mDataFragHdr;
-			  fread(&mDataFragHdr,sizeof(struct DataFragHeader),1,fflesh);
+			  fread(&mDataFragHdr,sizeof(struct DataFragHeader), 1, fflesh);
 	//          NumPixF*=2; // Игорь исправит!!!
 			  ChangeWordFrag(mDataFragHdr);
-			  if (mDataFragHdr.NumPix%2) mDataFragHdr.NumPix--;
-			  if (mDataFragHdr.NumPix>MaxPix) mDataFragHdr.NumPix=MaxPix;
+			  if (mDataFragHdr.NumPix % 2) mDataFragHdr.NumPix--;
+			  if (mDataFragHdr.NumPix > MaxPix) mDataFragHdr.NumPix = MaxPix;
 			  PrintDataFrag(ftxt, mDataFragHdr);
 
 			  FragID++;
@@ -2800,12 +2797,12 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 		OpenDialog->Filter = "iki|*.iki";
 		FileOpenDialog1->Options << fdoPickFolders << fdoAllowMultiSelect;
 		OpenDialog->Options << ofAllowMultiSelect;
+		OpenDialog->FileName  = GetCurrentDir();
 		if (OpenDialog->Execute())
 		{
 			unique_ptr <TStringList> FileList (new TStringList());
 			FileList->Assign(OpenDialog->Files);
 			SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
-			FileOpenDialog1->FileName = GetCurrentDir();
 			FileList->Sort();
 
 			if (FileOpenDialog1->Execute())
@@ -2876,6 +2873,10 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 
 						if (CompareIKIRes)
 						{
+							if (FormAnimateSetting->CheckBoxOnlySummary->Checked)
+							{
+								vCadrInfo.clear();
+							}
 							vCadrInfo.push_back(move(convertIKIFormatToInfoCadr(reader.get(), CompareIKIRes)));
 							double Time =  vCadrInfo.back().Time;
 							plotter->SetDateTimeX(FormAnimateSetting->CheckBoxDateTime->Checked);
@@ -2924,66 +2925,65 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 								plotter->AddPoint(ChartWy, 1, Time, vCadrInfo.back().OmegaOrient[1] * RTM);
 								plotter->AddPoint(ChartWz, 1, Time, vCadrInfo.back().OmegaOrient[2] * RTM);
 
-
-
 							//статистика по фрагментам
-								int iObject = 0;
-								for (int iFrag  = 0; iFrag < vCadrInfo.back().SizeWindowsList; iFrag++) {
-									plotter->SetSeriesColor(colorFrag[iFrag]);
-									plotter->AddPoint(ChartFragMean, iFrag, Time,
-												  				vCadrInfo.back().WindowsList[iFrag].Mean);
-									plotter->AddPoint(ChartFragNoise, iFrag, Time,
-																vCadrInfo.back().WindowsList[iFrag].Sigma);
-									plotter->AddPoint(ChartFragLevel, iFrag, Time,
-																vCadrInfo.back().WindowsList[iFrag].Level);
-									for (int iObjFrag = 0; iObjFrag < vCadrInfo.back().WindowsList[iFrag].CountObj; iObjFrag++) {
-										if (iFrag < maxDrawFrag) {
-											plotter->AddPoint(ChartFragBright, iFrag, Time,
-																vCadrInfo.back().ObjectsList[iObject].Bright);
-											if (vCadrInfo.back().ObjectsList[iObject].Square) {
-												plotter->AddPoint(ChartFragSizeEl, iFrag, Time,
-																		vCadrInfo.back().ObjectsList[iObject].Square);
+
+									int iObject = 0;
+									for (int iFrag  = 0; iFrag < vCadrInfo.back().SizeWindowsList; iFrag++) {
+										plotter->SetSeriesColor(colorFrag[iFrag]);
+										plotter->AddPoint(ChartFragMean, iFrag, Time,
+																	vCadrInfo.back().WindowsList[iFrag].Mean);
+										plotter->AddPoint(ChartFragNoise, iFrag, Time,
+																	vCadrInfo.back().WindowsList[iFrag].Sigma);
+										plotter->AddPoint(ChartFragLevel, iFrag, Time,
+																	vCadrInfo.back().WindowsList[iFrag].Level);
+										for (int iObjFrag = 0; iObjFrag < vCadrInfo.back().WindowsList[iFrag].CountObj; iObjFrag++) {
+											if (iFrag < maxDrawFrag) {
+												plotter->AddPoint(ChartFragBright, iFrag, Time,
+																	vCadrInfo.back().ObjectsList[iObject].Bright);
+												if (vCadrInfo.back().ObjectsList[iObject].Square) {
+													plotter->AddPoint(ChartFragSizeEl, iFrag, Time,
+																			vCadrInfo.back().ObjectsList[iObject].Square);
+												}
+												if (vCadrInfo.back().ObjectsList[iObject].StarID) {
+													plotter->AddPoint(ChartFragErrX, iFrag, Time,
+																		vCadrInfo.back().ObjectsList[iObject].Dx*1000.);
+													plotter->AddPoint(ChartFragErrY, iFrag, Time,
+																		vCadrInfo.back().ObjectsList[iObject].Dy*1000.);
+												}
 											}
-											if (vCadrInfo.back().ObjectsList[iObject].StarID) {
-												plotter->AddPoint(ChartFragErrX, iFrag, Time,
-																	vCadrInfo.back().ObjectsList[iObject].Dx*1000.);
-												plotter->AddPoint(ChartFragErrY, iFrag, Time,
-																	vCadrInfo.back().ObjectsList[iObject].Dy*1000.);
-											}
+											iObject++;
 										}
-										iObject++;
 									}
-								}
 
 								//статистика по звездам
-								plotter->SetShowLines(false);
-								plotter->SetDateTimeX(false);
-								if (vCadrInfo.back().IsBinary) {
-									plotter->SetSeriesColor(clLime);
-								}
-								else plotter->SetSeriesColor(clBlue);
+									plotter->SetShowLines(false);
+									plotter->SetDateTimeX(false);
+									if (vCadrInfo.back().IsBinary) {
+										plotter->SetSeriesColor(clLime);
+									}
+									else plotter->SetSeriesColor(clBlue);
 
-								for (int iObject = 0; iObject < vCadrInfo.back().SizeObjectsList; iObject++) {
-									if (vCadrInfo.back().ObjectsList[iObject].StarID /* && Dx && Dy */) {
-										plotter->AddPoint(ChartBrightMv,   0, vCadrInfo.back().ObjectsList[iObject].Mv,
-																			  vCadrInfo.back().ObjectsList[iObject].Bright);
-										if (vCadrInfo.back().ObjectsList[iObject].Square) {
-											plotter->AddPoint(ChartSizeMv,     0, vCadrInfo.back().ObjectsList[iObject].Mv,
-																			  vCadrInfo.back().ObjectsList[iObject].Square);
-											plotter->AddPoint(ChartBrightSize, 0, vCadrInfo.back().ObjectsList[iObject].Square,
+									for (int iObject = 0; iObject < vCadrInfo.back().SizeObjectsList; iObject++) {
+										if (vCadrInfo.back().ObjectsList[iObject].StarID /* && Dx && Dy */) {
+											plotter->AddPoint(ChartBrightMv,   0, vCadrInfo.back().ObjectsList[iObject].Mv,
+																				  vCadrInfo.back().ObjectsList[iObject].Bright);
+											if (vCadrInfo.back().ObjectsList[iObject].Square) {
+												plotter->AddPoint(ChartSizeMv,     0, vCadrInfo.back().ObjectsList[iObject].Mv,
+																				  vCadrInfo.back().ObjectsList[iObject].Square);
+												plotter->AddPoint(ChartBrightSize, 0, vCadrInfo.back().ObjectsList[iObject].Square,
 																		  vCadrInfo.back().ObjectsList[iObject].Bright);
-										}
+											}
 
-										if (vCadrInfo.back().ObjectsList[iObject].Sp!="__") {
-											float tempSpec = GetTempSpec(vCadrInfo.back().ObjectsList[iObject].Sp);
-											float brightMv0 = vCadrInfo.back().ObjectsList[iObject].Bright *
-																pow ((float)2.512, (float)vCadrInfo.back().ObjectsList[iObject].Mv);
-											plotter->AddPoint(ChartBrightSp, 0, tempSpec, brightMv0);
+											if (vCadrInfo.back().ObjectsList[iObject].Sp!="__") {
+												float tempSpec = GetTempSpec(vCadrInfo.back().ObjectsList[iObject].Sp);
+												float brightMv0 = vCadrInfo.back().ObjectsList[iObject].Bright *
+																	pow ((float)2.512, (float)vCadrInfo.back().ObjectsList[iObject].Mv);
+												plotter->AddPoint(ChartBrightSp, 0, tempSpec, brightMv0);
 
+											}
 										}
 									}
 								}
-							}
 						}
 
 						if (i % 100 == 0)
@@ -3008,15 +3008,19 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 						}
 					} CadrCompare ;
 
+
 					sort(vCadrInfo.begin(), vCadrInfo.end(), CadrCompare);
 					CalculateSeriesSKO();
 					FillStatusTable();
-					PrepareStartDraw();
+					if (FoldersList->Count == 1)
+					{
+						PrepareStartDraw();
+					}
 
                     				//печать статистики по серии кадров
 //			if (FormAnimateSetting->CheckBoxPrintReport->Checked) {
 //				PrintReportRes(vCadrInfo);
-//			}	
+//			}
 
 					UnicodeString folder = SaveScreenShots(FoldersList->Strings[curFolder]);
 					SaveTableToFile(TableStatInfo, TableStatInfo->RowCount, TableStatInfo->ColCount,

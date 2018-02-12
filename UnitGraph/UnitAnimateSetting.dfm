@@ -2,7 +2,7 @@ object FormAnimateSetting: TFormAnimateSetting
   Left = 0
   Top = 0
   Caption = #1053#1072#1089#1090#1088#1086#1081#1082#1080' '#1072#1085#1080#1084#1072#1094#1080#1080
-  ClientHeight = 593
+  ClientHeight = 612
   ClientWidth = 369
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -203,12 +203,12 @@ object FormAnimateSetting: TFormAnimateSetting
     Left = 8
     Top = 359
     Width = 352
-    Height = 131
+    Height = 155
     Caption = #1057#1074#1086#1076#1085#1099#1077' '#1075#1088#1072#1092#1080#1082#1080
     TabOrder = 3
     object CheckBoxCurrentTime: TCheckBox
       Left = 18
-      Top = 48
+      Top = 41
       Width = 191
       Height = 17
       Caption = #1054#1090#1086#1073#1088#1072#1078#1072#1090#1100' '#1090#1077#1082#1091#1097#1077#1077' '#1080#1079#1084#1077#1088#1077#1085#1080#1077
@@ -216,7 +216,7 @@ object FormAnimateSetting: TFormAnimateSetting
     end
     object RadioButton1: TRadioButton
       Left = 40
-      Top = 95
+      Top = 127
       Width = 113
       Height = 17
       Caption = #1083#1080#1085#1080#1103
@@ -224,7 +224,7 @@ object FormAnimateSetting: TFormAnimateSetting
     end
     object RadioButton2: TRadioButton
       Left = 180
-      Top = 95
+      Top = 127
       Width = 113
       Height = 17
       Caption = #1090#1086#1095#1082#1072
@@ -232,7 +232,7 @@ object FormAnimateSetting: TFormAnimateSetting
     end
     object CheckBoxDateTime: TCheckBox
       Left = 18
-      Top = 25
+      Top = 18
       Width = 231
       Height = 17
       Caption = #1054#1090#1086#1073#1088#1072#1078#1077#1085#1080#1077' '#1076#1072#1090#1099' '#1080' '#1074#1088#1077#1084#1077#1085#1080' '#1087#1086' '#1086#1089#1080' OX'
@@ -240,16 +240,24 @@ object FormAnimateSetting: TFormAnimateSetting
     end
     object CheckBoxResultOnly: TCheckBox
       Left = 18
-      Top = 71
+      Top = 64
       Width = 119
       Height = 17
       Caption = #1058#1086#1083#1100#1082#1086' '#1080#1079#1084#1077#1088#1077#1085#1080#1103
       TabOrder = 4
     end
+    object CheckBoxOnlySummary: TCheckBox
+      Left = 18
+      Top = 87
+      Width = 207
+      Height = 17
+      Caption = #1058#1086#1083#1100#1082#1086' '#1089#1074#1086#1076#1085#1099#1077' '#1075#1088#1072#1092#1080#1082#1080
+      TabOrder = 5
+    end
   end
   object GroupBox5: TGroupBox
     Left = 8
-    Top = 496
+    Top = 520
     Width = 353
     Height = 89
     Caption = #1042#1099#1073#1086#1088' '#1092#1072#1081#1083#1086#1074
