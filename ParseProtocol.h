@@ -677,7 +677,7 @@ namespace parse_prot
 				int msecs = 0;
 				int prevPos = in.tellg();
 
-				in>>line;
+				in >> line;
 				if(line == "ñ")
 				{
 					in >> secs;

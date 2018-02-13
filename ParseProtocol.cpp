@@ -852,7 +852,7 @@ namespace parse_prot {
 
 	void PrintDTMI_BOKZM(ofstream &file, struct DTMI_BOKZM tmi)
 	{
-		file<<"____________________________________"<<"\n";
+		file << "____________________________________"<<"\n";
 		file<<"Массив ДТМИ"<<"\n";
 		file<<"Tpr\t"<<tmi.timeBOKZ<<"\n";
 		file<<uppercase<<hex<<setfill('0');
@@ -982,7 +982,7 @@ void PrintDTMI_M2(ofstream &file, struct DTMI_M2 tmi) {
 bool checkLocFile(ifstream& in)
 {
 	string line;
-	for(int i = 0; i < 3 ; i++)
+	for (int i = 0; i < 3 ; i++)
 	{
 		getline(in,line);
 	}
@@ -990,7 +990,7 @@ bool checkLocFile(ifstream& in)
 	in.clear();
 	in.seekg(0, in.beg);
 
-	if(line.find("Локализация") == string::npos)
+	if (line.find("Локализация") == string::npos)
 	{
 		return false;
 	}
@@ -1240,7 +1240,9 @@ CadrInfo convertIKIFormatToInfoCadr(IKI_img* reader, bool CompareIKIRes)
 	cadrInfo.SizeWindowsList = cadrInfo.CountWindows;
 
 	for (int i = 0; i < cadrInfo.SizeStarsList; i++) {
-		if (reader->StarsData.SimulatedFrame.StarRec[i].Xs == 0 &&  reader->StarsData.SimulatedFrame.StarRec[i].Ys == 0)
+
+		if (reader->StarsData.SimulatedFrame.StarRec[i].Xs == 0
+		&&  reader->StarsData.SimulatedFrame.StarRec[i].Ys == 0)
 		{
 		   cadrInfo.SizeStarsList = i + 1;
 		   break;
@@ -1282,7 +1284,7 @@ CadrInfo convertIKIFormatToInfoCadr(IKI_img* reader, bool CompareIKIRes)
 	for (int i = 0; i < cadrInfo.SizeWindowsList; i ++)
 	{
 
-		if(reader->ImageData.WindowsData.Info[i].X == 0
+		if (reader->ImageData.WindowsData.Info[i].X == 0
 		&& reader->ImageData.WindowsData.Info[i].Y == 0)
 		{
 		   cadrInfo.SizeWindowsList = i + 1;
@@ -1302,12 +1304,10 @@ CadrInfo convertIKIFormatToInfoCadr(IKI_img* reader, bool CompareIKIRes)
 		 cadrInfo.WindowsList.push_back(winInfo);
 	}
 
-	for (int i = 0; i < cadrInfo.SizeWindowsList; i++)
+	for (int i = 0; i < cadrInfo.SizeObjectsList; i++)
 	{
-		if (cadrInfo.SizeWindowsList > cadrInfo.SizeObjectsList
-		&& i == cadrInfo.SizeObjectsList) break;
-
-		if (cadrInfo.ObjectsList[i].StarID == 0 && cadrInfo.WindowsList[i].CountObj > 1)
+		if (cadrInfo.ObjectsList[i].StarID == 0
+		&& cadrInfo.WindowsList[i].CountObj > 1)
 		{
 			cadrInfo.WindowsList[i].StarID = cadrInfo.ObjectsList[i + 1].StarID;
 			cadrInfo.WindowsList[i].Bright = cadrInfo.ObjectsList[i + 1].Bright;

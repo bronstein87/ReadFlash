@@ -87,20 +87,14 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 *.ini
+
+#Others
+
 ReadFlash.stat
-*.stat
-ReadFlash.cbproj.local
-*.stat
 ReadFlash.cbproj.local
 *.vlb
 *.local
 *.stat
-ReadFlash.stat
-ReadFlash.cbproj.local
-ReadFlash.cbproj.local
-*.local
-ReadFlash.cbproj.local
-ReadFlash.cbproj.local
 распознавание/SP (МФ)/MF01_40.c
 распознавание/SP (МФ)/MF01_40.h
 распознавание/SP_14/MBKZ2.cpp
@@ -113,4 +107,4 @@ ReadFlash.stat
 *.swp
 old_IKI/iki_img.cpp
 old_IKI/iki_img.h
-ReadFlash.stat
+
