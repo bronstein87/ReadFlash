@@ -1304,7 +1304,7 @@ CadrInfo convertIKIFormatToInfoCadr(IKI_img* reader, bool CompareIKIRes)
 		 cadrInfo.WindowsList.push_back(winInfo);
 	}
 
-	for (int i = 0; i < cadrInfo.SizeObjectsList; i++)
+	for (int i = 0; i < cadrInfo.SizeWindowsList && i < cadrInfo.SizeObjectsList; i++)
 	{
 		if (cadrInfo.ObjectsList[i].StarID == 0
 		&& cadrInfo.WindowsList[i].CountObj > 1)

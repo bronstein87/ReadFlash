@@ -362,7 +362,8 @@ void TFormGraphOrient::InitStatusInfoTable(const string& deviceName)
 			tableRows.push_back(statusValue);
 		}
 	}
-	else throw runtime_error("Не удалось найти файл " + fileName);
+	else
+	 throw runtime_error("Не удалось найти файл " + fileName);
 
 	for(int i = 1; i < TableStatusInfo->RowCount; i++)
 	{
@@ -2839,15 +2840,19 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 							if (reader->ReadFormat(toStdString(FileList->Strings[i]), false, skipFrame))
 							{
 								TStringDynArray SplittedString = SplitString(FileList->Strings[i], "\\");
-								UnicodeString ResFileName = FoldersList->Strings[curFolder] + "\\" + filePrefix + SplittedString[SplittedString.Length - 1];
+								UnicodeString ResFileName = FoldersList->Strings[curFolder] + "\\"
+								+ filePrefix + SplittedString[SplittedString.Length - 1];
 								if (FileExists(ResFileName) && (reader->ReadFormat(toStdString(ResFileName), false, skipFrame)))
 								{
 									CompareIKIRes = true;
 									if (!statusTableInited)
 									{
 										vector <string> splitted = split(reader->CameraSettings.DataSource, "_");
-										InitStatusInfoTable(splitted[0]);
-										statusTableInited = true;
+										if (!contains(splitted[0], "FrameMaker"))
+										{
+											InitStatusInfoTable(splitted[0]);
+											statusTableInited = true;
+										}
 									}
 									if ( (!i) /* && (FormAnimateSetting->CheckBoxPrintReport->Checked)*/ ) {
 //									печать параметров модели

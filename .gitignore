@@ -108,3 +108,4 @@ ReadFlash.stat
 old_IKI/iki_img.cpp
 old_IKI/iki_img.h
 
+*.res
