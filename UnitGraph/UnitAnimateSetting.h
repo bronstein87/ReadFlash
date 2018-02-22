@@ -9,6 +9,7 @@
 #include <Forms.hpp>
 #include <ExtCtrls.hpp>
 #include <Dialogs.hpp>
+#include <Vcl.ComCtrls.hpp>
 #include <memory>
 #include <IniFiles.hpp>
 #include "UnitGraphOrient.h"
@@ -56,6 +57,12 @@ __published:	// IDE-managed Components
 	TCheckBox *SkipFrameCheckBox;
 	TCheckBox *CheckBoxResultOnly;
 	TCheckBox *CheckBoxOnlySummary;
+	TPageControl *PageControl;
+	TTabSheet *ShowPage;
+	TTabSheet *FilesPage;
+	TTabSheet *DBOptionsPage;
+	TComboBox *KAComboBox;
+	TLabel *Label9;
 	void __fastcall ShapeColorLocObjTableMouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y);
 	void __fastcall ShapeColorZeroObjTableMouseDown(TObject *Sender, TMouseButton Button,
@@ -74,6 +81,8 @@ __published:	// IDE-managed Components
 	void __fastcall CheckBoxFillTableWindowsClick(TObject *Sender);
 	void __fastcall CheckBoxLabelFrameClick(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
+	void __fastcall updateKaNameList();
+
 private:	// User declarations
 public:		// User declarations
 	__fastcall TFormAnimateSetting(TComponent* Owner);

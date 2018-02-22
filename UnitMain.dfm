@@ -13,6 +13,7 @@ object MainForm: TMainForm
   FormStyle = fsMDIForm
   Menu = MainMenu1
   OldCreateOrder = False
+  Visible = True
   PixelsPerInch = 96
   TextHeight = 13
   object MainMenu1: TMainMenu
@@ -25,5 +26,33 @@ object MainForm: TMainForm
       Caption = #1040#1085#1072#1083#1080#1079
       OnClick = AnalyzeLookClick
     end
+    object DbAutorization: TMenuItem
+      Caption = #1040#1074#1090#1086#1088#1080#1079#1072#1094#1080#1103' '#1074' '#1041#1044
+      OnClick = DbAutorizationClick
+    end
+  end
+  object FDPhysPgDriverLink1: TFDPhysPgDriverLink
+    Left = 912
+    Top = 296
+  end
+  object FDGUIxLoginDialog1: TFDGUIxLoginDialog
+    Provider = 'Forms'
+    HistoryEnabled = True
+    VisibleItems.Strings = (
+      'Server'
+      'User_name'
+      'Password')
+    Left = 704
+    Top = 296
+  end
+  object FDGUIxAsyncExecuteDialog1: TFDGUIxAsyncExecuteDialog
+    Provider = 'Forms'
+    Left = 992
+    Top = 296
+  end
+  object FDGUIxErrorDialog1: TFDGUIxErrorDialog
+    Provider = 'Forms'
+    Left = 808
+    Top = 296
   end
 end

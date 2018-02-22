@@ -12,7 +12,7 @@
 extern int NumDoc, NumPar, NumTab, NumImage;
 
 using namespace parse_prot;
-
+using namespace std;
 //---------------------------------------------------------------------------
 __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 		: TForm(Owner),
@@ -37,7 +37,6 @@ __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 		Charts.push_back(ChartFragErrX); Charts.push_back(ChartFragErrY);
 		Charts.push_back(ChartFragBright); Charts.push_back(ChartFragSizeEl);
 		Charts.push_back(ChartFragMean); Charts.push_back(ChartFragBright); Charts.push_back(ChartFragLevel);
-
 
 //может быть здесь вызывать функцию синхронизации по времени - ?
 		Charts.push_back(ChartBrightMv);  Charts.push_back(ChartSizeMv);
@@ -538,7 +537,7 @@ void TFormGraphOrient::DrawAnimate(const struct CadrInfo &mCadr)
 void TFormGraphOrient::DrawObjects(const struct CadrInfo &mCadr)
 {
 	double X0, Y0, X1, Y1, Dx, Dy, Ist, Nel;
-	double zoomRedArrow  = StrToFloat(EditScale->Text)*1000.;
+	double zoomRedArrow  = StrToFloat(EditScale->Text) * 1000.;
 	double zoomBlueArrow, binCoef;
 
 	if (mCadr.IsBinary) binCoef = 0.5;

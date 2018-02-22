@@ -146,7 +146,7 @@ object FormGraphOrient: TFormGraphOrient
     Top = 8
     Width = 1430
     Height = 777
-    ActivePage = TabSheetStatStars
+    ActivePage = TabSheetAngles
     Anchors = [akLeft, akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 8

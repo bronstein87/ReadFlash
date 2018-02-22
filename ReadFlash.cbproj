@@ -68,7 +68,7 @@
         <Multithreaded>true</Multithreaded>
         <ProjectType>CppVCLApplication</ProjectType>
         <IncludePath>Word\;UnitGraph\;$(IncludePath)</IncludePath>
-        <AllPackageLibs>rtl.lib;vcl.lib;vclimg.lib;vclwinx.lib;Tee924.lib;TeePro924.lib;TeeUI924.lib;vclx.lib;xmlrtl.lib;dbrtl.lib;adortl.lib;bcboffice2k.lib</AllPackageLibs>
+        <AllPackageLibs>rtl.lib;vcl.lib;vclimg.lib;vclwinx.lib;Tee924.lib;TeePro924.lib;TeeUI924.lib;vclx.lib;xmlrtl.lib;dbrtl.lib;adortl.lib;bcboffice2k.lib;vclFireDAC.lib;FireDAC.lib;FireDACSqliteDriver.lib;FireDACCommonDriver.lib;FireDACCommon.lib;vcldb.lib;FireDACPgDriver.lib</AllPackageLibs>
         <_TCHARMapping>wchar_t</_TCHARMapping>
         <DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
         <DynamicRTL>true</DynamicRTL>
@@ -127,7 +127,7 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
-        <LinkPackageStatics>rtl.lib;vcl.lib;vclimg.lib;vclwinx.lib;Tee924.lib;TeePro924.lib;TeeUI924.lib;vclx.lib;xmlrtl.lib;dbrtl.lib;adortl.lib;bcboffice2k.lib</LinkPackageStatics>
+        <LinkPackageStatics>rtl.lib;vcl.lib;vclimg.lib;vclwinx.lib;Tee924.lib;TeePro924.lib;TeeUI924.lib;vclx.lib;xmlrtl.lib;dbrtl.lib;adortl.lib;bcboffice2k.lib;vclFireDAC.lib;FireDAC.lib;FireDACSqliteDriver.lib;FireDACCommonDriver.lib;FireDACCommon.lib;vcldb.lib;FireDACPgDriver.lib</LinkPackageStatics>
         <BT_BuildType>Debug</BT_BuildType>
         <Defines>_DEBUG;$(Defines)</Defines>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -160,6 +160,10 @@
         <CppCompile Include="AddString.cpp">
             <DependentOn>AddString.h</DependentOn>
             <BuildOrder>20</BuildOrder>
+        </CppCompile>
+        <CppCompile Include="DbClient.cpp">
+            <DependentOn>DbClient.h</DependentOn>
+            <BuildOrder>23</BuildOrder>
         </CppCompile>
         <CppCompile Include="FragmentScrollBox.cpp">
             <DependentOn>FragmentScrollBox.h</DependentOn>

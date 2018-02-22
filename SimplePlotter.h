@@ -1,4 +1,4 @@
-//---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 
 #ifndef SimplePlotterH
 #define SimplePlotterH
@@ -6,49 +6,44 @@
 #include <VCLTee.Chart.hpp>
 #include <VCLTee.Series.hpp>
 
-class SimplePlotter
-{
-	public:
+class SimplePlotter {
+public:
 
-	_fastcall explicit SimplePlotter ();
+	_fastcall explicit SimplePlotter();
 	_fastcall ~SimplePlotter();
 
 	void AddSeries(TChart* Chart, DWORD SeriesIndex, TColor Color);
-	void AddPoint (TChart* Chart, DWORD SeriesIndex, double X, double Y, TColor Color = clWhite);
-	void AddArray (TChart* Chart, DWORD SeriesIndex, const double* ArrayX, const double* ArrayY, DWORD ArraySize);
-    void CheckChartSeries(TChart* Chart);
+	void AddPoint(TChart* Chart, DWORD SeriesIndex, double X, double Y,
+		TColor Color = clWhite);
+	void AddArray(TChart* Chart, DWORD SeriesIndex, const double* ArrayX,
+		const double* ArrayY, DWORD ArraySize);
+	void CheckChartSeries(TChart* Chart);
 
-	void SetTitle (const AnsiString& _Title)
-	{
+	void SetTitle(const AnsiString& _Title) {
 		Title = _Title;
 	}
 
-	void SetSeriesColor (const TColor& _SeriesColor)
-	{
+	void SetSeriesColor(const TColor& _SeriesColor) {
 		SeriesColor = _SeriesColor;
 	}
 
-	void SetPointSize (unsigned short _PointSize)
-	{
+	void SetPointSize(unsigned short _PointSize) {
 		PointSize = _PointSize;
 	}
 
-	void SetPointerStyle (TSeriesPointerStyle _PointerStyle)
-	{
+	void SetPointerStyle(TSeriesPointerStyle _PointerStyle) {
 		PointerStyle = _PointerStyle;
 	}
 
-	void SetShowPoints (bool _ShowPoints)
-	{
+	void SetShowPoints(bool _ShowPoints) {
 		ShowPoints = _ShowPoints;
 	}
 
-	void SetShowLines (bool _ShowLines)
-	{
+	void SetShowLines(bool _ShowLines) {
 		ShowLines = _ShowLines;
 	}
-	void SetDateTimeX (bool _DateTimeX)
-	{
+
+	void SetDateTimeX(bool _DateTimeX) {
 		DateTimeX = _DateTimeX;
 	}
 
@@ -56,21 +51,21 @@ class SimplePlotter
 
 	void CheckGroupSeries(TChart *chartSource, TChart *chartApply);
 
-	void SaveChart(TChart* Chart, AnsiString name, unsigned int Height, unsigned int Width);
+	void SaveChart(TChart* Chart, AnsiString name, unsigned int Height,
+		unsigned int Width);
 
 	void ResetOptions();
 
-
-	private:
+private:
 
 	void SetSeriesOptions(TLineSeries* Series);
 	_fastcall SimplePlotter(const SimplePlotter&);
 
-	_fastcall SimplePlotter(SimplePlotter&& );
+	_fastcall SimplePlotter(SimplePlotter &&);
 
-	SimplePlotter& operator=(const SimplePlotter&);
+	SimplePlotter& operator = (const SimplePlotter&);
 
-	SimplePlotter& operator=(SimplePlotter&&);
+	SimplePlotter& operator = (SimplePlotter &&);
 
 	UnicodeString Title;
 	TColor SeriesColor;
@@ -78,9 +73,8 @@ class SimplePlotter
 	bool ShowLines;
 	bool DateTimeX;
 	unsigned short PointSize;
-	TSeriesPointerStyle  PointerStyle;
-
+	TSeriesPointerStyle PointerStyle;
 
 };
-//---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 #endif

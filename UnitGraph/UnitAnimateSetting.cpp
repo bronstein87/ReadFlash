@@ -15,8 +15,23 @@
 __fastcall TFormAnimateSetting::TFormAnimateSetting(TComponent* Owner)
 	: TForm(Owner)
 {
+	if (MainForm->client->isConnected())
+	{
+		updateKaNameList();
+	}
 }
 //---------------------------------------------------------------------------
+
+void __fastcall TFormAnimateSetting::updateKaNameList()
+{
+	 vector<AnsiString> kaNames = MainForm->client->getKaNames();
+	 KAComboBox->Clear();
+	 for (int i = 0; i < kaNames.size(); i++)
+	 {
+		   KAComboBox->AddItem(UnicodeString(kaNames[i]), NULL);
+	 }
+	 KAComboBox->Text = KAComboBox->Items[0][0];
+}
 void TFormAnimateSetting::ReadINI(const AnsiString& fileName)
 {
 	std::unique_ptr<TIniFile> Ini ( new TIniFile(fileName));
@@ -196,6 +211,7 @@ void __fastcall TFormAnimateSetting::FormClose(TObject *Sender, TCloseAction &Ac
 	WriteINI(FormGraphOrient->SourceDir+"\\options.ini");
 }
 //---------------------------------------------------------------------------
+
 
 
 
