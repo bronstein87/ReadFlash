@@ -14,6 +14,18 @@ namespace parse_prot {
 		*word2 = buf;
 	}
 
+	void CheckFileName(AnsiString &fileName)
+	{
+		for (int i = 1; i < fileName.Length() + 1; i++) {
+			if ((fileName[i] == ':') || (fileName[i] == ';') ||
+				(fileName[i] == '?') || (fileName[i] == '>') ||
+				(fileName[i] == '<') || (fileName[i] == '=') ||
+				(fileName[i] == '/') || (fileName[i] == '\\')) {
+					fileName[i] = '_';
+			}
+		}
+	}
+
 	unsigned int ReadBinaryString(string binaryString) {
 		string test_str;
 		double sum = 0;
@@ -532,9 +544,9 @@ namespace parse_prot {
 		file << flush;
 	}
 
-	void PrintLocalDTMI(struct DTMI tmi) {
-		AnsiString fileName;
+	void PrintLocalDTMI(AnsiString fileDir, struct DTMI tmi) {
 
+		AnsiString fileName;
 		fileName.printf("BOKZ_¹%d_%s", tmi.serialNumber, DayTimeToString(tmi.timeBOKZ).c_str());
 		fileName += "_DTMI_LOC.txt";
 
@@ -547,7 +559,8 @@ namespace parse_prot {
 			}
 		}
 
-		ofstream file(fileName.c_str());
+		CreateDir(UnicodeString(fileDir));
+		ofstream file((fileDir + fileName).c_str());
 		file << setw(6) << "¹" << " X, pix" << " Y, pix" << " Bright" <<
 			" Nel" << "\n";
 
@@ -571,9 +584,9 @@ namespace parse_prot {
 		file.close();
 	}
 
-	void PrintLocalMLOC(struct LOC tmi) {
-		AnsiString fileName;
+	void PrintLocalMLOC(AnsiString fileDir, struct LOC tmi) {
 
+		AnsiString fileName;
 		fileName.printf("BOKZ_¹%d_%s", tmi.serialNumber,
 			DayTimeToString(tmi.timeBOKZ).c_str());
 		fileName += "_MLOC_LOC.txt";
@@ -587,7 +600,8 @@ namespace parse_prot {
 			}
 		}
 
-		ofstream file(fileName.c_str());
+		CreateDir(UnicodeString(fileDir));
+		ofstream file((fileDir+fileName).c_str());
 
 		file << setw(6) << "¹" << " X, pix" << " Y, pix" << " Bright" <<
 			" Nel" << "\n";
@@ -767,19 +781,19 @@ namespace parse_prot {
 
 	void PrintMSHI_BOKZM(ofstream &file, struct MSHI_BOKZM tmi)
 	{
-		file<<"____________________________________"<<"\n";
-		file<<"Ìàññèâ ÌØÈÎÐ"<<"\n";
-		file<<"Tpr\t"<<tmi.timeBOKZ<<"\n";
-		file<<uppercase<<hex<<setfill('0');
-		file<<"ÊÑ1\t"<<"0x"<<setw(4)<<tmi.status1<<"\n";
-		file<<"ÊÑ2\t"<<"0x"<<setw(4)<<tmi.status2<<"\n";
-		file<<dec<<setfill(' ');
-		file<<"Ìàòðèöà îðèåíòàöèè:\n";
-		file<<std::setprecision(8);
+		file << "____________________________________" << "\n";
+		file << "Ìàññèâ ÌØÈÎÐ" << "\n";
+		file << "Tpr\t" << tmi.timeBOKZ << "\n";
+		file << uppercase << hex << setfill('0');
+		file << "ÊÑ1\t" << "0x" << setw(4) << tmi.status1 << "\n";
+		file << "ÊÑ2\t" << "0x" << setw(4) << tmi.status2 << "\n";
+		file << dec << setfill(' ');
+		file << "Ìàòðèöà îðèåíòàöèè:\n";
+		file << std::setprecision(8);
 		for (int i = 0; i < 3; i++) {
-			file<<std::setw(12)<<tmi.Mornt[i][0];
-			file<<std::setw(12)<<tmi.Mornt[i][1];
-			file<<std::setw(12)<<tmi.Mornt[i][2]<<"\n";
+			file << std::setw(12) << tmi.Mornt[i][0];
+			file << std::setw(12) << tmi.Mornt[i][1];
+			file << std::setw(12) << tmi.Mornt[i][2] << "\n";
 		}
 
 	//	double ang[3], MorntT[3][3];
@@ -852,46 +866,32 @@ namespace parse_prot {
 
 	void PrintDTMI_BOKZM(ofstream &file, struct DTMI_BOKZM tmi)
 	{
-		file << "____________________________________"<<"\n";
-		file<<"Ìàññèâ ÄÒÌÈ"<<"\n";
-		file<<"Tpr\t"<<tmi.timeBOKZ<<"\n";
-		file<<uppercase<<hex<<setfill('0');
-		file<<"ÊÑ1\t"<<"0x"<<setw(4)<<tmi.status1<<"\n";
-		file<<"ÊÑ2\t"<<"0x"<<setw(4)<<tmi.status2<<"\n";
-		file<<dec<<setfill(' ');
-		file<<"Çàâ. ¹\t"<<tmi.serialNumber<<"\n";
-		file<<"Foc, ìì:\t"<<tmi.Foc<<"\n";
-		file<<"X0, ìì:\t"<<tmi.Xg<<"\n";
-		file<<"Y0, ìì:\t"<<tmi.Yg<<"\n";
-		file<<"Texp, ìñ:\t"<<tmi.timeExp<<"\n";
-		file<<"NumLoc: \t"<<tmi.nLocalObj<<"\n";
-		file<<"NumFix: \t"<<tmi.nDeterObj<<"\n";
-		file<<setw(6)<<"¹"<<" X, pix"<<" Y, pix"<<" Bright"<<" Nel"<<"\n";
+		file << "____________________________________" << "\n";
+		file << "Ìàññèâ ÄÒÌÈ"<<"\n";
+		file << "Tpr\t"<<tmi.timeBOKZ<<"\n";
+		file << uppercase<<hex<<setfill('0');
+		file << "ÊÑ1\t" << "0x" << setw(4) << tmi.status1 << "\n";
+		file << "ÊÑ2\t" << "0x" << setw(4) << tmi.status2 << "\n";
+		file << dec<<setfill(' ');
+		file << "Çàâ. ¹\t" << tmi.serialNumber << "\n";
+		file << "Foc, ìì:\t" << tmi.Foc << "\n";
+		file << "X0, ìì:\t" << tmi.Xg << "\n";
+		file << "Y0, ìì:\t" << tmi.Yg << "\n";
+		file << "Texp, ìñ:\t" << tmi.timeExp << "\n";
+		file << "NumLoc: \t" << tmi.nLocalObj << "\n";
+		file << "NumDet: \t" << tmi.nDeterObj << "\n";
+		file << setw(6) << "¹" << " X, pix" << " Y, pix" << " Bright" << " Nel" << "\n";
 		for (int i = 0; i < MAX_OBJ_BOKZM; i++) {
-			file<<setw(6)<<(i+1)<<"\t";
-			file<<tmi.LocalList[i][0]<<"\t"<<tmi.LocalList[i][1]<<"\t";
-			file<<tmi.LocalList[i][2]<<"\t"<<tmi.LocalList[i][3]<<"\n";
+			file << setw(6) << (i+1) << "\t";
+			file << tmi.LocalList[i][0] << "\t" << tmi.LocalList[i][1] << "\t";
+			file << tmi.LocalList[i][2] << "\t" << tmi.LocalList[i][3] << "\n";
 		}
-		file<<"____________________________________"<<"\n";
-		file<<flush;
+		file << "____________________________________" << "\n";
+		file << flush;
 	}
 
-	void PrintLocalDTMI_BOKZM(struct DTMI_BOKZM tmi)
+	void PrintLocalDTMI_BOKZM(AnsiString fileName, struct DTMI_BOKZM tmi)
 	{
-		AnsiString fileName;
-
-		fileName.printf("BOKZ_¹%d_%.2f", tmi.serialNumber, tmi.timeBOKZ);
-		fileName += "_MLOC_LOC.txt";
-
-		for (int i = 1; i < fileName.Length() + 1; i++) {
-			if ((fileName[i] == ':') || (fileName[i] == ';') ||
-				(fileName[i] == '?') || (fileName[i] == '>') ||
-				(fileName[i] == '<') || (fileName[i] == '=') ||
-				(fileName[i] == '/') || (fileName[i] == '\\')) {
-					fileName[i] = '_';
-			}
-		}
-
 		ofstream file(fileName.c_str());
 
 		file << setw(6) << "¹" << " X, pix" << " Y, pix" << " Bright" <<

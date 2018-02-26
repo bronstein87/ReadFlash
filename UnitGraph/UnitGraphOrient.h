@@ -525,6 +525,7 @@ public: // User declarations
 	void PrintTableObjectsHandler(void);
 	void DrawAnimateHandler(void);
 	void SetVisibleLabelFrame(bool isVisible);
+    void SetVisibleLabelStar(bool isVisible);
 
 	AnsiString SourceDir;
 

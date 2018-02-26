@@ -327,7 +327,11 @@ GeneralizedDTMI DbClient::convertDTMI(const DTMI& dtmi, const TDateTime& date) {
 		gShtmi2.serialNumber = shtmi2_BOKZM.serialNumber;
 		gShtmi2.post = shtmi2_BOKZM.post;
 		gShtmi2.timeExp = shtmi2_BOKZM.timeExp;
+<<<<<<< HEAD
 		gShtmi2.cntCommandWord = 0;
+=======
+		gShtmi2.cntCommandWord = 0; //shtmi2_BOKZM.cntCommandWord;
+>>>>>>> origin/master
 		gShtmi2.cntCallNO = shtmi2_BOKZM.cntCallNO;
 		gShtmi2.cntNOtoSLEZH = 0;
 		gShtmi2.cntCallTO = shtmi2_BOKZM.cntCallTO;

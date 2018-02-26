@@ -299,7 +299,7 @@ void IKI_img::WriteFormat(string filename) // define_format_value = "%4x%-80.80s
 	if (StarsData.m_X != 0 || StarsData.m_Y != 0 || StarsData.m_Cur != 0)
 	{
 		memset(&buffer_string[0], 0, 200);
-		sprintf(buffer_string, "8.6f %8.6f %8.6f", StarsData.m_X, StarsData.m_Y, StarsData.m_Cur);
+		sprintf(buffer_string, "%8.6f %8.6f %8.6f", StarsData.m_X, StarsData.m_Y, StarsData.m_Cur);
 		print_string(FStream, m_X_Y_Cyr_id, m_X_Y_Cyr_name, (const char*)buffer_string);
 	}
 	print_string(FStream, local_recog_id, local_recog_name, toString(StarsData.LocalizedCount));
@@ -337,7 +337,7 @@ void IKI_img::WriteFormat(string filename) // define_format_value = "%4x%-80.80s
 	if (StarsData.RecognizedOrientationAngles[0] != 0 || StarsData.RecognizedOrientationAngles[1] != 0 || StarsData.RecognizedOrientationAngles[2] != 0)
 	{
 		memset(&buffer_string[0], 0, 200);
-		sprintf(buffer_string, "12.10f %12.10f %12.10f", StarsData.RecognizedOrientationAngles[0], StarsData.RecognizedOrientationAngles[1], StarsData.RecognizedOrientationAngles[2]);
+		sprintf(buffer_string, "%12.10f %12.10f %12.10f", StarsData.RecognizedOrientationAngles[0], StarsData.RecognizedOrientationAngles[1], StarsData.RecognizedOrientationAngles[2]);
 		print_string(FStream, rec_orient_angl_id, rec_orient_angl_name, (const char*)buffer_string);
 	}
 	if (StarsData.RecognizedOrientationQuaternion[0] != 0 || StarsData.RecognizedOrientationQuaternion[1] != 0 || StarsData.RecognizedOrientationQuaternion[2] != 0 || StarsData.RecognizedOrientationQuaternion[3] != 0)

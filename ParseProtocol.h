@@ -141,6 +141,8 @@ namespace parse_prot {
 
 	void SwapShort(short *word1, short *word2);
 
+	void CheckFileName(AnsiString &fileName);
+
 	unsigned int ReadBinaryString(string binaryString);
 
 	unsigned int StringToDayTime(string _line);
@@ -161,9 +163,9 @@ namespace parse_prot {
 
 	void PrintLOC(ofstream &file, struct LOC tmi);
 
-	void PrintLocalDTMI(struct DTMI tmi);
+	void PrintLocalDTMI(AnsiString fileDir, struct DTMI tmi);
 
-	void PrintLocalMLOC(struct LOC tmi);
+	void PrintLocalMLOC(AnsiString fileDir, struct LOC tmi);
 
 	void ConvertDataDTMI(struct DTMI tmi, struct CadrInfo &mCadr);
 
@@ -182,7 +184,7 @@ namespace parse_prot {
 
 	void PrintDTMI_BOKZM(ofstream &file, struct DTMI_BOKZM tmi);
 
-	void PrintLocalDTMI_BOKZM(struct DTMI_BOKZM tmi);
+	void PrintLocalDTMI_BOKZM(AnsiString fileName, struct DTMI_BOKZM tmi);
 
 	void PrintDTMI_M2(ofstream &file, struct DTMI_M2 tmi);
 
