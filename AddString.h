@@ -8,7 +8,7 @@
 #include <iomanip>
 #include <vector>
 #include <Classes.hpp>
-#include <System.hpp>
+#include <sysvari.h>
 using namespace std;
 namespace add_string {
 
@@ -16,7 +16,7 @@ namespace add_string {
 	bool contains (const string& str, const string& strToFind);
 	string toStdString(UnicodeString str);
 	UnicodeString toUString(const string& str);
-
+	AnsiString toString(Variant value);
 
 	template<typename Stream>
 	size_t findWord(Stream& in, const string& word) {

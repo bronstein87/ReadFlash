@@ -12,7 +12,7 @@
 		{
 			FOnHorizontalScroll(this);
 		}
-	TScrollBox::Dispatch(&Msg);
+		TScrollBox::Dispatch(&Msg);
 	}
 
 	void __fastcall FragmentScrollBox::WMVScroll(TMessage& Msg)
@@ -21,7 +21,7 @@
 		{
 			FOnVerticalScroll(this);
 		}
-	TScrollBox::Dispatch(&Msg);
+		TScrollBox::Dispatch(&Msg);
 	}
 
 

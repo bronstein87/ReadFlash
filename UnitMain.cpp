@@ -12,7 +12,10 @@ TMainForm *MainForm;
 // ---------------------------------------------------------------------------
 __fastcall TMainForm::TMainForm(TComponent* Owner) : client(new DbClient(NULL, FDGUIxLoginDialog1)), TForm(Owner)
 {
-	client->afterConnect(&afterDbConnect);
+	client->afterConnect(&afterDbConnect);            \
+	AnsiString string = "";
+	string.Insert("1", 2);
+	int i = 1;
 }
 
 // ---------------------------------------------------------------------------

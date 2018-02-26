@@ -3,6 +3,8 @@
 #pragma hdrstop
 
 #include "AddString.h"
+
+
 namespace add_string {
 	vector<string> split(const string& str, const string& delim)
 	{
@@ -37,6 +39,36 @@ namespace add_string {
 	UnicodeString toUString(const string& str)
 	{
 		return UnicodeString(str.c_str());
+	}
+	AnsiString toString(Variant value)
+	{
+		AnsiString string;
+		switch(TVarData(value).VType)
+		{
+			case varSmallint:
+			case varInteger:
+			{
+				string = IntToStr((int)value);
+				break;
+			}
+
+			case varDouble:
+			case varSingle:
+			{
+				string = Sysutils::FloatToStrF((double)value, ffFixed, 10, 4);
+				break;
+			}
+
+			case varBoolean:
+			{
+				if (value)
+					string = "true";
+				else
+					string = "false";
+			}
+
+		}
+		return string;
 	}
 
 }

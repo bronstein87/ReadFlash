@@ -25,6 +25,21 @@ double asinm(double xf) {
 	return asin(xf);
 }
 
+
+void QuatToMatrix(double quat[4],double matrix[3][3])
+{
+	matrix[0][0]=quat[0]*quat[0]+quat[1]*quat[1]-quat[2]*quat[2]-quat[3]*quat[3];
+	matrix[0][1]=2.0*(quat[1]*quat[2]+quat[0]*quat[3]);
+	matrix[0][2]=2.0*(quat[1]*quat[3]-quat[0]*quat[2]);
+	matrix[1][0]=2.0*(quat[1]*quat[2]-quat[0]*quat[3]);
+	matrix[1][1]=quat[0]*quat[0]-quat[1]*quat[1]+quat[2]*quat[2]-quat[3]*quat[3];
+	matrix[1][2]=2.0*(quat[2]*quat[3]+quat[0]*quat[1]);
+	matrix[2][0]=2.0*(quat[1]*quat[3]+quat[0]*quat[2]);
+	matrix[2][1]=2.0*(quat[2]*quat[3]-quat[0]*quat[1]);
+	matrix[2][2]=quat[0]*quat[0]-quat[1]*quat[1]-quat[2]*quat[2]+quat[3]*quat[3];
+}
+
+
 double atan2m(double yf, double xf) {
 	double ang;
 	if (fabs(xf) > 1e-10)
