@@ -63,6 +63,7 @@ __published:	// IDE-managed Components
 	TTabSheet *DBOptionsPage;
 	TComboBox *KAComboBox;
 	TLabel *Label9;
+	TCheckBox *CheckBoxLabelStar;
 	void __fastcall ShapeColorLocObjTableMouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y);
 	void __fastcall ShapeColorZeroObjTableMouseDown(TObject *Sender, TMouseButton Button,
@@ -82,6 +83,7 @@ __published:	// IDE-managed Components
 	void __fastcall CheckBoxLabelFrameClick(TObject *Sender);
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall updateKaNameList();
+	void __fastcall CheckBoxLabelStarClick(TObject *Sender);
 
 private:	// User declarations
 public:		// User declarations

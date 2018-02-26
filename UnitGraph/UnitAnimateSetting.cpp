@@ -48,6 +48,9 @@ void TFormAnimateSetting::ReadINI(const AnsiString& fileName)
 	ShapeColorTwoObjTable->Brush->Color = TColor(StrToInt(Ini->ReadString("Colors", "TwoObjTable", clWhite)));
 	ShapeColorThreeObjTable->Brush->Color = TColor(StrToInt(Ini->ReadString("Colors", "ThreeObjTable", clWhite)));
 
+	CheckBoxLabelStar->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckLabelStar", "0")));
+	CheckBoxLabelFrame->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckLabelFrame", "0")));
+
 	EditFilePrefix->Text = Ini->ReadString("File", "FilePrefix", "Img");
 	BeginFromEdit->Text = Ini->ReadString("File", "BeginFrom", "0");
 	SkipFrameCheckBox->Checked = StrToInt(Ini->ReadString("File", "SkipFrame", "1"));
@@ -81,6 +84,9 @@ void TFormAnimateSetting::WriteINI(const AnsiString& fileName)
 	Ini->WriteString("Colors", "OneObjTable", IntToStr(ShapeColorOneObjTable->Brush->Color));
 	Ini->WriteString("Colors", "TwoObjTable", IntToStr(ShapeColorTwoObjTable->Brush->Color));
 	Ini->WriteString("Colors", "ThreeObjTable", IntToStr(ShapeColorThreeObjTable->Brush->Color));
+
+	Ini->WriteString("CheckBox", "CheckLabelStar",   IntToStr((int)CheckBoxLabelStar->Checked));
+	Ini->WriteString("CheckBox", "CheckLabelFrame",  IntToStr((int)CheckBoxLabelFrame->Checked));
 
 	Ini->WriteString("File", "FilePrefix", EditFilePrefix->Text);
 	Ini->WriteString("File", "BeginFrom",  BeginFromEdit->Text);
@@ -183,15 +189,23 @@ void __fastcall TFormAnimateSetting::CheckBoxFillTableWindowsClick(TObject *Send
 
 void __fastcall TFormAnimateSetting::CheckBoxLabelFrameClick(TObject *Sender)
 {
-	TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
+	TFormGraphOrient* FormGraphOrient = dynamic_cast<TFormGraphOrient*>(this->Owner);
 	FormGraphOrient->SetVisibleLabelFrame(CheckBoxLabelFrame->Checked);
+	FormGraphOrient->DrawAnimateHandler();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormAnimateSetting::CheckBoxLabelStarClick(TObject *Sender)
+{
+	TFormGraphOrient* FormGraphOrient = dynamic_cast<TFormGraphOrient*>(this->Owner);
+	FormGraphOrient->SetVisibleLabelStar(CheckBoxLabelStar->Checked);
 	FormGraphOrient->DrawAnimateHandler();
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TFormAnimateSetting::CheckBoxApplyWindowsSeriesClick(TObject *Sender)
 {
-	TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
+	TFormGraphOrient* FormGraphOrient = dynamic_cast<TFormGraphOrient*>(this->Owner);
 	FormGraphOrient->DrawAnimateHandler();
 }
 //---------------------------------------------------------------------------
@@ -211,8 +225,4 @@ void __fastcall TFormAnimateSetting::FormClose(TObject *Sender, TCloseAction &Ac
 	WriteINI(FormGraphOrient->SourceDir+"\\options.ini");
 }
 //---------------------------------------------------------------------------
-
-
-
-
 

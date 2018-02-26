@@ -321,19 +321,19 @@ GeneralizedDTMI DbClient::convertDTMI(const DTMI& dtmi, const TDateTime& date) {
 	 {
 		GeneralizedSHTMI2 gShtmi2;
 		gShtmi2.timeBOKZ = date.DateTimeString();
-		gShtmi2.timePr = shtmi2.timeBOKZ;
-		gShtmi2.status1 = IntToHex(shtmi2.status1, 4);
-		gShtmi2.status2 = IntToHex(shtmi2.status2, 4);
-		gShtmi2.serialNumber = shtmi2.serialNumber;
-		gShtmi2.post = shtmi2.post;
-		gShtmi2.timeExp = shtmi2.timeExp;
-		gShtmi2.cntCommandWord = shtmi2.cntCommandWord;
-		gShtmi2.cntCallNO = shtmi2.cntCallNO;
+		gShtmi2.timePr = shtmi2_BOKZM.timeBOKZ;
+		gShtmi2.status1 = IntToHex(shtmi2_BOKZM.status1, 4);
+		gShtmi2.status2 = IntToHex(shtmi2_BOKZM.status2, 4);
+		gShtmi2.serialNumber = shtmi2_BOKZM.serialNumber;
+		gShtmi2.post = shtmi2_BOKZM.post;
+		gShtmi2.timeExp = shtmi2_BOKZM.timeExp;
+		gShtmi2.cntCommandWord = 0; //shtmi2_BOKZM.cntCommandWord;
+		gShtmi2.cntCallNO = shtmi2_BOKZM.cntCallNO;
 		gShtmi2.cntNOtoSLEZH = 0;
-		gShtmi2.cntCallTO = shtmi2.cntCallTO;
+		gShtmi2.cntCallTO = shtmi2_BOKZM.cntCallTO;
 		gShtmi2.cntTOtoSLEZH = 0;
 		gShtmi2.cntSLEZH = 0;
-		gShtmi2.cntStatOrient = convertArrayToString(shtmi2.cntStatOrient,
+		gShtmi2.cntStatOrient = convertArrayToString(shtmi2_BOKZM.cntStatOrient,
 			12);
 	 }
 //	struct DTMI_BOKZM {

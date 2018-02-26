@@ -135,7 +135,7 @@ private:
 		AnsiString toInsert;
 		for (int i = 0; i < size; i++)
 		{
-			toInsert = add_string::toString(array[i]) + ",";
+//			toInsert = add_string::toString(array[i]) + ",";
 			arrayStr.Insert(toInsert,  arrayStr.Length() + 1);
 		}
 		arrayStr.Insert("{", 1);
@@ -153,7 +153,7 @@ private:
 			arrayStr += "{";
 			for(int j = 0; j < columns; j++)
 			{
-				arrayStr += add_string::toString(matrix[i][j]) + ",";
+//				arrayStr += add_string::toString(matrix[i][j]) + ",";
 			}
 
 			arrayStr.Insert("}", arrayStr.Length());

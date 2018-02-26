@@ -2,7 +2,7 @@ object FormAnimateSetting: TFormAnimateSetting
   Left = 0
   Top = 0
   Caption = #1053#1072#1089#1090#1088#1086#1081#1082#1080
-  ClientHeight = 527
+  ClientHeight = 558
   ClientWidth = 368
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -18,12 +18,14 @@ object FormAnimateSetting: TFormAnimateSetting
     Left = 0
     Top = 0
     Width = 368
-    Height = 527
-    ActivePage = DBOptionsPage
+    Height = 558
+    ActivePage = ShowPage
     Align = alClient
     TabOrder = 0
+    ExplicitHeight = 527
     object ShowPage: TTabSheet
       Caption = #1040#1085#1080#1084#1072#1094#1080#1103
+      ExplicitHeight = 499
       object GroupBox1: TGroupBox
         Left = 3
         Top = 3
@@ -164,7 +166,7 @@ object FormAnimateSetting: TFormAnimateSetting
         Left = 6
         Top = 250
         Width = 352
-        Height = 98
+        Height = 127
         Caption = #1044#1074#1080#1078#1077#1085#1080#1077' '#1079#1074#1077#1079#1076
         TabOrder = 2
         object CheckBoxLabelFrame: TCheckBox
@@ -208,12 +210,21 @@ object FormAnimateSetting: TFormAnimateSetting
           Caption = #1053#1086#1084#1077#1088' '#1079#1074#1077#1079#1076#1099
           TabOrder = 4
         end
+        object CheckBoxLabelStar: TCheckBox
+          Left = 18
+          Top = 93
+          Width = 167
+          Height = 17
+          Caption = #1054#1090#1086#1073#1088#1072#1078#1072#1090#1100' '#1087#1086#1076#1087#1080#1089#1080' '#1079#1074#1077#1079#1076
+          TabOrder = 5
+          OnClick = CheckBoxLabelStarClick
+        end
       end
       object GroupBox4: TGroupBox
-        Left = 3
-        Top = 343
+        Left = 6
+        Top = 383
         Width = 352
-        Height = 155
+        Height = 144
         Caption = #1057#1074#1086#1076#1085#1099#1077' '#1075#1088#1072#1092#1080#1082#1080
         TabOrder = 3
         object CheckBoxCurrentTime: TCheckBox
@@ -225,8 +236,8 @@ object FormAnimateSetting: TFormAnimateSetting
           TabOrder = 0
         end
         object RadioButton1: TRadioButton
-          Left = 40
-          Top = 127
+          Left = 43
+          Top = 110
           Width = 113
           Height = 17
           Caption = #1083#1080#1085#1080#1103
@@ -234,7 +245,7 @@ object FormAnimateSetting: TFormAnimateSetting
         end
         object RadioButton2: TRadioButton
           Left = 180
-          Top = 127
+          Top = 110
           Width = 113
           Height = 17
           Caption = #1090#1086#1095#1082#1072
@@ -269,6 +280,7 @@ object FormAnimateSetting: TFormAnimateSetting
     object FilesPage: TTabSheet
       Caption = #1060#1072#1081#1083#1099
       ImageIndex = 1
+      ExplicitHeight = 499
       object GroupBox5: TGroupBox
         Left = 0
         Top = 3
@@ -319,6 +331,7 @@ object FormAnimateSetting: TFormAnimateSetting
     object DBOptionsPage: TTabSheet
       Caption = #1053#1072#1089#1090#1088#1086#1081#1082#1080' '#1041#1044
       ImageIndex = 2
+      ExplicitHeight = 499
       object Label9: TLabel
         Left = 19
         Top = 13
