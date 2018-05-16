@@ -254,6 +254,7 @@ __published: // IDE-managed Components
 	void __fastcall N21Click(TObject *Sender);
 	void __fastcall BOKZM2ParseProtocolClick(TObject *Sender);
 
+
 private: // User declarations
 
 	class Handle {
@@ -406,6 +407,9 @@ private: // User declarations
 				cadrInfo.OmegaOrient[1] * RTM /** BOKZ1000ConvCoef*/, pointColor);
 			Form->plotter->AddPoint(Form->ChartWz, 0, cadrInfo.Time,
 				cadrInfo.OmegaOrient[2] * RTM /** BOKZ1000ConvCoef*/, pointColor);
+//			for (int i = 0; i < cadrInfo.ObjectsList.size(); i++) {
+//
+//			}
 		}
 
 	protected:

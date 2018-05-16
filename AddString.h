@@ -50,6 +50,21 @@ namespace add_string {
 		return string::npos;
 	}
 
+	template<typename Stream>
+	size_t findLineBack(Stream& in, const string& line, string& findLine) {
+		while (getline(in, findLine)) {
+			if (findLine.find(line) != string::npos) {
+				return in.tellg() - findLine.size();
+			}
+		}
+
+		if (in.fail() && !in.eof()) {
+			throw(string("Ошибка считывания файла"));
+		}
+
+		return string::npos;
+	}
+
 }
 // ---------------------------------------------------------------------------
 #endif

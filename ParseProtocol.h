@@ -1031,7 +1031,6 @@ namespace parse_prot {
 							if (findWord(in, "состояния") != string::npos) {
 								string status2;
 								in >> status2 >> status2;
-
 								// ТО
 								cadrInfo.StatOrient =
 									strtoul(status2.c_str(), NULL, 16);
@@ -1070,9 +1069,10 @@ namespace parse_prot {
 						else
 							throw logic_error(errorMessage);
 						// локализованные
-
-						if (findWord(in, "объектов") != string::npos) {
-							in >> cadrInfo.CountLocalObj;
+						string fLine;
+						if (findLineBack(in, "локализованных объектов", fLine) != string::npos) {
+							vector <string> v = split(fLine,"\t");
+							cadrInfo.CountLocalObj = atoi(v[1].c_str());
 						}
 						else
 							throw logic_error(errorMessage);
@@ -1148,7 +1148,8 @@ namespace parse_prot {
 						}
 						else {
 							NeedNextFile = true;
-							cadrInfoVec.push_back(move(cadrInfo));
+							cadrInfoVec.push_back(cadrInfo);
+							handler(cadrInfo, pointColor);
 							break;
 						}
 
