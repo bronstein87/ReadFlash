@@ -11,6 +11,7 @@
 #include <DateUtils.hpp>
 #include <System.IOUtils.hpp>
 #include <math.h>
+#include <algorithm>
 
 #define MAX_STAT 	   16
 #define MAX_OBJ_DTMI   15
@@ -128,8 +129,6 @@ namespace parse_prot {
 		unsigned short Reserved[2];
 	};
 
-
-
 	static string arrStatErrorEng[MAX_STAT] = {
 		{"EC1"}, {"EC2"}, {"EC3"}, {"EC4"}, {"EC5"}, {"EC6"}, {"EC7"}, {"EC8"},
 		{"EC9"}, {"EC10"}, {"EC11"}, {"EC12"}, {"EC13"}, {"EC14"}, {"EC15"},
@@ -194,7 +193,7 @@ namespace parse_prot {
 	bool checkM2Loc(ifstream& in);
 
 	void writeBOKZ1000ProtocolToIKI(CadrInfo& cadrInfo, bool InfoVecEmpty,
-		TDateTime& startDate, double& timeStep, unsigned int& counter);
+		TDateTime& startDate, double timeStep, unsigned int& counter);
 
 	void writeProtocolToIKI(CadrInfo& cadrInfo, int counter);
 
@@ -287,23 +286,49 @@ namespace parse_prot {
 	}
 
 	template<class ProtHandler>
-	void readBOKZ60Protocol(ifstream& in, vector<CadrInfo>& cadrInfoVec,
+	void readBOKZ60MSHIOR(ifstream& in, vector<CadrInfo>& cadrInfoVec,
 		ProtHandler handle, TDateTime& startDate) {
 		try {
+
+			const char *args[] = {
+				"05", "06", "07", "08", "09", "0a", "0b", "0c", "0d"};
+			static vector<string>err(args, args + 9);
 			string line;
 			string errorMessage =
 				string("Cчитывание протокола завершено необычным образом. "
 				"Возможно работа прибора была остановлена.");
 			while (getline(in, line)) {
-				TColor PointColor = clBlue;
-				if (line.find("Состав ДТМИ:") != string::npos) {
+				bool error = false;
+				TColor PointColor = clGreen;
+				if (line.find("Состав МШИ ОР:") != string::npos) {
 					CadrInfo cadrInfo;
 					cadrInfo.ImageHeight = 512;
 					cadrInfo.ImageWidth = 512;
+					getline(in, line);
+					vector<string>splitted = split(line, "\t\t\t");
+					cadrInfo.StatOrient =
+						strtoul(string(splitted[1].substr(2, 3) + "0").c_str(),
+						NULL, 16);
+					if (contains(splitted[1], "e8")) {
+						PointColor = clBlue;
+					}
+
+					if (findLine(in, "Команда выполнена") != string::npos) {
+						getline(in, line);
+						splitted = split(line, "\t\t\t");
+						if (find(err.begin(), err.end(), splitted[1].substr(0,
+							2)) != err.end()) {
+							error = true;
+							PointColor = clRed;
+						}
+
+					}
 
 					// ищем время привязки
 					if (findWord(in, "информации") != string::npos) {
+						cadrInfo.FrameNumber = cadrInfo.Time;
 						in >> cadrInfo.Time;
+
 						if (cadrInfo.Time == 0 || cadrInfo.Time > 10000)
 							cadrInfo.Time = 0;
 						startDate =
@@ -320,18 +345,102 @@ namespace parse_prot {
 					else
 						throw logic_error(errorMessage);
 
-					if (findLine(in, "4) Код состояния 1") != string::npos) {
+					if (findLine(in, "4) Кватернион ориентации, Qо")
+						!= string::npos) {
+
+						for (int i = 0; i < 4; i++) {
+							getline(in, line);
+							vector<string>splittedStr =
+								split(line, "\t\t\t\t\t");
+							cadrInfo.QuatOrient[i] =
+								atof(splittedStr[1].c_str());
+						}
+						if (cadrInfo.QuatOrient[0] == 0 && !error)
+							continue;
+						double matrixOfOrientation[3][3];
+						quatToMatr(cadrInfo.QuatOrient, matrixOfOrientation);
+						MatrixToEkvAngles(matrixOfOrientation,
+							cadrInfo.AnglesOrient);
+
+					}
+					else
+						throw logic_error(errorMessage);
+
+					if (findLine(in, "5) Угловая скорость по оптическим")
+						!= string::npos) {
+						for (int i = 0; i < 3; i++) {
+							getline(in, line);
+							vector<string>splittedStr =
+								split(line, "\t\t\t\t\t");
+							cadrInfo.OmegaOrient[i] =
+								atof(splittedStr[1].c_str());
+						}
+					}
+					else
+						throw logic_error(errorMessage);
+
+					handle(cadrInfo, PointColor);
+					cadrInfoVec.push_back(cadrInfo);
+					writeProtocolToIKI(cadrInfo, cadrInfoVec.size());
+				}
+
+			}
+		}
+		catch (exception &e) {
+			ShowMessage(e.what());
+		}
+
+	}
+
+	template<class ProtHandler>
+	void readBOKZ60Protocol(ifstream& in, vector<CadrInfo>& cadrInfoVec,
+		ProtHandler handle, TDateTime& startDate) {
+		try {
+
+			const char *args[] = {
+				"05", "06", "07", "08", "09", "0a", "0b", "0c", "0d"};
+			static vector<string>err(args, args + 11);
+			string line;
+			string errorMessage =
+				string("Cчитывание протокола завершено необычным образом. "
+				"Возможно работа прибора была остановлена.");
+			while (getline(in, line)) {
+				TColor PointColor = clGreen;
+				if (line.find("Состав ДТМИ:") != string::npos) {
+					CadrInfo cadrInfo;
+					cadrInfo.ImageHeight = 512;
+					cadrInfo.ImageWidth = 512;
+
+					// ищем время привязки
+					if (findWord(in, "информации") != string::npos) {
+						cadrInfo.FrameNumber = cadrInfo.Time;
+						in >> cadrInfo.Time;
+						if (cadrInfo.Time == 0 || cadrInfo.Time > 10000)
+							cadrInfo.Time = 0;
+						startDate =
+							IncMilliSecond(DateOf(startDate),
+							cadrInfo.Time * 1000);
+						if (cadrInfoVec.size() == 0) {
+							cadrInfo.Time = startDate.Val;
+						}
+						else {
+							cadrInfo.Time = cadrInfoVec.back().Time +
+								(startDate.Val - cadrInfoVec.back().Time);
+						}
+						getline(in, line);
 						getline(in, line);
 						vector<string>splitted = split(line, "\t\t\t");
 						cadrInfo.StatOrient =
 							strtoul(string(splitted[1].substr(2, 3) + "0").c_str
 							(), NULL, 16);
-						// проверяем, что последний УСД не 0
+						if (contains(splitted[1], "e0")) {
+							PointColor = clBlue;
+						}
 
-						// if(splitted[1][3] == '0') continue;
-						if (!contains(splitted[1], "010") && !contains
-							(splitted[1], "020") && !contains(splitted[1],
-							"000")) {
+						getline(in, line);
+						splitted = split(line, "\t\t\t");
+						if (find(err.begin(), err.end(), splitted[1].substr(0,
+							2)) != err.end()) {
 							PointColor = clRed;
 						}
 					}
@@ -359,7 +468,7 @@ namespace parse_prot {
 
 					// ищем начало массива лок
 					if (findLine(in,
-						"	Х			Y			I			N")
+						"	Х			Y			I			nPix		ThFrag")
 						!= string::npos) {
 						vector<string>splittedLocData;
 						const int сountLocObj = 16;
@@ -506,7 +615,7 @@ namespace parse_prot {
 					cadrInfo.SizeWindowsList = cadrInfo.WindowsList.size();
 					cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
 
-					handle(cadrInfo);
+					handle(cadrInfo, PointColor);
 					cadrInfoVec.push_back(cadrInfo);
 					writeProtocolToIKI(cadrInfo, cadrInfoVec.size());
 				}
@@ -803,61 +912,79 @@ namespace parse_prot {
 
 		try {
 
+			const char *args[] = {
+				"04", "05", "06", "07", "08", "09", "0a", "0b", "0d", "0e"};
+			static vector<string>err(args, args + 10);
 			const string errorMessage =
 				string("Cчитывание протокола завершено необычным образом.");
+			const maxTimePr = 100000;
+			double timeStep = 0.25;
 			string line;
-			static double timeStep = 0.25;
+
 			static bool NeedNextFile = false;
+			// для ВГ
+			if (!cadrInfoVec.empty()) {
+				bool readLastData = true;
+				if (NeedNextFile) {
+					if (findWord(in, "такта:") != string::npos) {
+						int TickNumber = 0;
+						in >> TickNumber;
+						if (cadrInfoVec.empty()) {
+							NeedNextFile = false;
+						}
+						else {
+							if (TickNumber != cadrInfoVec.back().FrameNumber) {
+								cadrInfoVec.erase(cadrInfoVec.end() - 1);
+								readLastData = false;
+							}
+						}
 
-			if (NeedNextFile) {
-				if (findWord(in, "такта:") != string::npos) {
-					int TickNumber = 0;
-					in >> TickNumber;
-					if (TickNumber != cadrInfoVec.back().FrameNumber) {
-						throw logic_error(errorMessage);
+					}
+					else
+						readLastData = false;
+					if (readLastData) {
+						if (findLine(in, "5) Кватернион ориентации, Qо")
+							!= string::npos) {
+
+							for (int i = 0; i < 4; i++) {
+								getline(in, line);
+								vector<string>splittedStr =
+									split(line, "\t\t\t\t");
+								cadrInfoVec.back().QuatOrient[i] =
+									atof(splittedStr[1].c_str());
+							}
+
+							double matrixOfOrientation[3][3];
+							quatToMatr(cadrInfoVec.back().QuatOrient,
+								matrixOfOrientation);
+							MatrixToEkvAngles(matrixOfOrientation,
+								cadrInfoVec.back().AnglesOrient);
+
+						}
+						else
+							throw logic_error(errorMessage);
+						// протоколы кончаются на ДТМИ
+
+						if (findLine(in,
+							"Угловая скорость по оптическим измерениям в проекциях на оси ПСК")
+							!= string::npos) {
+							for (int i = 0; i < 3; i++) {
+								getline(in, line);
+								vector<string>splittedStr =
+									split(line, "\t\t\t\t");
+								cadrInfoVec.back().OmegaOrient[i] =
+									atof(splittedStr[1].c_str());
+							}
+
+						}
+						else
+							throw logic_error(errorMessage);
+						writeBOKZ1000ProtocolToIKI(cadrInfoVec.back(),
+							cadrInfoVec.empty(), startDate, timeStep, counter);
+						NeedNextFile = false;
 					}
 
 				}
-				else
-					throw logic_error(errorMessage);
-
-				if (findLine(in, "5) Кватернион ориентации, Qо")
-					!= string::npos) {
-
-					for (int i = 0; i < 4; i++) {
-						getline(in, line);
-						vector<string>splittedStr = split(line, "\t\t\t\t");
-						cadrInfoVec.back().QuatOrient[i] =
-							atof(splittedStr[1].c_str());
-					}
-
-					double matrixOfOrientation[3][3];
-					quatToMatr(cadrInfoVec.back().QuatOrient,
-						matrixOfOrientation);
-					MatrixToEkvAngles(matrixOfOrientation,
-						cadrInfoVec.back().AnglesOrient);
-
-				}
-				else
-					throw logic_error(errorMessage);
-				// протоколы кончаются на ДТМИ
-
-				if (findLine(in,
-					"Угловая скорость по оптическим измерениям в проекциях на оси ПСК")
-					!= string::npos) {
-					for (int i = 0; i < 3; i++) {
-						getline(in, line);
-						vector<string>splittedStr = split(line, "\t\t\t\t");
-						cadrInfoVec.back().OmegaOrient[i] =
-							atof(splittedStr[1].c_str());
-					}
-
-				}
-				else
-					throw logic_error(errorMessage);
-				writeBOKZ1000ProtocolToIKI(cadrInfoVec.back(),
-					cadrInfoVec.empty(), startDate, timeStep, counter);
-				NeedNextFile = false;
 			}
 
 			while (getline(in, line)) {
@@ -874,9 +1001,26 @@ namespace parse_prot {
 						cadrInfo.ImageHeight = 1024;
 						cadrInfo.ImageWidth = 1024;
 
+						if (findLine(in, "Состав ДТМИ 1:") != string::npos) {
+
+						   bool skipDTMI = false;
+						   for (int i = 0; i < 2; i++) {
+								getline(in, line);
+								if (contains(line, "(ошибка)")) {
+									skipDTMI = true;
+								}
+						   }
+						   if (skipDTMI) {
+							   continue;
+						   }
+
+                        }
+
 						// время привязки в секундах
 						if (findWord(in, "информации") != string::npos) {
 							in >> cadrInfo.Time;
+							if (cadrInfo.Time > maxTimePr)
+								continue;
 						}
 						else
 							throw logic_error(errorMessage);
@@ -884,7 +1028,6 @@ namespace parse_prot {
 						if (findWord(in, "состояния") != string::npos) {
 							string status;
 							in >> status >> status;
-
 							if (findWord(in, "состояния") != string::npos) {
 								string status2;
 								in >> status2 >> status2;
@@ -893,7 +1036,8 @@ namespace parse_prot {
 								cadrInfo.StatOrient =
 									strtoul(status2.c_str(), NULL, 16);
 								if (status == "ec00") {
-									if (status2.substr(0, 2) != "00") {
+									if (find(err.begin(), err.end(),
+										status2.substr(0, 2)) != err.end()) {
 										pointColor = clRed;
 									}
 								}
@@ -904,12 +1048,16 @@ namespace parse_prot {
 										status2.substr(0, 2) == "01") {
 										continue;
 									}
-									else if (status2.substr(0, 2) != "00") {
+
+									else if (find(err.begin(), err.end(),
+										status2.substr(0, 2)) != err.end()) {
 										pointColor = clRed;
 									}
 								}
+								// и тут пропускаем мусор
 								else if (status == "0000" && status2 ==
-									"0000" || status == "c400") {
+									"0000" || status == "c400" ||
+									status == "4456") {
 									continue;
 								}
 								else {
@@ -947,18 +1095,21 @@ namespace parse_prot {
 						else
 							throw logic_error(errorMessage);
 
+						if (findWord(in, "времени") != string::npos) {
+							in >> timeStep;
+						}
+
 						if (findLine(in,
 							"	Х			Y			I			N")
 							!= string::npos) {
-							vector<string>splittedLocData;
+							vector <string> splittedLocData;
 							const int сountLocObj = cadrInfo.CountLocalObj;
 							ObjectsInfo objInfo;
 							for (int i = 0; i < сountLocObj; i++) {
 								getline(in, line);
 								// см. эту строку в протоколе, чтобы понять почему так
 								splittedLocData = split(line, ")\t");
-								splittedLocData =
-									split(splittedLocData[1], "\t");
+								splittedLocData = split(splittedLocData[1], "\t");
 
 								objInfo.X = atof(splittedLocData[0].c_str());
 								objInfo.Y = atof(splittedLocData[1].c_str());
@@ -985,43 +1136,14 @@ namespace parse_prot {
 						else
 							throw logic_error(errorMessage);
 
-						// if(findLine(in,"16) Значение порогов во фрагментах") != string::npos)
-						// {
-						// for(int i = 0; i < cadrInfo.CountWindows; i++)
-						// {
-						// WindowsInfo winInfo;
-						// getline(in,line);
-						// vector<string> splittedStr = split(line,"\t");
-						// winInfo.Level =  atoi(splittedStr[1].c_str());
-						// if (winInfo.Level == 0) {
-						// break;
-						// }
-						// cadrInfo.WindowsList.push_back(winInfo);
-						// }
-						//
-						// }
-						// else throw logic_error(errorMessage);
-						//
-						//
-						// if(findLine(in,"17) Количество объектов во фрагментах") != string::npos)
-						// {
-						// for(int i = 0; i < cadrInfo.WindowsList.size(); i++)
-						// {
-						// getline(in,line);
-						// vector <string> splittedStr = split(line,"\t");
-						// cadrInfo.WindowsList[i].CountObj = atoi(splittedStr[1].c_str());
-						// }
-						//
-						// }
-						// else throw logic_error(errorMessage);
-
 						if (findWord(in, "такта:") != string::npos) {
+							// для ВГ
 							int TickNumberSecond = 0;
 							in >> TickNumberSecond;
 							// если была рассинхронизация
 							if (cadrInfo.FrameNumber != TickNumberSecond) {
 								timeStep += timeStep;
-								continue;
+								// continue;
 							}
 						}
 						else {
@@ -1074,8 +1196,8 @@ namespace parse_prot {
 
 				}
 			}
-		}
 
+		}
 		catch (exception &e) {
 			ShowMessage(e.what());
 		}
@@ -1177,8 +1299,8 @@ namespace parse_prot {
 						string status1, status2;
 						getline(in, status1);
 						getline(in, status2);
-						if (!(contains(status1, "e000H")
-						&& contains(status2,"0005H"))) {
+						if (!(contains(status1, "e000H") && contains(status2,
+							"0005H"))) {
 							pointColor = clRed;
 						}
 					}
@@ -1317,7 +1439,6 @@ namespace parse_prot {
 				if (!((status1 >> 15) & 1))
 					// если 16 бит не установлен, то это НО
 				{
-
 					if (contains(splitted[7], "000"))
 						cadrInfo.DeviceInfo = "HO 4";
 					else if (contains(splitted[7], "010"))
@@ -1398,8 +1519,8 @@ namespace parse_prot {
 		string line;
 		while (getline(in, line)) {
 			TColor pointColor = clBlue;
-			if (contains(line, "Расшифровка;МПИ;;ДТМИ Лок;")
-			&& !contains(line, "Таблица")) {
+			if (contains(line, "Расшифровка;МПИ;;ДТМИ Лок;") && !contains(line,
+				"Таблица")) {
 				CadrInfo cadrInfo;
 				cadrInfo.ImageHeight = 512;
 				cadrInfo.ImageWidth = 512;
@@ -1410,9 +1531,8 @@ namespace parse_prot {
 				UnicodeString date = toUString(splitted[0]);
 				UnicodeString time = toUString(splitted[1]);
 				cadrInfo.Time = StrToDateTime(date + " " + time).Val;
-				if (!contains(splitted[6], "000")
-				|| !contains(splitted[6],"010")
-				|| !contains(splitted[6], "020")) {
+				if (!contains(splitted[6], "000") || !contains(splitted[6],
+					"010") || !contains(splitted[6], "020")) {
 					TColor pointColor = clRed;
 				}
 				cadrInfo.CountLocalObj = atoi(splitted[10].c_str());
@@ -1457,3 +1577,9 @@ namespace parse_prot {
 
 // ---------------------------------------------------------------------------
 #endif
+
+
+
+
+
+

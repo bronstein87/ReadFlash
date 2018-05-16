@@ -63,7 +63,7 @@ struct LinesInfo
 struct CadrInfo
 {
 	_fastcall CadrInfo(): Time(0), FrameNumber(0), CountStars(0), CountWindows(0),
-	CountLocalObj(0), CountDeterObj(0), SizeStarsList(0), SizeWindowsList(0),
+	CountLocalObj(0), CountDeterObj(0), SizeStarsList(0), SizeWindowsList(0), SizeObjectsList(0),
 	 CountLines(0), CountBlock(0), MeanErrorX(0), MeanErrorY(0), MeanErrorXY(0),
 	  QuatOrient(), AnglesOrient(), AnglesModel(), //кватернион, матрица и углы ориентации
 	 AnglesDiff(),  OmegaOrient(), OmegaModel(), //угловая скорость, прогнозируемая матрица ориентации
@@ -107,6 +107,7 @@ struct CadrInfo
 	double MatrixTemp;     //температура КМОП-матрицы
 	double MeanErrorX, MeanErrorY, MeanErrorXY;
 };
+
 
 
  void GetMeanDeterError(struct CadrInfo &mCadr)

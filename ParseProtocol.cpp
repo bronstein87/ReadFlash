@@ -1013,9 +1013,11 @@ void writeProtocolToIKI(CadrInfo& cadrInfo, int counter)
 {
 	unique_ptr <IKI_img> writer (new IKI_img());
 	TDateTime dt = cadrInfo.Time;
-	writer->Georeferencing.DateTime = toStdString(DateTimeToStr(dt));
+	UnicodeString dtStr;
+	DateTimeToString(dtStr, UnicodeString("yyyy-MM-dd hh:mm:ss.z"), dt);
+	writer->Georeferencing.DateTime = toStdString(dtStr);
 	writer->Georeferencing.FrameNumber = ++counter;
-    writer->CameraSettings.ResolutionACP = 12;
+	writer->CameraSettings.ResolutionACP = 12;
 
 	writer->ImageData.FrameData.FrameHeight = cadrInfo.ImageHeight;
 	writer->ImageData.FrameData.FrameWidth = cadrInfo.ImageWidth;
@@ -1088,25 +1090,27 @@ void writeProtocolToIKI(CadrInfo& cadrInfo, int counter)
 
 
 
-void writeBOKZ1000ProtocolToIKI (CadrInfo& cadrInfo, bool InfoVecEmpty, TDateTime& startDate, double& timeStep, unsigned int& counter)
+void writeBOKZ1000ProtocolToIKI (CadrInfo& cadrInfo, bool InfoVecEmpty, TDateTime& startDate, double timeStep, unsigned int& counter)
 {
 	unique_ptr <IKI_img> writer (new IKI_img());
+	UnicodeString dt;
 	if (InfoVecEmpty)
 	{
-		writer->Georeferencing.DateTime = toStdString(DateTimeToStr(startDate));
+		DateTimeToString(dt, UnicodeString("yyyy-MM-dd hh:mm:ss.z"), startDate);
+		writer->Georeferencing.DateTime = toStdString(dt);
 	}
 	else
 	{
 		startDate = IncMilliSecond(startDate, timeStep * 1000);
-		writer->Georeferencing.DateTime = toStdString(DateTimeToStr(startDate));
-		timeStep = 0.25;
+		DateTimeToString(dt, UnicodeString("yyyy-MM-dd hh:mm:ss.z"), startDate);
+		writer->Georeferencing.DateTime = toStdString(dt);
 	}
 
 	writer->Georeferencing.FrameNumber = ++counter;
 	writer->StarsData.RezStat = 0;
 	writer->ImageData.FrameData.FrameHeight = 1024;
 	writer->ImageData.FrameData.FrameWidth = 1024;
-	writer->StarsData.SimulatedFrame.SizeStarList = cadrInfo.SizeObjectsList;
+	writer->StarsData.SizeLocalList = cadrInfo.SizeObjectsList;
 	writer->StarsData.LocalizedCount = cadrInfo.CountLocalObj;
 	writer->StarsData.RecognizedCount = cadrInfo.CountDeterObj;
 	writer->StarsData.Epsilon = cadrInfo.Epsilon;

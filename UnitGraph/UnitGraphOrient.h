@@ -401,11 +401,11 @@ private: // User declarations
 			Form->plotter->AddPoint(Form->ChartNumLoc, 0, cadrInfo.Time,
 				cadrInfo.CountLocalObj, pointColor);
 			Form->plotter->AddPoint(Form->ChartWx, 0, cadrInfo.Time,
-				cadrInfo.OmegaOrient[0] * RTM * BOKZ1000ConvCoef, pointColor);
+				cadrInfo.OmegaOrient[0] * RTM /** BOKZ1000ConvCoef*/, pointColor);
 			Form->plotter->AddPoint(Form->ChartWy, 0, cadrInfo.Time,
-				cadrInfo.OmegaOrient[1] * RTM * BOKZ1000ConvCoef, pointColor);
+				cadrInfo.OmegaOrient[1] * RTM /** BOKZ1000ConvCoef*/, pointColor);
 			Form->plotter->AddPoint(Form->ChartWz, 0, cadrInfo.Time,
-				cadrInfo.OmegaOrient[2] * RTM * BOKZ1000ConvCoef, pointColor);
+				cadrInfo.OmegaOrient[2] * RTM /** BOKZ1000ConvCoef*/, pointColor);
 		}
 
 	protected:
@@ -505,7 +505,6 @@ private: // User declarations
 	int Contrast;
 	unsigned short ResizeCoef;
 	unsigned short FontSize;
-	bool CompareIKIRes;
 	StatusInfo statusInfo;
 
 	vector<unsigned short>tableRows;

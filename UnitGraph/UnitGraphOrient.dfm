@@ -146,7 +146,7 @@ object FormGraphOrient: TFormGraphOrient
     Top = 8
     Width = 1430
     Height = 777
-    ActivePage = TabSheetStarsMotion
+    ActivePage = ShowFragmentTab
     Anchors = [akLeft, akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 8
@@ -964,13 +964,12 @@ object FormGraphOrient: TFormGraphOrient
         Caption = 'Label6'
       end
       object Label12: TLabel
-        Left = 568
-        Top = 702
+        Left = 571
+        Top = 709
         Width = 46
         Height = 13
         Anchors = [akLeft, akBottom]
         Caption = #1052#1072#1089#1096#1090#1072#1073
-        ExplicitTop = 720
       end
       object ChartMatrix: TChart
         Left = 23
@@ -999,10 +998,15 @@ object FormGraphOrient: TFormGraphOrient
         Title.Text.Strings = (
           #1044#1074#1080#1078#1077#1085#1080#1077' '#1079#1074#1105#1079#1076)
         OnClickLegend = ChartMatrixClickLegend
+        BottomAxis.Automatic = False
+        BottomAxis.AutomaticMaximum = False
+        BottomAxis.AutomaticMinimum = False
         BottomAxis.Axis.Color = 4210752
         BottomAxis.Grid.Color = 11119017
         BottomAxis.LabelsFormat.Font.Name = 'Verdana'
         BottomAxis.LabelStyle = talValue
+        BottomAxis.Maximum = 93.258103536676760000
+        BottomAxis.Minimum = -1.258103536676783000
         BottomAxis.TicksInner.Color = 11119017
         BottomAxis.Title.Font.Name = 'Verdana'
         Chart3DPercent = 1
@@ -1016,10 +1020,15 @@ object FormGraphOrient: TFormGraphOrient
         DepthTopAxis.LabelsFormat.Font.Name = 'Verdana'
         DepthTopAxis.TicksInner.Color = 11119017
         DepthTopAxis.Title.Font.Name = 'Verdana'
+        LeftAxis.Automatic = False
+        LeftAxis.AutomaticMaximum = False
+        LeftAxis.AutomaticMinimum = False
         LeftAxis.Axis.Color = 4210752
         LeftAxis.Grid.Color = 11119017
         LeftAxis.Inverted = True
         LeftAxis.LabelsFormat.Font.Name = 'Verdana'
+        LeftAxis.Maximum = 962.066949546165700000
+        LeftAxis.Minimum = -32.733616212832350000
         LeftAxis.TicksInner.Color = 11119017
         LeftAxis.Title.Font.Name = 'Verdana'
         Panning.MouseWheel = pmwNone
@@ -1164,7 +1173,7 @@ object FormGraphOrient: TFormGraphOrient
       end
       object EditCountHistory: TEdit
         Left = 911
-        Top = 697
+        Top = 707
         Width = 64
         Height = 21
         Anchors = [akLeft, akBottom]
@@ -1172,8 +1181,8 @@ object FormGraphOrient: TFormGraphOrient
         Text = '10'
       end
       object CheckBoxHistory: TCheckBox
-        Left = 758
-        Top = 697
+        Left = 751
+        Top = 709
         Width = 154
         Height = 17
         Anchors = [akLeft, akBottom]
@@ -1182,7 +1191,7 @@ object FormGraphOrient: TFormGraphOrient
       end
       object EditScale: TEdit
         Left = 623
-        Top = 697
+        Top = 707
         Width = 64
         Height = 21
         Anchors = [akLeft, akBottom]
@@ -1191,7 +1200,7 @@ object FormGraphOrient: TFormGraphOrient
       end
       object CheckBoxSaveScale: TCheckBox
         Left = 230
-        Top = 697
+        Top = 709
         Width = 257
         Height = 15
         Anchors = [akLeft, akBottom]

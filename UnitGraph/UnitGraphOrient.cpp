@@ -362,13 +362,13 @@ void TFormGraphOrient::InitStatusInfoTable(const string& deviceName)
 		}
 	}
 	else
-	 throw runtime_error("Не удалось найти файл " + fileName);
+	 throw runtime_error("Не удалось найти файл для построение таблиц по статусам " + fileName);
 
-	for(int i = 1; i < TableStatusInfo->RowCount; i++)
+	for(int i = 0; i < TableStatusInfo->RowCount; i++)
 	{
 		for(int j = 0; j < columnTitles.size(); j++)
 		{
-			TableStatusInfo->Cells[j + 1][i] = "0";
+			TableStatusInfo->Cells[j + 1][i + 1] = "0";
 		}
 	}
 }
@@ -396,7 +396,8 @@ void TFormGraphOrient::AddRowToStatusTable(const CadrInfo& cadr)
 					{
 						if(cadr.DeviceInfo.find(columnTitles[j]) != string::npos)
 						{
-							TableStatusInfo->Cells[j + 1][i + 1] =  StrToInt(TableStatusInfo->Cells[j + 1][i + 1]) + 1;
+							int count = StrToInt(TableStatusInfo->Cells[j + 1][i + 1]) + 1;
+							TableStatusInfo->Cells[j + 1][i + 1] =  IntToStr(count);
 							break;
 						}
 					}
@@ -2462,7 +2463,6 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 
 void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 {
-
 	try
 	{
 		OpenDialog->Options.Clear();
@@ -2476,7 +2476,7 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 			SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
 			TDateTime startDate;
 			FileAge(FileList->Strings[0], startDate);
-			InitStatusInfoTable("BM60");
+			InitStatusInfoTable("M2");
 			for (int i = 0; i < FileList->Count; i++)
 			{
 				AnsiString FileName = FileList->Strings[i];
@@ -2488,7 +2488,6 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 				}
 				if(checkLocFile(in))
 				{
-
 					HandleLoc60 handler (this);
 					readBOKZ60LocProtocol (in, vCadrInfo, handler, startDate);
 				}
@@ -2496,6 +2495,7 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 				else
 				{
 					Handle60 handle(this);
+				   //	readBOKZ60MSHIOR (in, vCadrInfo, handle, startDate);
 					readBOKZ60Protocol(in, vCadrInfo, handle, startDate);
 				}
 
@@ -2508,7 +2508,8 @@ void __fastcall TFormGraphOrient::BOKZ60ParseProtocolClick(TObject *Sender)
 		}
 	}
 
-	catch (exception &e) {
+	catch (exception &e)
+	{
 		ShowMessage(e.what());
 	}
 }
@@ -2527,7 +2528,7 @@ void TFormGraphOrient::FillStatusTable()
 		div += StrToInt(TableStatusInfo->Cells[1][i]);
 	}
 
-	if (div == 0) 
+	if (div == 0)
 	   return;
 	else
 	{ 
@@ -2850,7 +2851,7 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 {
 	const int maxDrawFrag = 12;
 	TColor colorFrag [maxDrawFrag];
-
+	bool CompareIKIRes = false;
 	try
 	{
 		OpenDialog->Filter = "iki|*.iki";
@@ -2908,13 +2909,15 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 								TStringDynArray SplittedString = SplitString(FileList->Strings[i], "\\");
 								UnicodeString ResFileName = FoldersList->Strings[curFolder] + "\\"
 								+ filePrefix + SplittedString[SplittedString.Length - 1];
-								if (FileExists(ResFileName) && (reader->ReadFormat(toStdString(ResFileName), false, skipFrame)))
+								if (FileExists(ResFileName)
+								&& (reader->ReadFormat(toStdString(ResFileName), false, skipFrame)))
 								{
 									CompareIKIRes = true;
 									if (!statusTableInited)
 									{
 										vector <string> splitted = split(reader->CameraSettings.DataSource, "_");
-										if (!contains(splitted[0], "FrameMaker") && !contains(splitted[0], "IdentStar"))
+										if (!contains(splitted[0], "FrameMaker")
+										&& !contains(splitted[0], "IdentStar"))
 										{
 											InitStatusInfoTable(splitted[0]);
 											statusTableInited = true;
@@ -3074,7 +3077,10 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 
 					sort(vCadrInfo.begin(), vCadrInfo.end(), CadrCompare);
 					CalculateSeriesSKO();
-					if (statusTableInited) FillStatusTable();
+					if (statusTableInited) {
+						FillStatusTable();
+					}
+
 					if (FoldersList->Count == 1) {
 						PrepareStartDraw();
 					}
@@ -3248,44 +3254,6 @@ void __fastcall TFormGraphOrient::ChartOrientClickLegend(TCustomChart *Sender, T
 //---------------------------------------------------------------------------
 
 
-void __fastcall TFormGraphOrient::BOKZM601000ParseProtocolClick(TObject *Sender)
-{
-		 OpenDialog->Options.Clear();
-		 OpenDialog->Filter = "txt|*.txt";
-		 OpenDialog->Options << ofAllowMultiSelect;
-		 if (OpenDialog->Execute())
-		 {
-			vCadrInfo.clear();
-			DeleteLineGraph();
-			unique_ptr <TStringList> FileList (new TStringList());
-			FileList->Assign(OpenDialog->Files);
-			SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
-			unsigned int counter = 0;
-			TDateTime startDate;
-			FileAge(FileList->Strings[0], startDate);
-		 	InitStatusInfoTable("M1000");
-			for (int i = 0; i < FileList->Count; i++)
-			{
-				AnsiString FileName = FileList->Strings[i];
-				ifstream in(FileName.c_str());
-				if (!in.is_open())
-				{
-					ShowMessage("Не удалось открыть файл");
-					return;
-				}
-
-				Handle1000 handle(this);
-				readBOKZ601000Protocol(in, vCadrInfo, counter, startDate, handle);
-			}
-
-			for (int i = 0; i < vCadrInfo.size(); i++)
-			{
-				AddRowToStatusTable(vCadrInfo[i]);
-			}
-			PrepareStartDraw();
-			CheckTabSheet();
-		}
-	}
 	// ---------------------------------------------------------------------------
 
 void __fastcall TFormGraphOrient::ChartMatrixClickLegend(TCustomChart *Sender, TMouseButton Button,
@@ -3469,6 +3437,42 @@ void __fastcall TFormGraphOrient::N21Click(TObject *Sender)
 //---------------------------------------------------------------------------
 
 
+void __fastcall TFormGraphOrient::BOKZM601000ParseProtocolClick(TObject *Sender)
+{
+		 OpenDialog->Options.Clear();
+		 OpenDialog->Filter = "txt|*.txt";
+		 OpenDialog->Options << ofAllowMultiSelect;
+		 if (OpenDialog->Execute())
+		 {
+			vCadrInfo.clear();
+			DeleteLineGraph();
+			unique_ptr <TStringList> FileList (new TStringList());
+			FileList->Assign(OpenDialog->Files);
+			SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
+			unsigned int counter = 0;
+			TDateTime startDate = TDateTime(2017,02,22,17,27,23,0);
+			FileAge(FileList->Strings[0], startDate);
+			InitStatusInfoTable("M1000");
+			for (int i = 0; i < FileList->Count; i++)
+			{
+				AnsiString FileName = FileList->Strings[i];
+				ifstream in(FileName.c_str());
+				if (!in.is_open())
+				{
+					ShowMessage("Не удалось открыть файл");
+					return;
+				}
+
+				Handle1000 handle(this);
+				readBOKZ601000Protocol(in, vCadrInfo, counter, startDate, handle);
+			}
+
+			FillStatusTable();
+			CalculateSeriesSKO();
+			PrepareStartDraw();
+			CheckTabSheet();
+		}
+	}
 
 void __fastcall TFormGraphOrient::BOKZM2ParseProtocolClick(TObject *Sender)
 {
@@ -3540,6 +3544,10 @@ void __fastcall TFormGraphOrient::BOKZM2ParseProtocolClick(TObject *Sender)
 	}
 	else throw logic_error("Неверный путь к директории");
  }
+
+
+
+
 
 
 

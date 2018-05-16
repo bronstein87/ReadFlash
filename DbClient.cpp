@@ -68,7 +68,8 @@ void DbClient::insertDTMI(const vector<GeneralizedDTMI>& dtmi,
 	query->Params->ArraySize = dtmi.size();
 	AnsiString schemaName = getSchemaNameByKaName(kaName);
 	query->SQL->Text = "INSERT INTO " + schemaName +
-		".dtmi values (:p1, :p2, :p3, :p4, :p5, :p6, :p7, :p8, :p9, :p10, :p11, " ":p12, :p13, :p14, :p15, :p16, :p18, :p19, :p20, :p21, :p22, :p23, :p24)";
+		".dtmi values (:p1, :p2, :p3, :p4, :p5, :p6, :p7, :p8, :p9, :p10, :p11, "
+		":p12, :p13, :p14, :p15, :p16, :p18, :p19, :p20, :p21, :p22, :p23, :p24)";
 
 	// quat_board последний
 	for (int i = 0; i < dtmi.size(); i++) {
@@ -202,8 +203,8 @@ GeneralizedSHTMI1 DbClient::convertSHTMI1(const SHTMI1& shtmi1,
 	GeneralizedSHTMI1 gShtmi1;
 	gShtmi1.timeBOKZ = date.DateTimeString();
 	gShtmi1.timePr = shtmi1.timeBOKZ;
-	gShtmi1.status1 = IntToHex(shtmi1.status1, 4);
-	gShtmi1.status2 = IntToHex(shtmi1.status2, 4);
+	gShtmi1.status1 = "0x" + IntToHex(shtmi1.status1, 4);
+	gShtmi1.status2 = "0x" + IntToHex(shtmi1.status2, 4);
 	gShtmi1.serialNumber = shtmi1.serialNumber;
 	gShtmi1.post = shtmi1.post;
 	gShtmi1.Foc = shtmi1.Foc;
@@ -224,8 +225,8 @@ GeneralizedSHTMI2 DbClient::convertSHTMI2(const SHTMI2& shtmi2,
 	GeneralizedSHTMI2 gShtmi2;
 	gShtmi2.timeBOKZ = date.DateTimeString();
 	gShtmi2.timePr = shtmi2.timeBOKZ;
-	gShtmi2.status1 = IntToHex(shtmi2.status1, 4);
-	gShtmi2.status2 = IntToHex(shtmi2.status2, 4);
+	gShtmi2.status1 = "0x" + IntToHex(shtmi2.status1, 4);
+	gShtmi2.status2 = "0x" + IntToHex(shtmi2.status2, 4);
 	gShtmi2.serialNumber = shtmi2.serialNumber;
 	gShtmi2.post = shtmi2.post;
 	gShtmi2.timeExp = shtmi2.timeExp;
@@ -327,11 +328,7 @@ GeneralizedDTMI DbClient::convertDTMI(const DTMI& dtmi, const TDateTime& date) {
 		gShtmi2.serialNumber = shtmi2_BOKZM.serialNumber;
 		gShtmi2.post = shtmi2_BOKZM.post;
 		gShtmi2.timeExp = shtmi2_BOKZM.timeExp;
-<<<<<<< HEAD
 		gShtmi2.cntCommandWord = 0;
-=======
-		gShtmi2.cntCommandWord = 0; //shtmi2_BOKZM.cntCommandWord;
->>>>>>> origin/master
 		gShtmi2.cntCallNO = shtmi2_BOKZM.cntCallNO;
 		gShtmi2.cntNOtoSLEZH = 0;
 		gShtmi2.cntCallTO = shtmi2_BOKZM.cntCallTO;
