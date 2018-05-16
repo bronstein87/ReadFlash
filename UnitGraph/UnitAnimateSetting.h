@@ -64,6 +64,11 @@ __published:	// IDE-managed Components
 	TComboBox *KAComboBox;
 	TLabel *Label9;
 	TCheckBox *CheckBoxLabelStar;
+	TLabel *Label11;
+	TComboBox *ComboBox1;
+	TLabel *Label10;
+	TDateTimePicker *DatePicker1S;
+	TCheckBox *CheckBoxLoadToDb;
 	void __fastcall ShapeColorLocObjTableMouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y);
 	void __fastcall ShapeColorZeroObjTableMouseDown(TObject *Sender, TMouseButton Button,

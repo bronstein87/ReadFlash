@@ -32,15 +32,20 @@ void __fastcall TFormAnimateSetting::updateKaNameList()
 	 }
 	 KAComboBox->Text = KAComboBox->Items[0][0];
 }
+//---------------------------------------------------------------------------
+
 void TFormAnimateSetting::ReadINI(const AnsiString& fileName)
 {
 	std::unique_ptr<TIniFile> Ini ( new TIniFile(fileName));
 
+//Вкладка "Анимация"
+	//Панель "Таблица объектов"
 	CheckBoxFillTableObjects->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckFillTableObjects", "0")));
 	CheckBoxApplyObjectsSeries->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckApplyObjectsSeries", "0")));
 	ShapeColorLocObjTable->Brush->Color = TColor(StrToInt(Ini->ReadString("Colors", "LocObjTable", clWhite)));
 	ShapeColorDetObjTable->Brush->Color = TColor(StrToInt(Ini->ReadString("Colors", "DetObjTable", clWhite)));
 
+	//Панель "Таблица фрагментов"
 	CheckBoxFillTableWindows->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckFillTableWindows", "0")));
 	CheckBoxApplyObjectsSeries->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckApplyObjectsSeries", "0")));
 	ShapeColorZeroObjTable->Brush->Color = TColor(StrToInt(Ini->ReadString("Colors", "ZeroObjTable", clWhite)));
@@ -48,17 +53,23 @@ void TFormAnimateSetting::ReadINI(const AnsiString& fileName)
 	ShapeColorTwoObjTable->Brush->Color = TColor(StrToInt(Ini->ReadString("Colors", "TwoObjTable", clWhite)));
 	ShapeColorThreeObjTable->Brush->Color = TColor(StrToInt(Ini->ReadString("Colors", "ThreeObjTable", clWhite)));
 
+	//Панель "Движение звезд"
 	CheckBoxLabelStar->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckLabelStar", "0")));
 	CheckBoxLabelFrame->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckLabelFrame", "0")));
 
-	EditFilePrefix->Text = Ini->ReadString("File", "FilePrefix", "Img");
-	BeginFromEdit->Text = Ini->ReadString("File", "BeginFrom", "0");
-	SkipFrameCheckBox->Checked = StrToInt(Ini->ReadString("File", "SkipFrame", "1"));
-
+	//Панель "Сводные графики"
 	CheckBoxDateTime->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckDateTime", "1")));
 	CheckBoxCurrentTime->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckCurrentTime", "1")));
 	CheckBoxResultOnly->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "ResultOnly", "1")));
 	CheckBoxOnlySummary->Checked =  (int)StrToInt(Ini->ReadString("CheckBox", "PlotStarGraphs", "0"));
+
+//Вкладка "Файлы"
+	EditFilePrefix->Text = Ini->ReadString("File", "FilePrefix", "Img");
+	BeginFromEdit->Text = Ini->ReadString("File", "BeginFrom", "0");
+	SkipFrameCheckBox->Checked = StrToInt(Ini->ReadString("File", "SkipFrame", "1"));
+
+//Вкладка "Настройки БД"
+	CheckBoxLoadToDb->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckLoadToDb", "0")));
 
 //настройки FormGraphOrient
 	TFormGraphOrient* FormGraphOrient =  dynamic_cast<TFormGraphOrient*>(this->Owner);
@@ -69,15 +80,19 @@ void TFormAnimateSetting::ReadINI(const AnsiString& fileName)
 	FormGraphOrient->FontSizeEdit->Text  = Ini->ReadString("DrawFrag", "FontSize",  "10");
 }
 //---------------------------------------------------------------------------
+
 void TFormAnimateSetting::WriteINI(const AnsiString& fileName)
 {
 	std::unique_ptr<TIniFile> Ini ( new TIniFile(fileName));
 
+//Вкладка "Анимация"
+	//Панель "Таблица объектов"
 	Ini->WriteString("CheckBox", "CheckFillTableObjects",   IntToStr((int)CheckBoxFillTableObjects->Checked));
 	Ini->WriteString("CheckBox", "CheckApplyObjectsSeries", IntToStr((int)CheckBoxApplyObjectsSeries->Checked));
 	Ini->WriteString("Colors", "LocObjTable", IntToStr(ShapeColorLocObjTable->Brush->Color));
 	Ini->WriteString("Colors", "DetObjTable", IntToStr(ShapeColorDetObjTable->Brush->Color));
 
+	//Панель "Таблица фрагментов"
 	Ini->WriteString("CheckBox", "CheckFillTableWindows",   IntToStr((int)CheckBoxFillTableWindows->Checked));
 	Ini->WriteString("CheckBox", "CheckApplyWindowsSeries", IntToStr((int)CheckBoxApplyWindowsSeries->Checked));
 	Ini->WriteString("Colors", "ZeroObjTable", IntToStr(ShapeColorZeroObjTable->Brush->Color));
@@ -85,17 +100,23 @@ void TFormAnimateSetting::WriteINI(const AnsiString& fileName)
 	Ini->WriteString("Colors", "TwoObjTable", IntToStr(ShapeColorTwoObjTable->Brush->Color));
 	Ini->WriteString("Colors", "ThreeObjTable", IntToStr(ShapeColorThreeObjTable->Brush->Color));
 
+	//Панель "Движение звезд"
 	Ini->WriteString("CheckBox", "CheckLabelStar",   IntToStr((int)CheckBoxLabelStar->Checked));
 	Ini->WriteString("CheckBox", "CheckLabelFrame",  IntToStr((int)CheckBoxLabelFrame->Checked));
 
-	Ini->WriteString("File", "FilePrefix", EditFilePrefix->Text);
-	Ini->WriteString("File", "BeginFrom",  BeginFromEdit->Text);
-	Ini->WriteString("File", "SkipFrame",  IntToStr((int)CheckBoxCurrentTime->Checked));
-
+	//Панель "Сводные графики"
 	Ini->WriteString("CheckBox", "DateTime", IntToStr((int)CheckBoxDateTime->Checked));
 	Ini->WriteString("CheckBox", "CheckCurrentTime", IntToStr((int)CheckBoxCurrentTime->Checked));
 	Ini->WriteString("CheckBox", "ResultOnly", IntToStr((int)CheckBoxResultOnly->Checked));
 	Ini->WriteString("CheckBox", "PlotStarGraphs", IntToStr((int)CheckBoxOnlySummary->Checked));
+
+//Вкладка "Файлы"
+	Ini->WriteString("File", "FilePrefix", EditFilePrefix->Text);
+	Ini->WriteString("File", "BeginFrom",  BeginFromEdit->Text);
+	Ini->WriteString("File", "SkipFrame",  IntToStr((int)CheckBoxCurrentTime->Checked));
+
+//Вкладка "Настройки БД"
+	Ini->WriteString("CheckBox", "CheckLoadToDb",   IntToStr((int)CheckBoxLoadToDb->Checked));
 
 //настройки FormGraphOrient
 	TFormGraphOrient* FormGraphOrient = dynamic_cast<TFormGraphOrient*>(this->Owner);
@@ -104,12 +125,11 @@ void TFormAnimateSetting::WriteINI(const AnsiString& fileName)
 	Ini->WriteString("DrawFrag", "FragScale", FormGraphOrient->ScaleEdit->Text);
 	Ini->WriteString("DrawFrag", "PixelSize", FormGraphOrient->PixelSizeEdit->Text);
 	Ini->WriteString("DrawFrag", "FontSize",  FormGraphOrient->FontSizeEdit->Text);
-
-
 }
 //---------------------------------------------------------------------------
+
 void __fastcall TFormAnimateSetting::ShapeColorLocObjTableMouseDown(TObject *Sender, TMouseButton Button,
-          TShiftState Shift, int X, int Y)
+		  TShiftState Shift, int X, int Y)
 {
 	if (ColorDialog1->Execute()) {
 		ShapeColorLocObjTable->Brush->Color=ColorDialog1->Color;

@@ -82,6 +82,17 @@ namespace parse_prot {
 		unsigned short test_short, Reserved[10];
 	};
 
+	struct LOC {
+		// string timeBOKZ;
+		unsigned int timeBOKZ;
+		unsigned short status1, status2;
+		unsigned short serialNumber, timeExp;
+		unsigned short nLocalObj, nFixedObj;
+		float MeanC, SigmaC;
+		float LocalList[32][4];
+		unsigned short Reserved[2];
+	};
+
 	struct MSHI_BOKZM {
 		unsigned short status1, status2;
 		float timeBOKZ;
@@ -118,17 +129,6 @@ namespace parse_prot {
 		float LocalList[MAX_OBJ_BOKZM][4];
 	};
 
-	struct LOC {
-		// string timeBOKZ;
-		unsigned int timeBOKZ;
-		unsigned short status1, status2;
-		unsigned short serialNumber, timeExp;
-		unsigned short nLocalObj, nFixedObj;
-		float MeanC, SigmaC;
-		float LocalList[32][4];
-		unsigned short Reserved[2];
-	};
-
 	static string arrStatErrorEng[MAX_STAT] = {
 		{"EC1"}, {"EC2"}, {"EC3"}, {"EC4"}, {"EC5"}, {"EC6"}, {"EC7"}, {"EC8"},
 		{"EC9"}, {"EC10"}, {"EC11"}, {"EC12"}, {"EC13"}, {"EC14"}, {"EC15"},
@@ -154,6 +154,8 @@ namespace parse_prot {
 
 	int TryReadDTMI(ifstream &finp, struct DTMI &tmi);
 
+	int TryReadLOC(ifstream &finp, struct LOC &tmi);
+
 	void PrintSHTMI1(ofstream &file, struct SHTMI1 tmi);
 
 	void PrintSHTMI2(ofstream &file, struct SHTMI2 tmi);
@@ -162,9 +164,9 @@ namespace parse_prot {
 
 	void PrintLOC(ofstream &file, struct LOC tmi);
 
-	void PrintLocalDTMI(AnsiString fileDir, struct DTMI tmi);
+	void PrintLocalDTMI(AnsiString fileDir, TDateTime curTime, struct DTMI tmi);
 
-	void PrintLocalMLOC(AnsiString fileDir, struct LOC tmi);
+	void PrintLocalMLOC(AnsiString fileDir, TDateTime curTime, struct LOC tmi);
 
 	void ConvertDataDTMI(struct DTMI tmi, struct CadrInfo &mCadr);
 

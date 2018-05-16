@@ -8,11 +8,21 @@
 #pragma link "VCLTee.TeeHighLowLine"
 
 #pragma resource "*.dfm"
-
-extern int NumDoc, NumPar, NumTab, NumImage;
-
 using namespace parse_prot;
 using namespace std;
+
+extern int NumDoc, NumPar, NumTab, NumImage;
+TDateTime zeroDate = EncodeDate(2000, 01, 01);
+
+ofstream fshtmi1, fshtmi2, fdtmi, fmloc;
+bool isSHTMI1 = 0, isSHTMI2 = 0, isDTMI = 0, isMLOC = 0, isOpenDtmi = 0;
+bool isLoadDb = false;
+
+vector <GeneralizedMSHIOR> vGeneralMSHI;
+vector <GeneralizedDTMI>   vGeneralDTMI;
+vector <GeneralizedSHTMI1> vGeneralSHTMI1;
+vector <GeneralizedSHTMI2> vGeneralSHTMI2;
+
 //---------------------------------------------------------------------------
 __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 		: TForm(Owner),
@@ -1903,6 +1913,12 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 	unsigned short ArraySHTMI2[SHTMI2Size];
 	ofstream fmshi, fshtmi1, fshtmi2, fdtmi, ftemp, fpow;
 	bool isMSHI = 0, isSHTMI1 = 0, isSHTMI2 = 0, isDTMI = 0, isTemp = 0, isPower = 0;
+	bool isLoadDb = FormAnimateSetting->CheckBoxLoadToDb->Checked;
+
+	vector <GeneralizedMSHIOR> vGeneralMSHI;
+	vector <GeneralizedDTMI>   vGeneralDTMI;
+	vector <GeneralizedSHTMI1> vGeneralSHTMI1;
+	vector <GeneralizedSHTMI2> vGeneralSHTMI2;
 
     OpenDialog->Options.Clear();
 	OpenDialog->Filter = "txt|*.txt";
@@ -1981,6 +1997,12 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 						fmshi << ang[0] * RTD << "\t";
 						fmshi << ang[1] * RTD << "\t";
 						fmshi << ang[2] * RTD << "\n";
+
+//						if (isLoadDb) {
+//							TDateTime saveTime = StrToDate(toUString(sdate)) +  StrToTime(toUString(stime));
+//							GeneralizedMSHIOR gMSHI = clientDb->convertMSHI_BOKZM(mshi, saveTime, 0);
+//							vGeneralMSHI.push_back(gMSHI);
+//						}
 					}
 				}
 			}
@@ -2025,6 +2047,12 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 						fshtmi1 << shtmi1.Mean << "\t" << shtmi1.Sigma << "\t";
 						fshtmi1 << shtmi1.countDefect << "\t" << shtmi1.Date << "\t";
 						fshtmi1 << shtmi1.verXCF << "\t" << shtmi1.verProg << "\n";
+
+						if (isLoadDb) {
+							TDateTime saveTime = StrToDate(toUString(sdate)) +  StrToTime(toUString(stime));
+							GeneralizedSHTMI1 gSHTMI1 = clientDb->convertSHTMI1_BOKZM(shtmi1, saveTime);
+							vGeneralSHTMI1.push_back(gSHTMI1);
+						}
 					}
 				}
 			}
@@ -2079,12 +2107,18 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
                             fshtmi2 << shtmi2.cntStatOrient[i] << "\t";
 						}
 						fshtmi2 <<"\n";
+
+						if (isLoadDb) {
+							TDateTime saveTime = StrToDate(toUString(sdate)) +  StrToTime(toUString(stime));
+							GeneralizedSHTMI2 gSHTMI2 = clientDb->convertSHTMI2_BOKZM(shtmi2, saveTime);
+							vGeneralSHTMI2.push_back(gSHTMI2);
+						}
 					}
 				}
 			}
 
 //чтение массива ДТМИ
-			if (line.find("ДТМИ") != std::string::npos) {
+			if (line.find("ДТМИ") != std::string::npos){
 				string word1, word2, word3;
 				unsigned int hex_val, dec_val;
 				int cntRecDTMI = 0, ind;
@@ -2118,7 +2152,7 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 					memcpy(&dtmi.LocalList[23][0], &ArrayDTMI[228],28*sizeof(short));
 					memcpy(&dtmi.LocalList[26][2], &ArrayDTMI[260],28*sizeof(short));
 
-					fout<<"\n"<<line<<"\n";
+					fout << "\n" << line << "\n";
 					PrintDTMI_BOKZM(fout, dtmi);
 
 					AnsiString stringSerial;
@@ -2165,13 +2199,21 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 					fdtmi << dtmi.Xg << "\t" << dtmi.Yg << "\t";
 					fdtmi << dtmi.nLocalObj << "\t" << dtmi.nDeterObj << "\n";
 
-					struct CadrInfo mCadr;
-					ConvertDataDTMI_BOKZM(dtmi, mCadr);
-					vCadrInfo.push_back(mCadr);
-					if (mCadr.Time > 0) {
-						plotter->AddPoint(ChartNumLoc, 0, mCadr.Time, mCadr.CountLocalObj);
-					}
+					if ( (dtmi.serialNumber > 0) && (dtmi.serialNumber < 200) ) {
+						if (isLoadDb) {
+							TDateTime saveTime = StrToDate(toUString(sdate)) +  StrToTime(toUString(stime));
+							GeneralizedDTMI gDTMI = clientDb->convertDTMI_BOKZM(dtmi, saveTime);
+							vGeneralDTMI.push_back(gDTMI);
+						}
 
+						struct CadrInfo mCadr;
+						mCadr.Time = newDateTime;
+						ConvertDataDTMI_BOKZM(dtmi, mCadr);
+						vCadrInfo.push_back(mCadr);
+						if (mCadr.Time > 0) {
+							plotter->AddPoint(ChartNumLoc, 0, mCadr.Time, mCadr.CountLocalObj);
+						}
+					}
 				}
 			}
 
@@ -2260,9 +2302,182 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 
 		PrepareStartDraw();
 		CheckTabSheet();
+
+		if (vGeneralSHTMI1.size()) {
+			clientDb->insertSHTMI1(vGeneralSHTMI1, FormAnimateSetting->KAComboBox->Text);
+		}
+		if (vGeneralSHTMI2.size()) {
+			clientDb->insertSHTMI2(vGeneralSHTMI2, FormAnimateSetting->KAComboBox->Text);
+		}
+		if (vGeneralDTMI.size()) {
+			clientDb->insertDTMI(vGeneralDTMI, FormAnimateSetting->KAComboBox->Text);
+		}
+		if (vGeneralMSHI.size()) {
+			clientDb->insertMSHIOR(vGeneralMSHI, FormAnimateSetting->KAComboBox->Text);
+		}
 	}
 }
  //---------------------------------------------------------------------------
+
+ void TFormGraphOrient::OutputDTMI(ofstream &_fout, AnsiString &_SaveDir, DTMI &_tmi)
+ {
+	LOC    mLOC;
+					if (_tmi.status2 == 0x0005) {
+						_tmi.test_short = 0;
+						SwapShort((short*)&_tmi.nWindows, (short*)&_tmi.epsillon);
+						for (int i = 0; i < MAX_WINDOW; i = i + 2) {
+
+							SwapShort((short*)&_tmi.levelWindow[i],
+									  (short*)&_tmi.levelWindow[i+1]);
+							SwapShort((short*)&_tmi.nObjectWindow[i],
+									  (short*)&_tmi.nObjectWindow[i+1]);
+						}
+						SwapShort((short*)&_tmi.nLocal[0], (short*)&_tmi.nLocal[1]);
+						SwapShort((short*)&_tmi.maxHist,   (short*)&_tmi.maxHistX);
+						SwapShort((short*)&_tmi.maxHistY,  (short*)&_tmi.test_short);
+
+						memcpy(&mLOC, &_tmi, sizeof(_tmi));
+
+						TDateTime curDate;
+						curDate.Val = zeroDate.Val + mLOC.timeBOKZ/86400.;
+						_fout << AnsiString(DateTimeToStr(curDate)).c_str() << "\n";
+
+						PrintLOC(_fout, mLOC);
+						PrintLocalMLOC(_SaveDir, curDate, mLOC);
+
+						if (!isMLOC) {
+							isMLOC = true;
+							fmloc.open((_SaveDir + FileTitle + "_mloc.txt").c_str());
+							fmloc << "Date\t";
+							fmloc << "Day/Time\t";
+							fmloc << "KC1\t" << "KC2\t" << "№\t" << "Texp\t";
+							fmloc << "NumLoc\t" << "NumFixed\t";
+							fmloc << "Mean\t" << "Sigma\t";
+							fmloc << "\n";
+						}
+						fmloc << AnsiString(DateToStr(curDate)).c_str() << "\t";
+						fmloc << DayTimeToString(mLOC.timeBOKZ).c_str() << "\t";
+						fmloc << uppercase << hex << setfill('0');
+						fmloc << "0x" << setw(4) << mLOC.status1 << "\t";
+						fmloc << "0x" << setw(4) << mLOC.status2 << "\t";
+						fmloc << dec << setfill(' ');
+						fmloc << setw(6) << mLOC.serialNumber << "\t";
+						fmloc << setw(6) << mLOC.timeExp << "\t";
+						fmloc << setw(6) << mLOC.nLocalObj << "\t";
+						fmloc << setw(6) << mLOC.nFixedObj << "\t";
+						fmloc << setw(6) << mLOC.MeanC << "\t";
+						fmloc << setw(6) << mLOC.SigmaC << "\t";
+						fmloc << "\n";
+
+//						if (isLoadDb) {
+//							TDateTime saveTime;// = StrToDate(toUString(sdate)) +  StrToTime(toUString(stime));
+//							GeneralizedDTMI gDTMI = clientDb->convertDTMI(mDTMI, saveTime);
+//							vGeneralDTMI.push_back(gDTMI);
+//						}
+
+						struct CadrInfo mCadr;
+						ConvertDataLOC(mLOC, mCadr);
+						mCadr.Time = curDate.Val;//cntRecDTMI++;
+						vCadrInfo.push_back(mCadr);
+					}
+					else {
+						TDateTime curDate;
+						curDate.Val = zeroDate.Val + _tmi.timeBOKZ/86400.;
+						_fout << AnsiString(DateTimeToStr(curDate)).c_str() << "\n";
+
+						PrintDTMI(_fout, _tmi);
+						PrintLocalDTMI(_SaveDir, curDate, _tmi);
+
+						if (!isDTMI) {
+							isDTMI = true;
+							fdtmi.open((_SaveDir + FileTitle + "_dtmi.txt").c_str());
+							fdtmi << "Date\t";
+							fdtmi << "Day/Time\t";
+							fdtmi << "TimeLastQ\t";
+							fdtmi << "KC1\t" << "KC2\t" << "№\t" << "Texp\t";
+							fdtmi << "NumLoc\t"  << "NumDet\t" << "NumFrag\t";
+							fdtmi << "NumL[0]\t" << "NumL[1]\t" << "MaxHist\t";
+							fdtmi << "Eps\t" << "DeltaT\t";
+
+							fdtmi << "\n";
+						}
+						fdtmi << AnsiString(DateToStr(curDate)).c_str() << "\t";
+						fdtmi << DayTimeToString(_tmi.timeBOKZ).c_str() << "\t";
+						fdtmi << setw(6) << DayTimeToString(_tmi.timeQuatLast) << "\t";
+						fdtmi << uppercase << hex << setfill('0');
+						fdtmi << "0x" << setw(4) << _tmi.status1 << "\t";
+						fdtmi << "0x" << setw(4) << _tmi.status2 << "\t";
+						fdtmi << dec << setfill(' ');
+						fdtmi << setw(6) << _tmi.serialNumber << "\t";
+						fdtmi << setw(6) << _tmi.timeExp << "\t";
+						fdtmi << setw(6) << _tmi.nLocalObj << "\t";
+						fdtmi << setw(6) << _tmi.nDeterObj << "\t";
+						fdtmi << setw(6) << _tmi.nWindows << "\t";
+						fdtmi << setw(6) << _tmi.nLocal[0] << "\t";
+						fdtmi << setw(6) << _tmi.nLocal[1] << "\t";
+						fdtmi << setw(6) << _tmi.maxHist << "\t";
+						fdtmi << setw(6) << _tmi.epsillon << "\t";
+						fdtmi << setw(6) << _tmi.dTimeBOKZ << "\t";
+						fdtmi << "\n";
+
+						if (isLoadDb) {
+							TDateTime saveTime;// = StrToDate(toUString(sdate)) +  StrToTime(toUString(stime));
+							GeneralizedDTMI gDTMI = clientDb->convertDTMI(_tmi, saveTime);
+							vGeneralDTMI.push_back(gDTMI);
+						}
+
+						struct CadrInfo mCadr;
+						ConvertDataDTMI(_tmi, mCadr);
+						mCadr.Time = curDate.Val;//cntRecDTMI++;
+						vCadrInfo.push_back(mCadr);
+					}
+                    isOpenDtmi = false;
+ }
+
+ void TFormGraphOrient::OutputLOC(ofstream &_fout, AnsiString &_SaveDir, LOC &_tmi)
+ {
+ 						TDateTime curDate;
+						curDate.Val = zeroDate.Val + _tmi.timeBOKZ/86400.;
+						_fout << AnsiString(DateTimeToStr(curDate)).c_str() << "\n";
+
+						PrintLOC(_fout, _tmi);
+						PrintLocalMLOC(_SaveDir, curDate, _tmi);
+
+						if (!isMLOC) {
+							isMLOC = true;
+							fmloc.open((_SaveDir + FileTitle + "_mloc.txt").c_str());
+							fmloc << "Date\t";
+							fmloc << "Day/Time\t";
+							fmloc << "KC1\t" << "KC2\t" << "№\t" << "Texp\t";
+							fmloc << "NumLoc\t" << "NumFixed\t";
+							fmloc << "Mean\t" << "Sigma\t";
+							fmloc << "\n";
+						}
+						fmloc << AnsiString(DateToStr(curDate)).c_str() << "\t";
+						fmloc << DayTimeToString(_tmi.timeBOKZ).c_str() << "\t";
+						fmloc << uppercase << hex << setfill('0');
+						fmloc << "0x" << setw(4) << _tmi.status1 << "\t";
+						fmloc << "0x" << setw(4) << _tmi.status2 << "\t";
+						fmloc << dec << setfill(' ');
+						fmloc << setw(6) << _tmi.serialNumber << "\t";
+						fmloc << setw(6) << _tmi.timeExp << "\t";
+						fmloc << setw(6) << _tmi.nLocalObj << "\t";
+						fmloc << setw(6) << _tmi.nFixedObj << "\t";
+						fmloc << setw(6) << _tmi.MeanC << "\t";
+						fmloc << setw(6) << _tmi.SigmaC << "\t";
+						fmloc << "\n";
+
+//						if (isLoadDb) {
+//							TDateTime saveTime;// = StrToDate(toUString(sdate)) +  StrToTime(toUString(stime));
+//							GeneralizedDTMI gDTMI = clientDb->convertDTMI(mDTMI, saveTime);
+//							vGeneralDTMI.push_back(gDTMI);
+//						}
+
+						struct CadrInfo mCadr;
+						ConvertDataLOC(_tmi, mCadr);
+						mCadr.Time = curDate.Val;//cntRecDTMI++;
+						vCadrInfo.push_back(mCadr);
+ }
 
 
 void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
@@ -2281,171 +2496,203 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 //		SetCurrentDir(CurDir);
 		GetFileTitles(FileName,&FileTitle);
 
+//добавить чтение с формы
+//		zeroDate = (int)FormAnimateSetting->DatePicker1S->DateTime;
+//		zeroDate = EncodeDate(2017, 3, 6);  //145 № 802
+//		zeroDate = EncodeDate(2017, 9, 7);  //145 № 802
+//		zeroDate = EncodeDate(2017, 12, 02);  //145 № 803
+//		zeroDate = EncodeDate(2018, 03, 07);  //145 № 804
+
+//		zeroDate = EncodeDate(2018, 4, 5);  //191 KC
+		zeroDate = EncodeDate(2017, 12, 26);  //191 KC
+
+		bool isLoadDb = FormAnimateSetting->CheckBoxLoadToDb->Checked;
+
 		ifstream finp(FileName.c_str());
 		if (!finp.is_open()) {
 			ShowMessage("Файл не может быть открыт!");
 			return;
 		}
 
-		ofstream fout((SaveDir + FileTitle + "_decode.txt").c_str());
-		ofstream fshtmi1((SaveDir + FileTitle + "_shtmi1.txt").c_str());
-		ofstream fshtmi2((SaveDir + FileTitle + "_shtmi2.txt").c_str());
-		ofstream fdtmi((SaveDir + FileTitle + "_dtmi.txt").c_str());
-		ofstream fmloc((SaveDir + FileTitle + "_mloc.txt").c_str());
-
-		fshtmi1<<"Day/Time\t";
-		fshtmi1<<"KC1\t"<<"KC2\t"<<"POST\t"<<"№\t"<<"Texp\t";
-		fshtmi1<<"Foc\t"<<"Xg\t"<<"Yg\t";
-		fshtmi1<<"Mean\t"<<"Sigma\t";
-		fshtmi1<<"Ndef\t"<<"CRC\t";
-		fshtmi1<<"Date\t"<<"Version\t";
-		fshtmi1<<"\n";
-
-		fshtmi2<<"Day/Time\t";
-		fshtmi2<<"KC1\t"<<"KC2\t"<<"POST\t"<<"№\t"<<"Texp\t";
-		fshtmi2<<"УСД\t"<<"НО\t"<<"НОСЛ\t";
-		fshtmi2<<"TО\t"<<"TОСЛ\t"<<"СЛЕЖ\t";
-		for (int i = 0; i < MAX_STAT; i++) {
-			fshtmi2<<"EC"<<(i+1)<<"\t";
-		}
-		fshtmi2<<"\n";
-
-		fdtmi<<"Day/Time\t";
-		fdtmi<<"KC1\t"<<"KC2\t"<<"№\t"<<"Texp\t";
-		fdtmi<<"NumLoc\t"<<"NumDet\t"<<"NumFrag\t";
-		fdtmi<<"Eps\t"<<"DeltaT\t";
-		fdtmi<<"TimeLastQ\t";
-		fdtmi<<"\n";
-
-		fmloc<<"Day/Time\t";
-		fmloc<<"KC1\t"<<"KC2\t"<<"№\t"<<"Texp\t";
-		fmloc<<"NumLoc\t"<<"NumFixed\t";
-		fmloc<<"Mean\t"<<"Sigma\t";
-		fmloc<<"\n";
-
+		ofstream fout;
+		fout.open((SaveDir + FileTitle + "_decode.txt").c_str());
 		string line;
-		int cntRecDTMI = 0;
 
 		SHTMI1 mSHTMI1;
 		SHTMI2 mSHTMI2;
 		DTMI   mDTMI;
 		LOC    mLOC;
 
+		isOpenDtmi = false;
+
 		while (!finp.eof())
 		{
 			getline(finp, line, '\n' );
-			if (line.find("ШТМИ1")!=string::npos) {
-				if(TryReadSHTMI1(finp, mSHTMI1)) {
+			if ( (line.find("ШТМИ1") != string::npos)
+				   || (line.find("У3-05") != std::string::npos)
+				   || (line.find("U3-5") != std::string::npos)) {
+
+				if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI);
+
+				if (TryReadSHTMI1(finp, mSHTMI1)) {
+
 					PrintSHTMI1(fout, mSHTMI1);
-					fshtmi1<<DayTimeToString(mSHTMI1.timeBOKZ).c_str()<<"\t";
-					fshtmi1<<uppercase<<hex<<setfill('0');
-					fshtmi1<<"0x"<<setw(4)<<mSHTMI1.status1<<"\t";
-					fshtmi1<<"0x"<<setw(4)<<mSHTMI1.status2<<"\t";
-					fshtmi1<<"0x"<<setw(4)<<mSHTMI1.post<<"\t";
-					fshtmi1<<dec<<setfill(' ');
-					fshtmi1<<mSHTMI1.serialNumber<<"\t";
-					fshtmi1<<mSHTMI1.timeExp<<"\t";
-					fshtmi1<<mSHTMI1.Foc<<"\t";
-					fshtmi1<<mSHTMI1.Xg<<"\t";
-					fshtmi1<<mSHTMI1.Yg<<"\t";
-					fshtmi1<<mSHTMI1.Mean<<"\t";
-					fshtmi1<<mSHTMI1.Sigma<<"\t";
-					fshtmi1<<mSHTMI1.countDefect<<"\t";
-					fshtmi1<<mSHTMI1.CRC<<"\t";
-					fshtmi1<<mSHTMI1.Date<<"\t";
-					fshtmi1<<mSHTMI1.Version<<"\t";
-					fshtmi1<<"\n";
+
+					if (!isSHTMI1) {
+						isSHTMI1 = true;
+						fshtmi1.open((SaveDir + FileTitle + "_shtmi1.txt").c_str());
+						fshtmi1 << "Day/Time\t";
+						fshtmi1 << "KC1\t" << "KC2\t" << "POST\t" << "№\t" << "Texp\t";
+						fshtmi1 << "Foc\t" << "Xg\t" << "Yg\t";
+						fshtmi1 << "Mean\t" << "Sigma\t";
+						fshtmi1 << "Ndef\t" << "CRC\t";
+						fshtmi1 << "Date\t" << "Version\t";
+						fshtmi1 << "\n";
+					}
+					fshtmi1 << DayTimeToString(mSHTMI1.timeBOKZ).c_str() << "\t";
+					fshtmi1 << uppercase << hex << setfill('0');
+					fshtmi1 << "0x" << setw(4) << mSHTMI1.status1 << "\t";
+					fshtmi1 << "0x" << setw(4) << mSHTMI1.status2 << "\t";
+					fshtmi1 << "0x" << setw(4) << mSHTMI1.post << "\t";
+					fshtmi1 << dec << setfill(' ');
+					fshtmi1 << mSHTMI1.serialNumber << "\t";
+					fshtmi1 << mSHTMI1.timeExp << "\t";
+					fshtmi1 << mSHTMI1.Foc << "\t";
+					fshtmi1 << mSHTMI1.Xg << "\t";
+					fshtmi1 << mSHTMI1.Yg << "\t";
+					fshtmi1 << mSHTMI1.Mean << "\t";
+					fshtmi1 << mSHTMI1.Sigma << "\t";
+					fshtmi1 << mSHTMI1.countDefect << "\t";
+					fshtmi1 << mSHTMI1.CRC << "\t";
+					fshtmi1 << mSHTMI1.Date << "\t";
+					fshtmi1 << mSHTMI1.Version << "\t";
+					fshtmi1 << "\n";
+
+					if (isLoadDb) {
+						TDateTime saveTime;// = StrToDate(toUString(sdate)) +  StrToTime(toUString(stime));
+						GeneralizedSHTMI1 gSHTMI1 = clientDb->convertSHTMI1(mSHTMI1, saveTime);
+						vGeneralSHTMI1.push_back(gSHTMI1);
+					}
 				}
 			}
-			else if (line.find("ШТМИ2") != string::npos) {
+			else if ( (line.find("ШТМИ2") != string::npos)
+				   || (line.find("У3-06") != std::string::npos)
+				   || (line.find("U3-6") != std::string::npos) ) {
 				if(TryReadSHTMI2(finp, mSHTMI2)) {
+
+					if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI);
+
+					TDateTime curDate;
+					curDate.Val = zeroDate.Val + mSHTMI2.timeBOKZ/86400.;
+					fout << AnsiString(DateTimeToStr(curDate)).c_str() << "\n";
 					PrintSHTMI2(fout, mSHTMI2);
-					fshtmi2<<DayTimeToString(mSHTMI2.timeBOKZ).c_str()<<"\t";
-					fshtmi2<<uppercase<<hex<<setfill('0');
-					fshtmi2<<"0x"<<setw(4)<<mSHTMI2.status1<<"\t";
-					fshtmi2<<"0x"<<setw(4)<<mSHTMI2.status2<<"\t";
-					fshtmi2<<"0x"<<setw(4)<<mSHTMI2.post<<"\t";
-					fshtmi2<<dec<<setfill(' ');
-					fshtmi2<<setw(6)<<mSHTMI2.serialNumber<<"\t";
-					fshtmi2<<setw(6)<<mSHTMI2.timeExp<<"\t";
-					fshtmi2<<setw(6)<<mSHTMI2.cntCommandWord<<"\t";
-					fshtmi2<<setw(6)<<mSHTMI2.cntCallNO<<"\t";
-					fshtmi2<<setw(6)<<mSHTMI2.cntNOtoSLEZH<<"\t";
-					fshtmi2<<setw(6)<<mSHTMI2.cntCallTO<<"\t";
-					fshtmi2<<setw(6)<<mSHTMI2.cntTOtoSLEZH<<"\t";
-					fshtmi2<<setw(8)<<mSHTMI2.cntSLEZH<<"\t";
-					for (int i = 0; i < MAX_STAT; i++) {
-						fshtmi2<<mSHTMI2.cntStatOrient[i]<<"\t";
-					}
-					fshtmi2<<"\n";
-				}
-			}
-			else if (line.find("ДТМИ1")!=string::npos) {
 
-				if (TryReadDTMI(finp, mDTMI)) {
-					struct CadrInfo mCadr;
-
-					if (mDTMI.status2 == 0x0005) {
-						mDTMI.test_short = 0;
-						SwapShort((short*)&mDTMI.nWindows, (short*)&mDTMI.epsillon);
-						for (int i = 0; i < MAX_WINDOW; i = i + 2) {
-
-							SwapShort((short*)&mDTMI.levelWindow[i],
-									  (short*)&mDTMI.levelWindow[i+1]);
-							SwapShort((short*)&mDTMI.nObjectWindow[i],
-									  (short*)&mDTMI.nObjectWindow[i+1]);
+					if (!isSHTMI2) {
+						isSHTMI2 = true;
+						fshtmi2.open((SaveDir + FileTitle + "_shtmi2.txt").c_str());
+						fshtmi2 << "Date\t";
+						fshtmi2 << "Day/Time\t";
+						fshtmi2 << "KC1\t" << "KC2\t" << "POST\t" << "№\t" << "Texp\t";
+						fshtmi2 << "УСД\t" << "НО\t" << "НОСЛ\t";
+						fshtmi2 << "TО\t" << "TОСЛ\t" << "СЛЕЖ\t";
+						for (int i = 0; i < MAX_STAT; i++) {
+							fshtmi2 << "EC" << (i+1) << "\t";
 						}
-						SwapShort((short*)&mDTMI.nLocal[0], (short*)&mDTMI.nLocal[1]);
-						SwapShort((short*)&mDTMI.maxHist, (short*)&mDTMI.maxHistX);
-						SwapShort((short*)&mDTMI.maxHistY, (short*)&mDTMI.test_short);
-
-						memcpy(&mLOC, &mDTMI, sizeof(mDTMI));
-						PrintLOC(fout,mLOC);
-						PrintLocalMLOC(SaveDir + "\\LocalList\\", mLOC);
-
-						fmloc<<DayTimeToString(mLOC.timeBOKZ).c_str()<<"\t";
-						fmloc<<uppercase<<hex<<setfill('0');
-						fmloc<<"0x"<<setw(4)<<mLOC.status1<<"\t";
-						fmloc<<"0x"<<setw(4)<<mLOC.status2<<"\t";
-						fmloc<<dec<<setfill(' ');
-						fmloc<<setw(6)<<mLOC.serialNumber<<"\t";
-						fmloc<<setw(6)<<mLOC.timeExp<<"\t";
-						fmloc<<setw(6)<<mLOC.nLocalObj<<"\t";
-						fmloc<<setw(6)<<mLOC.nFixedObj<<"\t";
-						fmloc<<setw(6)<<mLOC.MeanC<<"\t";
-						fmloc<<setw(6)<<mLOC.SigmaC<<"\t";
-						fmloc<<"\n";
-
-						ConvertDataLOC(mLOC, mCadr);
-						mCadr.Time = cntRecDTMI++;
+						fshtmi2 << "\n";
 					}
-					else {
-						PrintDTMI(fout, mDTMI);
-						PrintLocalDTMI(SaveDir + "\\LocalList\\", mDTMI);
-
-						fdtmi<<mDTMI.timeBOKZ<<"\t";
-						fdtmi<<uppercase<<hex<<setfill('0');
-						fdtmi<<"0x"<<setw(4)<<mDTMI.status1<<"\t";
-						fdtmi<<"0x"<<setw(4)<<mDTMI.status2<<"\t";
-						fdtmi<<dec<<setfill(' ');
-						fdtmi<<setw(6)<<mDTMI.serialNumber<<"\t";
-						fdtmi<<setw(6)<<mDTMI.timeExp<<"\t";
-						fdtmi<<setw(6)<<mDTMI.nLocalObj<<"\t";
-						fdtmi<<setw(6)<<mDTMI.nDeterObj<<"\t";
-						fdtmi<<setw(6)<<mDTMI.nWindows<<"\t";
-						fdtmi<<setw(6)<<mDTMI.epsillon<<"\t";
-						fdtmi<<setw(6)<<mDTMI.dTimeBOKZ<<"\t";
-						fdtmi<<setw(6)<<DayTimeToString(mDTMI.timeQuatLast)<<"\t";
-						fdtmi<<"\n";
-
-						ConvertDataDTMI(mDTMI, mCadr);
-						mCadr.Time=cntRecDTMI++;
+					fshtmi2 << AnsiString(DateToStr(curDate)).c_str() << "\t";
+					fshtmi2 << DayTimeToString(mSHTMI2.timeBOKZ).c_str()<<"\t";
+					fshtmi2 << uppercase << hex << setfill('0');
+					fshtmi2 << "0x" << setw(4) << mSHTMI2.status1 << "\t";
+					fshtmi2 << "0x" << setw(4) << mSHTMI2.status2 << "\t";
+					fshtmi2 << "0x" << setw(4) << mSHTMI2.post << "\t";
+					fshtmi2 << dec << setfill(' ');
+					fshtmi2 << setw(6) << mSHTMI2.serialNumber << "\t";
+					fshtmi2 << setw(6) << mSHTMI2.timeExp << "\t";
+					fshtmi2 << setw(6) << mSHTMI2.cntCommandWord << "\t";
+					fshtmi2 << setw(6) << mSHTMI2.cntCallNO << "\t";
+					fshtmi2 << setw(6) << mSHTMI2.cntNOtoSLEZH << "\t";
+					fshtmi2 << setw(6) << mSHTMI2.cntCallTO << "\t";
+					fshtmi2 << setw(6) << mSHTMI2.cntTOtoSLEZH << "\t";
+					fshtmi2 << setw(8) << mSHTMI2.cntSLEZH << "\t";
+					for (int i = 0; i < MAX_STAT; i++) {
+						fshtmi2 << mSHTMI2.cntStatOrient[i] << "\t";
 					}
-					vCadrInfo.push_back(mCadr);
+					fshtmi2 << "\n";
+
+					if (isLoadDb) {
+						TDateTime saveTime;// = StrToDate(toUString(sdate)) +  StrToTime(toUString(stime));
+						GeneralizedSHTMI2 gSHTMI2 = clientDb->convertSHTMI2(mSHTMI2, saveTime);
+						vGeneralSHTMI2.push_back(gSHTMI2);
+					}
 				}
 			}
+			else if ( (line.find("# ДТМИ1") != string::npos)
+				   || (line.find("У3-07") != std::string::npos)
+				   || (line.find("U3-7") != std::string::npos) ) {
+
+				if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI);
+				isOpenDtmi = true;
+				TryReadDTMI(finp, mDTMI);
+			}
+			else if ( (line.find("# ДТМИ2") != string::npos)
+				   || (line.find("У3-08") != std::string::npos)
+				   || (line.find("U3-8") != std::string::npos) ) {
+				TryReadDTMI(finp, mDTMI);
+			}
+			else if ( (line.find("# ДТМИ3") != string::npos)
+				   || (line.find("У3-09") != std::string::npos)
+				   || (line.find("U3-9") != std::string::npos) ) {
+				TryReadDTMI(finp, mDTMI);
+			}
+			else if ( (line.find("# ДТМИ4") != string::npos)
+				   || (line.find("У3-10") != std::string::npos)
+				   || (line.find("U3-10") != std::string::npos) ) {
+				TryReadDTMI(finp, mDTMI);
+			}
+			else if ( (line.find("# ДТМИ5") != string::npos)
+				   || (line.find("У3-11") != std::string::npos)
+				   || (line.find("U3-11") != std::string::npos) ) {
+				TryReadDTMI(finp, mDTMI);
+			}
+			else if ( (line.find("# ДТМИ6") != string::npos)
+				   || (line.find("У3-12") != std::string::npos)
+				   || (line.find("U3-12") != std::string::npos) ) {
+				TryReadDTMI(finp, mDTMI);
+			}
+			else if ( (line.find("# ДТМИ7") != string::npos)
+				   || (line.find("У3-13") != std::string::npos)
+				   || (line.find("U3-13") != std::string::npos) ) {
+				TryReadDTMI(finp, mDTMI);
+			}
+			else if ( (line.find("# ДТМИ8") != string::npos)
+				   || (line.find("У3-14") != std::string::npos)
+				   || (line.find("U3-14") != std::string::npos) ) {
+				TryReadDTMI(finp, mDTMI);
+			}
+			else if ( (line.find("# ДТМИ9") != string::npos)
+				   || (line.find("У3-15") != std::string::npos)
+				   || (line.find("U3-15") != std::string::npos) ) {
+				TryReadDTMI(finp, mDTMI);
+				if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI);
+			}
+			else if ( (line.find("U3-16") != std::string::npos)
+				   || (line.find("U3-17") != std::string::npos)
+				   || (line.find("U3-18") != std::string::npos)
+				   || (line.find("U3-19") != std::string::npos)
+				   || (line.find("U3-20") != std::string::npos)
+				   || (line.find("U3-21") != std::string::npos)
+				   || (line.find("U3-22") != std::string::npos)
+				   || (line.find("U3-23") != std::string::npos)	) {
+				   TryReadLOC(finp, mLOC);
+				 }
+			else if (line.find("U3-24") != std::string::npos) {
+				TryReadLOC(finp, mLOC);
+				OutputLOC(fout, SaveDir, mLOC);
+            }
 		}
 
+        if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI);
 		finp.close();
 		fout.close();
 		fshtmi1.close();

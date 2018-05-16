@@ -47,6 +47,10 @@ namespace parse_prot {
 						&mmin, &msec) == 4) {
 			dayTime = mday * 86400 + mhour * 3600 +  mmin * 60 + msec;
 		}
+		else if (sscanf(_line.c_str(), " %f-%f:%f:%f", &mday, &mhour,
+						&mmin, &msec) == 4) {
+			dayTime = mday * 86400 + mhour * 3600 +  mmin * 60 + msec;
+		}
 		else if (sscanf(_line.c_str(), "%f:%f:%f", &mhour,
 						&mmin, &msec) == 3) {
 			dayTime = mhour * 3600 + mmin * 60 + msec;
@@ -88,13 +92,13 @@ namespace parse_prot {
 				finp >> word;
 				tmi.status2 = ReadBinaryString(word);
 			}
-			else if ((word == "—≈–") || (word == "CEP") || (word == "—EP")) {
+			else if ((word == "—≈–") || (word == "CEP") || (word == "—EP") || (word == "—E–")) {
 				finp >> word;
-				if ((word == "ÕŒÃ") || (word == "HOM")) {
+				if ((word == "ÕŒÃ") || (word == "HOM")|| (word == "ÕŒM")) {
 					finp >> tmi.serialNumber;
 				}
 			}
-			else if ((word == "œŒ—“") || (word == "œOCT")) {
+			else if ((word == "œŒ—“") || (word == "œOCT") || (word == "œO—T")) {
 				finp >> word;
 				tmi.post = ReadBinaryString(word);
 			}
@@ -131,28 +135,28 @@ namespace parse_prot {
 				finp >> tmi.Version;
 				return 1;
 			}
-			else
-			{
-				unsigned short testArr[32];
-				int cntWord = 0;
-				while ((cntWord < 32) && (word.find("-----") == string::npos)) {
-					int highByte = ReadBinaryString(word);
-					finp >> word;
-					int lowByte = ReadBinaryString(word);
-					finp >> word;
-					testArr[cntWord] = (highByte << 8) | (lowByte);
-					cntWord++;
-				}
-				if ( (cntWord == 32) && (testArr[0] == 0x42C3) && (testArr[1] == 0x5AAA) ){
-					SwapShort((short *)&testArr[2],  (short *)&testArr[3]);
-					SwapShort((short *)&testArr[8],  (short *)&testArr[9]);
-					SwapShort((short *)&testArr[10], (short *)&testArr[11]);
-					SwapShort((short *)&testArr[12], (short *)&testArr[13]);
-					memcpy(&tmi, &testArr[2], sizeof(tmi));
-					return 1;
-				}
-			}
-			getline(finp, line, '\n');
+//			else
+//			{
+//				unsigned short testArr[32];
+//				int cntWord = 0;
+//				while ((cntWord < 32) && (word.find("-----") == string::npos)) {
+//					int highByte = ReadBinaryString(word);
+//					finp >> word;
+//					int lowByte = ReadBinaryString(word);
+//					finp >> word;
+//					testArr[cntWord] = (highByte << 8) | (lowByte);
+//					cntWord++;
+//				}
+//				if ( (cntWord == 32) && (testArr[0] == 0x42C3) && (testArr[1] == 0x5AAA) ){
+//					SwapShort((short *)&testArr[2],  (short *)&testArr[3]);
+//					SwapShort((short *)&testArr[8],  (short *)&testArr[9]);
+//					SwapShort((short *)&testArr[10], (short *)&testArr[11]);
+//					SwapShort((short *)&testArr[12], (short *)&testArr[13]);
+//					memcpy(&tmi, &testArr[2], sizeof(tmi));
+//					return 1;
+//				}
+//			}
+//			getline(finp, line, '\n');
 		}
 		return 0;
 	}
@@ -170,13 +174,13 @@ namespace parse_prot {
 				finp >> word;
 				tmi.status2 = ReadBinaryString(word);
 			}
-			else if ((word == "—≈–") || (word == "CEP")) {
+			else if ((word == "—≈–") || (word == "CEP") || (word == "—EP") || (word == "—E–")) {
 				finp >> word;
-				if ((word == "ÕŒÃ") || (word == "HOM")) {
+				if ((word == "ÕŒÃ") || (word == "HOM")|| (word == "ÕŒM")) {
 					finp >> tmi.serialNumber;
 				}
 			}
-			else if ((word == "œŒ—“") || (word == "œOCT")) {
+			else if ((word == "œŒ—“") || (word == "œOCT") || (word == "œO—T")) {
 				finp >> word;
 				tmi.post = ReadBinaryString(word);
 			}
@@ -230,26 +234,25 @@ namespace parse_prot {
 						return 1;
 					}
 			}
-			else {
-				unsigned short testArr[32];
-				int cntWord = 0;
-				while ((cntWord < 32) && (word.find("-----") == string::npos)) {
-					int highByte = ReadBinaryString(word);
-					finp >> word;
-					int lowByte = ReadBinaryString(word);
-                    finp >> word;
-					testArr[cntWord] = (highByte << 8) | (lowByte);
-					cntWord++;
-				}
-				if ( (cntWord == 32) && (testArr[0] == 0x42C3) && (testArr[1] == 0x6AAA) ){
-					SwapShort((short *)&testArr[2],  (short *)&testArr[3]);
-					SwapShort((short *)&testArr[14], (short *)&testArr[15]);
-					memcpy(&tmi, &testArr[2], sizeof(tmi));
-                    return 1;
-				}
-			}
-
-			getline(finp, line, '\n');
+//			else {
+//				unsigned short testArr[32];
+//				int cntWord = 0;
+//				while ((cntWord < 32) && (word.find("-----") == string::npos)) {
+//					int highByte = ReadBinaryString(word);
+//					finp >> word;
+//					int lowByte = ReadBinaryString(word);
+//					finp >> word;
+//					testArr[cntWord] = (highByte << 8) | (lowByte);
+//					cntWord++;
+//				}
+//				if ( (cntWord == 32) && (testArr[0] == 0x42C3) && (testArr[1] == 0x6AAA) ){
+//					SwapShort((short *)&testArr[2],  (short *)&testArr[3]);
+//					SwapShort((short *)&testArr[14], (short *)&testArr[15]);
+//					memcpy(&tmi, &testArr[2], sizeof(tmi));
+//					return 1;
+//				}
+//			}
+//			getline(finp, line, '\n');
 		}
 		return 0;
 	}
@@ -260,7 +263,7 @@ namespace parse_prot {
 		float fl1, fl2, fl3, sum;
 		int Stat1, Stat2;
 
-		while (!finp.eof()) {
+		while ( (!finp.eof()) && (word.find("-----") == string::npos)) {
 			finp >> word;
 			if ((word == " —1") || (word == "KC1")) {
 				finp >> word;
@@ -270,9 +273,9 @@ namespace parse_prot {
 				finp >> word;
 				tmi.status2 = ReadBinaryString(word);
 			}
-			else if ((word == "—≈–") || (word == "CEP")) {
+			else if ((word == "—≈–") || (word == "CEP") || (word == "—EP") || (word == "—E–")) {
 				finp >> word;
-				if ((word == "ÕŒÃ") || (word == "HOM")) {
+				if ((word == "ÕŒÃ") || (word == "HOM")|| (word == "ÕŒM")) {
 					finp >> tmi.serialNumber;
 				}
 			}
@@ -305,7 +308,8 @@ namespace parse_prot {
 				}
 				else {
 					getline(finp, line, '\n');
-					tmi.timeQuatLast = StringToDayTime(line);
+					word = word + line;
+					tmi.timeBOKZ = StringToDayTime(word);
 				}
 			}
 			else if (word == "ÀŒ ") {
@@ -385,37 +389,138 @@ namespace parse_prot {
 				finp >> tmi.maxHistY;
 				return 1;
 			}
-			else {
-				unsigned short testArr[32];
-				int cntWord = 0;
-				while ((cntWord < 32) && (word.find("-----") == string::npos)) {
-					int highByte = ReadBinaryString(word);
-					finp >> word;
-					int lowByte = ReadBinaryString(word);
-                    finp >> word;
-					testArr[cntWord] = (highByte << 8) | (lowByte);
-					cntWord++;
-				}
-				if ( (cntWord == 32) && (testArr[0] == 0x42C3) && (testArr[1] == 0x7AAA) ){
-					for (int iWord = 12; iWord <= 30; iWord = iWord + 2) {
-						SwapShort((short *)&testArr[iWord],  (short *)&testArr[iWord+1]);
-					}
-					memcpy(&tmi, &testArr[2], 30 * sizeof(short));
-				}
+//			else {
+//				unsigned short testArr[32];
+//				int cntWord = 0;
+//				while ((cntWord < 32) && (word.find("-----") == string::npos)) {
+//					int highByte = ReadBinaryString(word);
+//					finp >> word;
+//					int lowByte = ReadBinaryString(word);
+//                    finp >> word;
+//					testArr[cntWord] = (highByte << 8) | (lowByte);
+//					cntWord++;
+//				}
+//				if ( (cntWord == 32) && (testArr[0] == 0x42C3) && (testArr[1] == 0x7AAA) ){
+//					for (int iWord = 12; iWord <= 30; iWord = iWord + 2) {
+//						SwapShort((short *)&testArr[iWord],  (short *)&testArr[iWord+1]);
+//					}
+//					memcpy(&tmi, &testArr[2], 30 * sizeof(short));
+//				}
+//
+//				while ((line.find("ƒ“Ã»")==string::npos) && (!finp.eof())) {
+//					getline(finp, line, '\n' );
+//				}
+//				finp >> word;
+//					if ( (cntWord == 32) && (testArr[0] == 0x42C3) && (testArr[1] == 0x8AAA) ){
+//						for (int iWord = 2; iWord <= 30; iWord = iWord + 2) {
+//							SwapShort((short *)&testArr[iWord],  (short *)&testArr[iWord+1]);
+//						}
+//						memcpy(&tmi.LocalList[2][1], &testArr[2], 30 * sizeof(short));
+//						return 1;
+//					}
+//
+//            }
+//			getline(finp, line, '\n');
+		}
+		return 0;
+	}
 
-				while ((line.find("ƒ“Ã»")==string::npos) && (!finp.eof())) {
-					getline(finp, line, '\n' );
-				}
+	int TryReadLOC(ifstream &finp, struct LOC &tmi) {
+		string line, word, inpstr, test_word, test_str;
+		int indexObject = 0, indexParam = 0, intVal, flLow = 1;
+		float fl1, fl2, fl3, sum;
+		int Stat1, Stat2;
+
+		while ( (!finp.eof()) && (word.find("-----") == string::npos)) {
+			finp >> word;
+			if ((word == " —1") || (word == "KC1")) {
 				finp >> word;
-					if ( (cntWord == 32) && (testArr[0] == 0x42C3) && (testArr[1] == 0x8AAA) ){
-						for (int iWord = 2; iWord <= 30; iWord = iWord + 2) {
-							SwapShort((short *)&testArr[iWord],  (short *)&testArr[iWord+1]);
-						}
-						memcpy(&tmi.LocalList[2][1], &testArr[2], 30 * sizeof(short));
-						return 1;
-					}
-
-            }
+				tmi.status1 = ReadBinaryString(word);
+			}
+			else if ((word == " —2") || (word == "KC2")) {
+				finp >> word;
+				tmi.status2 = ReadBinaryString(word);
+			}
+			else if ((word == "—≈–") || (word == "CEP") || (word == "—EP") || (word == "—E–")) {
+				finp >> word;
+				if ((word == "ÕŒÃ") || (word == "HOM")|| (word == "ÕŒM")) {
+					finp >> tmi.serialNumber;
+				}
+			}
+			else if ((word == "T") || (word == "“")) {
+				finp >> word;
+				if (word == "› —œ")
+					finp >> tmi.timeExp;
+				else {
+					getline(finp, line, '\n');
+					word = word + line;
+					tmi.timeBOKZ = StringToDayTime(word);
+				}
+			}
+			else if ((word == "HAM") || (word == "Õ¿Ã") || (word == "Õ¿M")) {
+				finp >> word;
+				if ((word == "ÀŒ ") || (word == "ÀO ")) {
+					finp >> tmi.nLocalObj;
+				}
+				else if ((word == "Œ¡∆") || (word == "O¡∆")) {
+					finp >> tmi.nFixedObj;
+				}
+			}
+			else if (word == "Ã≈¿Õ") {
+				finp >> tmi.MeanC;
+			}
+			else if (word == "—»√Ã¿") {
+				finp >> tmi.SigmaC;
+			}
+			else if (word == "Õ œ» —") {
+				finp >> tmi.Reserved[0];
+			}
+			else if (word == "ÀŒ ") {
+				getline(finp, line, '\n');
+				int nread = sscanf(line.c_str(), "%f%f%f", &fl1, &fl2, &fl3);
+				if (nread == 3) {
+					indexObject = (short)fl1;
+					indexParam  = (short)fl2;
+					tmi.LocalList[indexObject][indexParam] = fl3;
+				}
+				else if (nread == 2) {
+					indexObject = (short)(fl1 / 10.);
+					indexParam = (short)fl1 % 10;
+					tmi.LocalList[indexObject][indexParam] = fl2;
+				}
+			}
+//			else {
+//				unsigned short testArr[32];
+//				int cntWord = 0;
+//				while ((cntWord < 32) && (word.find("-----") == string::npos)) {
+//					int highByte = ReadBinaryString(word);
+//					finp >> word;
+//					int lowByte = ReadBinaryString(word);
+//                    finp >> word;
+//					testArr[cntWord] = (highByte << 8) | (lowByte);
+//					cntWord++;
+//				}
+//				if ( (cntWord == 32) && (testArr[0] == 0x42C3) && (testArr[1] == 0x7AAA) ){
+//					for (int iWord = 12; iWord <= 30; iWord = iWord + 2) {
+//						SwapShort((short *)&testArr[iWord],  (short *)&testArr[iWord+1]);
+//					}
+//					memcpy(&tmi, &testArr[2], 30 * sizeof(short));
+//				}
+//
+//				while ((line.find("ƒ“Ã»")==string::npos) && (!finp.eof())) {
+//					getline(finp, line, '\n' );
+//				}
+//				finp >> word;
+//					if ( (cntWord == 32) && (testArr[0] == 0x42C3) && (testArr[1] == 0x8AAA) ){
+//						for (int iWord = 2; iWord <= 30; iWord = iWord + 2) {
+//							SwapShort((short *)&testArr[iWord],  (short *)&testArr[iWord+1]);
+//						}
+//						memcpy(&tmi.LocalList[2][1], &testArr[2], 30 * sizeof(short));
+//						return 1;
+//					}
+//
+//            }
+//			getline(finp, line, '\n');
 		}
 		return 0;
 	}
@@ -490,7 +595,14 @@ namespace parse_prot {
 		for (int i = 0; i < MAX_OBJ_DTMI; i++) {
 			file << setw(6) << (i + 1) << "\t";
 			file << tmi.LocalList[i][0] << "\t" << tmi.LocalList[i][1] << "\t";
-			file << tmi.LocalList[i][2] << "\t" << tmi.LocalList[i][3] << "\n";
+			file << tmi.LocalList[i][2] << "\t";
+			if (tmi.LocalList[i][3] < 1) {
+				short *level, *size;
+				size = (short *)(&tmi.LocalList[i][3]);
+				level = (short *)(size + 1);
+				file << *size << "\t" << *level << "\n";
+			}
+			else file << tmi.LocalList[i][3] << "\n";
 		}
 		file << setw(6) << "π" << " X, pix" << " Y, pix" << "\n";
 		for (int i = 0; i < MAX_WINDOW; i++) {
@@ -498,6 +610,10 @@ namespace parse_prot {
 			file << tmi.centrWindow[i][0] << "\t" << tmi.centrWindow[i][1]
 				<< "\t";
 			file << tmi.levelWindow[i] << "\t" << tmi.nObjectWindow[i] << "\n";
+		}
+
+		for (int i = 0; i < 4; i++) {
+			file << "Qapr[" << i << "]:\t" << tmi.quatBoard[i] << "\n";
 		}
 
 		for (int i = 0; i < 3; i++) {
@@ -521,7 +637,7 @@ namespace parse_prot {
 	void PrintLOC(ofstream &file, struct LOC tmi) {
 		file << "____________________________________" << "\n";
 		file << "Ã‡ÒÒË‚ ÃÀŒ " << "\n";
-		file << "Tpr\t" << DayTimeToString(tmi.timeBOKZ) << "\n";
+		file << "Tpr\t" << DayTimeToString(tmi.timeBOKZ).c_str() << "\n";
 		file << uppercase << hex << setfill('0');
 		file << " —1\t" << "0x" << setw(4) << tmi.status1 << "\n";
 		file << " —2\t" << "0x" << setw(4) << tmi.status2 << "\n";
@@ -537,30 +653,40 @@ namespace parse_prot {
 		for (int i = 0; i < 32; i++) {
 			file << setw(6) << (i + 1) << "\t";
 			file << tmi.LocalList[i][0] << "\t" << tmi.LocalList[i][1] << "\t";
-			file << tmi.LocalList[i][2] << "\t" << tmi.LocalList[i][3] << "\n";
+			file << tmi.LocalList[i][2] << "\t";
+			if (tmi.LocalList[i][3] < 1) {
+				short *level, *size;
+				size = (short *)(&tmi.LocalList[i][3]);
+				level = (short *)(size + 1);
+				file << *size << "\t" << *level << "\n";
+			}
+			else file << tmi.LocalList[i][3] << "\n";
 		}
 
 		file << "____________________________________" << "\n";
 		file << flush;
 	}
 
-	void PrintLocalDTMI(AnsiString fileDir, struct DTMI tmi) {
+	void PrintLocalDTMI(AnsiString fileDir, TDateTime curTime, struct DTMI tmi) {
 
-		AnsiString fileName;
-		fileName.printf("BOKZ_π%d_%s", tmi.serialNumber, DayTimeToString(tmi.timeBOKZ).c_str());
-		fileName += "_DTMI_LOC.txt";
+		AnsiString stringSerial, localDir, localName;
+		TFormatSettings curFormat;
 
-		for (int i = 1; i < fileName.Length() + 1; i++) {
-			if ((fileName[i] == ':') || (fileName[i] == ';') ||
-				(fileName[i] == '?') || (fileName[i] == '>') ||
-				(fileName[i] == '<') || (fileName[i] == '=') ||
-				(fileName[i] == '/') || (fileName[i] == '\\')) {
-				fileName[i] = '_';
-			}
-		}
+		stringSerial.sprintf("«‡‚. π %02d", tmi.serialNumber);
+		localDir = fileDir + "\\" + stringSerial;
+		CreateDir(localDir);
+//		localDir = localDir + "\\" + AnsiString(DateToStr(curTime)).c_str();
+//		CreateDir(localDir);
 
-		CreateDir(UnicodeString(fileDir));
-		ofstream file((fileDir + fileName).c_str());
+		curFormat.ShortDateFormat = "yyyy_mm_dd";
+		curFormat.LongTimeFormat  = "hh_nn_ss_zzz";
+		localName.sprintf("%s_%s_DTMI_LOC.txt",
+				AnsiString(DateToStr(curTime, curFormat)).c_str(),
+				AnsiString(TimeToStr(curTime, curFormat)).c_str());
+		CheckFileName(localName);
+		localName = localDir + "\\" + localName;
+
+		ofstream file(localName.c_str());
 		file << setw(6) << "π" << " X, pix" << " Y, pix" << " Bright" <<
 			" Nel" << "\n";
 
@@ -577,31 +703,33 @@ namespace parse_prot {
 				short *level, *size;
 				size = (short *)(&tmi.LocalList[i][3]);
 				level = (short *)(size + 1);
-				file << *size << "\t" << *level << "\n";
+				file << abs(*size) << "\t" << *level << "\n";
 			}
-			else file << tmi.LocalList[i][3] << "\n";
+			else file << fabs(tmi.LocalList[i][3]) << "\n";
 		}
 		file.close();
 	}
 
-	void PrintLocalMLOC(AnsiString fileDir, struct LOC tmi) {
+	void PrintLocalMLOC(AnsiString fileDir, TDateTime curTime, struct LOC tmi) {
 
-		AnsiString fileName;
-		fileName.printf("BOKZ_π%d_%s", tmi.serialNumber,
-			DayTimeToString(tmi.timeBOKZ).c_str());
-		fileName += "_MLOC_LOC.txt";
+		AnsiString stringSerial, localDir, localName;
+		TFormatSettings curFormat;
 
-		for (int i = 1; i < fileName.Length() + 1; i++) {
-			if ((fileName[i] == ':') || (fileName[i] == ';') ||
-				(fileName[i] == '?') || (fileName[i] == '>') ||
-				(fileName[i] == '<') || (fileName[i] == '=') ||
-				(fileName[i] == '/') || (fileName[i] == '\\')) {
-				fileName[i] = '_';
-			}
-		}
+		stringSerial.sprintf("«‡‚. π %02d", tmi.serialNumber);
+		localDir = fileDir + "\\" + stringSerial;
+		CreateDir(localDir);
+//		localDir = localDir + "\\" + AnsiString(DateToStr(curTime)).c_str();
+//		CreateDir(localDir);
 
-		CreateDir(UnicodeString(fileDir));
-		ofstream file((fileDir+fileName).c_str());
+		curFormat.ShortDateFormat = "yyyy_mm_dd";
+		curFormat.LongTimeFormat  = "hh_nn_ss_zzz";
+		localName.sprintf("%s_%s_MLOC_LOC.txt",
+				AnsiString(DateToStr(curTime, curFormat)).c_str(),
+				AnsiString(TimeToStr(curTime, curFormat)).c_str());
+		CheckFileName(localName);
+		localName = localDir + "\\" + localName;
+
+		ofstream file(localName.c_str());
 
 		file << setw(6) << "π" << " X, pix" << " Y, pix" << " Bright" <<
 			" Nel" << "\n";
@@ -618,7 +746,7 @@ namespace parse_prot {
 				short *level, *size;
 				size = (short *)(&tmi.LocalList[i][3]);
 				level = (short *)(size + 1);
-				file << *size << "\t" << *level << "\n";
+				file << abs(*size) << "\t" << *level << "\n";
 			}
 			else file << tmi.LocalList[i][3] << "\n";
 		}
@@ -750,7 +878,7 @@ namespace parse_prot {
 		mCadr.ImageHeight = 512;
 		mCadr.ImageWidth = 512;
 	//	mCadr.Time=data.Tpr_sec+data.Tpr_msec/1000.;
-    	mCadr.Time = tmi.timeBOKZ;
+//    	mCadr.Time = tmi.timeBOKZ;
 		mCadr.CountLocalObj = tmi.nLocalObj;
 
 		if (tmi.nLocalObj < MAX_OBJ_BOKZM) mCadr.SizeObjectsList = tmi.nLocalObj;

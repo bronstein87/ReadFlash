@@ -477,6 +477,9 @@ private: // User declarations
 	void __fastcall ChartMouseDown(TObject *Sender, TMouseButton Button,
 		TShiftState Shift, int X, int Y);
 
+
+	void OutputDTMI(ofstream &_fout, AnsiString &_SaveDir, DTMI &_tmi);
+	void OutputLOC(ofstream &_fout, AnsiString &_SaveDir, LOC &_tmi);
 	void StartPrintReport(IKI_img* reader);
 	void PrintReportRes(vector<CadrInfo>& cadrInfo);
 	void CalculateSeriesSKO();
@@ -503,6 +506,7 @@ private: // User declarations
 
 	std::unique_ptr<SimplePlotter>plotter;
 	std::unique_ptr<FragmentPainter>fPainter;
+	std::unique_ptr<DbClient> clientDb;
 
 	float ScaleFactorForScrollBox;
 	int ScaleFactorForImage;

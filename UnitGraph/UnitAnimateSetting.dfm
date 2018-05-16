@@ -19,10 +19,9 @@ object FormAnimateSetting: TFormAnimateSetting
     Top = 0
     Width = 368
     Height = 558
-    ActivePage = ShowPage
+    ActivePage = DBOptionsPage
     Align = alClient
     TabOrder = 0
-    ExplicitLeft = -8
     object ShowPage: TTabSheet
       Caption = #1040#1085#1080#1084#1072#1094#1080#1103
       object GroupBox1: TGroupBox
@@ -331,18 +330,62 @@ object FormAnimateSetting: TFormAnimateSetting
       ImageIndex = 2
       object Label9: TLabel
         Left = 19
-        Top = 13
+        Top = 45
         Width = 65
         Height = 13
         Caption = #1053#1072#1079#1074#1072#1085#1080#1077' '#1050#1040
       end
+      object Label11: TLabel
+        Left = 19
+        Top = 107
+        Width = 87
+        Height = 13
+        Caption = #1047#1072#1074#1086#1076#1089#1082#1086#1081' '#1085#1086#1084#1077#1088
+      end
+      object Label10: TLabel
+        Left = 19
+        Top = 165
+        Width = 134
+        Height = 13
+        Caption = #1044#1072#1090#1072' '#1086#1073#1085#1091#1083#1077#1085#1080#1103' 1-'#1089' '#1084#1077#1090#1082#1080
+      end
       object KAComboBox: TComboBox
         Left = 19
-        Top = 32
+        Top = 64
         Width = 145
         Height = 21
         TabOrder = 0
         Text = #1053#1077#1090' '#1087#1086#1076#1082#1083#1102#1095#1077#1085#1080#1103
+      end
+      object ComboBox1: TComboBox
+        Left = 19
+        Top = 126
+        Width = 145
+        Height = 21
+        Hint = #1058#1086#1083#1100#1082#1086' '#1076#1083#1103' '#1084#1072#1089#1089#1080#1074#1086#1074' '#1052#1064#1048#1054#1056
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 1
+        Text = #1053#1077#1090' '#1087#1086#1076#1082#1083#1102#1095#1077#1085#1080#1103
+      end
+      object DatePicker1S: TDateTimePicker
+        Left = 19
+        Top = 184
+        Width = 145
+        Height = 21
+        Date = 43157.546610416670000000
+        Time = 43157.546610416670000000
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 2
+      end
+      object CheckBoxLoadToDb: TCheckBox
+        Left = 19
+        Top = 12
+        Width = 145
+        Height = 17
+        Caption = #1047#1072#1075#1088#1091#1078#1072#1090#1100' '#1076#1072#1085#1085#1099#1077' '#1074' '#1041#1044
+        TabOrder = 3
       end
     end
   end
