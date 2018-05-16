@@ -532,7 +532,9 @@ public: // User declarations
 	void PrintTableObjectsHandler(void);
 	void DrawAnimateHandler(void);
 	void SetVisibleLabelFrame(bool isVisible);
-    void SetVisibleLabelStar(bool isVisible);
+	void SetVisibleLabelStar(bool isVisible);
+	void PrepareChartFrag(TColor *_colorFrag, const int _maxDrawFrag);
+	void DrawChartFrag(const TColor *_colorFrag, const int _maxDrawFrag, CadrInfo& _cadrInfo);
 
 	AnsiString SourceDir;
 

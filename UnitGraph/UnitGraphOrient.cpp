@@ -3094,6 +3094,66 @@ void TFormGraphOrient::CalculateSeriesSKO()
 //		AddRowToStatTable(numberRow++, "Wz_model, угл. мин/с", statParam, 8, 4);
 //	}
 }
+
+void TFormGraphOrient::PrepareChartFrag(TColor *_colorFrag, const int _maxDrawFrag)
+{
+	for (int iFrag  = 0; iFrag < _maxDrawFrag; iFrag++) {
+		_colorFrag[iFrag] = RGB((float)(_maxDrawFrag - iFrag) / _maxDrawFrag * 255,
+							200, (float)iFrag / _maxDrawFrag * 255 );
+		plotter->SetShowLines(true);
+		plotter->SetSeriesColor(_colorFrag[iFrag]);
+		plotter->SetTitle(IntToStr(iFrag + 1));
+		plotter->SetDateTimeX(FormAnimateSetting->CheckBoxDateTime->Checked);
+
+		plotter->AddSeries(ChartFragBright, iFrag, _colorFrag[iFrag]);
+		plotter->AddSeries(ChartFragSizeEl, iFrag, _colorFrag[iFrag]);
+		plotter->AddSeries(ChartFragErrX, iFrag, _colorFrag[iFrag]);
+		plotter->AddSeries(ChartFragErrY, iFrag, _colorFrag[iFrag]);
+
+		plotter->AddSeries(ChartFragMean, iFrag, _colorFrag[iFrag]);
+		plotter->AddSeries(ChartFragNoise, iFrag, _colorFrag[iFrag]);
+		plotter->AddSeries(ChartFragLevel, iFrag, _colorFrag[iFrag]);
+	}
+}
+
+void TFormGraphOrient::DrawChartFrag(const TColor *_colorFrag, const int _maxDrawFrag, CadrInfo& _cadrInfo)
+{
+	int iObject = 0;
+	double Time =  _cadrInfo.Time;
+
+	plotter->SetShowLines(true);
+	for (int iFrag  = 0; iFrag < _cadrInfo.SizeWindowsList; iFrag++) {
+
+		plotter->SetSeriesColor(_colorFrag[iFrag]);
+		plotter->SetTitle(IntToStr(iFrag + 1));
+
+		plotter->AddPoint(ChartFragMean, iFrag, Time,
+			_cadrInfo.WindowsList[iFrag].Mean);
+		plotter->AddPoint(ChartFragNoise, iFrag, Time,
+			_cadrInfo.WindowsList[iFrag].Sigma);
+		plotter->AddPoint(ChartFragLevel, iFrag, Time,
+			_cadrInfo.WindowsList[iFrag].Level);
+
+		for (int iObjFrag = 0; iObjFrag < _cadrInfo.WindowsList[iFrag].CountObj; iObjFrag++) {
+			if (iFrag < _maxDrawFrag) {
+				plotter->AddPoint(ChartFragBright, iFrag, Time,
+					_cadrInfo.ObjectsList[iObject].Bright);
+				if (_cadrInfo.ObjectsList[iObject].Square) {
+					plotter->AddPoint(ChartFragSizeEl, iFrag, Time,
+					_cadrInfo.ObjectsList[iObject].Square);
+				}
+				if (_cadrInfo.ObjectsList[iObject].StarID) {
+					plotter->AddPoint(ChartFragErrX, iFrag, Time,
+						_cadrInfo.ObjectsList[iObject].Dx*1000.);
+					plotter->AddPoint(ChartFragErrY, iFrag, Time,
+						_cadrInfo.ObjectsList[iObject].Dy*1000.);
+				}
+			}
+			iObject++;
+		}
+	}
+}
+
 void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 {
 	const int maxDrawFrag = 12;
@@ -3115,22 +3175,7 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 			if (FileOpenDialog1->Execute())
 			{
 				FileTitle = "IKI";
-				for (int iFrag  = 0; iFrag < maxDrawFrag; iFrag++) {
-					colorFrag[iFrag] = RGB((float)(maxDrawFrag - iFrag) / maxDrawFrag * 255,
-												200, (float)iFrag / maxDrawFrag * 255 );
-					plotter->SetShowLines(true);
-					plotter->SetSeriesColor(colorFrag[iFrag]);
-					plotter->SetTitle(IntToStr(iFrag + 1));
-					plotter->SetDateTimeX(FormAnimateSetting->CheckBoxDateTime->Checked);
-
-					plotter->AddSeries(ChartFragBright, iFrag, colorFrag[iFrag]);
-					plotter->AddSeries(ChartFragSizeEl, iFrag, colorFrag[iFrag]);
-					plotter->AddSeries(ChartFragErrX, iFrag, colorFrag[iFrag]);
-					plotter->AddSeries(ChartFragErrY, iFrag, colorFrag[iFrag]);
-					plotter->AddSeries(ChartFragMean, iFrag, colorFrag[iFrag]);
-					plotter->AddSeries(ChartFragNoise, iFrag, colorFrag[iFrag]);
-					plotter->AddSeries(ChartFragLevel, iFrag, colorFrag[iFrag]);
-				}
+				PrepareChartFrag(colorFrag, maxDrawFrag);
 
 				UnicodeString filePrefix = FormAnimateSetting->EditFilePrefix->Text;
 				unsigned short startFrom = StrToInt(FormAnimateSetting->BeginFromEdit->Text);
@@ -3239,36 +3284,9 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 								plotter->AddPoint(ChartWz, 1, Time, vCadrInfo.back().OmegaOrient[2] * RTM);
 
 							//статистика по фрагментам
+								DrawChartFrag(colorFrag, maxDrawFrag, vCadrInfo.back());
 
-									int iObject = 0;
-									for (int iFrag  = 0; iFrag < vCadrInfo.back().SizeWindowsList; iFrag++) {
-										plotter->SetSeriesColor(colorFrag[iFrag]);
-										plotter->AddPoint(ChartFragMean, iFrag, Time,
-																	vCadrInfo.back().WindowsList[iFrag].Mean);
-										plotter->AddPoint(ChartFragNoise, iFrag, Time,
-																	vCadrInfo.back().WindowsList[iFrag].Sigma);
-										plotter->AddPoint(ChartFragLevel, iFrag, Time,
-																	vCadrInfo.back().WindowsList[iFrag].Level);
-										for (int iObjFrag = 0; iObjFrag < vCadrInfo.back().WindowsList[iFrag].CountObj; iObjFrag++) {
-											if (iFrag < maxDrawFrag) {
-												plotter->AddPoint(ChartFragBright, iFrag, Time,
-																	vCadrInfo.back().ObjectsList[iObject].Bright);
-												if (vCadrInfo.back().ObjectsList[iObject].Square) {
-													plotter->AddPoint(ChartFragSizeEl, iFrag, Time,
-																			vCadrInfo.back().ObjectsList[iObject].Square);
-												}
-												if (vCadrInfo.back().ObjectsList[iObject].StarID) {
-													plotter->AddPoint(ChartFragErrX, iFrag, Time,
-																		vCadrInfo.back().ObjectsList[iObject].Dx*1000.);
-													plotter->AddPoint(ChartFragErrY, iFrag, Time,
-																		vCadrInfo.back().ObjectsList[iObject].Dy*1000.);
-												}
-											}
-											iObject++;
-										}
-									}
-
-								//статистика по звездам
+								//статистика по звездам -> DrawChartStars()
 									plotter->SetShowLines(false);
 									plotter->SetDateTimeX(false);
 									if (vCadrInfo.back().IsBinary) {

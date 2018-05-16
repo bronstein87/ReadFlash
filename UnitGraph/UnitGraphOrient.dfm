@@ -1667,10 +1667,6 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheetStatFrag: TTabSheet
       Caption = #1057#1090#1072#1090#1080#1089#1090#1080#1082#1072' '#1087#1086' '#1092#1088#1072#1075#1084#1077#1085#1090#1072#1084
       ImageIndex = 9
-      ExplicitLeft = -128
-      ExplicitTop = 90
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1422
         731)
