@@ -65,10 +65,10 @@ __published:	// IDE-managed Components
 	TLabel *Label9;
 	TCheckBox *CheckBoxLabelStar;
 	TLabel *Label11;
-	TComboBox *ComboBox1;
-	TLabel *Label10;
-	TDateTimePicker *DatePicker1S;
+	TComboBox *ComboBox1S;
 	TCheckBox *CheckBoxLoadToDb;
+	TLabel *Label12;
+	TEdit *EditListBokz;
 	void __fastcall ShapeColorLocObjTableMouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y);
 	void __fastcall ShapeColorZeroObjTableMouseDown(TObject *Sender, TMouseButton Button,
@@ -89,8 +89,10 @@ __published:	// IDE-managed Components
 	void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 	void __fastcall updateKaNameList();
 	void __fastcall CheckBoxLabelStarClick(TObject *Sender);
+	void __fastcall KAComboBoxChange(TObject *Sender);
 
 private:	// User declarations
+	void LoadDefaultSatelliteInfo(AnsiString _curDir);
 public:		// User declarations
 	__fastcall TFormAnimateSetting(TComponent* Owner);
 	void ReadINI(const AnsiString& fileName);

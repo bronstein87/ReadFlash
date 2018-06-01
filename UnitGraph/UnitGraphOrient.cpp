@@ -2498,13 +2498,19 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 
 //добавить чтение с формы
 //		zeroDate = (int)FormAnimateSetting->DatePicker1S->DateTime;
-//		zeroDate = EncodeDate(2017, 3, 6);  //145 № 802
-//		zeroDate = EncodeDate(2017, 9, 7);  //145 № 802
-//		zeroDate = EncodeDate(2017, 12, 02);  //145 № 803
-//		zeroDate = EncodeDate(2018, 03, 07);  //145 № 804
+//		zeroDate = EncodeDate(2017, 3, 6);  //14Ф145 № 802
+//		zeroDate = EncodeDate(2017, 9, 7);  //14Ф145 № 802
+//		zeroDate = EncodeDate(2017, 12, 02);  //14Ф145 № 803
+//		zeroDate = EncodeDate(2018, 03, 07);  //14Ф145 № 804
 
-//		zeroDate = EncodeDate(2018, 4, 5);  //191 KC
-		zeroDate = EncodeDate(2017, 12, 26);  //191 KC
+//		zeroDate = EncodeDate(2018, 4, 5);  //191KC
+//		zeroDate = EncodeDate(2017, 12, 26);  //191KC
+//		zeroDate = EncodeDate(2017, 11, 27);  //47KC №1
+//		zeroDate = EncodeDate(2017, 11, 22);  //14Ф137 №2
+
+		TFormatSettings curFormat;
+		curFormat.ShortDateFormat = "dd.mm.yyyy";
+		zeroDate = StrToDate(FormAnimateSetting->ComboBox1S->Text);
 
 		bool isLoadDb = FormAnimateSetting->CheckBoxLoadToDb->Checked;
 
@@ -2533,6 +2539,7 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 				   || (line.find("U3-5") != std::string::npos)) {
 
 				if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI);
+				ClearSHTMI1(mSHTMI1);
 
 				if (TryReadSHTMI1(finp, mSHTMI1)) {
 
@@ -2578,9 +2585,11 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 			else if ( (line.find("ШТМИ2") != string::npos)
 				   || (line.find("У3-06") != std::string::npos)
 				   || (line.find("U3-6") != std::string::npos) ) {
-				if(TryReadSHTMI2(finp, mSHTMI2)) {
 
-					if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI);
+				if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI);
+				ClearSHTMI2(mSHTMI2);
+
+				if(TryReadSHTMI2(finp, mSHTMI2)) {
 
 					TDateTime curDate;
 					curDate.Val = zeroDate.Val + mSHTMI2.timeBOKZ/86400.;
@@ -2633,46 +2642,79 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 
 				if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI);
 				isOpenDtmi = true;
+				ClearDTMI(mDTMI);   // or after OutputDTMI ?????
 				TryReadDTMI(finp, mDTMI);
 			}
 			else if ( (line.find("# ДТМИ2") != string::npos)
 				   || (line.find("У3-08") != std::string::npos)
 				   || (line.find("U3-8") != std::string::npos) ) {
+//				if (!isOpenDtmi)  {
+//					isOpenDtmi = true;
+//					ClearDTMI(mDTMI);
+//				}
 				TryReadDTMI(finp, mDTMI);
 			}
 			else if ( (line.find("# ДТМИ3") != string::npos)
 				   || (line.find("У3-09") != std::string::npos)
 				   || (line.find("U3-9") != std::string::npos) ) {
+//				if (!isOpenDtmi)  {
+//					isOpenDtmi = true;
+//					ClearDTMI(mDTMI);
+//				}
 				TryReadDTMI(finp, mDTMI);
 			}
 			else if ( (line.find("# ДТМИ4") != string::npos)
 				   || (line.find("У3-10") != std::string::npos)
 				   || (line.find("U3-10") != std::string::npos) ) {
+//				if (!isOpenDtmi)  {
+//					isOpenDtmi = true;
+//					ClearDTMI(mDTMI);
+//				}
 				TryReadDTMI(finp, mDTMI);
 			}
 			else if ( (line.find("# ДТМИ5") != string::npos)
 				   || (line.find("У3-11") != std::string::npos)
 				   || (line.find("U3-11") != std::string::npos) ) {
+//				if (!isOpenDtmi)  {
+//					isOpenDtmi = true;
+//					ClearDTMI(mDTMI);
+//				}
 				TryReadDTMI(finp, mDTMI);
 			}
 			else if ( (line.find("# ДТМИ6") != string::npos)
 				   || (line.find("У3-12") != std::string::npos)
 				   || (line.find("U3-12") != std::string::npos) ) {
+//				if (!isOpenDtmi)  {
+//					isOpenDtmi = true;
+//					ClearDTMI(mDTMI);
+//				}
 				TryReadDTMI(finp, mDTMI);
 			}
 			else if ( (line.find("# ДТМИ7") != string::npos)
 				   || (line.find("У3-13") != std::string::npos)
 				   || (line.find("U3-13") != std::string::npos) ) {
+//				if (!isOpenDtmi)  {
+//					isOpenDtmi = true;
+//					ClearDTMI(mDTMI);
+//				}
 				TryReadDTMI(finp, mDTMI);
 			}
 			else if ( (line.find("# ДТМИ8") != string::npos)
 				   || (line.find("У3-14") != std::string::npos)
 				   || (line.find("U3-14") != std::string::npos) ) {
+//				if (!isOpenDtmi)  {
+//					isOpenDtmi = true;
+//					ClearDTMI(mDTMI);
+//				}
 				TryReadDTMI(finp, mDTMI);
 			}
 			else if ( (line.find("# ДТМИ9") != string::npos)
 				   || (line.find("У3-15") != std::string::npos)
 				   || (line.find("U3-15") != std::string::npos) ) {
+//				if (!isOpenDtmi)  {
+//					isOpenDtmi = true;
+//					ClearDTMI(mDTMI);
+//				}
 				TryReadDTMI(finp, mDTMI);
 				if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI);
 			}
@@ -2689,7 +2731,7 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 			else if (line.find("U3-24") != std::string::npos) {
 				TryReadLOC(finp, mLOC);
 				OutputLOC(fout, SaveDir, mLOC);
-            }
+			}
 		}
 
         if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI);
@@ -3159,6 +3201,7 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 	const int maxDrawFrag = 12;
 	TColor colorFrag [maxDrawFrag];
 	bool CompareIKIRes = false;
+	int seriesID;
 	try
 	{
 		OpenDialog->Filter = "iki|*.iki";
@@ -3176,6 +3219,8 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 			{
 				FileTitle = "IKI";
 				PrepareChartFrag(colorFrag, maxDrawFrag);
+				if(FormAnimateSetting->CheckBoxResultOnly->Checked) seriesID = 0;
+				else seriesID = 1;
 
 				UnicodeString filePrefix = FormAnimateSetting->EditFilePrefix->Text;
 				unsigned short startFrom = StrToInt(FormAnimateSetting->BeginFromEdit->Text);
@@ -3276,12 +3321,12 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 								plotter->AddPoint(ChartWyError, 0, Time, vCadrInfo.back().OmegaDiff[1] * RTS);
 								plotter->AddPoint(ChartWzError, 0, Time, vCadrInfo.back().OmegaDiff[2] * RTS);
 
-								plotter->AddPoint(ChartAl, 1, Time, vCadrInfo.back().AnglesOrient[0] * RTD);
-								plotter->AddPoint(ChartDl, 1, Time, vCadrInfo.back().AnglesOrient[1] * RTD);
-								plotter->AddPoint(ChartAz, 1, Time, vCadrInfo.back().AnglesOrient[2] * RTD);
-								plotter->AddPoint(ChartWx, 1, Time, vCadrInfo.back().OmegaOrient[0] * RTM);
-								plotter->AddPoint(ChartWy, 1, Time, vCadrInfo.back().OmegaOrient[1] * RTM);
-								plotter->AddPoint(ChartWz, 1, Time, vCadrInfo.back().OmegaOrient[2] * RTM);
+								plotter->AddPoint(ChartAl, seriesID, Time, vCadrInfo.back().AnglesOrient[0] * RTD);
+								plotter->AddPoint(ChartDl, seriesID, Time, vCadrInfo.back().AnglesOrient[1] * RTD);
+								plotter->AddPoint(ChartAz, seriesID, Time, vCadrInfo.back().AnglesOrient[2] * RTD);
+								plotter->AddPoint(ChartWx, seriesID, Time, vCadrInfo.back().OmegaOrient[0] * RTM);
+								plotter->AddPoint(ChartWy, seriesID, Time, vCadrInfo.back().OmegaOrient[1] * RTM);
+								plotter->AddPoint(ChartWz, seriesID, Time, vCadrInfo.back().OmegaOrient[2] * RTM);
 
 							//статистика по фрагментам
 								DrawChartFrag(colorFrag, maxDrawFrag, vCadrInfo.back());

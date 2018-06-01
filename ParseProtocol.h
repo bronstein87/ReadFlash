@@ -148,6 +148,16 @@ namespace parse_prot {
 
 	AnsiString DayTimeToString(unsigned int time);
 
+	int StopReadArray(string line);
+
+	void ClearSHTMI1(struct SHTMI1 &tmi);
+
+	void ClearSHTMI2(struct SHTMI2 &tmi);
+
+	void ClearDTMI(struct DTMI &tmi);
+
+    void ClearLOC(struct LOC &tmi);
+
 	int TryReadSHTMI1(ifstream &finp, struct SHTMI1 &tmi);
 
 	int TryReadSHTMI2(ifstream &finp, struct SHTMI2 &tmi);

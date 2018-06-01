@@ -78,10 +78,38 @@ namespace parse_prot {
 		return sTime;
 	}
 
+	int StopReadArray(string line) {
+		if ( (line.find("----") != string::npos) ||
+			 (line.find("ÄÒÌÈ") != string::npos) ||
+			 (line.find("ØÒÌÈ") != string::npos) ||
+			 (line.find("Ó3-") != string::npos)  ||
+			 (line.find("U3-") != string::npos) ) {
+			return 1;
+		}
+		else return 0;
+	}
+
+	void ClearSHTMI1(struct SHTMI1 &tmi) {
+		tmi.timeBOKZ = 0;
+		tmi.status1  = 0;
+		tmi.status2  = 0;
+		tmi.post     = 0;
+		tmi.serialNumber = 0;
+		tmi.timeExp  = 0;
+		tmi.Foc = 0;
+		tmi.Xg  = 0;
+		tmi.Mean  = 0;
+		tmi.Sigma = 0;
+		tmi.countDefect = 0;
+		tmi.CRC  = 0;
+		tmi.Date = 0;
+		tmi.Version = 0;
+	}
+
 	int TryReadSHTMI1(ifstream &finp, struct SHTMI1 &tmi) {
 		string line, word = "";
 
-		while ((!finp.eof()) && (word.find("-----") == string::npos)) {
+		while ( (!finp.eof()) && (!StopReadArray(word)) ) {//(word.find("-----") == string::npos)) {
 			finp >> word;
 
 			if ((word == "ÊÑ1") || (word == "KC1")) {
@@ -161,10 +189,29 @@ namespace parse_prot {
 		return 0;
 	}
 
+	void ClearSHTMI2(struct SHTMI2 &tmi) {
+		tmi.timeBOKZ = 0;
+		tmi.status1  = 0;
+		tmi.status2  = 0;
+		tmi.post     = 0;
+		tmi.serialNumber = 0;
+		tmi.timeExp  = 0;
+		tmi.cntCommandWord = 0;
+		tmi.cntCallNO    = 0;
+		tmi.cntNOtoSLEZH = 0;
+		tmi.cntCallTO    = 0;
+		tmi.cntTOtoSLEZH = 0;
+		tmi.cntSLEZH     = 0;
+
+		for (int i = 0; i < MAX_STAT; i++) {
+			tmi.cntStatOrient[i] = 0;
+		}
+	}
+
 	int TryReadSHTMI2(ifstream &finp, struct SHTMI2 &tmi) {
 		string line, word = "";
 
-		while ((!finp.eof()) && (word.find("-----") == string::npos)) {
+		while ( (!finp.eof()) && (!StopReadArray(word)) ) {//(word.find("-----") == string::npos)) {
 			finp >> word;
 			if ((word == "ÊÑ1") || (word == "KC1")) {
 				finp >> word;
@@ -257,13 +304,61 @@ namespace parse_prot {
 		return 0;
 	}
 
+	void ClearDTMI(struct DTMI &tmi) {
+		tmi.timeBOKZ = 0;
+		tmi.status1  = 0;
+		tmi.status2  = 0;
+		tmi.serialNumber = 0;
+		tmi.timeExp   = 0;
+		tmi.nLocalObj = 0;
+		tmi.nDeterObj = 0;
+		tmi.nWindows  = 0;
+		tmi.epsillon  = 0;
+		tmi.dTimeBOKZ = 0;
+
+		for (int i = 0; i < MAX_OBJ_DTMI; i++) {
+			for (int j = 0; j < 4; j++) {
+				tmi.LocalList[i][j] = 0;
+			}
+		}
+
+		for (int i = 0; i < 3; i++) {
+			tmi.omega[i] = 0;
+		}
+
+		for (int i = 0; i < MAX_WINDOW; i++) {
+			tmi.levelWindow[i]    = 0 ;
+			tmi.nObjectWindow[i]  = 0;
+			tmi.centrWindow[i][0] = 0;
+			tmi.centrWindow[i][1] = 0;
+		}
+
+		tmi.timeQuatLast = 0;
+		for (int i = 0; i < 4; i++) {
+        	tmi.quatBoard[i] = 0;
+			tmi.quatLast[i]  = 0;
+		}
+
+		tmi.Epoch = 0;
+		tmi.nLocal[0] = 0;
+		tmi.nLocal[1] = 0;
+		tmi.maxHist   = 0;
+		tmi.maxHistX  = 0;
+		tmi.maxHistY  = 0;
+
+		for (int i = 0; i < 10; i++) {
+			tmi.Reserved[i] = 0;
+		}
+	}
+
 	int TryReadDTMI(ifstream &finp, struct DTMI &tmi) {
 		string line, word, inpstr, test_word, test_str;
 		int indexObject = 0, indexParam = 0, intVal, flLow = 1;
 		float fl1, fl2, fl3, sum;
 		int Stat1, Stat2;
 
-		while ( (!finp.eof()) && (word.find("-----") == string::npos)) {
+        word = "";
+		while ( (!finp.eof()) && (!StopReadArray(word)) ) {//(word.find("-----") == string::npos)) {
 			finp >> word;
 			if ((word == "ÊÑ1") || (word == "KC1")) {
 				finp >> word;
@@ -425,13 +520,34 @@ namespace parse_prot {
 		return 0;
 	}
 
+	void ClearLOC(struct LOC &tmi) {
+		tmi.timeBOKZ = 0;
+		tmi.status1  = 0;
+		tmi.status2  = 0;
+		tmi.serialNumber = 0;
+		tmi.timeExp   = 0;
+		tmi.nLocalObj = 0;
+		tmi.nFixedObj = 0;
+		tmi.MeanC  = 0;
+		tmi.SigmaC = 0;
+
+		for (int i = 0; i < 32; i++) {
+			for (int j = 0; j < 4; j++) {
+				tmi.LocalList[i][j] = 0;
+			}
+		}
+		tmi.Reserved[0] = 0;
+		tmi.Reserved[1] = 0;
+	}
+
+
 	int TryReadLOC(ifstream &finp, struct LOC &tmi) {
 		string line, word, inpstr, test_word, test_str;
 		int indexObject = 0, indexParam = 0, intVal, flLow = 1;
 		float fl1, fl2, fl3, sum;
 		int Stat1, Stat2;
 
-		while ( (!finp.eof()) && (word.find("-----") == string::npos)) {
+		while ( (!finp.eof()) && (!StopReadArray(word)) ) {//(word.find("-----") == string::npos)) {
 			finp >> word;
 			if ((word == "ÊÑ1") || (word == "KC1")) {
 				finp >> word;
@@ -596,7 +712,7 @@ namespace parse_prot {
 			file << setw(6) << (i + 1) << "\t";
 			file << tmi.LocalList[i][0] << "\t" << tmi.LocalList[i][1] << "\t";
 			file << tmi.LocalList[i][2] << "\t";
-			if (tmi.LocalList[i][3] < 1) {
+			if ( (tmi.LocalList[i][3] < 0.001) && (tmi.LocalList[i][2] > 0.001) ) {
 				short *level, *size;
 				size = (short *)(&tmi.LocalList[i][3]);
 				level = (short *)(size + 1);
@@ -654,7 +770,7 @@ namespace parse_prot {
 			file << setw(6) << (i + 1) << "\t";
 			file << tmi.LocalList[i][0] << "\t" << tmi.LocalList[i][1] << "\t";
 			file << tmi.LocalList[i][2] << "\t";
-			if (tmi.LocalList[i][3] < 1) {
+			if ( (tmi.LocalList[i][3] < 0.001) && (tmi.LocalList[i][2] > 0.001) ) {
 				short *level, *size;
 				size = (short *)(&tmi.LocalList[i][3]);
 				level = (short *)(size + 1);

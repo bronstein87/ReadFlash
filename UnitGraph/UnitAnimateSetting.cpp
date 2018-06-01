@@ -11,13 +11,113 @@
 
 //---------------------------------------------------------------------------
 
-	TFormAnimateSetting* FormAnimateSetting;
+
+const int maxDev  = 4;
+const int maxZero = 10;
+
+struct _DateTime {
+	unsigned short year, month, day;
+	unsigned short hour, min, sec, msec;
+};
+
+struct SateliteInfo {
+	string name, typeDev;
+	int cntDev, serial[maxDev];
+	int cntZeroTime;
+	_DateTime zeroTime[maxZero];
+};
+
+void LoadSatelliteList(AnsiString _sourceDir, vector <SateliteInfo> &vSat);
+
+void LoadSatelliteList(AnsiString _sourceDir, vector <SateliteInfo> &vSat)
+{
+	ifstream finp;
+	SateliteInfo sat;
+
+//load satellite list
+	finp.open(AnsiString(_sourceDir + "\\SatelliteInfo\\Satellite.txt").c_str());
+	while (getline(finp, sat.name)) {
+		vSat.push_back(sat);
+	}
+	finp.close(); finp.clear();
+
+//load device list
+	int iSat = 0;
+	finp.open(AnsiString(_sourceDir + "\\SatelliteInfo\\StarTrack.txt").c_str());
+	while (!finp.eof()) {
+		finp >> vSat[iSat].typeDev >> vSat[iSat].cntDev >> ":";
+		if (vSat[iSat].cntDev > maxDev) vSat[iSat].cntDev = maxDev;
+		for (int iDev = 0; iDev < vSat[iSat].cntDev; iDev++) {
+			finp >> vSat[iSat].serial[iDev] >> ";";
+		}
+		iSat++;
+	}
+	finp.close(); finp.clear();
+
+//load 1S-zero list
+	string date1S;
+	int year, month, day;
+	iSat = 0;
+	finp.open(AnsiString(_sourceDir + "\\SatelliteInfo\\ZeroTime.txt").c_str());
+	while (!finp.eof()) {
+		finp >> vSat[iSat].cntZeroTime >> ":";
+		if (vSat[iSat].cntZeroTime > maxZero) vSat[iSat].cntZeroTime = maxZero;
+		for (int iZero = 0; iZero < vSat[iSat].cntZeroTime; iZero++) {
+			finp >> date1S;
+			sscanf(date1S.c_str(), "%ld.%ld.%ld", &day, &month, &year);
+			vSat[iSat].zeroTime[iZero].day = day;
+			vSat[iSat].zeroTime[iZero].month = month;
+			vSat[iSat].zeroTime[iZero].year  = year;
+		}
+		iSat++;
+	}
+	finp.close();
+}
+
+TFormAnimateSetting* FormAnimateSetting;
+vector <SateliteInfo> vSatList;
 __fastcall TFormAnimateSetting::TFormAnimateSetting(TComponent* Owner)
 	: TForm(Owner)
 {
+	AnsiString CurDir = GetCurrentDir();
+
 	if (MainForm->client->isConnected())
 	{
 		updateKaNameList();
+	}
+	else
+	{
+		KAComboBox->Clear();
+		LoadSatelliteList(CurDir, vSatList);
+		for (int i = 0; i < vSatList.size(); i++) {
+			KAComboBox->Items->Add(vSatList[i].name.c_str());
+		}
+		KAComboBox->ItemIndex = 0;
+		KAComboBoxChange(Owner);
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormAnimateSetting::KAComboBoxChange(TObject *Sender)
+{
+	AnsiString date1S;
+	int iSat = KAComboBox->ItemIndex;
+	if (iSat >= 0) {
+		ComboBox1S->Clear();
+		for (int i = 0; i < vSatList[iSat].cntZeroTime; i++) {
+			date1S.sprintf("%02d.%02d.%04d", vSatList[iSat].zeroTime[i].day,
+			vSatList[iSat].zeroTime[i].month, vSatList[iSat].zeroTime[i].year);
+			ComboBox1S->Items->Add(UnicodeString(date1S));
+		}
+		ComboBox1S->ItemIndex = vSatList[iSat].cntZeroTime - 1;
+
+		EditListBokz->Clear();
+		AnsiString list = (vSatList[iSat].typeDev + " зав. № ").c_str();
+		for (int i = 0; i < vSatList[iSat].cntDev; i++) {
+			list += IntToStr(vSatList[iSat].serial[i]);
+			if (i <  vSatList[iSat].cntDev - 1) list += ",";
+        }
+        EditListBokz->Text = list;
 	}
 }
 //---------------------------------------------------------------------------
@@ -33,6 +133,13 @@ void __fastcall TFormAnimateSetting::updateKaNameList()
 	 KAComboBox->Text = KAComboBox->Items[0][0];
 }
 //---------------------------------------------------------------------------
+
+void TFormAnimateSetting::LoadDefaultSatelliteInfo(AnsiString _curDir)
+{
+	KAComboBox->Clear();
+	KAComboBox->Items->LoadFromFile(UnicodeString(_curDir + "\\SatelliteInfo\\Satellite.txt"));
+	KAComboBox->ItemIndex = 0;
+}
 
 void TFormAnimateSetting::ReadINI(const AnsiString& fileName)
 {
@@ -245,4 +352,7 @@ void __fastcall TFormAnimateSetting::FormClose(TObject *Sender, TCloseAction &Ac
 	WriteINI(FormGraphOrient->SourceDir+"\\options.ini");
 }
 //---------------------------------------------------------------------------
+
+
+
 
