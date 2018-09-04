@@ -34,6 +34,23 @@ namespace add_string {
 		return string::npos;
 	}
 
+    	template<typename Stream>
+	size_t findWord(Stream& in, const string& word, const string& resStr) {
+		string lineToWrite;
+		while (in >> lineToWrite) {
+			if (lineToWrite.find(word) != string::npos) {
+                resStr = lineToWrite;
+				return in.tellg() - lineToWrite.size();
+			}
+		}
+
+		if (in.fail() && !in.eof()) {
+			throw(string("Ошибка считывания файла"));
+		}
+
+		return string::npos;
+	}
+
 	template<typename Stream>
 	size_t findLine(Stream& in, const string& line) {
 		string lineToWrite;

@@ -5,6 +5,8 @@
 #include <tchar.h>
 #include <SysUtils.hpp>
 // ---------------------------------------------------------------------------
+#include <Vcl.Styles.hpp>
+#include <Vcl.Themes.hpp>
 USEFORM("UnitGraph\Analyze.cpp", AnalyzeForm);
 USEFORM("UnitGraph\UnitAnimateSetting.cpp", FormAnimateSetting);
 USEFORM("UnitGraph\UnitGraphOrient.cpp", FormGraphOrient);

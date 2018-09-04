@@ -1258,7 +1258,7 @@ void writeProtocolToIKI(CadrInfo& cadrInfo, int counter)
 	unique_ptr <IKI_img> writer (new IKI_img());
 	TDateTime dt = cadrInfo.Time;
 	UnicodeString dtStr;
-	DateTimeToString(dtStr, UnicodeString("yyyy-MM-dd hh:mm:ss.z"), dt);
+	DateTimeToString(dtStr, UnicodeString("dd.mm.yyyy hh:nn:ss.zzz"), dt);
 	writer->Georeferencing.DateTime = toStdString(dtStr);
 	writer->Georeferencing.FrameNumber = ++counter;
 	writer->CameraSettings.ResolutionACP = 12;
