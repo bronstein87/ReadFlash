@@ -137,6 +137,28 @@ namespace parse_prot {
 		float LocalList[MAX_OBJ_BOKZM][4];
 	};
 
+	struct DTMI_MSI {
+		float timeBOKZ;
+		float timeBetwCadrs;
+		short timeExp;
+		short SKOCadrAfterFilter;
+		short thresholdLoc;
+		short nLocalObj;
+		char  nDeterObj;
+		char  nFrag;
+		short numSec;
+		float omega;
+
+	};
+
+	struct TLOCBOKZM {
+		float LocalList[MAX_OBJ_BOKZM][4];
+	};
+
+	struct TFRAGBOKZM {
+		float fragList [MAX_OBJ_BOKZM][2];
+    };
+
 	static string arrStatErrorEng[MAX_STAT] = {
 		{"EC1"}, {"EC2"}, {"EC3"}, {"EC4"}, {"EC5"}, {"EC6"}, {"EC7"}, {"EC8"},
 		{"EC9"}, {"EC10"}, {"EC11"}, {"EC12"}, {"EC13"}, {"EC14"}, {"EC15"},
@@ -227,6 +249,163 @@ namespace parse_prot {
 
 	CadrInfo convertIKIFormatToInfoCadr(IKI_img* reader,
 		bool CompareIKIRes = false);
+
+	void parseMILHex(vector <string>& parseTo, int rowCount, ifstream& in, int offset); 
+
+	  	template<class ProtHandler>
+	void readBOKZMMil(ifstream& in, vector<CadrInfo>& cadrInfoVec,
+		ProtHandler handle) {
+
+		const int arraySize = 32;
+		const int sizeMSHI = 22;
+		const int sizeTLOC = 256;
+		const int sizeTFRAG = 128;
+		const int sizeMSI = 12;
+		const int TLOCCount = 8;
+		const int TFRAGCount = 4;
+
+		const string mshior = "\\'cc\\'d8\\'c8 \\'ce\\'d0";
+		const string mloc = "\\'cc\\'cb\\'ce\\'ca";
+		const string msi = "\\'c4\\'c8\\'cd\\'d4";
+		const string xyc = "XYc";
+		const int skipBeforeData = 3;
+		const int firstDataBlockFirstRow = 2;
+		const int taktPos = 1;
+
+
+		unsigned short arrayMSHI[sizeMSHI];
+		unsigned short arrayTLOC[sizeTLOC];
+		unsigned short arrayTFRAG[sizeTFRAG];
+		int currentTakt = 0;
+
+		CadrInfo cadrInfo;
+		string needToFind = mshior;
+		int tLocReaded = 0;
+		int tFragReaded = 0;
+
+		string line;
+		while (getline(in, line)) {
+
+		  if (line.find(mshior) != string::npos) {
+
+			if (needToFind != mshior) {
+			   needToFind = mshior;	
+			}
+
+			cadrInfo.CountBlock = 0;
+			cadrInfo.CountStars = 0;
+			cadrInfo.ImageHeight = 512;
+			cadrInfo.ImageWidth = 512;
+
+			for (int i = 0; i < skipBeforeData; i++) {
+				 getline(in, line);
+			}
+
+			vector <string> mshiStr;
+			parseMILHex(mshiStr, 3, in, firstDataBlockFirstRow);
+			int sz = mshiStr.size();
+			for (int i = 0; i < sizeMSHI; i++) {
+				 arrayMSHI[i] = strtoul(mshiStr[i].c_str(), NULL, 16);
+			}
+			MSHI_BOKZM mshi;
+			memcpy(&mshi, arrayMSHI, sizeof(short) * sizeMSHI);
+			if (mshi.Mornt[0][0] == 0 
+			&& mshi.Mornt[0][1] == 0
+			&& mshi.Mornt[0][2] == 0) {
+				continue;
+            }
+			cadrInfo.Time = mshi.timeBOKZ;
+			for (int i = 0; i < 3; i++)
+			{
+				for (int j = 0; j < 3; j++)
+				{
+				   cadrInfo.MatrixOrient[i][j] = mshi.Mornt[j][i];
+				}
+			}
+
+			MatrixToEkvAngles(cadrInfo.MatrixOrient, cadrInfo.AnglesOrient);
+			needToFind = mloc;
+
+		  }
+		  else if (line.find(mloc) != string::npos) {
+			 if (needToFind != mloc) {
+				needToFind = mshior;
+				cadrInfo = CadrInfo();
+				continue;	
+			} 
+
+
+			for (int i = 0; i < skipBeforeData; i++) {
+				 getline(in, line);
+			}
+
+			vector <string> tLocStr;
+			parseMILHex(tLocStr, 4, in, firstDataBlockFirstRow);
+			++tLocReaded;
+
+			int startFrom =  arraySize * (tLocReaded - 1);
+			int to = arraySize * tLocReaded;
+			for (int i = startFrom, j = 0; i < to; i++, j++) {
+				 arrayTLOC[i] = strtoul(tLocStr[j].c_str(), NULL, 16);
+			}
+
+
+			if (tLocReaded == TLOCCount) {
+				TLOCBOKZM tloc;
+				memcpy(&tloc, arrayTLOC,  sizeof(short) * sizeTLOC);
+				for (int i = 0; i < MAX_OBJ_BOKZM; i++) {
+					ObjectsInfo info;
+					info.X = tloc.LocalList[i][0];
+					info.Y = tloc.LocalList[i][1];
+					info.Bright = tloc.LocalList[i][2];
+					info.Square = tloc.LocalList[i][3];
+					if (info.X == 0 && info.Y == 0) {		
+						break;
+					}
+					cadrInfo.ObjectsList.push_back(info);
+				}
+				cadrInfo.SizeObjectsList = cadrInfo.CountLocalObj = cadrInfo.ObjectsList.size();
+				tLocReaded = 0;
+				needToFind = xyc; 
+			}
+
+		  }
+		  else if (line.find(xyc) != string::npos) {
+			 if (needToFind != xyc) {
+				needToFind = mshior;
+				cadrInfo = CadrInfo();
+				continue;	
+			} 
+
+
+			for (int i = 0; i < skipBeforeData; i++) {
+				 getline(in, line);
+			}
+
+			vector <string> tFragStr;
+			parseMILHex(tFragStr, 4, in, firstDataBlockFirstRow);
+			++tFragReaded;
+			
+			int startFrom =  arraySize * (tFragReaded - 1);
+			int to = arraySize * tFragReaded;
+			for (int i = startFrom, j = 0; i < to; i++, j++) {
+				 arrayTFRAG[i] = strtoul(tFragStr[j].c_str(), NULL, 16);
+			}
+
+
+			if (tFragReaded == TFRAGCount) {
+				needToFind = xyc; 
+				TFRAGBOKZM tfrag;
+				memcpy(&tfrag, arrayTFRAG,  sizeof(short) * sizeTFRAG);
+				tFragReaded = 0;
+				cadrInfoVec.push_back(cadrInfo);
+				handle(cadrInfo);
+				cadrInfo = CadrInfo();
+			}
+
+		  }
+	}
+}
 
 	template<class ProtHandler>
 	void readBOKZ60LocProtocol(ifstream& in, vector<CadrInfo>& cadrInfoVec,
