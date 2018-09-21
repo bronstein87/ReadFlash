@@ -12,12 +12,11 @@ using namespace parse_prot;
 using namespace std;
 
 extern int NumDoc, NumPar, NumTab, NumImage;
-TDateTime zeroDate = EncodeDate(2000, 01, 01);
 
-ofstream fshtmi1, fshtmi2, fdtmi, fmloc;
-bool isSHTMI1 = 0, isSHTMI2 = 0, isDTMI = 0, isMLOC = 0, isOpenDtmi = 0;
+bool isDTMI = 0, isMLOC = 0, isOpenDtmi = 0;
 bool isLoadDb = false;
 
+ofstream fdtmi, fmloc;
 vector <GeneralizedMSHIOR> vGeneralMSHI;
 vector <GeneralizedDTMI>   vGeneralDTMI;
 vector <GeneralizedSHTMI1> vGeneralSHTMI1;
@@ -453,10 +452,10 @@ void TFormGraphOrient::PrepareStartDraw()
 void TFormGraphOrient::ClearAnimate(void)
 {
 //AnimateShapes
-//	for (int i = 0; i < MaxBlockSeries; i++)
-//		BlockSeries[i]->Visible = false;
-//	for (int i = 0; i < MaxFrameSeries; i++)
-//		FrameSeries[i]->Visible = false;
+	for (int i = 0; i < MaxBlockSeries; i++)
+		BlockSeries[i]->Visible = false;	//Clear();
+	for (int i = 0; i < MaxFrameSeries; i++)
+		FrameSeries[i]->Visible = false;    //Clear();
 
 //AnimatePoints
 	Series9->Clear();
@@ -485,6 +484,11 @@ void TFormGraphOrient::SetVisibleLabelFrame(bool isVisible)
 void TFormGraphOrient::SetVisibleLabelStar(bool isVisible)
 {
 		Series1->Marks->Visible = isVisible;
+}
+
+void TFormGraphOrient::SetVisibleLabelObject(bool isVisible)
+{
+		Series9->Marks->Visible = isVisible;
 }
 
 void DrawOneScroll(double _Time, TChart *_Chart, TLineSeries *_Series)
@@ -560,8 +564,9 @@ void TFormGraphOrient::DrawObjects(const struct CadrInfo &mCadr)
 	else binCoef = 1.;
 
 	zoomBlueArrow = mCadr.SizePixel * zoomRedArrow / binCoef;
-	EditTimeDev->Text = DateTimeToStr(mCadr.Time);//FloatToStrF(mCadr.Time,ffFixed, 10, 3);
-
+	UnicodeString uString;
+	DateTimeToString(uString, "dd.mm.yyyy hh:mm:ss.zzz",(TDateTime) mCadr.Time);
+	EditTimeDev->Text = uString;
 	double meanDx = 0., meanDy = 0., meanDistX = 0., meanDistY = 0.;
 	int countDetObject = 0;
 
@@ -577,13 +582,15 @@ void TFormGraphOrient::DrawObjects(const struct CadrInfo &mCadr)
 		if (Nel) sizeBubble = 3 * sqrtm(fabs(Nel)) + 0.5;
 		else sizeBubble = 1.;
 
+		AnsiString LabelObject = FloatToStrF(mCadr.ObjectsList[iObject].Bright,ffFixed,8,0) + " EMP\r\n"
+							 + mCadr.ObjectsList[iObject].Square + " PIX";
 		if (!mCadr.ObjectsList[iObject].StarID && !Dx && !Dy) {
-			Series9->AddBubble(X0, Y0, sizeBubble, "", clBlue);
+			Series9->AddBubble(X0, Y0, sizeBubble, LabelObject, clBlue);
 		}
 		else
 		{
 			//локализованный объект
-			Series9->AddBubble(X0, Y0, sizeBubble, "", clGreen);
+			Series9->AddBubble(X0, Y0, sizeBubble, LabelObject, clGreen);
 			meanDx += Dx;
 			meanDy += Dy;
 
@@ -665,6 +672,7 @@ void TFormGraphOrient::DrawBlock(const struct CadrInfo &mCadr)
 //DrawWindows()
 	for (int i = 0; i < mCadr.SizeWindowsList; i++)    //!!!
 	{
+		FrameSeries[i]->Visible = true;
 		FrameSeries[i]->X0 = mCadr.WindowsList[i].Xstart;
 		FrameSeries[i]->X1 = mCadr.WindowsList[i].Xstart
 							  + mCadr.WindowsList[i].Width;
@@ -758,7 +766,7 @@ void TFormGraphOrient::DrawBlock(const struct CadrInfo &mCadr)
 	float binCoef = 1.;
 	if (mCadr.IsBinary) binCoef = 0.5;
 
-	for (int i = 0; i < mCadr.SizeStarsList; i++){
+	for (int i = 0; i < mCadr.SizeStarsList; i++) {
 
 		AnsiString LabelStar = FloatToStrF(mCadr.StarsList[i].Mv,ffFixed,8,2) + " "
 							 + mCadr.StarsList[i].Sp[0] + mCadr.StarsList[i].Sp[1];
@@ -777,6 +785,16 @@ void TFormGraphOrient::DrawBlock(const struct CadrInfo &mCadr)
 	else
 		Label6->Caption = "ОШИБКА! Число строк: "+IntToStr(CountLines)
 						+ " вместо " + IntToStr(mCadr.CountLines);
+
+	if (!mCadr.StatOrient) {
+		Label15->Caption = "Al = " + FloatToStrF(mCadr.AnglesOrient[0] * RTD, ffFixed, 8, 4)
+						 + ", Dl = " + FloatToStrF(mCadr.AnglesOrient[1] * RTD, ffFixed, 8, 4)
+						 + ", Az = " + FloatToStrF(mCadr.AnglesOrient[2] * RTD, ffFixed, 8, 4);
+	}
+	else {
+		Label15->Caption = "Ориентация не определена";
+	}
+
 
 }
 
@@ -1900,8 +1918,214 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 
 }
 
+string cwMSHI[4]   = {"3618", "3E18", "6618", "6E18"};
+string cwSHTMI1[4] = {"3440", "3C40", "6440", "6C40"};
+string cwSHTMI2[4] = {"3460", "3C60", "6460", "6C60"};
+string cwDTMI[4]   = {"3480", "3C80", "6480", "6C80"};
+string codeOC[4]   = {"3000", "3800", "6000", "6800"};
 
-void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
+int FindWordInList(string _line, string *list, int size)
+{
+	for (int i = 0; i < size; i++) {
+		if (_line.find(list[i]) != std::string::npos) return i;
+	}
+	return -1;
+}
+
+void __fastcall TFormGraphOrient::MenuOpenArsenalClick(TObject *Sender)
+{
+	const int sizeMSHI   = 24;
+	const int sizeSHTMI1 = 32;
+	const int sizeSHTMI2 = 32;
+	const int sizeDTMI   = 32;
+
+	unsigned short ArrayMSHI[sizeMSHI];
+	unsigned short ArraySHTMI1[sizeSHTMI1];
+	unsigned short ArraySHTMI2[sizeSHTMI2];
+	unsigned short ArrayDTMI[sizeDTMI];
+
+	bool isMSHI = 0, isSHTMI1 = 0, isSHTMI2 = 0;
+	isDTMI = 0, isMLOC = 0, isOpenDtmi = 0;
+
+	OpenDialog->Options.Clear();
+//	OpenDialog->Filter = "dat|*.dat";
+
+	if (OpenDialog->Execute()) {
+
+		DTMI dtmi;
+		TFormatSettings curFormat;
+		curFormat.ShortDateFormat = "dd.mm.yyyy";
+		TDateTime zeroDate = StrToDate(FormAnimateSetting->ComboBox1S->Text);
+		TDateTime curDate  = zeroDate;
+
+		bool isLoadDb = FormAnimateSetting->CheckBoxLoadToDb->Checked;
+
+		vCadrInfo.clear();
+		DeleteLineGraph();
+
+		AnsiString FileName = OpenDialog->FileName;
+		AnsiString CurDir   = ExtractFileDir(FileName);
+		AnsiString SaveDir  = CurDir + "\\Result\\";
+		CreateDir(SaveDir);
+		GetFileTitles(FileName,&FileTitle);
+
+		ifstream finp(FileName.c_str());
+		if (!finp.is_open()) {
+			ShowMessage("Файл не может быть открыт!");
+			return;
+		}
+		finp >> hex;
+
+		ofstream fout, fmshi, fshtmi1, fshtmi2;
+		fout.open((SaveDir + FileTitle + "_decode.txt").c_str());
+
+		string line, word;
+        int devIndex;
+		while (!finp.eof())
+		{
+			getline(finp, line, '\n' );
+//чтение массива МШИОР
+			devIndex = FindWordInList(line, cwMSHI, 4);
+			if ( (devIndex >= 0) && (devIndex < 4) ) {
+				getline(finp, line, '\n' );
+				if (line.find(codeOC[devIndex]) != std::string::npos) {
+					finp >> word;
+					for (int i = 0; i < sizeMSHI; i++) {
+						finp >> ArrayMSHI[i];
+					}
+
+					int *pInt;
+					for (int i = 2; i <= 22; i = i + 2) {
+						SwapShort((short*)&ArrayMSHI[i], (short*)&ArrayMSHI[i + 1]);
+						if (i > 2) {
+							pInt = (int*)&ArrayMSHI[i];
+							float val = (double)*pInt/(double)0x7fffffff;
+							memcpy(&ArrayMSHI[i], &val, sizeof(float));
+						}
+					}
+					MSHI mshi;
+					memcpy(&mshi, ArrayMSHI, sizeof(mshi));
+
+					curDate.Val = zeroDate.Val + mshi.timeBOKZ/86400.;
+					PrintMSHI(fout, mshi, curDate);
+					if (!isMSHI) {
+						fmshi.open((SaveDir + FileTitle + "_mshi.txt").c_str());
+						PrintLogMSHI(fmshi, mshi, curDate, 0);
+						isMSHI = true;
+					}
+					else PrintLogMSHI(fmshi, mshi, curDate, 1);
+				}
+			}
+//чтение массива ШТМИ1
+			devIndex = FindWordInList(line, cwSHTMI1, 4);
+			if ( (devIndex >= 0) && (devIndex < 4) ) {
+				getline(finp, line, '\n' );
+				if (line.find(codeOC[devIndex]) != std::string::npos) {
+					finp >> word;
+					for (int i = 0; i < sizeSHTMI1; i++) {
+						finp >> ArraySHTMI1[i];
+					}
+
+					SwapShort((short*)&ArraySHTMI1[2], (short*)&ArraySHTMI1[3]);
+					SwapShort((short*)&ArraySHTMI1[8], (short*)&ArraySHTMI1[9]);
+					SwapShort((short*)&ArraySHTMI1[10], (short*)&ArraySHTMI1[11]);
+					SwapShort((short*)&ArraySHTMI1[12], (short*)&ArraySHTMI1[13]);
+
+					SHTMI1 shtmi1;
+					memcpy(&shtmi1, &ArraySHTMI1[2], sizeof(shtmi1));
+					PrintSHTMI1(fout, shtmi1);
+					if (!isSHTMI1) {
+						fshtmi1.open((SaveDir + FileTitle + "_shtmi1.txt").c_str());
+						PrintLogSHTMI1(fshtmi1, shtmi1, 0);
+						isSHTMI1 = true;
+					}
+					else PrintLogSHTMI1(fshtmi1, shtmi1, 1);
+				}
+			}
+//чтение массива ШТМИ2
+			devIndex = FindWordInList(line, cwSHTMI2, 4);
+			if ( (devIndex >= 0) && (devIndex < 4) ) {
+				getline(finp, line, '\n' );
+				if (line.find(codeOC[devIndex]) != std::string::npos) {
+					finp >> word;
+					for (int i = 0; i < sizeSHTMI2; i++) {
+						finp >> ArraySHTMI2[i];
+					}
+					SwapShort((short*)&ArraySHTMI2[2], (short*)&ArraySHTMI2[3]);
+					SwapShort((short*)&ArraySHTMI2[14], (short*)&ArraySHTMI2[15]);
+
+					SHTMI2 shtmi2;
+					memcpy(&shtmi2, &ArraySHTMI2[2], sizeof(shtmi2));
+
+					curDate.Val = zeroDate.Val + shtmi2.timeBOKZ/86400.;
+					PrintSHTMI2(fout, shtmi2, curDate);
+					if (!isSHTMI2) {
+						fshtmi2.open((SaveDir + FileTitle + "_shtmi2.txt").c_str());
+						PrintLogSHTMI2(fshtmi2, shtmi2, curDate, 0);
+						isSHTMI2 = true;
+					}
+					else PrintLogSHTMI2(fshtmi2, shtmi2, curDate, 1);
+				}
+			}
+//чтение массива ДТМИ
+			devIndex = FindWordInList(line, cwDTMI, 4);
+			if ( (devIndex >= 0) && (devIndex < 4) ) {
+				getline(finp, line, '\n' );
+				if (line.find(codeOC[devIndex]) != std::string::npos) {
+					finp >> word;
+					for (int i = 0; i < sizeDTMI; i++) {
+						finp >> ArrayDTMI[i];
+					}
+
+					if (ArrayDTMI[1] == 0x7aaa) {
+						SwapShort((short*)&ArrayDTMI[2], (short*)&ArrayDTMI[3]);
+						for (int i = 12; i < 32; i = i + 2) {
+							SwapShort((short*)&ArrayDTMI[i], (short*)&ArrayDTMI[i+1]);
+						}
+					}
+
+					if ( (ArrayDTMI[1] == 0x8aaa) || (ArrayDTMI[1] == 0x9aaa) || (ArrayDTMI[1] == 0xaaaa)
+					   ||(ArrayDTMI[1] == 0xbaaa) || (ArrayDTMI[1] == 0xcaaa) || (ArrayDTMI[1] == 0xdaaa) ) {
+						for (int i = 2; i < 32; i = i + 2) {
+							SwapShort((short*)&ArrayDTMI[i], (short*)&ArrayDTMI[i+1]);
+						}
+					}
+
+					if (ArrayDTMI[1] == 0xfaaa) {
+						SwapShort((short*)&ArrayDTMI[2], (short*)&ArrayDTMI[3]);
+						for (int i = 4; i < 16; i = i + 2) {
+							SwapShort((short*)&ArrayDTMI[i], (short*)&ArrayDTMI[i+1]);
+						}
+					}
+					switch (ArrayDTMI[1])
+					{
+						case 0x7aaa: { memcpy(&dtmi, &ArrayDTMI[2], sizeof(short)*30); break; }
+						case 0x8aaa: { memcpy(&dtmi.LocalList[2][1], &ArrayDTMI[2], sizeof(short)*30); break; }
+						case 0x9aaa: { memcpy(&dtmi.LocalList[6][0], &ArrayDTMI[2], sizeof(short)*30); break; }
+						case 0xaaaa: { memcpy(&dtmi.LocalList[9][3], &ArrayDTMI[2], sizeof(short)*30); break; }
+						case 0xbaaa: { memcpy(&dtmi.LocalList[13][2], &ArrayDTMI[2], sizeof(short)*30); break; }
+						case 0xcaaa: { memcpy(&dtmi.centrWindow[1][0], &ArrayDTMI[2], sizeof(short)*30); break; }
+						case 0xdaaa: { memcpy(&dtmi.centrWindow[8][1], &ArrayDTMI[2], sizeof(short)*30); break; }
+						case 0xeaaa: { memcpy(&dtmi.levelWindow[0], &ArrayDTMI[2], sizeof(short)*30); break; }
+						case 0xfaaa: { memcpy(&dtmi.nObjectWindow[14], &ArrayDTMI[2], sizeof(short)*30);
+									   OutputDTMI(fout, SaveDir, dtmi, zeroDate);	break; }
+						default: ;
+					}
+				}
+			}
+		}
+		finp.close();
+		fout.close();
+		if (isMSHI)   fmshi.close();
+		if (isSHTMI1) fshtmi1.close();
+		if (isSHTMI2) fshtmi2.close();
+		if (isDTMI)   fdtmi.close();
+		if (isMLOC)   fmloc.close();
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormGraphOrient::MenuOpenEnergyClick(TObject *Sender)
 {
 	const int DTMISize = 290;
 	const int MSHISize = 22;
@@ -1911,8 +2135,10 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 	unsigned short ArrayMSHI[MSHISize];
 	unsigned short ArraySHTMI1[SHTMI1Size];
 	unsigned short ArraySHTMI2[SHTMI2Size];
+
 	ofstream fmshi, fshtmi1, fshtmi2, fdtmi, ftemp, fpow;
 	bool isMSHI = 0, isSHTMI1 = 0, isSHTMI2 = 0, isDTMI = 0, isTemp = 0, isPower = 0;
+
 	bool isLoadDb = FormAnimateSetting->CheckBoxLoadToDb->Checked;
 
 	vector <GeneralizedMSHIOR> vGeneralMSHI;
@@ -1920,7 +2146,7 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 	vector <GeneralizedSHTMI1> vGeneralSHTMI1;
 	vector <GeneralizedSHTMI2> vGeneralSHTMI2;
 
-    OpenDialog->Options.Clear();
+	OpenDialog->Options.Clear();
 	OpenDialog->Filter = "txt|*.txt";
 	if (OpenDialog->Execute()) {
 
@@ -1940,8 +2166,12 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 			return;
 		}
 
+		isSHTMI1 = false; isSHTMI2 = false;
+		isDTMI = false, isMLOC = false, isOpenDtmi = false;
+
 		ofstream fout((SaveDir + FileTitle + "_decode.txt").c_str());
 		string line;
+
 		while (!finp.eof())
 		{
 			getline(finp, line, '\n' );
@@ -2104,7 +2334,7 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 						fshtmi2 << shtmi2.cntCallNO << "\t";
 						fshtmi2 << shtmi2.cntCallTO << "\t";
 						for (int i = 0; i < 12; i++) {
-                            fshtmi2 << shtmi2.cntStatOrient[i] << "\t";
+							fshtmi2 << shtmi2.cntStatOrient[i] << "\t";
 						}
 						fshtmi2 <<"\n";
 
@@ -2319,14 +2549,16 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 }
  //---------------------------------------------------------------------------
 
- void TFormGraphOrient::OutputDTMI(ofstream &_fout, AnsiString &_SaveDir, DTMI &_tmi)
+ void TFormGraphOrient::OutputDTMI(ofstream &_fout, AnsiString &_SaveDir, DTMI &_tmi, TDateTime zeroDate)
  {
 	LOC    mLOC;
+	TDateTime curDate;
+	struct CadrInfo mCadr;
+
 					if (_tmi.status2 == 0x0005) {
 						_tmi.test_short = 0;
 						SwapShort((short*)&_tmi.nWindows, (short*)&_tmi.epsillon);
 						for (int i = 0; i < MAX_WINDOW; i = i + 2) {
-
 							SwapShort((short*)&_tmi.levelWindow[i],
 									  (short*)&_tmi.levelWindow[i+1]);
 							SwapShort((short*)&_tmi.nObjectWindow[i],
@@ -2338,7 +2570,6 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 
 						memcpy(&mLOC, &_tmi, sizeof(_tmi));
 
-						TDateTime curDate;
 						curDate.Val = zeroDate.Val + mLOC.timeBOKZ/86400.;
 						_fout << AnsiString(DateTimeToStr(curDate)).c_str() << "\n";
 
@@ -2375,13 +2606,9 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 //							vGeneralDTMI.push_back(gDTMI);
 //						}
 
-						struct CadrInfo mCadr;
 						ConvertDataLOC(mLOC, mCadr);
-						mCadr.Time = curDate.Val;//cntRecDTMI++;
-						vCadrInfo.push_back(mCadr);
 					}
 					else {
-						TDateTime curDate;
 						curDate.Val = zeroDate.Val + _tmi.timeBOKZ/86400.;
 						_fout << AnsiString(DateTimeToStr(curDate)).c_str() << "\n";
 
@@ -2398,7 +2625,6 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 							fdtmi << "NumLoc\t"  << "NumDet\t" << "NumFrag\t";
 							fdtmi << "NumL[0]\t" << "NumL[1]\t" << "MaxHist\t";
 							fdtmi << "Eps\t" << "DeltaT\t";
-
 							fdtmi << "\n";
 						}
 						fdtmi << AnsiString(DateToStr(curDate)).c_str() << "\t";
@@ -2420,23 +2646,21 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
 						fdtmi << setw(6) << _tmi.dTimeBOKZ << "\t";
 						fdtmi << "\n";
 
-						if (isLoadDb) {
-							TDateTime saveTime;// = StrToDate(toUString(sdate)) +  StrToTime(toUString(stime));
-							GeneralizedDTMI gDTMI = clientDb->convertDTMI(_tmi, saveTime);
-							vGeneralDTMI.push_back(gDTMI);
-						}
-
-						struct CadrInfo mCadr;
+//						if (isLoadDb) {
+//							TDateTime saveTime;// = StrToDate(toUString(sdate)) +  StrToTime(toUString(stime));
+//							GeneralizedDTMI gDTMI = clientDb->convertDTMI(_tmi, saveTime);
+//							vGeneralDTMI.push_back(gDTMI);
+//						}
 						ConvertDataDTMI(_tmi, mCadr);
-						mCadr.Time = curDate.Val;//cntRecDTMI++;
-						vCadrInfo.push_back(mCadr);
 					}
-                    isOpenDtmi = false;
+					mCadr.Time = curDate.Val;
+					vCadrInfo.push_back(mCadr);
+					isOpenDtmi = false;
  }
 
- void TFormGraphOrient::OutputLOC(ofstream &_fout, AnsiString &_SaveDir, LOC &_tmi)
+ void TFormGraphOrient::OutputLOC(ofstream &_fout, AnsiString &_SaveDir, LOC &_tmi, TDateTime zeroDate)
  {
- 						TDateTime curDate;
+						TDateTime curDate;
 						curDate.Val = zeroDate.Val + _tmi.timeBOKZ/86400.;
 						_fout << AnsiString(DateTimeToStr(curDate)).c_str() << "\n";
 
@@ -2480,11 +2704,18 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyTMIClick(TObject *Sender)
  }
 
 
-void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
+void __fastcall TFormGraphOrient::MenuOpenSamspaceClick(TObject *Sender)
 {
 	OpenDialog->Options.Clear();
 	OpenDialog->Filter = "txt|*.txt";
 	if (OpenDialog->Execute()) {
+
+		TFormatSettings curFormat;
+		curFormat.ShortDateFormat = "dd.mm.yyyy";
+		TDateTime zeroDate = StrToDate(FormAnimateSetting->ComboBox1S->Text);
+		TDateTime curDate  = zeroDate;
+
+		bool isLoadDb = FormAnimateSetting->CheckBoxLoadToDb->Checked;
 
 		vCadrInfo.clear();
 		DeleteLineGraph();
@@ -2493,26 +2724,7 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 		AnsiString CurDir   = ExtractFileDir(FileName);
 		AnsiString SaveDir  = CurDir + "\\Result\\";
 		CreateDir(SaveDir);
-//		SetCurrentDir(CurDir);
 		GetFileTitles(FileName,&FileTitle);
-
-//добавить чтение с формы
-//		zeroDate = (int)FormAnimateSetting->DatePicker1S->DateTime;
-//		zeroDate = EncodeDate(2017, 3, 6);  //14Ф145 № 802
-//		zeroDate = EncodeDate(2017, 9, 7);  //14Ф145 № 802
-//		zeroDate = EncodeDate(2017, 12, 02);  //14Ф145 № 803
-//		zeroDate = EncodeDate(2018, 03, 07);  //14Ф145 № 804
-
-//		zeroDate = EncodeDate(2018, 4, 5);  //191KC
-//		zeroDate = EncodeDate(2017, 12, 26);  //191KC
-//		zeroDate = EncodeDate(2017, 11, 27);  //47KC №1
-//		zeroDate = EncodeDate(2017, 11, 22);  //14Ф137 №2
-
-		TFormatSettings curFormat;
-		curFormat.ShortDateFormat = "dd.mm.yyyy";
-		zeroDate = StrToDate(FormAnimateSetting->ComboBox1S->Text);
-
-		bool isLoadDb = FormAnimateSetting->CheckBoxLoadToDb->Checked;
 
 		ifstream finp(FileName.c_str());
 		if (!finp.is_open()) {
@@ -2520,17 +2732,18 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 			return;
 		}
 
-		ofstream fout;
+		ofstream fout, fmshi, fshtmi1, fshtmi2;
 		fout.open((SaveDir + FileTitle + "_decode.txt").c_str());
-		string line;
+
+		bool isSHTMI1 = 0, isSHTMI2 = 0;
+		isDTMI = 0, isMLOC = 0, isOpenDtmi = 0;
 
 		SHTMI1 mSHTMI1;
 		SHTMI2 mSHTMI2;
 		DTMI   mDTMI;
 		LOC    mLOC;
 
-		isOpenDtmi = false;
-
+		string line;
 		while (!finp.eof())
 		{
 			getline(finp, line, '\n' );
@@ -2538,42 +2751,18 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 				   || (line.find("У3-05") != std::string::npos)
 				   || (line.find("U3-5") != std::string::npos)) {
 
-				if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI);
+				if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI, zeroDate);
 				ClearSHTMI1(mSHTMI1);
 
 				if (TryReadSHTMI1(finp, mSHTMI1)) {
 
 					PrintSHTMI1(fout, mSHTMI1);
-
 					if (!isSHTMI1) {
-						isSHTMI1 = true;
 						fshtmi1.open((SaveDir + FileTitle + "_shtmi1.txt").c_str());
-						fshtmi1 << "Day/Time\t";
-						fshtmi1 << "KC1\t" << "KC2\t" << "POST\t" << "№\t" << "Texp\t";
-						fshtmi1 << "Foc\t" << "Xg\t" << "Yg\t";
-						fshtmi1 << "Mean\t" << "Sigma\t";
-						fshtmi1 << "Ndef\t" << "CRC\t";
-						fshtmi1 << "Date\t" << "Version\t";
-						fshtmi1 << "\n";
+						PrintLogSHTMI1(fshtmi1, mSHTMI1, 0);
+						isSHTMI1 = true;
 					}
-					fshtmi1 << DayTimeToString(mSHTMI1.timeBOKZ).c_str() << "\t";
-					fshtmi1 << uppercase << hex << setfill('0');
-					fshtmi1 << "0x" << setw(4) << mSHTMI1.status1 << "\t";
-					fshtmi1 << "0x" << setw(4) << mSHTMI1.status2 << "\t";
-					fshtmi1 << "0x" << setw(4) << mSHTMI1.post << "\t";
-					fshtmi1 << dec << setfill(' ');
-					fshtmi1 << mSHTMI1.serialNumber << "\t";
-					fshtmi1 << mSHTMI1.timeExp << "\t";
-					fshtmi1 << mSHTMI1.Foc << "\t";
-					fshtmi1 << mSHTMI1.Xg << "\t";
-					fshtmi1 << mSHTMI1.Yg << "\t";
-					fshtmi1 << mSHTMI1.Mean << "\t";
-					fshtmi1 << mSHTMI1.Sigma << "\t";
-					fshtmi1 << mSHTMI1.countDefect << "\t";
-					fshtmi1 << mSHTMI1.CRC << "\t";
-					fshtmi1 << mSHTMI1.Date << "\t";
-					fshtmi1 << mSHTMI1.Version << "\t";
-					fshtmi1 << "\n";
+					else PrintLogSHTMI1(fshtmi1, mSHTMI1, 1);
 
 					if (isLoadDb) {
 						TDateTime saveTime;// = StrToDate(toUString(sdate)) +  StrToTime(toUString(stime));
@@ -2586,48 +2775,19 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 				   || (line.find("У3-06") != std::string::npos)
 				   || (line.find("U3-6") != std::string::npos) ) {
 
-				if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI);
+				if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI, zeroDate);
 				ClearSHTMI2(mSHTMI2);
 
 				if(TryReadSHTMI2(finp, mSHTMI2)) {
 
-					TDateTime curDate;
 					curDate.Val = zeroDate.Val + mSHTMI2.timeBOKZ/86400.;
-					fout << AnsiString(DateTimeToStr(curDate)).c_str() << "\n";
-					PrintSHTMI2(fout, mSHTMI2);
-
+					PrintSHTMI2(fout, mSHTMI2, curDate);
 					if (!isSHTMI2) {
-						isSHTMI2 = true;
 						fshtmi2.open((SaveDir + FileTitle + "_shtmi2.txt").c_str());
-						fshtmi2 << "Date\t";
-						fshtmi2 << "Day/Time\t";
-						fshtmi2 << "KC1\t" << "KC2\t" << "POST\t" << "№\t" << "Texp\t";
-						fshtmi2 << "УСД\t" << "НО\t" << "НОСЛ\t";
-						fshtmi2 << "TО\t" << "TОСЛ\t" << "СЛЕЖ\t";
-						for (int i = 0; i < MAX_STAT; i++) {
-							fshtmi2 << "EC" << (i+1) << "\t";
-						}
-						fshtmi2 << "\n";
+						PrintLogSHTMI2(fshtmi2, mSHTMI2, curDate, 0);
+						isSHTMI2 = true;
 					}
-					fshtmi2 << AnsiString(DateToStr(curDate)).c_str() << "\t";
-					fshtmi2 << DayTimeToString(mSHTMI2.timeBOKZ).c_str()<<"\t";
-					fshtmi2 << uppercase << hex << setfill('0');
-					fshtmi2 << "0x" << setw(4) << mSHTMI2.status1 << "\t";
-					fshtmi2 << "0x" << setw(4) << mSHTMI2.status2 << "\t";
-					fshtmi2 << "0x" << setw(4) << mSHTMI2.post << "\t";
-					fshtmi2 << dec << setfill(' ');
-					fshtmi2 << setw(6) << mSHTMI2.serialNumber << "\t";
-					fshtmi2 << setw(6) << mSHTMI2.timeExp << "\t";
-					fshtmi2 << setw(6) << mSHTMI2.cntCommandWord << "\t";
-					fshtmi2 << setw(6) << mSHTMI2.cntCallNO << "\t";
-					fshtmi2 << setw(6) << mSHTMI2.cntNOtoSLEZH << "\t";
-					fshtmi2 << setw(6) << mSHTMI2.cntCallTO << "\t";
-					fshtmi2 << setw(6) << mSHTMI2.cntTOtoSLEZH << "\t";
-					fshtmi2 << setw(8) << mSHTMI2.cntSLEZH << "\t";
-					for (int i = 0; i < MAX_STAT; i++) {
-						fshtmi2 << mSHTMI2.cntStatOrient[i] << "\t";
-					}
-					fshtmi2 << "\n";
+					else PrintLogSHTMI2(fshtmi2, mSHTMI2, curDate, 1);
 
 					if (isLoadDb) {
 						TDateTime saveTime;// = StrToDate(toUString(sdate)) +  StrToTime(toUString(stime));
@@ -2640,7 +2800,7 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 				   || (line.find("У3-07") != std::string::npos)
 				   || (line.find("U3-7") != std::string::npos) ) {
 
-				if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI);
+				if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI, zeroDate);
 				isOpenDtmi = true;
 				ClearDTMI(mDTMI);   // or after OutputDTMI ?????
 				TryReadDTMI(finp, mDTMI);
@@ -2716,7 +2876,7 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 //					ClearDTMI(mDTMI);
 //				}
 				TryReadDTMI(finp, mDTMI);
-				if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI);
+				if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI, zeroDate);
 			}
 			else if ( (line.find("U3-16") != std::string::npos)
 				   || (line.find("U3-17") != std::string::npos)
@@ -2730,11 +2890,11 @@ void __fastcall TFormGraphOrient::MenuOpenProgressTMIClick(TObject *Sender)
 				 }
 			else if (line.find("U3-24") != std::string::npos) {
 				TryReadLOC(finp, mLOC);
-				OutputLOC(fout, SaveDir, mLOC);
+				OutputLOC(fout, SaveDir, mLOC, zeroDate);
 			}
 		}
 
-        if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI);
+		if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI, zeroDate);
 		finp.close();
 		fout.close();
 		fshtmi1.close();
@@ -3854,13 +4014,3 @@ void __fastcall TFormGraphOrient::BOKZM2ParseProtocolClick(TObject *Sender)
 	}
 	else throw logic_error("Неверный путь к директории");
  }
-
-
-
-
-
-
-
-
-
-

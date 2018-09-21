@@ -52,6 +52,7 @@ double asinm(double xf);
 double atan2m(double yf, double xf);
 void quatToMatr(const double Quat[], double M_ornt[3][3]);
 void MatrixToEkvAngles(const double Matrix[3][3], double Angles[3]);
+int CheckQuatNorm(const double quat[4], double deltaNorm);
 void QuatToMatrix(double quat[4], double matrix[3][3]);
 double GetAxisAngle(double lmn1[3], double lmn2[3]);
 void calcTransitionMatrix(double pointAlpha, double pointBeta,

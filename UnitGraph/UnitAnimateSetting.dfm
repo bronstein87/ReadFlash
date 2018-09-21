@@ -19,7 +19,7 @@ object FormAnimateSetting: TFormAnimateSetting
     Top = 0
     Width = 368
     Height = 558
-    ActivePage = DBOptionsPage
+    ActivePage = ShowPage
     Align = alClient
     TabOrder = 0
     object ShowPage: TTabSheet
@@ -177,45 +177,58 @@ object FormAnimateSetting: TFormAnimateSetting
           OnClick = CheckBoxLabelFrameClick
         end
         object CheckBoxFrameMv: TCheckBox
-          Left = 174
-          Top = 47
-          Width = 134
+          Left = 220
+          Top = 71
+          Width = 120
           Height = 17
           Caption = #1047#1074#1077#1079#1076#1085#1072#1103' '#1074#1077#1083#1080#1095#1080#1085#1072
           TabOrder = 1
+          Visible = False
         end
         object CheckBoxFrameSp: TCheckBox
-          Left = 174
-          Top = 70
-          Width = 134
+          Left = 220
+          Top = 94
+          Width = 123
           Height = 17
           Caption = #1057#1087#1077#1082#1090#1088#1072#1083#1100#1085#1099#1081' '#1082#1083#1072#1089#1089
           TabOrder = 2
+          Visible = False
         end
         object CheckBoxFrameID: TCheckBox
-          Left = 40
-          Top = 47
+          Left = 220
+          Top = 25
           Width = 120
           Height = 17
           Caption = #1053#1086#1084#1077#1088' '#1092#1088#1072#1075#1084#1077#1085#1090#1072
           TabOrder = 3
+          Visible = False
         end
         object CheckBoxFrameStarID: TCheckBox
-          Left = 40
-          Top = 70
+          Left = 220
+          Top = 48
           Width = 97
           Height = 17
           Caption = #1053#1086#1084#1077#1088' '#1079#1074#1077#1079#1076#1099
           TabOrder = 4
+          Visible = False
         end
         object CheckBoxLabelStar: TCheckBox
           Left = 18
-          Top = 93
+          Top = 47
           Width = 167
           Height = 17
           Caption = #1054#1090#1086#1073#1088#1072#1078#1072#1090#1100' '#1087#1086#1076#1087#1080#1089#1080' '#1079#1074#1077#1079#1076
           TabOrder = 5
           OnClick = CheckBoxLabelStarClick
+        end
+        object CheckBoxLabelObject: TCheckBox
+          Left = 18
+          Top = 70
+          Width = 191
+          Height = 17
+          Caption = #1054#1090#1086#1073#1088#1072#1078#1072#1090#1100' '#1087#1086#1076#1087#1080#1089#1080' '#1086#1073#1098#1077#1082#1090#1086#1074
+          TabOrder = 6
+          OnClick = CheckBoxLabelObjectClick
         end
       end
       object GroupBox4: TGroupBox

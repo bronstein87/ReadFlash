@@ -25,8 +25,17 @@ double asinm(double xf) {
 	return asin(xf);
 }
 
+int CheckQuatNorm(const double quat[4], double deltaNorm)
+{
+	double norm;
+	if ((deltaNorm < 0) || (deltaNorm > 0.1)) return -1;
+	norm = quat[0] * quat[0] + quat[1] * quat[1] + quat[2] * quat[2] + quat[3] * quat[3];
+	norm = sqrtm(norm);
+	if (fabs(norm - 1.) <= deltaNorm) return 0;
+	else return 1;
+}
 
-void QuatToMatrix(double quat[4],double matrix[3][3])
+void QuatToMatrix(double quat[4], double matrix[3][3])
 {
 	matrix[0][0]=quat[0]*quat[0]+quat[1]*quat[1]-quat[2]*quat[2]-quat[3]*quat[3];
 	matrix[0][1]=2.0*(quat[1]*quat[2]+quat[0]*quat[3]);

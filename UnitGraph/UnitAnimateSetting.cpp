@@ -162,7 +162,7 @@ void TFormAnimateSetting::ReadINI(const AnsiString& fileName)
 
 	//Панель "Движение звезд"
 	CheckBoxLabelStar->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckLabelStar", "0")));
-	CheckBoxLabelFrame->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckLabelFrame", "0")));
+//	CheckBoxLabelFrame->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckLabelFrame", "0")));
 
 	//Панель "Сводные графики"
 	CheckBoxDateTime->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckDateTime", "1")));
@@ -220,7 +220,7 @@ void TFormAnimateSetting::WriteINI(const AnsiString& fileName)
 //Вкладка "Файлы"
 	Ini->WriteString("File", "FilePrefix", EditFilePrefix->Text);
 	Ini->WriteString("File", "BeginFrom",  BeginFromEdit->Text);
-	Ini->WriteString("File", "SkipFrame",  IntToStr((int)CheckBoxCurrentTime->Checked));
+	Ini->WriteString("File", "SkipFrame",  IntToStr((int)SkipFrameCheckBox->Checked));
 
 //Вкладка "Настройки БД"
 	Ini->WriteString("CheckBox", "CheckLoadToDb",   IntToStr((int)CheckBoxLoadToDb->Checked));
@@ -330,6 +330,14 @@ void __fastcall TFormAnimateSetting::CheckBoxLabelStarClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
+void __fastcall TFormAnimateSetting::CheckBoxLabelObjectClick(TObject *Sender)
+{
+	TFormGraphOrient* FormGraphOrient = dynamic_cast<TFormGraphOrient*>(this->Owner);
+	FormGraphOrient->SetVisibleLabelObject(CheckBoxLabelObject->Checked);
+	FormGraphOrient->DrawAnimateHandler();
+}
+//---------------------------------------------------------------------------
+
 void __fastcall TFormAnimateSetting::CheckBoxApplyWindowsSeriesClick(TObject *Sender)
 {
 	TFormGraphOrient* FormGraphOrient = dynamic_cast<TFormGraphOrient*>(this->Owner);
@@ -352,7 +360,4 @@ void __fastcall TFormAnimateSetting::FormClose(TObject *Sender, TCloseAction &Ac
 	WriteINI(FormGraphOrient->SourceDir+"\\options.ini");
 }
 //---------------------------------------------------------------------------
-
-
-
 

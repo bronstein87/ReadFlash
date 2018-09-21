@@ -69,6 +69,7 @@ __published:	// IDE-managed Components
 	TCheckBox *CheckBoxLoadToDb;
 	TLabel *Label12;
 	TEdit *EditListBokz;
+	TCheckBox *CheckBoxLabelObject;
 	void __fastcall ShapeColorLocObjTableMouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y);
 	void __fastcall ShapeColorZeroObjTableMouseDown(TObject *Sender, TMouseButton Button,
@@ -90,6 +91,7 @@ __published:	// IDE-managed Components
 	void __fastcall updateKaNameList();
 	void __fastcall CheckBoxLabelStarClick(TObject *Sender);
 	void __fastcall KAComboBoxChange(TObject *Sender);
+	void __fastcall CheckBoxLabelObjectClick(TObject *Sender);
 
 private:	// User declarations
 	void LoadDefaultSatelliteInfo(AnsiString _curDir);

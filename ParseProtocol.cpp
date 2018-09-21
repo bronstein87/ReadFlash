@@ -79,7 +79,8 @@ namespace parse_prot {
 	}
 
 	int StopReadArray(string line) {
-		if ( (line.find("----") != string::npos) ||
+		if ( (line.find("#") != string::npos) ||
+//		if ( (line.find("----") != string::npos) ||
 			 (line.find("ƒ“Ã»") != string::npos) ||
 			 (line.find("ÿ“Ã»") != string::npos) ||
 			 (line.find("”3-") != string::npos)  ||
@@ -641,6 +642,70 @@ namespace parse_prot {
 		return 0;
 	}
 
+	void PrintMSHI(ofstream &file, struct MSHI tmi, TDateTime curDate) {
+		file << AnsiString(DateTimeToStr(curDate)).c_str() << "\n";
+		file << "____________________________________" << "\n";
+		file << "Ã‡ÒÒË‚ Ãÿ»Œ–" << "\n";
+		file << "Tpr\t" << DayTimeToString(tmi.timeBOKZ).c_str() << "\n";
+		file << uppercase << hex << setfill('0');
+		file << " —1:\t" << "0x" << setw(4) << tmi.status1 << "\n";
+		file << " —2:\t" << "0x" << setw(4) << tmi.status2 << "\n";
+		file << dec << setfill(' ');
+		for (int i = 0; i < 3; i++) {
+			file << "OZ[" << i << "]:\t" << tmi.OZ[i] << "\n";
+		}
+		for (int i = 0; i < 4; i++) {
+			file << "Qornt[" << i << "]:\t" << tmi.Qornt[i] << "\n";
+		}
+		for (int i = 0; i < 3; i++) {
+			file << "W[" << i << "], '':\t" << tmi.W[i] * RTS << "\n";
+		}
+		file << "____________________________________" << "\n";
+		file << flush;
+	}
+
+	void PrintLogMSHI(ofstream &file, struct MSHI tmi, TDateTime curDate, bool create) {
+		if (!create) {
+			file << "Date\t";
+			file << "Day/Time\t";
+			file << "KC1\t" << "KC2\t";
+			file << "OZ[0]\t" << "OZ[1]\t" << "OZ[2]\t";
+			file << "Q[0]\t" << "Q[1]\t" << "Q[2]\t" << "Q[3]\t";
+			file << "Wx,''/c\t" << "Wy,''/c\t" << "Wz,''/c\t";
+			file << "Al, deg\t" << "Dl, deg\t" << "Az, deg\t";
+			file << "\n";
+		}
+
+		file << AnsiString(DateTimeToStr(curDate)).c_str() << "\t";
+		file << DayTimeToString(tmi.timeBOKZ).c_str() << "\t";
+		file << uppercase << hex << setfill('0');
+		file << "0x" << setw(4) << tmi.status1 << "\t";
+		file << "0x" << setw(4) << tmi.status2 << "\t";
+		file << dec << setfill(' ');
+		for (int i = 0; i < 3; i++) {
+			file << tmi.OZ[i] << "\t";
+		}
+		for (int i = 0; i < 4; i++) {
+			file << tmi.Qornt[i] << "\t";
+		}
+		for (int i = 0; i < 3; i++) {
+			file << tmi.W[i] * RTS << "\t";
+		}
+
+		double Qdbl[4], Mornt[3][3], ang[3] = {0, 0, 0};
+		for (int i = 0; i < 4; i++) {
+			 Qdbl[i] = (double)tmi.Qornt[i];
+		}
+		if ( !CheckQuatNorm(Qdbl, 0.001) ) {
+			QuatToMatrix(Qdbl, Mornt);
+			MatrixToEkvAngles(Mornt, ang);
+		}
+		for (int i = 0; i < 3; i++) {
+			file << ang[i] * RTD << "\t";
+		}
+		file << "\n";
+	}
+
 	void PrintSHTMI1(ofstream &file, struct SHTMI1 tmi) {
 		file << "____________________________________" << "\n";
 		file << "Ã‡ÒÒË‚ ÿ“Ã»1" << "\n";
@@ -665,7 +730,38 @@ namespace parse_prot {
 		file << flush;
 	}
 
-	void PrintSHTMI2(ofstream &file, struct SHTMI2 tmi) {
+	void PrintLogSHTMI1(ofstream &file, struct SHTMI1 tmi, bool create) {
+		if (!create) {
+			file << "Day/Time\t";
+			file << "KC1\t" << "KC2\t" << "POST\t" << "π\t" << "Texp\t";
+			file << "Foc\t" << "Xg\t" << "Yg\t";
+			file << "Mean\t" << "Sigma\t";
+			file << "Ndef\t" << "CRC\t";
+			file << "Date\t" << "Version\t";
+			file << "\n";
+		}
+		file << DayTimeToString(tmi.timeBOKZ).c_str() << "\t";
+		file << uppercase << hex << setfill('0');
+		file << "0x" << setw(4) << tmi.status1 << "\t";
+		file << "0x" << setw(4) << tmi.status2 << "\t";
+		file << "0x" << setw(4) << tmi.post << "\t";
+		file << dec << setfill(' ');
+		file << tmi.serialNumber << "\t";
+		file << tmi.timeExp << "\t";
+		file << tmi.Foc << "\t";
+		file << tmi.Xg << "\t";
+		file << tmi.Yg << "\t";
+		file << tmi.Mean << "\t";
+		file << tmi.Sigma << "\t";
+		file << tmi.countDefect << "\t";
+		file << tmi.CRC << "\t";
+		file << tmi.Date << "\t";
+		file << tmi.Version << "\t";
+		file << "\n";
+	}
+
+	void PrintSHTMI2(ofstream &file, struct SHTMI2 tmi, TDateTime curDate) {
+		file << AnsiString(DateToStr(curDate)).c_str() << "\n";
 		file << "____________________________________" << "\n";
 		file << "Ã‡ÒÒË‚ ÿ“Ã»2" << "\n";
 		file << "Tpr\t" << DayTimeToString(tmi.timeBOKZ).c_str() << "\n";
@@ -689,6 +785,39 @@ namespace parse_prot {
 		}
 		file << "____________________________________" << "\n";
 		file << flush;
+	}
+
+	void PrintLogSHTMI2(ofstream &file, struct SHTMI2 tmi, TDateTime curDate, bool create) {
+		if (!create) {
+			file << "Date\t";
+			file << "Day/Time\t";
+			file << "KC1\t" << "KC2\t" << "POST\t" << "π\t" << "Texp\t";
+			file << "”—ƒ\t" << "ÕŒ\t" << "ÕŒ—À\t";
+			file << "TŒ\t" << "TŒ—À\t" << "—À≈∆\t";
+			for (int i = 0; i < MAX_STAT; i++) {
+				file << "EC" << (i+1) << "\t";
+			}
+			file << "\n";
+		}
+		file << AnsiString(DateToStr(curDate)).c_str() << "\t";
+		file << DayTimeToString(tmi.timeBOKZ).c_str()<<"\t";
+		file << uppercase << hex << setfill('0');
+		file << "0x" << setw(4) << tmi.status1 << "\t";
+		file << "0x" << setw(4) << tmi.status2 << "\t";
+		file << "0x" << setw(4) << tmi.post << "\t";
+		file << dec << setfill(' ');
+		file << setw(6) << tmi.serialNumber << "\t";
+		file << setw(6) << tmi.timeExp << "\t";
+		file << setw(6) << tmi.cntCommandWord << "\t";
+		file << setw(6) << tmi.cntCallNO << "\t";
+		file << setw(6) << tmi.cntNOtoSLEZH << "\t";
+		file << setw(6) << tmi.cntCallTO << "\t";
+		file << setw(6) << tmi.cntTOtoSLEZH << "\t";
+		file << setw(8) << tmi.cntSLEZH << "\t";
+		for (int i = 0; i < MAX_STAT; i++) {
+			file << tmi.cntStatOrient[i] << "\t";
+		}
+		file << "\n";
 	}
 
 	void PrintDTMI(ofstream &file, struct DTMI tmi) {
@@ -1643,11 +1772,13 @@ CadrInfo convertIKIFormatToInfoCadr(IKI_img* reader, bool CompareIKIRes)
 		for (int i = 0;  i < 3; i++)
 		{
 			double diff = cadrInfo.AnglesOrient[i] - reader->Georeferencing.OrientationAngles[i];
-			if (abs(diff) > 5)        // ÔÓÚÓÏ Û·‡Ú¸
-			{
-				diff = (cadrInfo.AnglesOrient[i] + reader->Georeferencing.OrientationAngles[i])
-				-	abs(cadrInfo.AnglesOrient[i] - reader->Georeferencing.OrientationAngles[i]);
-			}
+//			if (abs(diff) > 5)        // ÔÓÚÓÏ Û·‡Ú¸
+//			{
+//				diff = (cadrInfo.AnglesOrient[i] + reader->Georeferencing.OrientationAngles[i])
+//				-	abs(cadrInfo.AnglesOrient[i] - reader->Georeferencing.OrientationAngles[i]);
+//			}
+			if (abs(diff) >  PI) diff -= 2*PI;
+			if (abs(diff) < -PI) diff += 2*PI;
 			cadrInfo.AnglesDiff[i] = diff;
 		}
 

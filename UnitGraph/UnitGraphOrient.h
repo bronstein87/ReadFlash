@@ -101,11 +101,11 @@ __published: // IDE-managed Components
 	TOpenDialog *OpenDialog;
 	TCheckBox *SortFileCheckBox;
 	TMenuItem *MenuOpenFlash;
-	TMenuItem *MenuOpenTMI;
+	TMenuItem *MenuOpenSamspace;
 	TMenuItem *N1;
 	TMenuItem *BOKZ60ParseProtocol;
 	TMenuItem *BOKZM2VParseProtocol;
-	TMenuItem *N2;
+	TMenuItem *MenuOpenEnregy;
 	TLabel *LabelFrameReport;
 	TMenuItem *ReadIKIFormat;
 	TChartEditor *ChartEditor1;
@@ -213,6 +213,8 @@ __published: // IDE-managed Components
 	TEdit *RatioEdit;
 	TLabel *Label13;
 	TLabel *Label14;
+	TLabel *Label15;
+	TMenuItem *MenuOpenArsenal;
 
 	void __fastcall MenuSaveClick(TObject *Sender);
 	void __fastcall MenuClearClick(TObject *Sender);
@@ -229,11 +231,11 @@ __published: // IDE-managed Components
 	void __fastcall FormMouseWheelUp(TObject *Sender, TShiftState Shift,
 		const TPoint& MousePos, bool &Handled);
 	void __fastcall MenuOpenFlashClick(TObject *Sender);
-	void __fastcall MenuOpenProgressTMIClick(TObject *Sender);
+	void __fastcall MenuOpenSamspaceClick(TObject *Sender);
 	void __fastcall EditNumCadrChange(TObject *Sender);
 	void __fastcall BOKZ60ParseProtocolClick(TObject *Sender);
 	void __fastcall BOKZM2VParseProtocolClick(TObject *Sender);
-	void __fastcall MenuOpenEnergyTMIClick(TObject *Sender);
+	void __fastcall MenuOpenEnergyClick(TObject *Sender);
 	void __fastcall ScaleEditChange(TObject *Sender);
 	void __fastcall PixelBrightCheckBoxClick(TObject *Sender);
 	void __fastcall PixelSizeEditChange(TObject *Sender);
@@ -253,6 +255,7 @@ __published: // IDE-managed Components
 	void __fastcall BOKZMFParseProtocolClick(TObject *Sender);
 	void __fastcall N21Click(TObject *Sender);
 	void __fastcall BOKZM2ParseProtocolClick(TObject *Sender);
+	void __fastcall MenuOpenArsenalClick(TObject *Sender);
 
 
 private: // User declarations
@@ -478,8 +481,8 @@ private: // User declarations
 		TShiftState Shift, int X, int Y);
 
 
-	void OutputDTMI(ofstream &_fout, AnsiString &_SaveDir, DTMI &_tmi);
-	void OutputLOC(ofstream &_fout, AnsiString &_SaveDir, LOC &_tmi);
+	void OutputDTMI(ofstream &_fout, AnsiString &_SaveDir, DTMI &_tmi, TDateTime zeroDate);
+	void OutputLOC(ofstream &_fout, AnsiString &_SaveDir, LOC &_tmi, TDateTime zeroDate);
 	void StartPrintReport(IKI_img* reader);
 	void PrintReportRes(vector<CadrInfo>& cadrInfo);
 	void CalculateSeriesSKO();
@@ -533,6 +536,7 @@ public: // User declarations
 	void DrawAnimateHandler(void);
 	void SetVisibleLabelFrame(bool isVisible);
 	void SetVisibleLabelStar(bool isVisible);
+    void SetVisibleLabelObject(bool isVisible);
 	void PrepareChartFrag(TColor *_colorFrag, const int _maxDrawFrag);
 	void DrawChartFrag(const TColor *_colorFrag, const int _maxDrawFrag, CadrInfo& _cadrInfo);
 

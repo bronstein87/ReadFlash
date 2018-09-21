@@ -12,6 +12,7 @@
 #include <System.IOUtils.hpp>
 #include <math.h>
 #include <algorithm>
+#include "MathM.h"
 
 #define MAX_STAT 	   16
 #define MAX_OBJ_DTMI   15
@@ -42,6 +43,13 @@ namespace parse_prot {
 		float quatBoard[4], Epoch;
 		stLocal LocalList1[15], LocalList2[15], ResultList[12];
 		unsigned char nObjectWindow[16];
+	};
+
+	struct MSHI {
+		unsigned short status1, status2;
+		unsigned int timeBOKZ;
+		float OZ[3], Qornt[4];
+        float W[3];
 	};
 
 	struct SHTMI1 {
@@ -166,9 +174,14 @@ namespace parse_prot {
 
 	int TryReadLOC(ifstream &finp, struct LOC &tmi);
 
-	void PrintSHTMI1(ofstream &file, struct SHTMI1 tmi);
+	void PrintMSHI(ofstream &file, struct MSHI tmi, TDateTime curDate);
+	void PrintLogMSHI(ofstream &file, struct MSHI tmi, TDateTime curDate, bool create);
 
-	void PrintSHTMI2(ofstream &file, struct SHTMI2 tmi);
+	void PrintSHTMI1(ofstream &file, struct SHTMI1 tmi);
+	void PrintLogSHTMI1(ofstream &file, struct SHTMI1 tmi, bool create);
+
+	void PrintSHTMI2(ofstream &file, struct SHTMI2 tmi, TDateTime curDate);
+	void PrintLogSHTMI2(ofstream &file, struct SHTMI2 tmi, TDateTime curDate, bool create);
 
 	void PrintDTMI(ofstream &file, struct DTMI tmi);
 
