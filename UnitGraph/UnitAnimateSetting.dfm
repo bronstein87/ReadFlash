@@ -24,6 +24,10 @@ object FormAnimateSetting: TFormAnimateSetting
     TabOrder = 0
     object ShowPage: TTabSheet
       Caption = #1040#1085#1080#1084#1072#1094#1080#1103
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GroupBox1: TGroupBox
         Left = 3
         Top = 3
@@ -291,6 +295,10 @@ object FormAnimateSetting: TFormAnimateSetting
     object FilesPage: TTabSheet
       Caption = #1060#1072#1081#1083#1099
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GroupBox5: TGroupBox
         Left = 0
         Top = 3
@@ -341,6 +349,10 @@ object FormAnimateSetting: TFormAnimateSetting
     object DBOptionsPage: TTabSheet
       Caption = #1053#1072#1089#1090#1088#1086#1081#1082#1080' '#1041#1044
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label9: TLabel
         Left = 19
         Top = 45

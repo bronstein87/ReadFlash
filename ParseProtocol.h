@@ -1230,7 +1230,221 @@ namespace parse_prot {
 
 	}
 
-	template<class ProtHandler>
+//	template<class ProtHandler>
+//	void readBOKZMFProtocol(ifstream& in, vector<CadrInfo>& cadrInfoVec,
+//		ProtHandler handler, TDateTime& dt) {
+//		try {
+//			const string errorMessage =
+//				string("Cчитывание протокола завершено необычным образом.");
+//			string line;
+//			const string dtmi1 =
+//				"\\par \\b C\\'ee\\'f1\\'f2\\'e0\\'e2 \\'c4\\'d2\\'cc\\'c81:";
+//			const string mshior = "Alfa"; // признак начала МШИ ОР слежения
+//			const string matrixOrient =
+//				"\\'cc\\'e0\\'f2\\'f0\\'e8\\'f6\\'e0 \\'ee\\'f0\\'e8\\'e5\\'ed\\'f2\\'e0\\'f6\\'e8\\'e8";
+//			const string codeStatus =
+//				"\\'ca\\'ee\\'e4 \\'f1\\'ee\\'f1\\'f2\\'ee\\'ff\\'ed\\'e8\\'ff";
+//			// КС ДМТИ
+//			const string CS = "Az"; // перед кодом состояния
+//			const string timePrMSHIOR = "(\\'d2\\'ef\\'f0";
+//			// время привязки   МШИ ОР
+//			const string timePrDTMI =
+//				"\\'ef\\'f0\\'e8\\'e2\\'ff\\'e7\\'ea\\'e8";
+//			// время привязки ДТМИ
+//			const string objects = "\\'ee\\'e1\\'fa\\'e5\\'ea\\'f2\\'ee\\'e2";
+//			const string locTable =
+//				"\\par \\b0  \\f1\\u8470?     X       Y       \\f0\\'df\\'f0\\'ea\\'ee\\'f1\\'f2\\'fc \\'d7\\'e8\\'f1\\'eb\\'ee \\'fd\\'eb.";
+//			const string fragTable = "\\par \\b0  \\f1\\u8470?     X       Y  ";
+//			const string datetime =
+//				"\\viewkind4\\uc1\\pard\\b\\f0\\fs20\\'d3\\'f7\\'e0\\'f1\\'f2\\'ee\\'ea";
+//			const string timePrHMS = "\\'ef\\'f0\\'e8\\'e2\\'ff\\'e7\\'ea\\'e8";
+//
+//			if (dt.Val == 0 && findLine(in, datetime) != string::npos) {
+//				getline(in, line);
+//				getline(in, line);
+//				vector<string>splitted = split(line, " ");
+//				dt = StrToDateTime(toUString(splitted[2] + " " + splitted[3]));
+//				in.seekg(ios_base::beg);
+//			}
+//			else
+//				throw logic_error("Не найдено стартовое время привязки");
+//
+//			while (getline(in, line)) {
+//				CadrInfo cadrInfo;
+//				cadrInfo.ImageHeight = 512;
+//				cadrInfo.ImageWidth = 512;
+//				if (line.find(dtmi1) != string::npos) {
+//					if (findWord(in, timePrDTMI) != string::npos) {
+//						string hms;
+//						in >> hms >> hms;
+//						dt = StrToDateTime
+//							(dt.DateString() + " " + toUString(hms));
+//						cadrInfo.Time = dt.Val;
+//					}
+//					else
+//						throw logic_error(errorMessage);
+//
+//					if (findWord(in, objects) != string::npos) // лок
+//					{
+//						in >> cadrInfo.CountLocalObj;
+//					}
+//					else
+//						throw logic_error(errorMessage);
+//
+//					if (findWord(in, objects) != string::npos) // расп.
+//					{
+//						in >> cadrInfo.CountDeterObj;
+//					}
+//					else
+//						throw logic_error(errorMessage);
+//
+//					if (findLine(in, locTable) != string::npos) {
+//						ObjectsInfo objInfo;
+//						while (getline(in, line) && line != "\\par ") {
+//							vector<string>splitted = split(line, " ");
+//							objInfo.X = atof(splitted[2].c_str());
+//							objInfo.Y = atof(splitted[3].c_str());
+//							if (objInfo.X == 0 && objInfo.Y == 0)
+//								break;
+//							objInfo.Bright = atof(splitted[4].c_str());
+//							objInfo.Square = atoi(splitted[5].c_str());
+//							cadrInfo.ObjectsList.push_back(objInfo);
+//						}
+//						cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
+//					}
+//					else
+//						throw logic_error(errorMessage);
+//					handler(cadrInfo, clBlue);
+//					cadrInfoVec.push_back(cadrInfo);
+//					writeProtocolToIKI(cadrInfo, cadrInfoVec.size());
+//
+//				}
+//				else if (line.find(mshior) != string::npos) {
+//					TColor pointColor = clBlue;
+//					if (findLine(in, CS) != string::npos) {
+//						string status1, status2;
+//						getline(in, status1);
+//						getline(in, status2);
+//						if (!(contains(status1, "e000H") && contains(status2,
+//							"0005H"))) {
+//							pointColor = clRed;
+//						}
+//					}
+//					else
+//						throw logic_error(errorMessage);
+//
+//					if (findWord(in, timePrMSHIOR) != string::npos) {
+//						string hms;
+//						in >> hms >> hms;
+//						dt = StrToDateTime
+//							(dt.DateString() + " " + toUString(hms));
+//						cadrInfo.Time = dt.Val;
+//					}
+//					else
+//						throw logic_error(errorMessage);
+//
+//					if (findLine(in, matrixOrient) != string::npos) {
+//						for (int i = 0; i < 3; i++) {
+//							getline(in, line);
+//							vector<string>splitted = split(line, " ");
+//							cadrInfo.MatrixOrient[i][0] =
+//								atof(splitted[1].c_str());
+//							cadrInfo.MatrixOrient[i][1] =
+//								atof(splitted[2].c_str());
+//							cadrInfo.MatrixOrient[i][2] =
+//								atof(splitted[3].c_str());
+//						}
+//						MatrixToEkvAngles(cadrInfo.MatrixOrient,
+//							cadrInfo.AnglesOrient);
+//					}
+//
+//					// число локализ. объектов
+//					if (findWord(in, "NumLoc") != string::npos) {
+//						in >> cadrInfo.CountLocalObj;
+//					}
+//					else
+//						throw logic_error(errorMessage);
+//
+//					// ищем число фрагментов
+//					if (findWord(in, "NumObj") != string::npos) {
+//						in >> cadrInfo.CountDeterObj;
+//					}
+//					else
+//						throw logic_error(errorMessage);
+//
+//					// ищем число распознанных объектов
+//					if (findWord(in, "NumFrag") != string::npos) {
+//						// общее число фрагментов
+//						in >> cadrInfo.CountWindows;
+//					}
+//					else
+//						throw logic_error(errorMessage);
+//
+//					if (findLine(in, "NumSec") != string::npos) {
+//						for (int i = 0; i < 3; i++) {
+//							getline(in, line);
+//							vector<string>splitted = split(line, " ");
+//							cadrInfo.OmegaOrient[i] =
+//								atof(splitted.back().c_str());
+//						}
+//					}
+//					else
+//						throw logic_error(errorMessage);
+//
+//					if (findLine(in, locTable) != string::npos) {
+//						ObjectsInfo objInfo;
+//						while (getline(in, line) && line != "\\par ") {
+//							vector<string>splitted = split(line, " ");
+//							objInfo.X = atof(splitted[2].c_str());
+//							objInfo.Y = atof(splitted[3].c_str());
+//							if (objInfo.X == 0 && objInfo.Y == 0)
+//								break;
+//							objInfo.Bright = atof(splitted[4].c_str());
+//							objInfo.Square = atoi(splitted[5].c_str());
+//							cadrInfo.ObjectsList.push_back(objInfo);
+//						}
+//						cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
+//					}
+//					else
+//						throw logic_error(errorMessage);
+//
+//					if (findLine(in, fragTable) != string::npos) {
+//						WindowsInfo winInfo;
+//						bool checkFirstRow = false;
+//						while (getline(in, line) && line != "\\par ") {
+//							vector<string>splitted = split(line, " ");
+//							if (!checkFirstRow) {
+//								winInfo.Xstart = atof(splitted[3].c_str());
+//								winInfo.Ystart = atof(splitted[4].c_str());
+//								winInfo.CountObj = 1;
+//								checkFirstRow = true;
+//							}
+//							else {
+//								winInfo.Xstart = atof(splitted[2].c_str());
+//								winInfo.Ystart = atof(splitted[3].c_str());
+//								winInfo.CountObj = 1;
+//								cadrInfo.WindowsList.push_back(winInfo);
+//							}
+//						}
+//						cadrInfo.SizeWindowsList = cadrInfo.WindowsList.size();
+//					}
+//					else
+//						throw logic_error(errorMessage);
+//					handler(cadrInfo, pointColor);
+//					cadrInfoVec.push_back(cadrInfo);
+//					writeProtocolToIKI(cadrInfo, cadrInfoVec.size());
+//
+//				}
+//			}
+//		}
+//
+//		catch (exception &e) {
+//			ShowMessage(e.what());
+//		}
+//
+//	}
+
+    	template<class ProtHandler>
 	void readBOKZMFProtocol(ifstream& in, vector<CadrInfo>& cadrInfoVec,
 		ProtHandler handler, TDateTime& dt) {
 		try {
@@ -1238,7 +1452,7 @@ namespace parse_prot {
 				string("Cчитывание протокола завершено необычным образом.");
 			string line;
 			const string dtmi1 =
-				"\\par \\b C\\'ee\\'f1\\'f2\\'e0\\'e2 \\'c4\\'d2\\'cc\\'c81:";
+				"\\b\\'c4\\'ee\\'ef. \\'e8\\'ed\\'f4\\'ee\\'f0\\'ec\\'e0\\'f6\\'e8\\'ff:";
 			const string mshior = "Alfa"; // признак начала МШИ ОР слежения
 			const string matrixOrient =
 				"\\'cc\\'e0\\'f2\\'f0\\'e8\\'f6\\'e0 \\'ee\\'f0\\'e8\\'e5\\'ed\\'f2\\'e0\\'f6\\'e8\\'e8";
@@ -1253,17 +1467,16 @@ namespace parse_prot {
 			// время привязки ДТМИ
 			const string objects = "\\'ee\\'e1\\'fa\\'e5\\'ea\\'f2\\'ee\\'e2";
 			const string locTable =
-				"\\par \\b0  \\f1\\u8470?     X       Y       \\f0\\'df\\'f0\\'ea\\'ee\\'f1\\'f2\\'fc \\'d7\\'e8\\'f1\\'eb\\'ee \\'fd\\'eb.";
+				"\\b0  \\f1\\u8470?     X       Y       \\f0\\'df\\'f0\\'ea\\'ee\\'f1\\'f2\\'fc \\'d7\\'e8\\'f1\\'eb\\'ee \\'fd\\'eb.";
 			const string fragTable = "\\par \\b0  \\f1\\u8470?     X       Y  ";
 			const string datetime =
-				"\\viewkind4\\uc1\\pard\\b\\f0\\fs20\\'d3\\'f7\\'e0\\'f1\\'f2\\'ee\\'ea";
+				"\\'c1\\'d8\\'c2:";
 			const string timePrHMS = "\\'ef\\'f0\\'e8\\'e2\\'ff\\'e7\\'ea\\'e8";
 
-			if (dt.Val == 0 && findLine(in, datetime) != string::npos) {
-				getline(in, line);
-				getline(in, line);
-				vector<string>splitted = split(line, " ");
-				dt = StrToDateTime(toUString(splitted[2] + " " + splitted[3]));
+			if (dt.Val == 0 && findWord(in, datetime) != string::npos) {
+				string date, time;
+				in >> date >> time;
+				dt = StrToDateTime(toUString(date + " " + time));
 				in.seekg(ios_base::beg);
 			}
 			else
@@ -1273,53 +1486,8 @@ namespace parse_prot {
 				CadrInfo cadrInfo;
 				cadrInfo.ImageHeight = 512;
 				cadrInfo.ImageWidth = 512;
-				if (line.find(dtmi1) != string::npos) {
-					if (findWord(in, timePrDTMI) != string::npos) {
-						string hms;
-						in >> hms >> hms;
-						dt = StrToDateTime
-							(dt.DateString() + " " + toUString(hms));
-						cadrInfo.Time = dt.Val;
-					}
-					else
-						throw logic_error(errorMessage);
 
-					if (findWord(in, objects) != string::npos) // лок
-					{
-						in >> cadrInfo.CountLocalObj;
-					}
-					else
-						throw logic_error(errorMessage);
-
-					if (findWord(in, objects) != string::npos) // расп.
-					{
-						in >> cadrInfo.CountDeterObj;
-					}
-					else
-						throw logic_error(errorMessage);
-
-					if (findLine(in, locTable) != string::npos) {
-						ObjectsInfo objInfo;
-						while (getline(in, line) && line != "\\par ") {
-							vector<string>splitted = split(line, " ");
-							objInfo.X = atof(splitted[2].c_str());
-							objInfo.Y = atof(splitted[3].c_str());
-							if (objInfo.X == 0 && objInfo.Y == 0)
-								break;
-							objInfo.Bright = atof(splitted[4].c_str());
-							objInfo.Square = atoi(splitted[5].c_str());
-							cadrInfo.ObjectsList.push_back(objInfo);
-						}
-						cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
-					}
-					else
-						throw logic_error(errorMessage);
-					handler(cadrInfo, clBlue);
-					cadrInfoVec.push_back(cadrInfo);
-					writeProtocolToIKI(cadrInfo, cadrInfoVec.size());
-
-				}
-				else if (line.find(mshior) != string::npos) {
+			if (line.find(mshior) != string::npos) {
 					TColor pointColor = clBlue;
 					if (findLine(in, CS) != string::npos) {
 						string status1, status2;
@@ -1342,7 +1510,7 @@ namespace parse_prot {
 					}
 					else
 						throw logic_error(errorMessage);
-
+						//тут исправить
 					if (findLine(in, matrixOrient) != string::npos) {
 						for (int i = 0; i < 3; i++) {
 							getline(in, line);
@@ -1400,7 +1568,8 @@ namespace parse_prot {
 							if (objInfo.X == 0 && objInfo.Y == 0)
 								break;
 							objInfo.Bright = atof(splitted[4].c_str());
-							objInfo.Square = atoi(splitted[5].c_str());
+							int square = atoi(splitted[5].c_str());
+							objInfo.Square = square < 0 ? -square : square;
 							cadrInfo.ObjectsList.push_back(objInfo);
 						}
 						cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();

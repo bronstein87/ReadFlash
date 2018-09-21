@@ -3751,7 +3751,7 @@ void __fastcall TFormGraphOrient::CheckBoxLimitClick(TObject *Sender)
 void __fastcall TFormGraphOrient::BOKZMFParseProtocolClick(TObject *Sender)
 {
 		 OpenDialog->Options.Clear();
-		 OpenDialog->Filter = "ip1|*.ip1 | ip2|*.ip2";
+		 OpenDialog->Filter = "ip1|*.ip1";
 		 OpenDialog->Options << ofAllowMultiSelect;
 		 if (OpenDialog->Execute())
 		 {
