@@ -215,6 +215,7 @@ __published: // IDE-managed Components
 	TLabel *Label14;
 	TLabel *Label15;
 	TMenuItem *MenuOpenArsenal;
+	TMenuItem *BOKZMParse;
 
 	void __fastcall MenuSaveClick(TObject *Sender);
 	void __fastcall MenuClearClick(TObject *Sender);
@@ -256,6 +257,7 @@ __published: // IDE-managed Components
 	void __fastcall N21Click(TObject *Sender);
 	void __fastcall BOKZM2ParseProtocolClick(TObject *Sender);
 	void __fastcall MenuOpenArsenalClick(TObject *Sender);
+	void __fastcall BOKZMParseClick(TObject *Sender);
 
 
 private: // User declarations
@@ -308,6 +310,29 @@ private: // User declarations
 				cadrInfo.OmegaOrient[1] * RTM, pointColor);
 			Form->plotter->AddPoint(Form->ChartWz, 0, cadrInfo.Time,
 				cadrInfo.OmegaOrient[2] * RTM, pointColor);
+			Form->plotter->AddPoint(Form->ChartNumFrag, 0, cadrInfo.Time,
+				cadrInfo.CountWindows);
+		}
+
+	};
+
+		class HandleM : public Handle {
+	public:
+		_fastcall HandleM(TFormGraphOrient* _Form) : Handle(_Form) {
+		}
+
+		void operator()(CadrInfo& cadrInfo, TColor pointColor = clBlue) {
+
+			Form->plotter->AddPoint(Form->ChartAl, 0, cadrInfo.Time,
+				cadrInfo.AnglesOrient[0] * RTD, pointColor);
+			Form->plotter->AddPoint(Form->ChartDl, 0, cadrInfo.Time,
+				cadrInfo.AnglesOrient[1] * RTD, pointColor);
+			Form->plotter->AddPoint(Form->ChartAz, 0, cadrInfo.Time,
+				cadrInfo.AnglesOrient[2] * RTD, pointColor);
+			Form->plotter->AddPoint(Form->ChartNumLoc, 0, cadrInfo.Time,
+				cadrInfo.CountLocalObj, pointColor);
+			Form->plotter->AddPoint(Form->ChartNumDet, 0, cadrInfo.Time,
+				cadrInfo.CountDeterObj, pointColor);
 			Form->plotter->AddPoint(Form->ChartNumFrag, 0, cadrInfo.Time,
 				cadrInfo.CountWindows);
 		}
@@ -518,15 +543,15 @@ private: // User declarations
 	unsigned short FontSize;
 	StatusInfo statusInfo;
 
-	vector<unsigned short>tableRows;
-	vector<string>columnTitles;
+	vector <unsigned short> tableRows;
+	vector <string> columnTitles;
 
-	vector<TChart*>Charts;
-	vector<CadrInfo>vCadrInfo;
-	vector<TImage*>ImageVector;
-	vector<FragmentData>FragmentVector;
-	vector<FragmentScrollBox*>ImageScrollBoxVector;
-	vector<TImage*>FragmentsNumbers;
+	vector <TChart*> Charts;
+	vector <CadrInfo> vCadrInfo;
+	vector <TImage*> ImageVector;
+	vector <FragmentData> FragmentVector;
+	vector <FragmentScrollBox*> ImageScrollBoxVector;
+	vector <TImage*> FragmentsNumbers;
 
 public: // User declarations
 

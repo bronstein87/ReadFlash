@@ -137,7 +137,7 @@ namespace parse_prot {
 		float LocalList[MAX_OBJ_BOKZM][4];
 	};
 
-	struct DTMI_MSI {
+	struct MSI_BOKZM {
 		float timeBOKZ;
 		float timeBetwCadrs;
 		short timeExp;
@@ -270,13 +270,11 @@ namespace parse_prot {
 		const string xyc = "XYc";
 		const int skipBeforeData = 3;
 		const int firstDataBlockFirstRow = 2;
-		const int taktPos = 1;
-
 
 		unsigned short arrayMSHI[sizeMSHI];
 		unsigned short arrayTLOC[sizeTLOC];
 		unsigned short arrayTFRAG[sizeTFRAG];
-		int currentTakt = 0;
+		unsigned short arrayMSI[sizeMSI];
 
 		CadrInfo cadrInfo;
 		string needToFind = mshior;
@@ -303,17 +301,18 @@ namespace parse_prot {
 
 			vector <string> mshiStr;
 			parseMILHex(mshiStr, 3, in, firstDataBlockFirstRow);
-			int sz = mshiStr.size();
+
 			for (int i = 0; i < sizeMSHI; i++) {
 				 arrayMSHI[i] = strtoul(mshiStr[i].c_str(), NULL, 16);
 			}
 			MSHI_BOKZM mshi;
 			memcpy(&mshi, arrayMSHI, sizeof(short) * sizeMSHI);
-			if (mshi.Mornt[0][0] == 0 
+			if (mshi.Mornt[0][0] == 0
 			&& mshi.Mornt[0][1] == 0
 			&& mshi.Mornt[0][2] == 0) {
+
 				continue;
-            }
+			}
 			cadrInfo.Time = mshi.timeBOKZ;
 			for (int i = 0; i < 3; i++)
 			{
@@ -324,8 +323,31 @@ namespace parse_prot {
 			}
 
 			MatrixToEkvAngles(cadrInfo.MatrixOrient, cadrInfo.AnglesOrient);
-			needToFind = mloc;
+            cadrInfo.IsOrient = true;
+			needToFind = msi;
+		  }
+		  else if (line.find(msi) != string::npos) {
 
+			if (needToFind != msi) {
+				needToFind = mshior;
+				cadrInfo = CadrInfo();
+				continue;
+			}
+
+			for (int i = 0; i < skipBeforeData; i++) {
+				 getline(in, line);
+			}
+
+			vector <string> msiStr;
+			parseMILHex(msiStr, 2, in, firstDataBlockFirstRow);
+			for (int i = 0; i < sizeMSI; i++) {
+				 arrayMSI[i] = strtoul(msiStr[i].c_str(), NULL, 16);
+			}
+			MSI_BOKZM msi;
+			memcpy(&msi, arrayMSI, sizeof(short) * sizeMSI);
+			cadrInfo.CountDeterObj = msi.nDeterObj;
+			cadrInfo.CountWindows = msi.nFrag;
+			needToFind = mloc;
 		  }
 		  else if (line.find(mloc) != string::npos) {
 			 if (needToFind != mloc) {
@@ -333,7 +355,6 @@ namespace parse_prot {
 				cadrInfo = CadrInfo();
 				continue;	
 			} 
-
 
 			for (int i = 0; i < skipBeforeData; i++) {
 				 getline(in, line);

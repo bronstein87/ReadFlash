@@ -4014,3 +4014,44 @@ void __fastcall TFormGraphOrient::BOKZM2ParseProtocolClick(TObject *Sender)
 	}
 	else throw logic_error("Неверный путь к директории");
  }
+
+void __fastcall TFormGraphOrient::BOKZMParseClick(TObject *Sender)
+{
+		try
+	{
+		OpenDialog->Options.Clear();
+		OpenDialog->Filter = "mil|*.mil";
+		OpenDialog->Options << ofAllowMultiSelect;
+		if (OpenDialog->Execute()) {
+			vCadrInfo.clear();
+			DeleteLineGraph();
+			unique_ptr <TStringList> FileList (new TStringList());
+			FileList->Assign(OpenDialog->Files);
+			SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
+			for (int i = 0; i < FileList->Count; i++)
+			{
+				AnsiString FileName = FileList->Strings[i];
+				ifstream in(FileName.c_str());
+				if (!in.is_open())
+				{
+					ShowMessage("Не удалось открыть файл");
+					return;
+				}
+				HandleM handler (this);
+				readBOKZMMil (in, vCadrInfo, handler);
+
+			}
+
+			PrepareStartDraw();
+			CheckTabSheet();
+			CalculateSeriesSKO();
+		}
+	}
+
+	catch (exception &e)
+	{
+		ShowMessage(e.what());
+	}
+}
+//---------------------------------------------------------------------------
+
