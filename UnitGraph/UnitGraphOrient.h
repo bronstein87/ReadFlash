@@ -216,6 +216,8 @@ __published: // IDE-managed Components
 	TLabel *Label15;
 	TMenuItem *MenuOpenArsenal;
 	TMenuItem *BOKZMParse;
+	TPopupMenu *PopupMenu1;
+	TMenuItem *SaveSeriesData;
 
 	void __fastcall MenuSaveClick(TObject *Sender);
 	void __fastcall MenuClearClick(TObject *Sender);
@@ -258,6 +260,7 @@ __published: // IDE-managed Components
 	void __fastcall BOKZM2ParseProtocolClick(TObject *Sender);
 	void __fastcall MenuOpenArsenalClick(TObject *Sender);
 	void __fastcall BOKZMParseClick(TObject *Sender);
+	void __fastcall SaveSeriesDataClick(TObject *Sender);
 
 
 private: // User declarations

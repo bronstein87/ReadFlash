@@ -54,6 +54,7 @@ __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 		for (unsigned int i = 0; i < Charts.size(); i++) {
 			Charts[i]->OnMouseWheel = &ChartMouseWheel;
 			Charts[i]->OnMouseDown = &ChartMouseDown;
+			Charts[i]->PopupMenu = PopupMenu1;
 		}
 
 	SourceDir = GetCurrentDir();
@@ -3374,7 +3375,6 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 			FileList->Assign(OpenDialog->Files);
 			SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
 			FileList->Sort();
-
 			if (FileOpenDialog1->Execute())
 			{
 				FileTitle = "IKI";
@@ -3429,7 +3429,6 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 								{
 									CompareIKIRes = false;
 								}
-
 							}
 							else ShowMessage("Не удалось считать " + AnsiString(FileList->Strings[i]));
 						}
@@ -3510,7 +3509,7 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 																		  vCadrInfo.back().ObjectsList[iObject].Bright);
 											}
 
-											if (vCadrInfo.back().ObjectsList[iObject].Sp!="__") {
+											if (vCadrInfo.back().ObjectsList[iObject].Sp != "__") {
 												float tempSpec = GetTempSpec(vCadrInfo.back().ObjectsList[iObject].Sp);
 												float brightMv0 = vCadrInfo.back().ObjectsList[iObject].Bright *
 																	pow ((float)2.512, (float)vCadrInfo.back().ObjectsList[iObject].Mv);
@@ -4052,6 +4051,43 @@ void __fastcall TFormGraphOrient::BOKZMParseClick(TObject *Sender)
 	{
 		ShowMessage(e.what());
 	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormGraphOrient::SaveSeriesDataClick(TObject *Sender)
+{
+	 TComponent *pComponent = PopupMenu1->PopupComponent;
+	 if (pComponent)
+	 {
+		TChart* chart = dynamic_cast <TChart*> (pComponent);
+		if (chart)
+		{
+			string dirName = toStdString(GetCurrentDir()) + "\\" + "Графики в txt";
+			TDirectory::CreateDirectoryW("Графики в txt");
+			TDateTime currentDt = TDateTime::CurrentDateTime();
+			UnicodeString dtStr;
+			DateTimeToString(dtStr, UnicodeString("yyyy-MM-dd hh-mm-ss"), currentDt);
+			string chartName =  toStdString(chart->Name) + "_" + toStdString(dtStr);
+			string path = dirName + "\\" + chartName + ".txt";
+			ofstream out(path.c_str(), std::ofstream::out);
+			if (out.is_open())
+			{
+				for (int i = 0; i < chart->SeriesCount(); i++)
+				{
+					out << toStdString(chart->Series[i]->Name) << "\n";
+					out << "X\t" << "Y\t" << "\n";
+					for (int j = 0; j < chart->Series[i]->Count(); j++)
+					{
+						out << chart->Series[i]->XValues->Value[j] << "\t" << chart->Series[i]->YValues->Value[j] << "\n";
+					}
+					out << "===================================\n";
+					out.close();
+				}
+
+			}
+
+		}
+	 }
 }
 //---------------------------------------------------------------------------
 
