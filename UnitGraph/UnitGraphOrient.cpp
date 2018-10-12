@@ -2972,20 +2972,26 @@ void TFormGraphOrient::FillStatusTable()
 		AddRowToStatusTable(vCadrInfo[i]);
 	}
 
-	int div = 0;
-	for (int i = 1; i < TableStatusInfo->RowCount; i++)
+	const int NO4Pos = 3;
+	if (TableStatusInfo->ColCount >= NO4Pos
+	&& TableStatusInfo->Cells[0][NO4Pos] == "НО4")
 	{
-		div += StrToInt(TableStatusInfo->Cells[1][i]);
+		int div = 0;
+		for (int i = 1; i < TableStatusInfo->RowCount; i++)
+		{
+			div += StrToInt(TableStatusInfo->Cells[1][i]);
+		}
+
+		if (div == 0)
+		   return;
+		else
+		{
+			statusInfo.NoOneCount = div;
+			statusInfo.NoFourCount = StrToFloat(TableStatusInfo->Cells[4][1]);
+			RatioEdit->Text = FloatToStr((statusInfo.NoFourCount / statusInfo.NoOneCount) * 100) ;
+		}
 	}
 
-	if (div == 0)
-	   return;
-	else
-	{ 
-		statusInfo.NoOneCount = div;
-		statusInfo.NoFourCount = StrToFloat(TableStatusInfo->Cells[4][1]); 
-		RatioEdit->Text = FloatToStr((statusInfo.NoFourCount / statusInfo.NoOneCount) * 100) ;
-	}
 }
 // ---------------------------------------------------------------------------
 
@@ -4016,7 +4022,7 @@ void __fastcall TFormGraphOrient::BOKZM2ParseProtocolClick(TObject *Sender)
 
 void __fastcall TFormGraphOrient::BOKZMParseClick(TObject *Sender)
 {
-		try
+	try
 	{
 		OpenDialog->Options.Clear();
 		OpenDialog->Filter = "mil|*.mil";
@@ -4088,6 +4094,46 @@ void __fastcall TFormGraphOrient::SaveSeriesDataClick(TObject *Sender)
 
 		}
 	 }
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormGraphOrient::BOKZM60MILParseClick(TObject *Sender)
+{
+   	try
+	{
+		OpenDialog->Options.Clear();
+		OpenDialog->Filter = "txt|*.txt";
+		OpenDialog->Options << ofAllowMultiSelect;
+		if (OpenDialog->Execute()) {
+			vCadrInfo.clear();
+			DeleteLineGraph();
+			unique_ptr <TStringList> FileList (new TStringList());
+			FileList->Assign(OpenDialog->Files);
+			SetCurrentDir(ExtractFileDir(FileList->Strings[0]));
+			for (int i = 0; i < FileList->Count; i++)
+			{
+				AnsiString FileName = FileList->Strings[i];
+				ifstream in(FileName.c_str());
+				if (!in.is_open())
+				{
+					ShowMessage("Не удалось открыть файл");
+					return;
+				}
+				Handle60 handler (this);
+				readBOKZM60Mil (in, vCadrInfo, handler);
+
+			}
+
+			PrepareStartDraw();
+			CheckTabSheet();
+			CalculateSeriesSKO();
+		}
+	}
+
+	catch (exception &e)
+	{
+		ShowMessage(e.what());
+	}
 }
 //---------------------------------------------------------------------------
 

@@ -13,6 +13,7 @@
 #include <math.h>
 #include <algorithm>
 #include "MathM.h"
+#include <System.RegularExpressions.hpp>
 
 #define MAX_STAT 	   16
 #define MAX_OBJ_DTMI   15
@@ -250,9 +251,118 @@ namespace parse_prot {
 	CadrInfo convertIKIFormatToInfoCadr(IKI_img* reader,
 		bool CompareIKIRes = false);
 
-	void parseMILHex(vector <string>& parseTo, int rowCount, ifstream& in, int offset); 
+	void parseMILHex(vector <string>& parseTo, int rowCount, ifstream& in, int offset);
 
-	  	template<class ProtHandler>
+	void parseMILHex(vector <string>& parseTo, int rowCount, ifstream& in);
+
+	template <class ProtHandler>
+	void readBOKZM60Mil (ifstream& in, vector<CadrInfo>& cadrInfoVec,
+		ProtHandler handle)
+		{
+			const string mshior = "สั:	..18";
+			const string loc = "สั:	..80";
+			const int sizeMSHI = 24;
+			const int sizeOneLoc = 30;
+			const int sizeLOC = 270;
+			const int locCount = 9;
+			short arrayMSHI[sizeMSHI];
+			short arrayLOC[sizeLOC];
+			string line;
+			int currentLoc = 0;
+			CadrInfo cadrInfo;
+
+			while (getline(in, line)) {
+					if (TRegEx::IsMatch(toUString(line), toUString(mshior))) {
+					   getline(in, line);
+					   vector <string> mshiStr;
+					   parseMILHex(mshiStr, 3, in);
+
+						for (int i = 0; i < sizeMSHI; i++) {
+						 arrayMSHI[i] = strtoul(mshiStr[i].c_str(), NULL, 16);
+						}
+						SwapShort((arrayMSHI + 2), (arrayMSHI + 3));
+
+						for (int i = 4; i < sizeMSHI; i += 2) {
+								SwapShort((arrayMSHI + i), (arrayMSHI + i + 1));
+								int* pInt = (int*)&arrayMSHI[i];
+								float val = (double)*pInt/(double)0x7fffffff;
+								memcpy(arrayMSHI + i, &val, sizeof(float));
+						}
+						MSHI mshi;
+						memcpy(&mshi, arrayMSHI, sizeof(short) * sizeMSHI);
+						if (mshi.Qornt[0] == 0
+						&& mshi.Qornt[1] == 0
+						&& mshi.Qornt[2] == 0
+						&& mshi.Qornt[3] == 0) {
+							continue;
+						}
+						cadrInfo.Time = mshi.timeBOKZ;
+						for (int i = 0; i < 4; i++)
+						{
+							cadrInfo.QuatOrient[i] = mshi.Qornt[i];
+						}
+
+					quatToMatr(cadrInfo.QuatOrient, cadrInfo.MatrixOrient);
+					MatrixToEkvAngles(cadrInfo.MatrixOrient, cadrInfo.AnglesOrient);
+					cadrInfo.IsOrient = true;
+					cadrInfoVec.push_back(cadrInfo);
+					handle(cadrInfo);
+					cadrInfo = CadrInfo();
+
+					}
+
+					else if (TRegEx::IsMatch(toUString(line), toUString(loc))) {
+						cadrInfo.CountBlock = 0;
+						cadrInfo.CountStars = 0;
+						cadrInfo.ImageHeight = 512;
+						cadrInfo.ImageWidth = 512;
+
+						getline(in, line);
+						++currentLoc;
+						vector <string> locStr;
+						parseMILHex(locStr, 4, in);
+						locStr.erase(locStr.begin(), locStr.begin() + 2);
+						int startFrom = sizeOneLoc * (currentLoc - 1);
+						int to = sizeOneLoc * currentLoc;
+
+						for (int i = startFrom, j = 0; i < to; i++, j++) {
+							arrayLOC[i] = strtoul(locStr[j].c_str(), NULL, 16);
+						}
+
+						if (currentLoc == locCount) {
+							LOC loc;
+							SwapShort((arrayLOC), (arrayLOC + 1));
+							for (int i = 8; i < sizeLOC; i += 2) {
+								SwapShort((arrayLOC + i), (arrayLOC + i + 1));
+							}
+							memcpy(&loc, arrayLOC,  sizeof(short) * sizeLOC);
+							for (int i = 0; i < 32; i++) {
+								ObjectsInfo info;
+								info.X = loc.LocalList[i][0];
+								info.Y = loc.LocalList[i][1];
+								info.Bright = loc.LocalList[i][2];
+								info.Square = *(char*)&loc.LocalList[i][3];
+								if (info.X == 0 && info.Y == 0) {
+									break;
+								}
+								cadrInfo.ObjectsList.push_back(info);
+						}
+						cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
+						cadrInfo.CountLocalObj = loc.nLocalObj;
+						cadrInfo.CountDeterObj = loc.nFixedObj;
+						cadrInfo.Time = loc.timeBOKZ;
+						cadrInfoVec.push_back(cadrInfo);
+						handle(cadrInfo);
+						cadrInfo = CadrInfo();
+						currentLoc = 0;
+						}
+					}
+
+				}
+
+		 }
+
+		template<class ProtHandler>
 	void readBOKZMMil(ifstream& in, vector<CadrInfo>& cadrInfoVec,
 		ProtHandler handle) {
 
@@ -287,7 +397,7 @@ namespace parse_prot {
 		  if (line.find(mshior) != string::npos) {
 
 			if (needToFind != mshior) {
-			   needToFind = mshior;	
+			   needToFind = mshior;
 			}
 
 			cadrInfo.CountBlock = 0;
@@ -300,7 +410,7 @@ namespace parse_prot {
 			}
 
 			vector <string> mshiStr;
-			parseMILHex(mshiStr, 3, in, firstDataBlockFirstRow);
+			parseMILHex(mshiStr, 3, in);
 
 			for (int i = 0; i < sizeMSHI; i++) {
 				 arrayMSHI[i] = strtoul(mshiStr[i].c_str(), NULL, 16);
@@ -323,7 +433,7 @@ namespace parse_prot {
 			}
 
 			MatrixToEkvAngles(cadrInfo.MatrixOrient, cadrInfo.AnglesOrient);
-            cadrInfo.IsOrient = true;
+			cadrInfo.IsOrient = true;
 			needToFind = msi;
 		  }
 		  else if (line.find(msi) != string::npos) {
@@ -380,14 +490,14 @@ namespace parse_prot {
 					info.Y = tloc.LocalList[i][1];
 					info.Bright = tloc.LocalList[i][2];
 					info.Square = tloc.LocalList[i][3];
-					if (info.X == 0 && info.Y == 0) {		
+					if (info.X == 0 && info.Y == 0) {
 						break;
 					}
 					cadrInfo.ObjectsList.push_back(info);
 				}
 				cadrInfo.SizeObjectsList = cadrInfo.CountLocalObj = cadrInfo.ObjectsList.size();
 				tLocReaded = 0;
-				needToFind = xyc; 
+				needToFind = xyc;
 			}
 
 		  }

@@ -149,7 +149,7 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <BT_BuildType>Debug</BT_BuildType>
-        <LinkPackageStatics>rtl.lib;vcl.lib;vclimg.lib;vclwinx.lib;Tee924.lib;TeePro924.lib;TeeUI924.lib;vclx.lib;xmlrtl.lib;dbrtl.lib;adortl.lib;bcboffice2k.lib</LinkPackageStatics>
+        <LinkPackageStatics>rtl.lib;vcl.lib;vclimg.lib;vclwinx.lib;Tee924.lib;TeePro924.lib;TeeUI924.lib;vclx.lib;xmlrtl.lib;dbrtl.lib;adortl.lib;bcboffice2k.lib;vclFireDAC.lib;FireDAC.lib;FireDACSqliteDriver.lib;FireDACCommonDriver.lib;FireDACCommon.lib;vcldb.lib;FireDACPgDriver.lib</LinkPackageStatics>
         <Defines>NDEBUG;$(Defines)</Defines>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">

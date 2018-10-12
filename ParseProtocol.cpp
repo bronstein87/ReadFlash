@@ -1793,6 +1793,21 @@ CadrInfo convertIKIFormatToInfoCadr(IKI_img* reader, bool CompareIKIRes)
 	return cadrInfo;
 }
 
+	void parseMILHex(vector <string>& parseTo, int rowCount, ifstream& in)
+	{
+			const int rowSize = 8;
+			string line;
+			for (int i = 0 ; i < rowCount; i++) {
+				getline(in, line);
+				vector <string> row =  split(line, "\t");
+				while (row.size() > rowSize)
+				{
+				   row.erase(row.begin());
+				}
+			   parseTo.insert(parseTo.end(), row.begin(), row.end());
+			}
+	}
+
 	void parseMILHex(vector <string>& parseTo, int rowCount, ifstream& in, int offset)
 	{
 			string line;
