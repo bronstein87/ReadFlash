@@ -76,8 +76,12 @@ struct RawFileInfo {
 };
 
 struct StatusInfo {
+	int InitModePos;
+	int ResultModePos;
 	float NoOneCount;
 	float NoFourCount;
+	vector <unsigned short> TableRows;
+	vector <string> ColumnTitles;
 };
 
 class TFormAnimateSetting;
@@ -535,26 +539,23 @@ private: // User declarations
 	void ResizePlot(TChart *chart, double kx, double ky, int indexX,
 		int indexY);
 
-	unique_ptr<TFormAnimateSetting>FormAnimateSetting;
+	unique_ptr <TFormAnimateSetting> FormAnimateSetting;
 	TChartShape *BlockSeries[MaxBlockSeries];
 	TChartShape *FrameSeries[MaxFrameSeries];
 
 	AnsiString FileTitle;
 	AnsiString CurDir;
 
-	std::unique_ptr<SimplePlotter>plotter;
-	std::unique_ptr<FragmentPainter>fPainter;
-	std::unique_ptr<DbClient> clientDb;
+	std::unique_ptr <SimplePlotter> plotter;
+	std::unique_ptr <FragmentPainter> fPainter;
+	std::unique_ptr <DbClient> clientDb;
 
 	float ScaleFactorForScrollBox;
 	int ScaleFactorForImage;
 	int Contrast;
 	unsigned short ResizeCoef;
 	unsigned short FontSize;
-	StatusInfo statusInfo;
-
-	vector <unsigned short> tableRows;
-	vector <string> columnTitles;
+	StatusInfo StatusInfo;
 
 	vector <TChart*> Charts;
 	vector <CadrInfo> vCadrInfo;

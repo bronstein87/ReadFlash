@@ -340,7 +340,7 @@ void TFormGraphOrient::PrintTableObjects(const struct CadrInfo &mCadr)
 
 void TFormGraphOrient::InitStatusInfoTable(const string& deviceName)
 {
-	tableRows.clear();
+	StatusInfo.TableRows.clear();
 	string fileName = toStdString(ExtractFileDir(Application->ExeName)) + "\\" + deviceName + ".txt";
 	ifstream in (fileName.c_str());
 	if (in.is_open())
@@ -352,14 +352,17 @@ void TFormGraphOrient::InitStatusInfoTable(const string& deviceName)
 		getline(in, line);
 		TableStatusInfo->RowCount  = atoi(line.c_str());
 		getline(in, line);
+		vector <string> splitted = split(line, "/");
+		StatusInfo.InitModePos = atoi(splitted[0].c_str());
+		StatusInfo.ResultModePos = atoi(splitted[1].c_str());
 
-		vector <string> splitted = split(line, "\t");
-		columnTitles = split(splitted[1], ";");
-		TableStatusInfo->ColCount  = columnTitles.size() + 1;
+		splitted = split(line, "\t");
+		StatusInfo.ColumnTitles = split(splitted[1], ";");
+		TableStatusInfo->ColCount  = StatusInfo.ColumnTitles.size() + 1;
 		TableStatusInfo->Cells[0][0] = "Значение статуса";
-		for(int i = 0; i < columnTitles.size(); i++)
+		for(int i = 0; i < StatusInfo.ColumnTitles.size(); i++)
 		{
-			TableStatusInfo->Cells[i + 1][0] = toUString(columnTitles[i]);
+			TableStatusInfo->Cells[i + 1][0] = toUString(StatusInfo.ColumnTitles[i]);
 		}
 
 		int currentRow = 1;
@@ -368,7 +371,7 @@ void TFormGraphOrient::InitStatusInfoTable(const string& deviceName)
 			splitted = split(line, "\t");
 			unsigned short statusValue = strtol(splitted[1].c_str(), NULL, 16);
 			TableStatusInfo->Cells[0][currentRow++] = toUString(splitted[0] + " " + splitted[1]);
-			tableRows.push_back(statusValue);
+			StatusInfo.TableRows.push_back(statusValue);
 		}
 	}
 	else
@@ -376,7 +379,7 @@ void TFormGraphOrient::InitStatusInfoTable(const string& deviceName)
 
 	for(int i = 0; i < TableStatusInfo->RowCount; i++)
 	{
-		for(int j = 0; j < columnTitles.size(); j++)
+		for(int j = 0; j < StatusInfo.ColumnTitles.size(); j++)
 		{
 			TableStatusInfo->Cells[j + 1][i + 1] = "0";
 		}
@@ -388,7 +391,7 @@ void TFormGraphOrient::ClearStatusInfoTable()
 {
 	for(int i = 1; i < TableStatusInfo->RowCount; i++)
 	{
-		for(int j = 0; j < columnTitles.size(); j++)
+		for(int j = 0; j < StatusInfo.ColumnTitles.size(); j++)
 		{
 			TableStatusInfo->Cells[j + 1][i] = "0";
 		}
@@ -398,13 +401,13 @@ void TFormGraphOrient::ClearStatusInfoTable()
 
 void TFormGraphOrient::AddRowToStatusTable(const CadrInfo& cadr)
 {
-	  for (int i = 0; i < tableRows.size(); i++)
+	  for (int i = 0; i < StatusInfo.TableRows.size(); i++)
 	  {
-			if (tableRows[i] == cadr.StatOrient)
+			if (StatusInfo.TableRows[i] == cadr.StatOrient)
 			{
-					for(int j = 0; j < columnTitles.size(); j++)
+					for(int j = 0; j < StatusInfo.ColumnTitles.size(); j++)
 					{
-						if(cadr.DeviceInfo.find(columnTitles[j]) != string::npos)
+						if(cadr.DeviceInfo.find(StatusInfo.ColumnTitles[j]) != string::npos)
 						{
 							int count = StrToInt(TableStatusInfo->Cells[j + 1][i + 1]) + 1;
 							TableStatusInfo->Cells[j + 1][i + 1] =  IntToStr(count);
@@ -2972,26 +2975,20 @@ void TFormGraphOrient::FillStatusTable()
 		AddRowToStatusTable(vCadrInfo[i]);
 	}
 
-	const int NO4Pos = 3;
-	if (TableStatusInfo->ColCount >= NO4Pos
-	&& TableStatusInfo->Cells[0][NO4Pos] == "НО4")
-	{
-		int div = 0;
-		for (int i = 1; i < TableStatusInfo->RowCount; i++)
-		{
-			div += StrToInt(TableStatusInfo->Cells[1][i]);
-		}
+	int div = 0;
+	for (int i = 1; i < TableStatusInfo->RowCount; i++)
+	 {
+		div += StrToInt(TableStatusInfo->Cells[StatusInfo.InitModePos][i]);
+	 }
 
-		if (div == 0)
-		   return;
-		else
-		{
-			statusInfo.NoOneCount = div;
-			statusInfo.NoFourCount = StrToFloat(TableStatusInfo->Cells[4][1]);
-			RatioEdit->Text = FloatToStr((statusInfo.NoFourCount / statusInfo.NoOneCount) * 100) ;
-		}
-	}
-
+	 if (div == 0)
+		 return;
+	 else
+	 {
+		StatusInfo.NoOneCount = div;
+		StatusInfo.NoFourCount = StrToFloat(TableStatusInfo->Cells[StatusInfo.ResultModePos][1]);
+	 	RatioEdit->Text = FloatToStr((StatusInfo.NoFourCount / StatusInfo.NoOneCount) * 100) ;
+	 }
 }
 // ---------------------------------------------------------------------------
 
@@ -3571,7 +3568,7 @@ void __fastcall TFormGraphOrient::ReadIKIFormatClick(TObject *Sender)
 					SaveTableToFile(TableStatusInfo, TableStatusInfo->RowCount, TableStatusInfo->ColCount,
 									toStdString(folder + "\\table_status.txt"));
 					ofstream out(string(toStdString(folder) + "\\table_status.txt").c_str(), std::ofstream::out | std::ofstream::app);
-					out << toStdString(RatioEdit->Text) <<"\t"<< statusInfo.NoOneCount <<"\t"<< statusInfo.NoFourCount;
+					out << toStdString(RatioEdit->Text) << "\t" << StatusInfo.NoOneCount << "\t" << StatusInfo.NoFourCount;
 
 				}
 		}
