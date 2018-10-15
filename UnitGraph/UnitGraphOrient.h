@@ -317,6 +317,11 @@ private: // User declarations
 				cadrInfo.OmegaOrient[2] * RTM, pointColor);
 			Form->plotter->AddPoint(Form->ChartNumFrag, 0, cadrInfo.Time,
 				cadrInfo.CountWindows);
+			Form->plotter->AddPoint(Form->ChartFone, 0, cadrInfo.Time,
+				cadrInfo.MeanBright);
+			Form->plotter->AddPoint(Form->ChartNoise, 0, cadrInfo.Time,
+				cadrInfo.SigmaBright);
+
 		}
 
 	};

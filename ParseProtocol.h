@@ -346,6 +346,8 @@ namespace parse_prot {
 									break;
 								}
 								cadrInfo.ObjectsList.push_back(info);
+								cadrInfo.MeanBright = loc.MeanC;
+								cadrInfo.SigmaBright = loc.SigmaC;
 						}
 						cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
 						cadrInfo.CountLocalObj = loc.nLocalObj;
