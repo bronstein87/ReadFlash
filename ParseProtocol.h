@@ -1280,12 +1280,22 @@ namespace parse_prot {
 					else
 						readLastData = false;
 					if (readLastData) {
+
+						if (findLine(in, "3) Код ошибки")
+							!= string::npos) {
+							getline(in, line);
+							vector <string> splittedStr = split(line, "\t");
+							splittedStr = split(splittedStr[1], " ");
+							cadrInfoVec.back().timePr = atoi(splittedStr[0].c_str());
+						}
+						else throw logic_error(errorMessage);
+
 						if (findLine(in, "5) Кватернион ориентации, Qо")
 							!= string::npos) {
 
 							for (int i = 0; i < 4; i++) {
 								getline(in, line);
-								vector<string>splittedStr =
+								vector <string> splittedStr =
 									split(line, "\t\t\t\t");
 								cadrInfoVec.back().QuatOrient[i] =
 									atof(splittedStr[1].c_str());
@@ -1296,7 +1306,6 @@ namespace parse_prot {
 								matrixOfOrientation);
 							MatrixToEkvAngles(matrixOfOrientation,
 								cadrInfoVec.back().AnglesOrient);
-
 						}
 						else
 							throw logic_error(errorMessage);
@@ -1318,6 +1327,7 @@ namespace parse_prot {
 							throw logic_error(errorMessage);
 						writeBOKZ1000ProtocolToIKI(cadrInfoVec.back(),
 							cadrInfoVec.empty(), startDate, timeStep, counter);
+						handler(cadrInfoVec.back(), clBlue);
 						NeedNextFile = false;
 					}
 
@@ -1351,8 +1361,7 @@ namespace parse_prot {
 							   continue;
 						   }
 
-                        }
-
+						}
 						// время привязки в секундах
 						if (findWord(in, "информации") != string::npos) {
 							in >> cadrInfo.Time;
@@ -1379,6 +1388,7 @@ namespace parse_prot {
 								}
 								// НО
 								else if (status == "2400") {
+									continue;
 									pointColor = clGreen;
 									if (status2.substr(0, 2) == "0c" ||
 										status2.substr(0, 2) == "01") {
@@ -1486,9 +1496,43 @@ namespace parse_prot {
 						else {
 							NeedNextFile = true;
 							cadrInfoVec.push_back(cadrInfo);
-							handler(cadrInfo, pointColor);
 							break;
 						}
+
+						if (findLine(in, "3) Код ошибки")
+							!= string::npos) {
+							getline(in, line);
+							vector <string> splittedStr = split(line, "\t");
+							splittedStr = split(splittedStr[1], " ");
+							cadrInfo.timePr = atoi(splittedStr[0].c_str());
+						}
+						else throw logic_error(errorMessage);
+
+						if (findLine(in, "4) Координаты оси OZ ПСК в ИСК:")
+							!= string::npos) {
+
+							for (int i = 0; i < 3; i++) {
+								getline(in, line);
+								vector<string>splittedStr =
+									split(line, "\t\t\t\t\t");
+								cadrInfo.ozAxis[i] =
+									atof(splittedStr[1].c_str());
+							}
+
+							quatToMatr(cadrInfo.QuatOrient,
+								cadrInfo.MatrixOrient);
+							MatrixToEkvAngles(cadrInfo.MatrixOrient,
+								cadrInfo.AnglesOrient);
+							if (cadrInfo.AnglesOrient[0] == 0
+							&& cadrInfo.AnglesOrient[1] == 0
+							&& cadrInfo.AnglesOrient[2] == 0)
+							{
+								continue;
+							}
+						}
+						else
+							throw logic_error(errorMessage);
+
 
 						if (findLine(in, "5) Кватернион ориентации, Qо")
 							!= string::npos) {
@@ -1505,6 +1549,12 @@ namespace parse_prot {
 								cadrInfo.MatrixOrient);
 							MatrixToEkvAngles(cadrInfo.MatrixOrient,
 								cadrInfo.AnglesOrient);
+							if (cadrInfo.AnglesOrient[0] == 0
+							&& cadrInfo.AnglesOrient[1] == 0
+							&& cadrInfo.AnglesOrient[2] == 0)
+							{
+								continue;
+							}
 						}
 						else
 							throw logic_error(errorMessage);

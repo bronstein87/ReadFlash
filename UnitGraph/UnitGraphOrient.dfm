@@ -861,10 +861,6 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheetImage: TTabSheet
       Caption = #1055#1072#1088#1072#1084#1077#1090#1088#1099' '#1080#1079#1086#1073#1088#1072#1078#1077#1085#1080#1103
       ImageIndex = 4
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1430
         731)
@@ -920,9 +916,21 @@ object FormGraphOrient: TFormGraphOrient
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
           #1059#1088#1086#1074#1077#1085#1100' '#1096#1091#1084#1072' (1'#1057#1050#1054'), '#1045#1052#1056)
+        BottomAxis.Automatic = False
+        BottomAxis.AutomaticMaximum = False
+        BottomAxis.AutomaticMinimum = False
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
+        LeftAxis.Automatic = False
+        LeftAxis.AutomaticMaximum = False
+        LeftAxis.AutomaticMinimum = False
         LeftAxis.AxisValuesFormat = '#,##0.#####'
         Panning.MouseWheel = pmwNone
+        RightAxis.Automatic = False
+        RightAxis.AutomaticMaximum = False
+        RightAxis.AutomaticMinimum = False
+        TopAxis.Automatic = False
+        TopAxis.AutomaticMaximum = False
+        TopAxis.AutomaticMinimum = False
         View3D = False
         Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone

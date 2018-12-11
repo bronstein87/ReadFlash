@@ -69,6 +69,7 @@ struct CadrInfo
 	 AnglesDiff(),  OmegaOrient(), OmegaModel(), //угловая скорость, прогнозируемая матрица ориентации
 	 OmegaDiff(), AxesDiff() { }
 
+    int timePr;
 	double Time;
 	std::string DeviceInfo;
 	int FrameNumber;
@@ -102,6 +103,7 @@ struct CadrInfo
 	double QuatOrient[4], MatrixOrient[3][3], AnglesOrient[3], AnglesModel[3];   //кватернион, матрица и углы ориентации
 	double AnglesDiff[3];
 	double OmegaOrient[3], OmegaModel[3], MatrixProg[3][3]; //угловая скорость, прогнозируемая матрица ориентации
+    double ozAxis[3]; // temp
 	double OmegaDiff[3];
 	double AxesDiff[3];
 	double MatrixTemp;     //температура КМОП-матрицы
