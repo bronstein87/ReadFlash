@@ -15,10 +15,10 @@
 const int maxDev  = 4;
 const int maxZero = 10;
 
-struct _DateTime {
-	unsigned short year, month, day;
-	unsigned short hour, min, sec, msec;
-};
+//struct _DateTime {
+//	unsigned short year, month, day;
+//	unsigned short hour, min, sec, msec;
+//};
 
 struct SateliteInfo {
 	string name, typeDev;
@@ -65,9 +65,9 @@ void LoadSatelliteList(AnsiString _sourceDir, vector <SateliteInfo> &vSat)
 		for (int iZero = 0; iZero < vSat[iSat].cntZeroTime; iZero++) {
 			finp >> date1S;
 			sscanf(date1S.c_str(), "%ld.%ld.%ld", &day, &month, &year);
-			vSat[iSat].zeroTime[iZero].day = day;
-			vSat[iSat].zeroTime[iZero].month = month;
-			vSat[iSat].zeroTime[iZero].year  = year;
+			vSat[iSat].zeroTime[iZero].Day = day;
+			vSat[iSat].zeroTime[iZero].Month = month;
+			vSat[iSat].zeroTime[iZero].Year  = year;
 		}
 		iSat++;
 	}
@@ -103,13 +103,14 @@ void __fastcall TFormAnimateSetting::KAComboBoxChange(TObject *Sender)
 	AnsiString date1S;
 	int iSat = KAComboBox->ItemIndex;
 	if (iSat >= 0) {
-		ComboBox1S->Clear();
+		ZeroDate1S->Clear();
 		for (int i = 0; i < vSatList[iSat].cntZeroTime; i++) {
-			date1S.sprintf("%02d.%02d.%04d", vSatList[iSat].zeroTime[i].day,
-			vSatList[iSat].zeroTime[i].month, vSatList[iSat].zeroTime[i].year);
-			ComboBox1S->Items->Add(UnicodeString(date1S));
+			date1S.sprintf("%02d.%02d.%04d", vSatList[iSat].zeroTime[i].Day,
+			vSatList[iSat].zeroTime[i].Month, vSatList[iSat].zeroTime[i].Year);
+			ZeroDate1S->Items->Add(UnicodeString(date1S));
 		}
-		ComboBox1S->ItemIndex = vSatList[iSat].cntZeroTime - 1;
+		ZeroDate1S->ItemIndex = vSatList[iSat].cntZeroTime - 1;
+        ZeroTime1S->Time = 0;
 
 		EditListBokz->Clear();
 		AnsiString list = (vSatList[iSat].typeDev + " зав. № ").c_str();
@@ -177,6 +178,14 @@ void TFormAnimateSetting::ReadINI(const AnsiString& fileName)
 
 //Вкладка "Настройки БД"
 	CheckBoxLoadToDb->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckLoadToDb", "0")));
+	int iSat = StrToInt(Ini->ReadString("DataBase", "Satellite",  "-1"));
+	if ( (iSat >= 0) && (iSat < KAComboBox->Items->Count) ) {
+		KAComboBox->ItemIndex = iSat;
+		KAComboBoxChange(FormAnimateSetting);
+	}
+	ZeroDate1S->Text = Ini->ReadString("ComboBox", "ZeroDate1S", "01.01.2018");
+	ZeroTime1S->Time = StrToTime(Ini->ReadString("Edits", "ZeroTime1S", "23:00:00"));
+	CheckBoxSinc->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckSinc", "0")));
 
 //настройки FormGraphOrient
 	TFormGraphOrient* FormGraphOrient =  dynamic_cast<TFormGraphOrient*>(this->Owner);
@@ -223,7 +232,11 @@ void TFormAnimateSetting::WriteINI(const AnsiString& fileName)
 	Ini->WriteString("File", "SkipFrame",  IntToStr((int)SkipFrameCheckBox->Checked));
 
 //Вкладка "Настройки БД"
+	Ini->WriteString("DataBase", "Satellite",  IntToStr((int)KAComboBox->ItemIndex));
 	Ini->WriteString("CheckBox", "CheckLoadToDb",   IntToStr((int)CheckBoxLoadToDb->Checked));
+	Ini->WriteString("ComboBox","ZeroDate1S", ZeroDate1S->Text);
+	Ini->WriteString("Edits","ZeroTime1S", TimeToStr(ZeroTime1S->Time));
+    Ini->WriteString("CheckBox", "CheckSinc",   IntToStr((int)CheckBoxSinc->Checked));
 
 //настройки FormGraphOrient
 	TFormGraphOrient* FormGraphOrient = dynamic_cast<TFormGraphOrient*>(this->Owner);

@@ -22,6 +22,8 @@ vector <GeneralizedDTMI>   vGeneralDTMI;
 vector <GeneralizedSHTMI1> vGeneralSHTMI1;
 vector <GeneralizedSHTMI2> vGeneralSHTMI2;
 
+vector <CadrInfo> mBokz[2];
+
 //---------------------------------------------------------------------------
 __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 		: TForm(Owner),
@@ -39,7 +41,8 @@ __fastcall TFormGraphOrient::TFormGraphOrient(TComponent* Owner)
 		Charts.push_back(ChartWx); Charts.push_back(ChartWy); Charts.push_back(ChartWz);
 		Charts.push_back(ChartMx); Charts.push_back(ChartMy); Charts.push_back(ChartMxy);
 		Charts.push_back(ChartNumFrag); Charts.push_back(ChartNumLoc); Charts.push_back(ChartNumDet);
-		Charts.push_back(ChartFone); Charts.push_back(ChartNoise); Charts.push_back(ChartTemp);
+		Charts.push_back(ChartLevel); Charts.push_back(ChartFone); Charts.push_back(ChartNoise);
+		Charts.push_back(ChartSunAngle); Charts.push_back(ChartTemp);
 		Charts.push_back(ChartAlError); Charts.push_back(ChartDlError); Charts.push_back(ChartAzError);
 		Charts.push_back(ChartWxError); Charts.push_back(ChartWyError); Charts.push_back(ChartWzError);
 		Charts.push_back(ChartErrorOX); Charts.push_back(ChartErrorOY); Charts.push_back(ChartErrorOZ);
@@ -126,6 +129,8 @@ void __fastcall TFormGraphOrient::FormCreate(TObject *Sender)
 void __fastcall TFormGraphOrient::FormClose(TObject *Sender, TCloseAction &Action)
 {
 		vCadrInfo.clear();
+		mBokz[0].clear();
+        mBokz[1].clear();
 		Action = caFree;
 		FormAnimateSetting->WriteINI(SourceDir+"\\options.ini");
 }
@@ -421,7 +426,7 @@ void TFormGraphOrient::InitTableStat()
 {
 	int k = 0;
 
-	TableStatInfo->RowCount  = 25;
+	TableStatInfo->RowCount  = 5;
 	TableStatInfo->ColCount  = 6;
 	TableStatInfo->FixedCols = 0;
 	TableStatInfo->FixedRows = 1;
@@ -435,6 +440,7 @@ void TFormGraphOrient::InitTableStat()
 
 void TFormGraphOrient::AddRowToStatTable(int nRow, AnsiString stringName, Statistika _stat, int p1,int p2)
 {
+	if (TableStatInfo->RowCount <= nRow) TableStatInfo->RowCount = nRow + 1;
 	TableStatInfo->Cells[0][nRow] = stringName;
 	TableStatInfo->Cells[1][nRow] = FloatToStrF(_stat.mean, ffFixed, p1, p2);
 	TableStatInfo->Cells[2][nRow] = FloatToStrF(_stat.sigma, ffFixed, p1, p2);
@@ -1608,9 +1614,9 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 						plotter->AddPoint(ChartMy, 0, mCadrInfo.Time, mCadrInfo.MeanErrorY * 1000.);
 						plotter->AddPoint(ChartMxy, 0, mCadrInfo.Time, mCadrInfo.MeanErrorXY * 1000.);
 						plotter->AddPoint(ChartNumDet, 0, mCadrInfo.Time, mCadrInfo.CountDeterObj);
-						plotter->AddPoint(ChartWx, 0, mCadrInfo.Time, mCadrInfo.OmegaOrient[0] * RTM);
-						plotter->AddPoint(ChartWy, 0, mCadrInfo.Time, mCadrInfo.OmegaOrient[1] * RTM);
-						plotter->AddPoint(ChartWz, 0, mCadrInfo.Time, mCadrInfo.OmegaOrient[2] * RTM);
+						plotter->AddPoint(ChartWx, 0, mCadrInfo.Time, mCadrInfo.OmegaOrient[0] * RTS);
+						plotter->AddPoint(ChartWy, 0, mCadrInfo.Time, mCadrInfo.OmegaOrient[1] * RTS);
+						plotter->AddPoint(ChartWz, 0, mCadrInfo.Time, mCadrInfo.OmegaOrient[2] * RTS);
 
 			  }
 			  plotter->AddPoint(ChartTemp, 0, mCadrInfo.Time, mCadrInfo.MatrixTemp);
@@ -1687,9 +1693,9 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 					plotter->AddPoint(ChartMy, 0, mCadrInfo.Time, mCadrInfo.MeanErrorY * 1000.);
 					plotter->AddPoint(ChartMxy, 0, mCadrInfo.Time, mCadrInfo.MeanErrorXY * 1000.);
 					plotter->AddPoint(ChartNumDet, 0, mCadrInfo.Time, mCadrInfo.CountDeterObj);
-					plotter->AddPoint(ChartWx, 0, mCadrInfo.Time, mCadrInfo.OmegaOrient[0] * RTM);
-					plotter->AddPoint(ChartWy, 0, mCadrInfo.Time, mCadrInfo.OmegaOrient[1] * RTM);
-					plotter->AddPoint(ChartWz, 0, mCadrInfo.Time, mCadrInfo.OmegaOrient[2] * RTM);
+					plotter->AddPoint(ChartWx, 0, mCadrInfo.Time, mCadrInfo.OmegaOrient[0] * RTS);
+					plotter->AddPoint(ChartWy, 0, mCadrInfo.Time, mCadrInfo.OmegaOrient[1] * RTS);
+					plotter->AddPoint(ChartWz, 0, mCadrInfo.Time, mCadrInfo.OmegaOrient[2] * RTS);
 
 			  }
 			  plotter->AddPoint(ChartTemp, 0, mCadrInfo.Time, mCadrInfo.MatrixTemp);
@@ -1919,12 +1925,6 @@ void __fastcall TFormGraphOrient::MenuOpenFlashClick(TObject *Sender)
 
 }
 
-string cwMSHI[4]   = {"3618", "3E18", "6618", "6E18"};
-string cwSHTMI1[4] = {"3440", "3C40", "6440", "6C40"};
-string cwSHTMI2[4] = {"3460", "3C60", "6460", "6C60"};
-string cwDTMI[4]   = {"3480", "3C80", "6480", "6C80"};
-string codeOC[4]   = {"3000", "3800", "6000", "6800"};
-
 int FindWordInList(string _line, string *list, int size)
 {
 	for (int i = 0; i < size; i++) {
@@ -1933,35 +1933,86 @@ int FindWordInList(string _line, string *list, int size)
 	return -1;
 }
 
-void __fastcall TFormGraphOrient::MenuOpenArsenalClick(TObject *Sender)
+TDateTime EpochToDateTime (double era)
 {
+	double daysJ2000 = era * 36525;
+	TDateTime dateTimeJ2000 = EncodeDateTime(2000, 1, 1, 12, 0, 0, 0);
+	TDateTime curDateTime;
+	curDateTime.Val =  dateTimeJ2000.Val + daysJ2000 + 0.125;// +3 hours for Msk
+	return curDateTime;
+}
+
+void AddCadrInfo(CadrInfo _curCadr, vector <CadrInfo> &vectCadr)
+{
+	int n = vectCadr.size();
+	if (n) {
+		if (fabs(_curCadr.Time - vectCadr[n-1].Time) * 86400 > 0.001)
+			vectCadr.push_back(_curCadr);
+		}
+	else vectCadr.push_back(_curCadr);
+}
+
+vector <CadrInfo> vMshiInfo, vLocalInfo, vDtmiInfo;
+void __fastcall TFormGraphOrient::MenuOpenMILClick(TObject *Sender)
+{
+	const int sizeSinc   =  4;
 	const int sizeMSHI   = 24;
 	const int sizeSHTMI1 = 32;
 	const int sizeSHTMI2 = 32;
 	const int sizeDTMI   = 32;
+	const int sizeMLOC   = 32;
+	const int sizeMIL    = 32;
 
+	string cwSinc[4]   = {"3224", "3A24", "6224", "6224"}; //add for №4 M60
+	string cwMSHI[4]   = {"3618", "3E18", "6618", "6E18"};
+	string cwSHTMI1[4] = {"3440", "3C40", "6440", "6C40"};
+	string cwSHTMI2[4] = {"3460", "3C60", "6460", "6C60"};
+	string cwDTMI[4]   = {"3480", "3C80", "6480", "6C80"};
+	string cwMLOC[4]   = {"34A0", "3CA0", "64A0", "6CA0"};
+	string codeOC[4]   = {"3000", "3800", "6000", "6800"};
+
+	unsigned short ArraySinc[sizeSinc];
 	unsigned short ArrayMSHI[sizeMSHI];
 	unsigned short ArraySHTMI1[sizeSHTMI1];
 	unsigned short ArraySHTMI2[sizeSHTMI2];
-	unsigned short ArrayDTMI[sizeDTMI];
+	unsigned short ArrayDTMI[30*9];
+	unsigned short ArrayMLOC[30*9];
+	unsigned short ArrayMIL32[sizeMIL];
 
+	int isM1000 = false;
 	bool isMSHI = 0, isSHTMI1 = 0, isSHTMI2 = 0;
 	isDTMI = 0, isMLOC = 0, isOpenDtmi = 0;
 
 	OpenDialog->Options.Clear();
-//	OpenDialog->Filter = "dat|*.dat";
+	OpenDialog->Filter = "Текстовые файлы|*.dat; *.txt|Все файлы|*.*";
+	OpenDialog->Options << ofAllowMultiSelect;
 
 	if (OpenDialog->Execute()) {
+
+		vMshiInfo.clear();
+		vLocalInfo.clear();
+		vDtmiInfo.clear();
 
 		DTMI dtmi;
 		TFormatSettings curFormat;
 		curFormat.ShortDateFormat = "dd.mm.yyyy";
-		TDateTime zeroDate = StrToDate(FormAnimateSetting->ComboBox1S->Text);
+		TDateTime zeroDate  = StrToDate(FormAnimateSetting->ZeroDate1S->Text)
+				  			+ StrToTime(TimeToStr(FormAnimateSetting->ZeroTime1S->Time));
 		TDateTime curDate  = zeroDate;
+
+		string str = AnsiString(FormAnimateSetting->EditListBokz->Text).c_str();
+		if (str.find("БОКЗ-М60/1000") != string::npos) {
+			isM1000 = true;
+		}
+
+		double dtBokz;
+		if (isM1000) dtBokz = 0.25;
+		else  dtBokz = 1.0;
+		SetClkBokz(dtBokz);
 
 		bool isLoadDb = FormAnimateSetting->CheckBoxLoadToDb->Checked;
 
-		vCadrInfo.clear();
+		vMshiInfo.clear();
 		DeleteLineGraph();
 
 		AnsiString FileName = OpenDialog->FileName;
@@ -1970,158 +2021,284 @@ void __fastcall TFormGraphOrient::MenuOpenArsenalClick(TObject *Sender)
 		CreateDir(SaveDir);
 		GetFileTitles(FileName,&FileTitle);
 
-		ifstream finp(FileName.c_str());
-		if (!finp.is_open()) {
-			ShowMessage("Файл не может быть открыт!");
-			return;
-		}
-		finp >> hex;
-
-		ofstream fout, fmshi, fshtmi1, fshtmi2;
+		if (OpenDialog->Files->Count > 1) {
+			FileTitle += "("+IntToStr(OpenDialog->Files->Count) + ")";
+        }
+		ofstream fout, fmshi, fshtmi1, fshtmi2, fquat;
 		fout.open((SaveDir + FileTitle + "_decode.txt").c_str());
 
 		string line, word;
-        int devIndex;
-		while (!finp.eof())
-		{
-			getline(finp, line, '\n' );
-//чтение массива МШИОР
-			devIndex = FindWordInList(line, cwMSHI, 4);
-			if ( (devIndex >= 0) && (devIndex < 4) ) {
-				getline(finp, line, '\n' );
-				if (line.find(codeOC[devIndex]) != std::string::npos) {
-					finp >> word;
-					for (int i = 0; i < sizeMSHI; i++) {
-						finp >> ArrayMSHI[i];
-					}
-
-					int *pInt;
-					for (int i = 2; i <= 22; i = i + 2) {
-						SwapShort((short*)&ArrayMSHI[i], (short*)&ArrayMSHI[i + 1]);
-						if (i > 2) {
-							pInt = (int*)&ArrayMSHI[i];
-							float val = (double)*pInt/(double)0x7fffffff;
-							memcpy(&ArrayMSHI[i], &val, sizeof(float));
-						}
-					}
-					MSHI mshi;
-					memcpy(&mshi, ArrayMSHI, sizeof(mshi));
-
-					curDate.Val = zeroDate.Val + mshi.timeBOKZ/86400.;
-					PrintMSHI(fout, mshi, curDate);
-					if (!isMSHI) {
-						fmshi.open((SaveDir + FileTitle + "_mshi.txt").c_str());
-						PrintLogMSHI(fmshi, mshi, curDate, 0);
-						isMSHI = true;
-					}
-					else PrintLogMSHI(fmshi, mshi, curDate, 1);
-				}
-			}
-//чтение массива ШТМИ1
-			devIndex = FindWordInList(line, cwSHTMI1, 4);
-			if ( (devIndex >= 0) && (devIndex < 4) ) {
-				getline(finp, line, '\n' );
-				if (line.find(codeOC[devIndex]) != std::string::npos) {
-					finp >> word;
-					for (int i = 0; i < sizeSHTMI1; i++) {
-						finp >> ArraySHTMI1[i];
-					}
-
-					SwapShort((short*)&ArraySHTMI1[2], (short*)&ArraySHTMI1[3]);
-					SwapShort((short*)&ArraySHTMI1[8], (short*)&ArraySHTMI1[9]);
-					SwapShort((short*)&ArraySHTMI1[10], (short*)&ArraySHTMI1[11]);
-					SwapShort((short*)&ArraySHTMI1[12], (short*)&ArraySHTMI1[13]);
-
-					SHTMI1 shtmi1;
-					memcpy(&shtmi1, &ArraySHTMI1[2], sizeof(shtmi1));
-					PrintSHTMI1(fout, shtmi1);
-					if (!isSHTMI1) {
-						fshtmi1.open((SaveDir + FileTitle + "_shtmi1.txt").c_str());
-						PrintLogSHTMI1(fshtmi1, shtmi1, 0);
-						isSHTMI1 = true;
-					}
-					else PrintLogSHTMI1(fshtmi1, shtmi1, 1);
-				}
-			}
-//чтение массива ШТМИ2
-			devIndex = FindWordInList(line, cwSHTMI2, 4);
-			if ( (devIndex >= 0) && (devIndex < 4) ) {
-				getline(finp, line, '\n' );
-				if (line.find(codeOC[devIndex]) != std::string::npos) {
-					finp >> word;
-					for (int i = 0; i < sizeSHTMI2; i++) {
-						finp >> ArraySHTMI2[i];
-					}
-					SwapShort((short*)&ArraySHTMI2[2], (short*)&ArraySHTMI2[3]);
-					SwapShort((short*)&ArraySHTMI2[14], (short*)&ArraySHTMI2[15]);
-
-					SHTMI2 shtmi2;
-					memcpy(&shtmi2, &ArraySHTMI2[2], sizeof(shtmi2));
-
-					curDate.Val = zeroDate.Val + shtmi2.timeBOKZ/86400.;
-					PrintSHTMI2(fout, shtmi2, curDate);
-					if (!isSHTMI2) {
-						fshtmi2.open((SaveDir + FileTitle + "_shtmi2.txt").c_str());
-						PrintLogSHTMI2(fshtmi2, shtmi2, curDate, 0);
-						isSHTMI2 = true;
-					}
-					else PrintLogSHTMI2(fshtmi2, shtmi2, curDate, 1);
-				}
-			}
-//чтение массива ДТМИ
-			devIndex = FindWordInList(line, cwDTMI, 4);
-			if ( (devIndex >= 0) && (devIndex < 4) ) {
-				getline(finp, line, '\n' );
-				if (line.find(codeOC[devIndex]) != std::string::npos) {
-					finp >> word;
-					for (int i = 0; i < sizeDTMI; i++) {
-						finp >> ArrayDTMI[i];
-					}
-
-					if (ArrayDTMI[1] == 0x7aaa) {
-						SwapShort((short*)&ArrayDTMI[2], (short*)&ArrayDTMI[3]);
-						for (int i = 12; i < 32; i = i + 2) {
-							SwapShort((short*)&ArrayDTMI[i], (short*)&ArrayDTMI[i+1]);
-						}
-					}
-
-					if ( (ArrayDTMI[1] == 0x8aaa) || (ArrayDTMI[1] == 0x9aaa) || (ArrayDTMI[1] == 0xaaaa)
-					   ||(ArrayDTMI[1] == 0xbaaa) || (ArrayDTMI[1] == 0xcaaa) || (ArrayDTMI[1] == 0xdaaa) ) {
-						for (int i = 2; i < 32; i = i + 2) {
-							SwapShort((short*)&ArrayDTMI[i], (short*)&ArrayDTMI[i+1]);
-						}
-					}
-
-					if (ArrayDTMI[1] == 0xfaaa) {
-						SwapShort((short*)&ArrayDTMI[2], (short*)&ArrayDTMI[3]);
-						for (int i = 4; i < 16; i = i + 2) {
-							SwapShort((short*)&ArrayDTMI[i], (short*)&ArrayDTMI[i+1]);
-						}
-					}
-					switch (ArrayDTMI[1])
-					{
-						case 0x7aaa: { memcpy(&dtmi, &ArrayDTMI[2], sizeof(short)*30); break; }
-						case 0x8aaa: { memcpy(&dtmi.LocalList[2][1], &ArrayDTMI[2], sizeof(short)*30); break; }
-						case 0x9aaa: { memcpy(&dtmi.LocalList[6][0], &ArrayDTMI[2], sizeof(short)*30); break; }
-						case 0xaaaa: { memcpy(&dtmi.LocalList[9][3], &ArrayDTMI[2], sizeof(short)*30); break; }
-						case 0xbaaa: { memcpy(&dtmi.LocalList[13][2], &ArrayDTMI[2], sizeof(short)*30); break; }
-						case 0xcaaa: { memcpy(&dtmi.centrWindow[1][0], &ArrayDTMI[2], sizeof(short)*30); break; }
-						case 0xdaaa: { memcpy(&dtmi.centrWindow[8][1], &ArrayDTMI[2], sizeof(short)*30); break; }
-						case 0xeaaa: { memcpy(&dtmi.levelWindow[0], &ArrayDTMI[2], sizeof(short)*30); break; }
-						case 0xfaaa: { memcpy(&dtmi.nObjectWindow[14], &ArrayDTMI[2], sizeof(short)*30);
-									   OutputDTMI(fout, SaveDir, dtmi, zeroDate);	break; }
-						default: ;
-					}
-				}
-			}
+		int devIndex;
+		TColor colorStat[MAX_STAT];
+		for (int iStat = 0; iStat < MAX_STAT; iStat++) {
+			colorStat[iStat] = RGB((float)(MAX_STAT - iStat) / MAX_STAT * 255,
+									200, (float)iStat / MAX_STAT * 255 );
+			plotter->SetShowLines(true);
+			plotter->SetSeriesColor(colorStat[iStat]);
+			plotter->SetTitle("EC" + IntToStr(iStat + 1));
+			plotter->AddSeries(ChartCounter, iStat, colorStat[iStat]);
 		}
-		finp.close();
+		plotter->SetShowLines(false);
+		plotter->SetSeriesColor(clBlue);
+		plotter->SetTitle("БОКЗ");
+
+		vCadrInfo.clear();
+		for (int iFile = 0; iFile < OpenDialog->Files->Count; iFile++) {
+
+			ifstream finp(AnsiString(OpenDialog->Files->Strings[iFile]).c_str());
+			if (!finp.is_open()) {
+				ShowMessage("Файл не может быть открыт!");
+				return;
+			}
+			finp >> hex;
+
+			while (!finp.eof())
+			{
+				getline(finp, line, '\n' );
+
+	//чтение КС "Синхро"
+//				devIndex = FindWordInList(line, cwSinc, 4);
+//				if ( (devIndex >= 0) && (devIndex < 4) ) {
+//					finp >> word;
+//					for (int i = 0; i < sizeSinc; i++) {
+//						finp >> ArraySinc[i];
+//					}
+//					getline(finp, line, '\n' );
+//					getline(finp, line, '\n' );
+//					if (line.find(codeOC[devIndex]) != std::string::npos) {
+//						SwapShort((short*)&ArraySinc[0], (short*)&ArraySinc[1]);
+//						SwapShort((short*)&ArraySinc[2], (short*)&ArraySinc[3]);
+//						float val = *(int*)&ArraySinc[2]/(double)0x80000000;
+//						memcpy(&ArraySinc[2], &val, sizeof(float));
+//
+//						SINCHRO sinc;
+//						memcpy(&sinc, ArraySinc, sizeof(sinc));
+//						if (FormAnimateSetting->CheckBoxSinc->Checked) {
+//							zeroDate.Val = EpochToDateTime(sinc.curEpoch).Val
+//										 - sinc.countClk/86400.;
+//						}
+//					}
+//				}
+	//чтение массива МШИОР
+				devIndex = FindWordInList(line, cwMSHI, 4);
+				if ( (devIndex >= 0) && (devIndex < 4) ) {
+					getline(finp, line, '\n' );
+					if (line.find(codeOC[devIndex]) != std::string::npos) {
+						finp >> word;
+						for (int i = 0; i < sizeMSHI; i++) {
+							finp >> ArrayMSHI[i];
+						}
+
+						int *pInt;
+						for (int i = 2; i <= 22; i = i + 2) {
+							SwapShort((short*)&ArrayMSHI[i], (short*)&ArrayMSHI[i + 1]);
+							if (i > 2) {
+								pInt = (int*)&ArrayMSHI[i];
+								float val = (double)*pInt/(double)0x80000000;
+								if (i >= 18) val *= (PI/32);
+								memcpy(&ArrayMSHI[i], &val, sizeof(float));
+							}
+						}
+
+						MSHI mshi;
+						memcpy(&mshi, ArrayMSHI, sizeof(mshi));
+						curDate = GetDateTime(zeroDate, mshi.timeBOKZ);
+						PrintMSHI(fout, mshi, curDate);
+						if (!isMSHI) {
+							fmshi.open((SaveDir + FileTitle + "_mshi.txt").c_str());
+							fquat.open((SaveDir + FileTitle + "_quat.txt").c_str());
+						}
+						PrintLogMSHI(fmshi, mshi, curDate, isMSHI);
+
+						UnicodeString uString;
+						double ang[3], Mornt[3][3], Qornt[4];
+						double Tpr = mshi.timeBOKZ * dtBokz;
+
+						DateTimeToString(uString, UnicodeString("yyyy-mm-dd hh:nn:ss.zzz"), curDate);
+						fquat << AnsiString(uString).c_str() << "\t";
+						fquat << Tpr << "\t" << std::setprecision(8);
+						for (int i = 0; i < 4; i++) {
+							fquat << mshi.Qornt[i] << "\t";
+						}
+						fquat << "\n";
+
+						for (int i = 0; i < 4; i++) {
+							Qornt[i] =  mshi.Qornt[i];
+						}
+						if (!CheckQuatNorm(Qornt, 0.001)) {
+							QuatToMatrix(Qornt, Mornt);
+							MatrixToEkvAngles(Mornt, ang);
+							plotter->AddPoint(ChartAl, 0, Tpr, ang[0] * RTD);
+							plotter->AddPoint(ChartDl, 0, Tpr, ang[1] * RTD);
+							plotter->AddPoint(ChartAz, 0, Tpr, ang[2] * RTD);
+							plotter->AddPoint(ChartWx, 0, Tpr, mshi.W[0] * RTS);
+							plotter->AddPoint(ChartWy, 0, Tpr, mshi.W[1] * RTS);
+							plotter->AddPoint(ChartWz, 0, Tpr, mshi.W[2] * RTS);
+
+							CadrInfo mCadr;
+							mCadr.Time = curDate.Val;
+							mCadr.IsOrient = true;
+							for (int i = 0; i < 3; i++) {
+								mCadr.AnglesOrient[i] = ang[i];
+								mCadr.OmegaOrient[i]  = mshi.W[i];
+							}
+							AddCadrInfo(mCadr, vMshiInfo);
+						}
+					}
+				}
+	//чтение массива ШТМИ1
+				devIndex = FindWordInList(line, cwSHTMI1, 4);
+				if ( (devIndex >= 0) && (devIndex < 4) ) {
+					getline(finp, line, '\n' );
+					if (line.find(codeOC[devIndex]) != std::string::npos) {
+						finp >> word;
+						for (int i = 0; i < sizeSHTMI1; i++) {
+							finp >> ArraySHTMI1[i];
+						}
+
+						SwapShort((short*)&ArraySHTMI1[2], (short*)&ArraySHTMI1[3]);
+						SwapShort((short*)&ArraySHTMI1[8], (short*)&ArraySHTMI1[9]);
+						SwapShort((short*)&ArraySHTMI1[10], (short*)&ArraySHTMI1[11]);
+						SwapShort((short*)&ArraySHTMI1[12], (short*)&ArraySHTMI1[13]);
+
+						SHTMI1 shtmi1;
+						memcpy(&shtmi1, &ArraySHTMI1[2], sizeof(shtmi1));
+						PrintSHTMI1(fout, shtmi1);
+						if (!isSHTMI1) {
+							fshtmi1.open((SaveDir + FileTitle + "_shtmi1.txt").c_str());
+						}
+						PrintLogSHTMI1(fshtmi1, shtmi1, isSHTMI1);
+					}
+				}
+	//чтение массива ШТМИ2
+				devIndex = FindWordInList(line, cwSHTMI2, 4);
+				if ( (devIndex >= 0) && (devIndex < 4) ) {
+					getline(finp, line, '\n' );
+					if (line.find(codeOC[devIndex]) != std::string::npos) {
+						finp >> word;
+						for (int i = 0; i < sizeSHTMI2; i++) {
+							finp >> ArraySHTMI2[i];
+						}
+						SwapShort((short*)&ArraySHTMI2[2], (short*)&ArraySHTMI2[3]);
+						SwapShort((short*)&ArraySHTMI2[14], (short*)&ArraySHTMI2[15]);
+
+						SHTMI2 shtmi2;
+						memcpy(&shtmi2, &ArraySHTMI2[2], sizeof(shtmi2));
+
+						curDate = GetDateTime(zeroDate, shtmi2.timeBOKZ);
+						PrintSHTMI2(fout, shtmi2, curDate);
+						if (!isSHTMI2) {
+							fshtmi2.open((SaveDir + FileTitle + "_shtmi2.txt").c_str());
+						}
+						PrintLogSHTMI2(fshtmi2, shtmi2, curDate, isSHTMI2);
+
+						plotter->AddPoint(ChartStat, 0, shtmi2.timeBOKZ,
+										  (shtmi2.status2 & 0xFF00) >> 8);
+
+						for (int iStat = 0; iStat < MAX_STAT; iStat++) {
+							plotter->AddPoint(ChartCounter, iStat, shtmi2.timeBOKZ,
+										  shtmi2.cntStatOrient[iStat], colorStat[iStat]);
+						}
+					}
+				}
+
+				short nAr;
+				unsigned short *pArray, CC1, CC2;
+	//чтение массива ДТМИ
+				devIndex = FindWordInList(line, cwDTMI, 4);
+				if ( (devIndex >= 0) && (devIndex < 4) ) {
+					getline(finp, line, '\n' );
+					if (line.find(codeOC[devIndex]) != std::string::npos) {
+						finp >> word;
+						for (int i = 0; i < sizeDTMI; i++) {
+							finp >> ArrayMIL32[i];
+						}
+						CC2 = ArrayMIL32[1];
+						nAr = (CC2 - 0x7aaa) >> 12;
+						if ( (nAr >=0) && (nAr < 9))  {
+							memcpy(&ArrayDTMI[30*nAr], &ArrayMIL32[2], sizeof(short)*30);
+							if (CC2 == 0xfaaa) {
+								SwapShort((short*)&ArrayDTMI[0], (short*)&ArrayDTMI[1]);
+								for (int i = 10; i < 30*7; i = i + 2) {
+									SwapShort((short*)&ArrayDTMI[i], (short*)&ArrayDTMI[i+1]);
+								}
+								for (int i = 30*8 + 2; i <= 30*8 + 12; i = i + 2) {
+									SwapShort((short*)&ArrayDTMI[i], (short*)&ArrayDTMI[i+1]);
+								}
+								DTMI dtmi;
+								memcpy(&dtmi, ArrayDTMI, sizeof(ArrayDTMI));
+								OutputDTMI(fout, SaveDir, dtmi, zeroDate, 1);
+							}
+						}
+					}
+				}
+
+	//чтение массива МЛОК / ДТМИ по подадресу МЛОК
+				devIndex = FindWordInList(line, cwMLOC, 4);
+				if ( (devIndex >= 0) && (devIndex < 4) ) {
+					getline(finp, line, '\n' );
+					if (line.find(codeOC[devIndex]) != std::string::npos) {
+						finp >> word;
+						for (int i = 0; i < sizeMIL; i++) {
+							finp >> ArrayMIL32[i];
+						}
+
+						CC1 = ArrayMIL32[0];
+						CC2 = ArrayMIL32[1];
+						if (CC1 == 0x42FB) pArray = ArrayMLOC;
+						else pArray = ArrayDTMI;
+
+						nAr = (CC2 - 0x7aaa) >> 12;
+						if ( (nAr >=0) && (nAr < 9) )  {
+							memcpy(&pArray[30*nAr], &ArrayMIL32[2], sizeof(short)*30);
+							if (CC2 == 0xfaaa) {
+								if (CC1 == 0x42FB) {
+									SwapShort((short*)&ArrayMLOC[0], (short*)&ArrayMLOC[1]);
+									for (int i = 8; i < 30*9 - 2; i = i + 2) {
+										SwapShort((short*)&ArrayMLOC[i], (short*)&ArrayMLOC[i+1]);
+									}
+									LOC mloc;
+									memcpy(&mloc, ArrayMLOC, sizeof(ArrayMLOC));
+									OutputLOC(fout, SaveDir, mloc, zeroDate, 1);
+								}
+								else {
+									SwapShort((short*)&ArrayDTMI[0], (short*)&ArrayDTMI[1]);
+									for (int i = 10; i < 30*7; i = i + 2) {
+										SwapShort((short*)&ArrayDTMI[i], (short*)&ArrayDTMI[i+1]);
+									}
+									for (int i = 30*8 + 2; i <= 30*8 + 12; i = i + 2) {
+										SwapShort((short*)&ArrayDTMI[i], (short*)&ArrayDTMI[i+1]);
+									}
+									DTMI dtmi;
+									memcpy(&dtmi, ArrayDTMI, sizeof(ArrayDTMI));
+									OutputDTMI(fout, SaveDir, dtmi, zeroDate, 1);
+								}
+							}
+						}
+					}
+				}
+			}
+			finp.close();
+		}
 		fout.close();
-		if (isMSHI)   fmshi.close();
+		if (isMSHI)   { fmshi.close(); fquat.close(); }
 		if (isSHTMI1) fshtmi1.close();
 		if (isSHTMI2) fshtmi2.close();
 		if (isDTMI)   fdtmi.close();
 		if (isMLOC)   fmloc.close();
+
+		PrepareStartDraw();
+		CheckTabSheet();
+		int nRow = 1;
+		CalculateOrientStat(vMshiInfo, 0, nRow);
+		CalculateParamStat(vDtmiInfo, 0, nRow);
+		CalculateLocalStat(vLocalInfo, 0, nRow);
+		SaveScreenShots(SaveDir.c_str());
+		SaveTableToFile(TableStatInfo, TableStatInfo->RowCount, TableStatInfo->ColCount,
+									AnsiString(SaveDir + FileTitle + "_stat.txt").c_str());
+		vMshiInfo.clear();
+		vLocalInfo.clear();
+		vDtmiInfo.clear();
 	}
 }
 //---------------------------------------------------------------------------
@@ -2471,7 +2648,7 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyClick(TObject *Sender)
 					}
 					if (countTemp) {
 						if (!isTemp) {
-                        	isTemp = true;
+							isTemp = true;
 							ftemp.open((SaveDir + FileTitle + "_temp.txt").c_str());
 							ftemp << "Date&Time\t" <<"ТЕМП-1\t" << "ТЕМП-2\t" << "ТЕМП-3\n";
 						}
@@ -2550,14 +2727,15 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyClick(TObject *Sender)
 }
  //---------------------------------------------------------------------------
 
- void TFormGraphOrient::OutputDTMI(ofstream &_fout, AnsiString &_SaveDir, DTMI &_tmi, TDateTime zeroDate)
+ void TFormGraphOrient::OutputDTMI(ofstream &_fout, AnsiString &_SaveDir, DTMI &_tmi, TDateTime zeroDate, int isM1000)
  {
 	LOC    mLOC;
 	TDateTime curDate;
 	struct CadrInfo mCadr;
-
+	double dtBokz, Tpr;
+	if (isM1000) dtBokz = 0.25;
+	else dtBokz = 1.0;
 					if (_tmi.status2 == 0x0005) {
-						_tmi.test_short = 0;
 						SwapShort((short*)&_tmi.nWindows, (short*)&_tmi.epsillon);
 						for (int i = 0; i < MAX_WINDOW; i = i + 2) {
 							SwapShort((short*)&_tmi.levelWindow[i],
@@ -2568,26 +2746,26 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyClick(TObject *Sender)
 						SwapShort((short*)&_tmi.nLocal[0], (short*)&_tmi.nLocal[1]);
 						SwapShort((short*)&_tmi.maxHist,   (short*)&_tmi.maxHistX);
 						SwapShort((short*)&_tmi.maxHistY,  (short*)&_tmi.test_short);
-
+						for (int i = 0; i < 10; i = i + 2) {
+							SwapShort((short*)&_tmi.Reserved[i], (short*)&_tmi.Reserved[i+1]);
+						}
 						memcpy(&mLOC, &_tmi, sizeof(_tmi));
 
-						curDate.Val = zeroDate.Val + mLOC.timeBOKZ/86400.;
-						_fout << AnsiString(DateTimeToStr(curDate)).c_str() << "\n";
-
-						PrintLOC(_fout, mLOC);
-						PrintLocalMLOC(_SaveDir, curDate, mLOC);
+						curDate = GetDateTime(zeroDate, mLOC.timeBOKZ);
+						PrintLOC(_fout, curDate, mLOC, isM1000);
+						PrintLocalMLOC(_SaveDir, curDate, mLOC, isM1000);
 
 						if (!isMLOC) {
 							isMLOC = true;
 							fmloc.open((_SaveDir + FileTitle + "_mloc.txt").c_str());
-							fmloc << "Date\t";
+							fmloc << "Date&Time\t";
 							fmloc << "Day/Time\t";
 							fmloc << "KC1\t" << "KC2\t" << "№\t" << "Texp\t";
 							fmloc << "NumLoc\t" << "NumFixed\t";
 							fmloc << "Mean\t" << "Sigma\t";
 							fmloc << "\n";
 						}
-						fmloc << AnsiString(DateToStr(curDate)).c_str() << "\t";
+						fmloc << OutputDateTime(curDate).c_str() << "\t";
 						fmloc << DayTimeToString(mLOC.timeBOKZ).c_str() << "\t";
 						fmloc << uppercase << hex << setfill('0');
 						fmloc << "0x" << setw(4) << mLOC.status1 << "\t";
@@ -2600,6 +2778,7 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyClick(TObject *Sender)
 						fmloc << setw(6) << mLOC.MeanC << "\t";
 						fmloc << setw(6) << mLOC.SigmaC << "\t";
 						fmloc << "\n";
+						fmloc << flush;
 
 //						if (isLoadDb) {
 //							TDateTime saveTime;// = StrToDate(toUString(sdate)) +  StrToTime(toUString(stime));
@@ -2607,19 +2786,20 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyClick(TObject *Sender)
 //							vGeneralDTMI.push_back(gDTMI);
 //						}
 
-						ConvertDataLOC(mLOC, mCadr);
+						ConvertDataLOC(mLOC, mCadr, isM1000);
+						plotter->AddPoint(ChartNumLoc, 0, mLOC.timeBOKZ * dtBokz, mLOC.nLocalObj);
+						plotter->AddPoint(ChartFone,   0, mLOC.timeBOKZ * dtBokz, mLOC.MeanC);
+						plotter->AddPoint(ChartNoise,  0, mLOC.timeBOKZ * dtBokz, mLOC.SigmaC);
 					}
 					else {
-						curDate.Val = zeroDate.Val + _tmi.timeBOKZ/86400.;
-						_fout << AnsiString(DateTimeToStr(curDate)).c_str() << "\n";
-
-						PrintDTMI(_fout, _tmi);
-						PrintLocalDTMI(_SaveDir, curDate, _tmi);
+						curDate = GetDateTime(zeroDate, _tmi.timeBOKZ);
+						PrintDTMI(_fout, curDate, _tmi, isM1000);
+						PrintLocalDTMI(_SaveDir, curDate, _tmi, isM1000);
 
 						if (!isDTMI) {
 							isDTMI = true;
 							fdtmi.open((_SaveDir + FileTitle + "_dtmi.txt").c_str());
-							fdtmi << "Date\t";
+							fdtmi << "Date&Time\t";
 							fdtmi << "Day/Time\t";
 							fdtmi << "TimeLastQ\t";
 							fdtmi << "KC1\t" << "KC2\t" << "№\t" << "Texp\t";
@@ -2628,7 +2808,7 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyClick(TObject *Sender)
 							fdtmi << "Eps\t" << "DeltaT\t";
 							fdtmi << "\n";
 						}
-						fdtmi << AnsiString(DateToStr(curDate)).c_str() << "\t";
+						fdtmi << OutputDateTime(curDate).c_str() << "\t";
 						fdtmi << DayTimeToString(_tmi.timeBOKZ).c_str() << "\t";
 						fdtmi << setw(6) << DayTimeToString(_tmi.timeQuatLast) << "\t";
 						fdtmi << uppercase << hex << setfill('0');
@@ -2646,39 +2826,50 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyClick(TObject *Sender)
 						fdtmi << setw(6) << _tmi.epsillon << "\t";
 						fdtmi << setw(6) << _tmi.dTimeBOKZ << "\t";
 						fdtmi << "\n";
+						fdtmi << flush;
 
 //						if (isLoadDb) {
 //							TDateTime saveTime;// = StrToDate(toUString(sdate)) +  StrToTime(toUString(stime));
 //							GeneralizedDTMI gDTMI = clientDb->convertDTMI(_tmi, saveTime);
 //							vGeneralDTMI.push_back(gDTMI);
 //						}
-						ConvertDataDTMI(_tmi, mCadr);
+						ConvertDataDTMI(_tmi, mCadr, isM1000);
+						plotter->AddPoint(ChartNumLoc, 0, _tmi.timeBOKZ * dtBokz, _tmi.nLocalObj);
+						plotter->AddPoint(ChartNumDet, 0, _tmi.timeBOKZ * dtBokz, _tmi.nDeterObj);
+						plotter->AddPoint(ChartNumFrag, 0, _tmi.timeBOKZ* dtBokz, _tmi.nWindows);
+
+						if (mCadr.SizeWindowsList) {
+							plotter->AddPoint(ChartLevel, 0, _tmi.timeBOKZ * dtBokz, mCadr.Level);
+						}
+
 					}
 					mCadr.Time = curDate.Val;
-					vCadrInfo.push_back(mCadr);
+					AddCadrInfo(mCadr, vCadrInfo);
+					AddCadrInfo(mCadr, vDtmiInfo);
 					isOpenDtmi = false;
  }
 
- void TFormGraphOrient::OutputLOC(ofstream &_fout, AnsiString &_SaveDir, LOC &_tmi, TDateTime zeroDate)
+ void TFormGraphOrient::OutputLOC(ofstream &_fout, AnsiString &_SaveDir, LOC &_tmi, TDateTime zeroDate, int isM1000)
  {
+	double dtBokz, Tpr;
+	if (isM1000) dtBokz = 0.25;
+	else dtBokz = 1.0;
 						TDateTime curDate;
-						curDate.Val = zeroDate.Val + _tmi.timeBOKZ/86400.;
-						_fout << AnsiString(DateTimeToStr(curDate)).c_str() << "\n";
-
-						PrintLOC(_fout, _tmi);
-						PrintLocalMLOC(_SaveDir, curDate, _tmi);
+						curDate = GetDateTime(zeroDate, _tmi.timeBOKZ);
+						PrintLOC(_fout, curDate, _tmi, isM1000);
+						PrintLocalMLOC(_SaveDir, curDate, _tmi, isM1000);
 
 						if (!isMLOC) {
 							isMLOC = true;
 							fmloc.open((_SaveDir + FileTitle + "_mloc.txt").c_str());
-							fmloc << "Date\t";
+							fmloc << "Date&Time\t";
 							fmloc << "Day/Time\t";
 							fmloc << "KC1\t" << "KC2\t" << "№\t" << "Texp\t";
 							fmloc << "NumLoc\t" << "NumFixed\t";
 							fmloc << "Mean\t" << "Sigma\t";
 							fmloc << "\n";
 						}
-						fmloc << AnsiString(DateToStr(curDate)).c_str() << "\t";
+						fmloc << OutputDateTime(curDate).c_str() << "\t";
 						fmloc << DayTimeToString(_tmi.timeBOKZ).c_str() << "\t";
 						fmloc << uppercase << hex << setfill('0');
 						fmloc << "0x" << setw(4) << _tmi.status1 << "\t";
@@ -2699,9 +2890,13 @@ void __fastcall TFormGraphOrient::MenuOpenEnergyClick(TObject *Sender)
 //						}
 
 						struct CadrInfo mCadr;
-						ConvertDataLOC(_tmi, mCadr);
+						ConvertDataLOC(_tmi, mCadr, isM1000);
+						plotter->AddPoint(ChartNumLoc, 0, _tmi.timeBOKZ * dtBokz, _tmi.nLocalObj);
+						plotter->AddPoint(ChartFone,   0, _tmi.timeBOKZ * dtBokz, _tmi.MeanC);
+						plotter->AddPoint(ChartNoise,  0, _tmi.timeBOKZ * dtBokz, _tmi.SigmaC);
 						mCadr.Time = curDate.Val;//cntRecDTMI++;
-						vCadrInfo.push_back(mCadr);
+						AddCadrInfo(mCadr, vCadrInfo);
+						AddCadrInfo(mCadr, vLocalInfo);
  }
 
 
@@ -2713,7 +2908,7 @@ void __fastcall TFormGraphOrient::MenuOpenSamspaceClick(TObject *Sender)
 
 		TFormatSettings curFormat;
 		curFormat.ShortDateFormat = "dd.mm.yyyy";
-		TDateTime zeroDate = StrToDate(FormAnimateSetting->ComboBox1S->Text);
+		TDateTime zeroDate = StrToDate(FormAnimateSetting->ZeroDate1S->Text);
 		TDateTime curDate  = zeroDate;
 
 		bool isLoadDb = FormAnimateSetting->CheckBoxLoadToDb->Checked;
@@ -2736,8 +2931,19 @@ void __fastcall TFormGraphOrient::MenuOpenSamspaceClick(TObject *Sender)
 		ofstream fout, fmshi, fshtmi1, fshtmi2;
 		fout.open((SaveDir + FileTitle + "_decode.txt").c_str());
 
+		bool isM1000 = false;
 		bool isSHTMI1 = 0, isSHTMI2 = 0;
 		isDTMI = 0, isMLOC = 0, isOpenDtmi = 0;
+
+		string str = AnsiString(FormAnimateSetting->EditListBokz->Text).c_str();
+		if (str.find("БОКЗ-М60/1000") != string::npos) {
+			isM1000 = true;
+		}
+
+		double dtBokz;
+		if (isM1000) dtBokz = 0.25;
+		else  dtBokz = 1.0;
+		SetClkBokz(dtBokz);
 
 		SHTMI1 mSHTMI1;
 		SHTMI2 mSHTMI2;
@@ -2752,7 +2958,7 @@ void __fastcall TFormGraphOrient::MenuOpenSamspaceClick(TObject *Sender)
 				   || (line.find("У3-05") != std::string::npos)
 				   || (line.find("U3-5") != std::string::npos)) {
 
-				if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI, zeroDate);
+				if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI, zeroDate, isM1000);
 				ClearSHTMI1(mSHTMI1);
 
 				if (TryReadSHTMI1(finp, mSHTMI1)) {
@@ -2760,10 +2966,8 @@ void __fastcall TFormGraphOrient::MenuOpenSamspaceClick(TObject *Sender)
 					PrintSHTMI1(fout, mSHTMI1);
 					if (!isSHTMI1) {
 						fshtmi1.open((SaveDir + FileTitle + "_shtmi1.txt").c_str());
-						PrintLogSHTMI1(fshtmi1, mSHTMI1, 0);
-						isSHTMI1 = true;
 					}
-					else PrintLogSHTMI1(fshtmi1, mSHTMI1, 1);
+					PrintLogSHTMI1(fshtmi1, mSHTMI1, isSHTMI1);
 
 					if (isLoadDb) {
 						TDateTime saveTime;// = StrToDate(toUString(sdate)) +  StrToTime(toUString(stime));
@@ -2776,19 +2980,16 @@ void __fastcall TFormGraphOrient::MenuOpenSamspaceClick(TObject *Sender)
 				   || (line.find("У3-06") != std::string::npos)
 				   || (line.find("U3-6") != std::string::npos) ) {
 
-				if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI, zeroDate);
+				if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI, zeroDate, isM1000);
 				ClearSHTMI2(mSHTMI2);
 
-				if(TryReadSHTMI2(finp, mSHTMI2)) {
-
-					curDate.Val = zeroDate.Val + mSHTMI2.timeBOKZ/86400.;
+				if (TryReadSHTMI2(finp, mSHTMI2)) {
+					curDate = GetDateTime(zeroDate, mSHTMI2.timeBOKZ);
 					PrintSHTMI2(fout, mSHTMI2, curDate);
 					if (!isSHTMI2) {
 						fshtmi2.open((SaveDir + FileTitle + "_shtmi2.txt").c_str());
-						PrintLogSHTMI2(fshtmi2, mSHTMI2, curDate, 0);
-						isSHTMI2 = true;
 					}
-					else PrintLogSHTMI2(fshtmi2, mSHTMI2, curDate, 1);
+					PrintLogSHTMI2(fshtmi2, mSHTMI2, curDate, isSHTMI2);
 
 					if (isLoadDb) {
 						TDateTime saveTime;// = StrToDate(toUString(sdate)) +  StrToTime(toUString(stime));
@@ -2801,7 +3002,7 @@ void __fastcall TFormGraphOrient::MenuOpenSamspaceClick(TObject *Sender)
 				   || (line.find("У3-07") != std::string::npos)
 				   || (line.find("U3-7") != std::string::npos) ) {
 
-				if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI, zeroDate);
+				if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI, zeroDate, isM1000);
 				isOpenDtmi = true;
 				ClearDTMI(mDTMI);   // or after OutputDTMI ?????
 				TryReadDTMI(finp, mDTMI);
@@ -2877,7 +3078,7 @@ void __fastcall TFormGraphOrient::MenuOpenSamspaceClick(TObject *Sender)
 //					ClearDTMI(mDTMI);
 //				}
 				TryReadDTMI(finp, mDTMI);
-				if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI, zeroDate);
+				if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI, zeroDate, isM1000);
 			}
 			else if ( (line.find("U3-16") != std::string::npos)
 				   || (line.find("U3-17") != std::string::npos)
@@ -2891,11 +3092,11 @@ void __fastcall TFormGraphOrient::MenuOpenSamspaceClick(TObject *Sender)
 				 }
 			else if (line.find("U3-24") != std::string::npos) {
 				TryReadLOC(finp, mLOC);
-				OutputLOC(fout, SaveDir, mLOC, zeroDate);
+				OutputLOC(fout, SaveDir, mLOC, zeroDate, isM1000);
 			}
 		}
 
-		if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI, zeroDate);
+		if (isOpenDtmi) OutputDTMI(fout, SaveDir, mDTMI, zeroDate, isM1000);
 		finp.close();
 		fout.close();
 		fshtmi1.close();
@@ -2903,11 +3104,260 @@ void __fastcall TFormGraphOrient::MenuOpenSamspaceClick(TObject *Sender)
 		fdtmi.close();
 		fmloc.close();
 
+//		int nn = ChartNumLoc->Series[0]->Count();
+
 		PrepareStartDraw();
 		CheckTabSheet();
 	}
 }
 
+struct TTimeEmka {
+	unsigned char year, month, day;
+	unsigned char hour, min, sec;
+};
+
+int FindValueInList(unsigned short _val, unsigned short *list, int size)
+{
+	for (int i = 0; i < size; i++) {
+		if (_val == list[i]) return i;
+	}
+	return -1;
+}
+
+int TimeEmkaToDateTime(TTimeEmka timeEmka, TDateTime &curTime)
+{
+	AnsiString stDate, stTime;
+	int year, day, month, hour, min, sec;
+	stDate.sprintf("%x %x %x", timeEmka.day,  timeEmka.month, timeEmka.year);
+	sscanf(stDate.c_str(), "%ld %ld %ld", &day,  &month, &year);
+
+	stTime.sprintf("%x %x %x", timeEmka.hour, timeEmka.min,   timeEmka.sec);
+	sscanf(stTime.c_str(), "%ld %ld %ld", &hour, &min,   &sec);
+
+	year += 2000;
+	curTime = EncodeDate(year, month, day) + EncodeTime(hour, min, sec, 0);
+}
+
+void TFormGraphOrient::DrawMshi_2V(TMshi_2V *mshi, TDateTime curDate, int num)
+{
+	TColor arColor[4] = {clBlue, clGreen, clRed, clGray};
+	if ( (num >= 0) && (num < 2) ) {
+		int nSeries = num;
+		plotter->SetDateTimeX(true);
+		AnsiString title = "мБОКЗ №" + IntToStr(num+1);
+		plotter->SetTitle(title);
+		plotter->SetSeriesColor(arColor[num]);
+
+		CadrInfo mCadr;
+		double Qdbl[4], Mornt[3][3], ang[3] = {0, 0, 0}, angSun = 0;
+		//если выполнение команды завершено и ориентация определена успешно
+		if ( (mshi->status1 & 0x4000) && !(mshi->status2 & 0xFF00)) {
+
+			for (int i = 0; i < 4; i++) {
+				 Qdbl[i] = (double)mshi->Qornt[i];
+			}
+			if ( !CheckQuatNorm(Qdbl, 0.001) ) {
+				QuatToMatrix(Qdbl, Mornt);
+				MatrixToEkvAngles(Mornt, ang);
+				plotter->AddPoint(ChartAl, nSeries, curDate.Val, ang[0] * RTD);
+				plotter->AddPoint(ChartDl, nSeries, curDate.Val, ang[1] * RTD);
+				plotter->AddPoint(ChartAz, nSeries, curDate.Val, ang[2] * RTD);
+
+				double DJD, DJD1900, SunI[3], SunD[3];
+				_DateTime stDate;
+				DecodeDateTime(curDate, stDate.Year, stDate.Month,  stDate.Day,
+							stDate.Hour, stDate.Min, stDate.Sec, stDate.mSec);
+
+				DJD = DateTimeToDaysJ2000(&stDate)/36525;
+				DJD1900=(DJD + 1.0) * 36525 + 2415020.0;
+				SunVector(DJD1900, Mornt, SunI, SunD);
+				angSun = acosm(SunD[2]);
+				plotter->AddPoint(ChartSunAngle, nSeries, curDate.Val, angSun * RTD);
+
+				mCadr.IsOrient = true;
+			}
+			else mCadr.IsOrient = false;
+			plotter->AddPoint(ChartWx, nSeries, curDate.Val, mshi->W[0] * RTS);
+			plotter->AddPoint(ChartWy, nSeries, curDate.Val, mshi->W[1] * RTS);
+			plotter->AddPoint(ChartWz, nSeries, curDate.Val, mshi->W[2] * RTS);
+			plotter->AddPoint(ChartMxy, nSeries, curDate.Val, (mshi->mxy)/1e+4 * 1000.);
+			plotter->AddPoint(ChartNumDet,  nSeries, curDate.Val, mshi->NumDet);
+		}
+		plotter->AddPoint(ChartNumFrag, nSeries, curDate.Val, mshi->NumFrag);
+		plotter->AddPoint(ChartNumLoc,  nSeries, curDate.Val, mshi->NumLoc);
+		plotter->AddPoint(ChartLevel,    nSeries, curDate.Val, mshi->ThMax);
+		plotter->AddPoint(ChartTemp, nSeries, curDate.Val, (mshi->Tcmv)/10.);
+
+		mCadr.Time = curDate.Val;
+		if (mCadr.IsOrient) {
+			for (int i = 0; i < 3; i++) {
+				mCadr.AnglesOrient[i] = ang[i];
+				mCadr.OmegaOrient[i]  = mshi->W[i];
+			}
+			mCadr.CountDeterObj = mshi->NumDet;
+			mCadr.MeanErrorXY = (mshi->mxy)/1e+4; //mm
+			mCadr.SunAngle = angSun;
+		}
+		mCadr.CountStars = mshi->NumStar;
+		mCadr.CountWindows  = mshi->NumFrag;
+		mCadr.CountLocalObj = mshi->NumLoc;
+		mCadr.MatrixTemp = mshi->Tcmv/10;
+		mCadr.Level = mshi->ThMax;
+		AddCadrInfo(mCadr, mBokz[num]);
+	}
+}
+
+void __fastcall TFormGraphOrient::MenuOpenEMKAClick(TObject *Sender)
+{
+	unsigned short cwMSHI[2]   = {0x4E00, 0x5600};
+	unsigned short cwSHTMI1[2] = {0x4C40, 0x5440};
+	unsigned short cwSHTMI2[2] = {0x4C60, 0x5460};
+//	unsigned short cwDTMI[2]   = {0x4C80, 0x5480};
+//	unsigned short cwMLOC[2]   = {0x4CA0, 0x54A0};
+	unsigned short codeOC[2]   = {0x4800, 0x5000};
+
+	FILE *fbin;
+	TTimeEmka timeEmka;
+	TDateTime curDate;
+	TBoardArray packet;
+
+	ofstream fmshi[2], fshtmi1[2], fshtmi2[2], fdtmi[2];
+	bool isMshi[2] = {false, false};
+	bool isShtmi1[2] = {false, false};
+	bool isShtmi2[2] = {false, false};
+//	bool isDtmi[2] = {false, false};
+	unsigned char cbuf, indexBokz;
+
+	OpenDialog->Options.Clear();
+	OpenDialog->Filter = "bin|*.bin";
+	if (OpenDialog->Execute()) {
+
+		AnsiString FileName = OpenDialog->FileName;
+		AnsiString CurDir   = ExtractFileDir(FileName);
+		AnsiString SaveDir  = CurDir + "\\Расшифровка\\";
+		CreateDir(SaveDir);
+		GetFileTitles(FileName,&FileTitle);
+
+		MakeCRC16Table();
+		mBokz[0].clear(); mBokz[1].clear();
+		fbin = fopen(FileName.c_str(),"rb");
+		while (!feof(fbin)) {
+			if (fread(&cbuf, sizeof(char), 1, fbin) && (cbuf == 0xE5) ) {
+				if (fread(&cbuf, sizeof(char), 1, fbin) && (cbuf == 0xE5) ) {
+					fread(&timeEmka, sizeof(TTimeEmka), 1, fbin);
+					fread(&packet.cmdWord, sizeof(short), 1, fbin);
+//чтение МШИОР
+					int devIndex = FindValueInList(packet.cmdWord, cwMSHI, 2);
+					if ( (devIndex >= 0) && (devIndex < 2) ) {
+						fread(&packet.ansWord, sizeof(short), 1, fbin);
+						if (packet.ansWord == codeOC[devIndex]) {
+							fread(packet.bufMIL, sizeof(short), 34, fbin);
+							packet.crcCalc = GetCRC16((unsigned char*)&packet, 70);
+							SwapShort((short*)&packet.bufMIL[2], (short*)&packet.bufMIL[3]);
+							for (int i = 5; i <= 23; i = i + 2) {
+								SwapShort((short*)&packet.bufMIL[i], (short*)&packet.bufMIL[i + 1]);
+							}
+							TimeEmkaToDateTime(timeEmka, curDate);
+							if (!isMshi[devIndex]) {
+								fmshi[devIndex].open((SaveDir + FileTitle +
+												"_mshi_"+IntToStr(devIndex)+".txt").c_str());
+							}
+							PrintMshi_2V(fmshi[devIndex], &packet, curDate, isMshi[devIndex]);
+							if ( (packet.statTmi == 2) && (packet.crcCalc == packet.crcBoard) ) {
+								TMshi_2V *mshi;
+								mshi = (TMshi_2V*)&packet.bufMIL;
+								DrawMshi_2V(mshi, curDate, devIndex);
+//								DrawMshi_2V(mshi, curDate, 0);
+//								DrawMshi_2V(mshi, curDate, 1);
+							}
+						}
+					}
+//чтение ШТМИ1
+					devIndex = FindValueInList(packet.cmdWord, cwSHTMI1, 2);
+					if ( (devIndex >= 0) && (devIndex < 2) ) {
+						fread(&packet.ansWord, sizeof(short), 1, fbin);
+						if (packet.ansWord == codeOC[devIndex]) {
+							fread(packet.bufMIL, sizeof(short), 34, fbin);
+							packet.crcCalc = GetCRC16((unsigned char*)&packet, 70);
+							SwapShort((short*)&packet.bufMIL[1], (short*)&packet.bufMIL[2]);
+							for (int i = 8; i <= 12; i = i + 2) {
+								SwapShort((short*)&packet.bufMIL[i], (short*)&packet.bufMIL[i + 1]);
+							}
+							TimeEmkaToDateTime(timeEmka, curDate);
+							if (!isShtmi1[devIndex]) {
+								fshtmi1[devIndex].open((SaveDir + FileTitle +
+												"_shtmi1_"+IntToStr(devIndex)+".txt").c_str());
+							}
+							PrintShtmi1_2V(fshtmi1[devIndex], &packet, curDate, isShtmi1[devIndex]);
+						}
+					}
+//чтение ШТМИ2
+					devIndex = FindValueInList(packet.cmdWord, cwSHTMI2, 2);
+					if ( (devIndex >= 0) && (devIndex < 2) ) {
+						fread(&packet.ansWord, sizeof(short), 1, fbin);
+						if (packet.ansWord == codeOC[devIndex]) {
+							fread(packet.bufMIL, sizeof(short), 34, fbin);
+							packet.crcCalc = GetCRC16((unsigned char*)&packet, 70);
+							SwapShort((short*)&packet.bufMIL[1], (short*)&packet.bufMIL[2]);
+							SwapShort((short*)&packet.bufMIL[14], (short*)&packet.bufMIL[15]);
+							TimeEmkaToDateTime(timeEmka, curDate);
+							if (!isShtmi2[devIndex]) {
+								fshtmi2[devIndex].open((SaveDir + FileTitle +
+												"_shtmi2_"+IntToStr(devIndex)+".txt").c_str());
+							}
+							PrintShtmi2_2V(fshtmi2[devIndex], &packet, curDate, isShtmi2[devIndex]);
+							if ( (packet.statTmi == 2) && (packet.crcCalc == packet.crcBoard) ) {
+								TShtmi2_2V *pTmi = (TShtmi2_2V*)(packet.bufMIL);
+								unsigned short stat = (pTmi->status2 & 0xFF00) >> 8;
+								if (!devIndex)
+									plotter->AddPoint(ChartStat, 0, curDate.Val, stat, clBlue);
+								else plotter->AddPoint(ChartStat, 0, curDate.Val, stat, clGreen);
+							}
+						}
+					}
+//чтение ДТМИ
+//					devIndex = FindValueInList(cmdWord, cwDTMI, 2);
+//					if ( (devIndex >= 0) && (devIndex < 2) ) {
+//						if (!isDtmi[devIndex]) {
+//									fdtmi[devIndex].open((SaveDir + FileTitle +
+//													"_dtmi_"+IntToStr(devIndex)+".txt").c_str());
+//						}
+//						PrintDtmi_2V(fdtmi[devIndex], &packet, curDate, isDtmi[devIndex]);
+//                    }
+				}
+			}
+		}
+		fclose(fbin);
+
+		for (int i = 0; i < 2; i++) {
+			if (isMshi[i]) fmshi[i].close();
+			if (isShtmi1[i]) fshtmi1[i].close();
+			if (isShtmi2[i]) fshtmi2[i].close();
+//			if (isDtmi[i]) fdtmi[i].close();
+		}
+
+		PrepareStartDraw();
+		CheckTabSheet();
+
+		int nRow = 1;
+		for (int nDevice = 0; nDevice < 2; nDevice++) {
+			if (mBokz[nDevice].size()) {
+				TableStatInfo->Cells[0][nRow++] = "мБОКЗ №" + IntToStr(nDevice + 1);
+				CalculateOrientStat(mBokz[nDevice], nDevice, nRow);
+				CalculateParamStat(mBokz[nDevice], nDevice, nRow);
+			}
+		}
+
+		for (int i = 0; i < Charts.size(); i++) {
+			plotter->CheckChartSeries(Charts[i]);
+		}
+
+		SaveScreenShots(SaveDir.c_str());
+		SaveTableToFile(TableStatInfo, TableStatInfo->RowCount, TableStatInfo->ColCount,
+									AnsiString(SaveDir + FileTitle + "_stat.txt").c_str());
+	}
+}
+//---------------------------------------------------------------------------
 
 
 
@@ -3071,9 +3521,160 @@ void TFormGraphOrient::PrintReportRes(vector <CadrInfo>& cadrInfo)
 	}
 }
 
+void TFormGraphOrient::CalculateLocalStat(vector <CadrInfo> &vLocal, int nSeries, int &countRow)
+{
+	Statistika statParam;
+
+	if (nSeries < ChartFone->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.MeanBright; return a.MeanBright;} } GetMeanBright;
+		statParam = calculateStatParam(vLocal.begin(), vLocal.end(), 0.0, GetMeanBright);
+		AddRowToStatTable(countRow++, "Уровень фона (МЛОК), ЕМР", statParam, 8, 2);
+		ChartFone->Series[nSeries]->Title += " (от " + FloatToStrF(statParam.min, ffFixed, 8, 1)
+									+ " до " + FloatToStrF(statParam.max, ffFixed, 8, 1) + ", МЛОК";
+	}
+
+	if (nSeries < ChartNoise->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.SigmaBright; return a.SigmaBright;} } GetSigmaBright;
+		statParam = calculateStatParam (vLocal.begin(), vLocal.end(), 0.0, GetSigmaBright);
+		AddRowToStatTable(countRow++, "СКО фона (МЛОК), ЕМР", statParam, 8, 2);
+		ChartNoise->Series[nSeries]->Title += " (от " + FloatToStrF(statParam.min, ffFixed, 8, 1)
+									 + " до " + FloatToStrF(statParam.max, ffFixed, 8, 1) + ", МЛОК";
+	}
+
+	if (nSeries < ChartNumLoc->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.CountLocalObj; return a.CountLocalObj;} } GetCountLocalObj;
+		statParam = calculateStatParam (vLocal.begin(), vLocal.end(), 0.0, GetCountLocalObj);
+		AddRowToStatTable(countRow++, "Число объектов (МЛОК)", statParam, 8, 2);
+		ChartNumLoc->Series[nSeries]->Title += " (от " + FloatToStrF(statParam.min, ffFixed, 8, 0)
+									 + " до " + FloatToStrF(statParam.max, ffFixed, 8, 0) + ", МЛОК";
+	}
+}
+
+void TFormGraphOrient::CalculateOrientStat(vector <CadrInfo> &vOrient, int nSeries, int &countRow)
+{
+	Statistika statParam;
+
+	if (nSeries < ChartAl->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.AnglesOrient[0];} } GetAnglesOrientAl;
+		statParam = calculateStatParam (vOrient.begin(), vOrient.end(), 0.0, GetAnglesOrientAl);
+		statParam.mean *= RTD; 		statParam.sigma *= RTS;
+		statParam.min *= RTD;		statParam.max *= RTD;
+		AddRowToStatTable(countRow++, "Прямое восхождение, град (СКО - угл. сек)", statParam, 8, 4);
+		ChartAl->Series[nSeries]->Title += " (CКО = " + FloatToStrF(statParam.sigma, ffFixed, 8, 2) + " '')";
+	}
+
+	if (nSeries < ChartDl->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.AnglesOrient[1];} } GetAnglesOrientDl;
+		statParam = calculateStatParam (vOrient.begin(), vOrient.end(), 0.0, GetAnglesOrientDl);
+		statParam.mean *= RTD; 		statParam.sigma *= RTS;
+		statParam.min *= RTD;		statParam.max *= RTD;
+		AddRowToStatTable(countRow++,"Склонение, град (СКО - угл. сек)", statParam, 8, 4);
+		ChartDl->Series[nSeries]->Title += " (CКО = " + FloatToStrF(statParam.sigma, ffFixed, 8, 2) + " '')";
+	}
+
+	if (nSeries < ChartAz->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.AnglesOrient[2];} } GetAnglesOrientAz;
+		statParam = calculateStatParam (vOrient.begin(), vOrient.end(), 0.0, GetAnglesOrientAz);
+		statParam.mean *= RTD; 		statParam.sigma *= RTS;
+		statParam.min *= RTD;		statParam.max *= RTD;
+		AddRowToStatTable(countRow++, "Азимут, град (СКО - угл. сек)", statParam, 8, 4);
+		ChartAz->Series[nSeries]->Title += " (CКО = " + FloatToStrF(statParam.sigma, ffFixed, 8, 2) + " '')";
+	}
+
+	if (nSeries < ChartWx->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.OmegaOrient[0];} } GetOmegaOrientF;
+		statParam = calculateStatParam (vOrient.begin(), vOrient.end(), 0.0, GetOmegaOrientF);
+		statParam.mean *= RTS; 		statParam.sigma *= RTS;
+		statParam.min *= RTS;		statParam.max *= RTS;
+		AddRowToStatTable(countRow++, "Угловая скорость по оси OX, угл. сек/с", statParam, 8, 4);
+		ChartWx->Series[nSeries]->Title += " (CКО = " + FloatToStrF(statParam.sigma, ffFixed, 8, 2) + " ''/c)";
+	}
+
+	if (nSeries < ChartWy->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.OmegaOrient[1];} } GetOmegaOrientS;
+		statParam = calculateStatParam (vOrient.begin(), vOrient.end(), 0.0, GetOmegaOrientS);
+		statParam.mean *= RTS; 		statParam.sigma *= RTS;
+		statParam.min *= RTS;		statParam.max *= RTS;
+		AddRowToStatTable(countRow++, "Угловая скорость по оси OY, угл. сек/с", statParam, 8, 4);
+		ChartWy->Series[nSeries]->Title += " (CКО = " + FloatToStrF(statParam.sigma, ffFixed, 8, 2) + " ''/c)";
+	}
+
+	if (nSeries < ChartWz->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.OmegaOrient[2];} } GetOmegaOrientT;
+		statParam = calculateStatParam (vOrient.begin(), vOrient.end(), 0.0, GetOmegaOrientT);
+		statParam.mean *= RTS; 		statParam.sigma *= RTS;
+		statParam.min *= RTS;		statParam.max *= RTS;
+		AddRowToStatTable(countRow++, "Угловая скорость по оси OZ, угл. сек/с", statParam, 8, 4);
+		ChartWz->Series[nSeries]->Title += " (CКО = " + FloatToStrF(statParam.sigma, ffFixed, 8, 2) + " ''/c)";
+	}
+
+	if (nSeries < ChartSunAngle->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.SunAngle;} } GetSunAngle;
+		statParam = calculateStatParam (vOrient.begin(), vOrient.end(), 0.0, GetSunAngle);
+		statParam.mean *= RTD; 		statParam.sigma *= RTD;
+		statParam.min *= RTD;		statParam.max *= RTD;
+		AddRowToStatTable(countRow++, "Угол опт. оси к Солнцу, град.", statParam, 8, 2);
+		ChartSunAngle->Series[nSeries]->Title += " (от " + FloatToStrF(statParam.min, ffFixed, 8, 1)
+									 + " до " + FloatToStrF(statParam.max, ffFixed, 8, 1) + ", град.)";
+	}
+}
+
+void TFormGraphOrient::CalculateParamStat(vector <CadrInfo> &vOrient, int nSeries, int &countRow)
+{
+	Statistika statParam;
+
+	if (ChartLevel->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a, bool& f) {f = false; return a.Level;} } GetLevel;
+		statParam = calculateStatParam(vOrient.begin(), vOrient.end(), 0.0, GetLevel);
+		AddRowToStatTable(countRow++, "Порог по фрагментам, ЕМР", statParam, 8, 1);
+		ChartLevel->Series[nSeries]->Title += " (от " + FloatToStrF(statParam.min, ffFixed, 8, 0)
+									+ " до " + FloatToStrF(statParam.max, ffFixed, 8, 0) + " ЕМР)";
+	}
+
+	if (nSeries < ChartNumFrag->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.CountWindows; return a.CountWindows;} } GetCountWindows;
+		statParam = calculateStatParam (vOrient.begin(), vOrient.end(), 0.0, GetCountWindows);
+		AddRowToStatTable(countRow++, "Число фрагментов", statParam, 8, 2);
+		ChartNumFrag->Series[nSeries]->Title += " (от " + FloatToStrF(statParam.min, ffFixed, 8, 0)
+									 + " до " + FloatToStrF(statParam.max, ffFixed, 8, 0) +")";
+	}
+
+	if (nSeries < ChartNumLoc->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a, bool& f) {f = false; return a.CountLocalObj;} } GetCountLocalObj;
+		statParam = calculateStatParam (vOrient.begin(), vOrient.end(), 0.0, GetCountLocalObj);
+		AddRowToStatTable(countRow++, "Число объектов", statParam, 8, 2);
+		ChartNumLoc->Series[nSeries]->Title += " (от " + FloatToStrF(statParam.min, ffFixed, 8, 0)
+									 + " до " + FloatToStrF(statParam.max, ffFixed, 8, 0) +")";
+	}
+
+	if (nSeries < ChartNumDet->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.CountDeterObj;} } GetCountDeterObj;
+		statParam = calculateStatParam (vOrient.begin(), vOrient.end(), 0.0, GetCountDeterObj);
+		AddRowToStatTable(countRow++, "Число звезд", statParam, 8, 2);
+		ChartNumDet->Series[nSeries]->Title += " (от " + FloatToStrF(statParam.min, ffFixed, 8, 0)
+									 + " до " + FloatToStrF(statParam.max, ffFixed, 8, 0) +")";
+	}
+
+	if (nSeries < ChartMxy->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.MeanErrorXY;} } GetMeanErrXY;
+		statParam = calculateStatParam (vOrient.begin(), vOrient.end(), 0.0, GetMeanErrXY);
+		statParam.mean *= 1000; 	statParam.sigma *= 1000;
+		statParam.min *= 1000;		statParam.max *= 1000;
+		AddRowToStatTable(countRow++, "Ост. рассогласования, мкм", statParam, 8, 2);
+		ChartMxy->Series[nSeries]->Title += " (среднее = " + FloatToStrF(statParam.mean, ffFixed, 8, 1) +" мкм)";
+	}
+
+	if (nSeries < ChartTemp->SeriesCount()) {
+		struct { double operator() (const CadrInfo& a, bool& f) {f = false; return a.MatrixTemp;} } GetMatrixTemp;
+		statParam = calculateStatParam (vOrient.begin(), vOrient.end(), 0.0, GetMatrixTemp);
+		AddRowToStatTable(countRow++, "Температура, град.", statParam, 8, 2);
+		ChartTemp->Series[nSeries]->Title += " (среднее = " + FloatToStrF(statParam.mean, ffFixed, 8, 1) +" град.)";
+	}
+
+}
+
 void TFormGraphOrient::CalculateSeriesSKO()
 {
-	pair <double, double> meanStd;
 	Statistika statParam;
 	int numberRow = 1;
 
@@ -3112,9 +3713,6 @@ void TFormGraphOrient::CalculateSeriesSKO()
 		ChartNumDet->Series[0]->Title += " CКО: " + FloatToStrF(statParam.sigma, ffFixed, 8, 4);
 	}
 
-	//struct { double operator() (const CadrInfo& a) {return a.MatrixTemp;} } GetMatrixTemp;
-	//meanStd = calculateMeanStdDv (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetMatrixTemp);
-
 	if (ChartAl->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.AnglesOrient[0];} } GetAnglesOrientAl;
 		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetAnglesOrientAl);
@@ -3139,7 +3737,7 @@ void TFormGraphOrient::CalculateSeriesSKO()
 		statParam.mean *= RTD; 		statParam.sigma *= RTS;
 		statParam.min *= RTD;		statParam.max *= RTD;
 		AddRowToStatTable(numberRow++, "Азимут, град/угл. сек", statParam, 8, 4);
-//		ChartAz->Series[0]->Title += " CКО: " + FloatToStrF(meanStd.second, ffFixed, 8, 4);
+//		ChartAz->Series[0]->Title += " CКО: " + FloatToStrF(statParam.sigma, ffFixed, 8, 4);
 	}
 
 	if (ChartAlError->SeriesCount()) {
@@ -3199,28 +3797,28 @@ void TFormGraphOrient::CalculateSeriesSKO()
 	if (ChartWx->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.OmegaOrient[0];} } GetOmegaOrientF;
 		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaOrientF);
-		statParam.mean *= RTM; 		statParam.sigma *= RTM;
-		statParam.min *= RTM;		statParam.max *= RTM;
-		AddRowToStatTable(numberRow++, "Угловая скорость по оси OX, угл. мин/с (угл. сек/с)", statParam, 8, 4);
-		ChartWx->Series[1]->Title += " CКО: " + FloatToStrF(statParam.sigma, ffFixed, 8, 4);
+		statParam.mean *= RTS; 		statParam.sigma *= RTS;
+		statParam.min *= RTS;		statParam.max *= RTS;
+		AddRowToStatTable(numberRow++, "Угловая скорость по оси OX, угл. сек/с", statParam, 8, 4);
+		ChartWx->Series[1]->Title += " CКО: " + FloatToStrF(statParam.sigma, ffFixed, 8, 2) + " ''/c";
 	}
 
 	if (ChartWy->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.OmegaOrient[1];} } GetOmegaOrientS;
 		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaOrientS);
-		statParam.mean *= RTM; 		statParam.sigma *= RTM;
-		statParam.min *= RTM;		statParam.max *= RTM;
-		AddRowToStatTable(numberRow++, "Угловая скорость по оси OY, угл. мин/с (угл. сек/с)", statParam, 8, 4);
-		ChartWy->Series[1]->Title += " CКО: " + FloatToStrF(statParam.sigma, ffFixed, 8, 4);
+		statParam.mean *= RTS; 		statParam.sigma *= RTS;
+		statParam.min *= RTS;		statParam.max *= RTS;
+		AddRowToStatTable(numberRow++, "Угловая скорость по оси OY, угл. сек/с", statParam, 8, 4);
+		ChartWy->Series[1]->Title += " CКО: " + FloatToStrF(statParam.sigma, ffFixed, 8, 2) + " ''/c";
 	}
 
 	if (ChartWz->SeriesCount()) {
 		struct { double operator() (const CadrInfo& a, bool& f) {f = !a.IsOrient; return a.OmegaOrient[2];} } GetOmegaOrientT;
 		statParam = calculateStatParam (vCadrInfo.begin(), vCadrInfo.end(), 0.0, GetOmegaOrientT);
-		statParam.mean *= RTM; 		statParam.sigma *= RTM;
-		statParam.min *= RTM;		statParam.max *= RTM;
-		AddRowToStatTable(numberRow++, "Угловая скорость по оси OZ, угл. мин/с (угл. сек/с)", statParam, 8, 4);
-		ChartWz->Series[1]->Title += " CКО: " + FloatToStrF(statParam.sigma, ffFixed, 8, 4);
+		statParam.mean *= RTS; 		statParam.sigma *= RTS;
+		statParam.min *= RTS;		statParam.max *= RTS;
+		AddRowToStatTable(numberRow++, "Угловая скорость по оси OZ, угл. сек/с", statParam, 8, 4);
+		ChartWz->Series[1]->Title += " CКО: " + FloatToStrF(statParam.sigma, ffFixed, 8, 2) + " ''/c";
 	}
 
 	if (ChartWxError->SeriesCount()) {
@@ -3653,9 +4251,9 @@ void __fastcall TFormGraphOrient::FormResize(TObject *Sender)
 	ResizePlot(ChartErrorOZ, 1, 3, 0, 2);
 
 //остаточные рассогласования
-	ResizePlot(ChartMx,  1, 3, 0, 0);
-	ResizePlot(ChartMy,  1, 3, 0, 1);
-	ResizePlot(ChartMxy, 1, 3, 0, 2);
+	ResizePlot(ChartMxy, 1, 3, 0, 0);
+	ResizePlot(ChartMx,  1, 3, 0, 1);
+	ResizePlot(ChartMy,  1, 3, 0, 2);
 
 //число объектов
 	ResizePlot(ChartNumFrag, 1, 3, 0, 0);
@@ -3664,8 +4262,12 @@ void __fastcall TFormGraphOrient::FormResize(TObject *Sender)
 
 //характеристики изображения
 	ResizePlot(ChartFone,  1, 3, 0, 0);
-	ResizePlot(ChartNoise, 1, 3, 0, 1);
-	ResizePlot(ChartTemp,  1, 3, 0, 2);
+	ResizePlot(ChartFone,  1, 3, 0, 1);
+	ResizePlot(ChartNoise, 1, 3, 0, 2);
+
+//дополнительные параметры
+    ResizePlot(ChartSunAngle,  1, 3, 0, 0);
+	ResizePlot(ChartTemp,  1, 3, 0, 1);
 
 //статистика по фрагментам
 	ResizePlot(ChartFragErrX,   2, 2, 0, 0);
@@ -3685,8 +4287,6 @@ void __fastcall TFormGraphOrient::FormResize(TObject *Sender)
 	ResizePlot(ChartBrightSp,   2, 2, 1, 1);
 }
 //---------------------------------------------------------------------------
-
-
 
 void __fastcall TFormGraphOrient::ChartsFragClickLegend(TCustomChart *Sender, TMouseButton Button,
 		  TShiftState Shift, int X, int Y)
@@ -4090,4 +4690,17 @@ void __fastcall TFormGraphOrient::SaveSeriesDataClick(TObject *Sender)
 	 }
 }
 //---------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
 

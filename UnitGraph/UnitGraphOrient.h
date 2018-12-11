@@ -101,16 +101,14 @@ __published: // IDE-managed Components
 	TOpenDialog *OpenDialog;
 	TCheckBox *SortFileCheckBox;
 	TMenuItem *MenuOpenFlash;
-	TMenuItem *MenuOpenSamspace;
 	TMenuItem *N1;
 	TMenuItem *BOKZ60ParseProtocol;
 	TMenuItem *BOKZM2VParseProtocol;
-	TMenuItem *MenuOpenEnregy;
 	TLabel *LabelFrameReport;
 	TMenuItem *ReadIKIFormat;
 	TChartEditor *ChartEditor1;
 	TFileOpenDialog *FileOpenDialog1;
-	TPageControl *Fyf;
+	TPageControl *PageControl1;
 	TTabSheet *TabSheetAngles;
 	TChart *ChartAl;
 	TChart *ChartDl;
@@ -138,7 +136,6 @@ __published: // IDE-managed Components
 	TTabSheet *TabSheetImage;
 	TChart *ChartFone;
 	TChart *ChartNoise;
-	TChart *ChartTemp;
 	TTabSheet *TabSheetStarsMotion;
 	TLabel *Label4;
 	TLabel *Label3;
@@ -214,10 +211,22 @@ __published: // IDE-managed Components
 	TLabel *Label13;
 	TLabel *Label14;
 	TLabel *Label15;
-	TMenuItem *MenuOpenArsenal;
 	TMenuItem *BOKZMParse;
 	TPopupMenu *PopupMenu1;
 	TMenuItem *SaveSeriesData;
+	TMenuItem *N2;
+	TMenuItem *MenuOpenSamspace;
+	TMenuItem *MenuOpenEnergy;
+	TMenuItem *MenuOpenArsenal;
+	TMenuItem *MenuOpenEMKA;
+	TTabSheet *TabSheetResStat;
+	TChart *ChartStat;
+	TChart *ChartCounter;
+	TCheckBox *CheckBoxInterval;
+	TTabSheet *TabSheet1;
+	TChart *ChartTemp;
+	TChart *ChartSunAngle;
+	TChart *ChartLevel;
 
 	void __fastcall MenuSaveClick(TObject *Sender);
 	void __fastcall MenuClearClick(TObject *Sender);
@@ -258,9 +267,10 @@ __published: // IDE-managed Components
 	void __fastcall BOKZMFParseProtocolClick(TObject *Sender);
 	void __fastcall N21Click(TObject *Sender);
 	void __fastcall BOKZM2ParseProtocolClick(TObject *Sender);
-	void __fastcall MenuOpenArsenalClick(TObject *Sender);
+	void __fastcall MenuOpenMILClick(TObject *Sender);
 	void __fastcall BOKZMParseClick(TObject *Sender);
 	void __fastcall SaveSeriesDataClick(TObject *Sender);
+	void __fastcall MenuOpenEMKAClick(TObject *Sender);
 
 
 private: // User declarations
@@ -508,11 +518,14 @@ private: // User declarations
 	void __fastcall ChartMouseDown(TObject *Sender, TMouseButton Button,
 		TShiftState Shift, int X, int Y);
 
-
-	void OutputDTMI(ofstream &_fout, AnsiString &_SaveDir, DTMI &_tmi, TDateTime zeroDate);
-	void OutputLOC(ofstream &_fout, AnsiString &_SaveDir, LOC &_tmi, TDateTime zeroDate);
+	void DrawMshi_2V(TMshi_2V *mshi, TDateTime curDate, int num);
+	void OutputDTMI(ofstream &_fout, AnsiString &_SaveDir, DTMI &_tmi, TDateTime zeroDate, int isM1000);
+	void OutputLOC(ofstream &_fout, AnsiString &_SaveDir, LOC &_tmi, TDateTime zeroDate, int isM1000);
 	void StartPrintReport(IKI_img* reader);
 	void PrintReportRes(vector<CadrInfo>& cadrInfo);
+	void CalculateLocalStat(vector <CadrInfo> &vLocal, int nSeries, int &countRow);
+	void CalculateOrientStat(vector <CadrInfo> &vOrient, int nSeries, int &countRow);
+    void CalculateParamStat(vector <CadrInfo> &vOrient, int nSeries, int &countRow);
 	void CalculateSeriesSKO();
 	void SaveTableToFile(TStringGrid* table, short rowCount, short columnCount,
 		string filename);

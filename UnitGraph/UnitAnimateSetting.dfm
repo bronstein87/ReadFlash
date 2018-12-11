@@ -19,15 +19,11 @@ object FormAnimateSetting: TFormAnimateSetting
     Top = 0
     Width = 368
     Height = 558
-    ActivePage = ShowPage
+    ActivePage = FilesPage
     Align = alClient
     TabOrder = 0
     object ShowPage: TTabSheet
       Caption = #1040#1085#1080#1084#1072#1094#1080#1103
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GroupBox1: TGroupBox
         Left = 3
         Top = 3
@@ -295,10 +291,6 @@ object FormAnimateSetting: TFormAnimateSetting
     object FilesPage: TTabSheet
       Caption = #1060#1072#1081#1083#1099
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GroupBox5: TGroupBox
         Left = 0
         Top = 3
@@ -349,10 +341,6 @@ object FormAnimateSetting: TFormAnimateSetting
     object DBOptionsPage: TTabSheet
       Caption = #1053#1072#1089#1090#1088#1086#1081#1082#1080' '#1041#1044
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label9: TLabel
         Left = 19
         Top = 45
@@ -362,14 +350,14 @@ object FormAnimateSetting: TFormAnimateSetting
       end
       object Label11: TLabel
         Left = 19
-        Top = 107
+        Top = 163
         Width = 134
         Height = 13
         Caption = #1044#1072#1090#1072' '#1086#1073#1085#1091#1083#1077#1085#1080#1103' 1-'#1089' '#1084#1077#1090#1082#1080
       end
       object Label12: TLabel
         Left = 19
-        Top = 168
+        Top = 104
         Width = 96
         Height = 13
         Caption = #1047#1074#1077#1079#1076#1085#1099#1077' '#1076#1072#1090#1095#1080#1082#1080
@@ -383,9 +371,9 @@ object FormAnimateSetting: TFormAnimateSetting
         Text = #1053#1077#1090' '#1087#1086#1076#1082#1083#1102#1095#1077#1085#1080#1103
         OnChange = KAComboBoxChange
       end
-      object ComboBox1S: TComboBox
+      object ZeroDate1S: TComboBox
         Left = 19
-        Top = 126
+        Top = 182
         Width = 166
         Height = 21
         Hint = #1058#1086#1083#1100#1082#1086' '#1076#1083#1103' '#1084#1072#1089#1089#1080#1074#1086#1074' '#1052#1064#1048#1054#1056
@@ -404,12 +392,30 @@ object FormAnimateSetting: TFormAnimateSetting
       end
       object EditListBokz: TEdit
         Left = 19
-        Top = 187
+        Top = 123
         Width = 166
         Height = 21
         ReadOnly = True
         TabOrder = 3
         Text = #1053#1077#1090' '#1087#1086#1076#1082#1083#1102#1095#1077#1085#1080#1103
+      end
+      object ZeroTime1S: TDateTimePicker
+        Left = 19
+        Top = 209
+        Width = 166
+        Height = 21
+        Date = -90.000000000000000000
+        Time = -90.000000000000000000
+        Kind = dtkTime
+        TabOrder = 4
+      end
+      object CheckBoxSinc: TCheckBox
+        Left = 35
+        Top = 236
+        Width = 150
+        Height = 17
+        Caption = #1089#1095#1080#1090#1072#1090#1100' '#1087#1086' '#1050#1057' "'#1057#1080#1085#1093#1088#1086'"'
+        TabOrder = 5
       end
     end
   end

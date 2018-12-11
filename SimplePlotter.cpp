@@ -45,6 +45,8 @@ void SimplePlotter::SaveChart(TChart* Chart, AnsiString name,
 	Chart->Height = SaveHeigth;
 	Chart->Width = SaveWidth;
 	Chart->Legend->Alignment = laRight;
+
+//	Chart->SaveToMetafile();
 }
 
 void SimplePlotter::AddSeries(TChart* Chart, DWORD SeriesIndex, TColor Color) {

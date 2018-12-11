@@ -23,7 +23,10 @@
 using namespace std;
 using namespace add_string;
 
+double clkBokz = 1.;
+
 namespace parse_prot {
+
 	struct stLocal {
 		float x, y;
 		float bright, size;
@@ -43,6 +46,11 @@ namespace parse_prot {
 		float quatBoard[4], Epoch;
 		stLocal LocalList1[15], LocalList2[15], ResultList[12];
 		unsigned char nObjectWindow[16];
+	};
+
+	struct SINCHRO {
+		unsigned int countClk;
+        float curEpoch;
 	};
 
 	struct MSHI {
@@ -87,7 +95,8 @@ namespace parse_prot {
 		float quatLast[4], Epoch;
 		unsigned short nLocal[2], maxHist;
 		unsigned short maxHistX, maxHistY;
-		unsigned short test_short, Reserved[10];
+		unsigned short test_short;
+		short Reserved[10];
 	};
 
 	struct LOC {
@@ -98,7 +107,7 @@ namespace parse_prot {
 		unsigned short nLocalObj, nFixedObj;
 		float MeanC, SigmaC;
 		float LocalList[32][4];
-		unsigned short Reserved[2];
+		unsigned short nPix, Reserved;
 	};
 
 	struct MSHI_BOKZM {
@@ -148,7 +157,6 @@ namespace parse_prot {
 		char  nFrag;
 		short numSec;
 		float omega;
-
 	};
 
 	struct TLOCBOKZM {
@@ -159,6 +167,64 @@ namespace parse_prot {
 		float fragList [MAX_OBJ_BOKZM][2];
     };
 
+	struct TMshi_2V {
+		unsigned short status1, status2;
+		unsigned int time_sec;
+		unsigned short time_ms;
+		float OZ[3], Qornt[4], W[3];
+		unsigned short serial, Tcmv;
+		unsigned char  NumStar, NumFrag;
+		unsigned short NumLoc, NumDet;
+		unsigned short ThMax, mxy;
+	};
+
+	struct TShtmi1_2V {
+        unsigned short nAr;
+		unsigned int time_sec;
+		unsigned short time_ms;
+		unsigned short status1, status2;
+		unsigned short serial, post;
+		float Foc, Xg, Yg;
+		unsigned short timeExp;
+		unsigned short Mean, Sigma;
+		unsigned short statKP, cntKP;
+		unsigned short Tcmv, Reserved[5];
+		unsigned short CatCS[2], ConstCS[2], ProgCS[2];
+		unsigned short Version;
+	};
+
+	struct TShtmi2_2V {
+		unsigned short nAr;
+		unsigned int time_sec;
+		unsigned short time_ms;
+		unsigned short status1, status2;
+		unsigned short serial, post, timeExp;
+		unsigned short cntCommandWord, cntCallNO, cntNOtoSLEZH;
+		unsigned short cntCallTO, cntTOtoSLEZH;
+		unsigned int cntSLEZH;
+		unsigned short cntStatOrient[MAX_STAT];
+	};
+
+	struct TDtmi_2V {
+		unsigned short nAr;
+		unsigned int time_sec;
+		unsigned short time_ms;
+		unsigned short status1, status2;
+		unsigned short serial, post, Tcmv;
+		unsigned short cntRegErr, timeExp;
+		unsigned short NumAll[2], NumL[2], NumLoc;
+		unsigned char  NumStore, NumDet;
+		unsigned char  NumStar, NumFrag;
+		unsigned short MaxH;
+		unsigned char  dxMaxH, dyMaxH;
+	};
+
+	struct TBoardArray {
+		unsigned short cmdWord, ansWord;
+		unsigned short bufMIL[32];
+		unsigned short statTmi, crcBoard, crcCalc;
+	};
+
 	static string arrStatErrorEng[MAX_STAT] = {
 		{"EC1"}, {"EC2"}, {"EC3"}, {"EC4"}, {"EC5"}, {"EC6"}, {"EC7"}, {"EC8"},
 		{"EC9"}, {"EC10"}, {"EC11"}, {"EC12"}, {"EC13"}, {"EC14"}, {"EC15"},
@@ -168,15 +234,25 @@ namespace parse_prot {
 		{"ея9"}, {"ея10"}, {"ея11"}, {"ея12"}, {"ея13"}, {"ея14"}, {"ея15"},
 		{"ея16"}};
 
+	void MakeCRC16Table(void);
+	unsigned short GetCRC16(unsigned char *buf, int size);
+    unsigned short crc16_ccitt(unsigned char *data_p, int length);
+
 	void SwapShort(short *word1, short *word2);
 
 	void CheckFileName(AnsiString &fileName);
+
+	void SetClkBokz(double clk);
 
 	unsigned int ReadBinaryString(string binaryString);
 
 	unsigned int StringToDayTime(string _line);
 
+	TDateTime GetDateTime(TDateTime _zeroDate, unsigned int _timeBOKZ);
+
 	AnsiString DayTimeToString(unsigned int time);
+
+	AnsiString OutputDateTime(TDateTime _curDate);
 
 	int StopReadArray(string line);
 
@@ -197,25 +273,27 @@ namespace parse_prot {
 	int TryReadLOC(ifstream &finp, struct LOC &tmi);
 
 	void PrintMSHI(ofstream &file, struct MSHI tmi, TDateTime curDate);
-	void PrintLogMSHI(ofstream &file, struct MSHI tmi, TDateTime curDate, bool create);
+	void PrintLogMSHI(ofstream &file, struct MSHI tmi, TDateTime curDate, bool &create);
 
 	void PrintSHTMI1(ofstream &file, struct SHTMI1 tmi);
-	void PrintLogSHTMI1(ofstream &file, struct SHTMI1 tmi, bool create);
+	void PrintLogSHTMI1(ofstream &file, struct SHTMI1 tmi, bool &create);
 
 	void PrintSHTMI2(ofstream &file, struct SHTMI2 tmi, TDateTime curDate);
-	void PrintLogSHTMI2(ofstream &file, struct SHTMI2 tmi, TDateTime curDate, bool create);
+	void PrintLogSHTMI2(ofstream &file, struct SHTMI2 tmi, TDateTime curDate, bool &create);
 
-	void PrintDTMI(ofstream &file, struct DTMI tmi);
+	void PrintDTMI(ofstream &file, TDateTime curDate, struct DTMI tmi, int isM1000);
+	void PrintLOC(ofstream &file, TDateTime curDate, struct LOC tmi, int isM1000);
 
-	void PrintLOC(ofstream &file, struct LOC tmi);
+	void PrintLocalDTMI(AnsiString fileDir, TDateTime curDate, struct DTMI tmi, int isM1000);
+	void PrintLocalMLOC(AnsiString fileDir, TDateTime curDate, struct LOC tmi, int isM1000);
 
-	void PrintLocalDTMI(AnsiString fileDir, TDateTime curTime, struct DTMI tmi);
+	void ConvertDataDTMI(struct DTMI tmi, struct CadrInfo &mCadr, int isM1000);
+	void ConvertDataLOC(struct LOC tmi, struct CadrInfo &mCadr, int isM1000);
 
-	void PrintLocalMLOC(AnsiString fileDir, TDateTime curTime, struct LOC tmi);
-
-	void ConvertDataDTMI(struct DTMI tmi, struct CadrInfo &mCadr);
-
-	void ConvertDataLOC(struct LOC tmi, struct CadrInfo &mCadr);
+	void PrintMshi_2V(ofstream &file, struct TBoardArray *pack, TDateTime curDate, bool &create);
+	void PrintShtmi1_2V(ofstream &file, struct TBoardArray *pack, TDateTime curDate, bool &create);
+	void PrintShtmi2_2V(ofstream &file, struct TBoardArray *pack, TDateTime curDate, bool &create);
+	void PrintDtmi_2V(ofstream &file, struct TDtmi_2V tmi, TDateTime curDate, bool &create);
 
 	int ReadTMIArray(ifstream &_inp, string _keyWord, unsigned short *arrayTMI,
 		const int _sizeArray);
