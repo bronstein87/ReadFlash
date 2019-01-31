@@ -4,7 +4,47 @@
 
 #include "ParseProtocol.h"
 using namespace add_string;
+unsigned short TableCRC[256];
+typedef unsigned short uint16_t;
+
 namespace parse_prot {
+
+	void MakeCRC16Table(void)
+	{
+		unsigned short r;
+		for(int i = 0; i < 256; i++)
+		{
+			r = ((unsigned short)i) << 8;
+			for(int j = 0; j < 8; j++)
+			{
+				if (r&(1<<15)) r = (r << 1) ^ 0x1021;
+				else r = r << 1;
+			}
+			TableCRC[i] = r;
+		}
+	}
+
+	unsigned short GetCRC16(unsigned char *buf, int size)
+	{
+		unsigned short crc = 0xFFFF;
+
+		while (size--)
+		crc = (crc << 8) ^ TableCRC[(crc >> 8) ^ *buf++];
+
+		return crc;
+	}
+
+	unsigned short crc16_ccitt(unsigned char *data_p, int length)
+	{
+		unsigned char x;
+		unsigned short crc = 0xFFFF;
+		while (length--){
+			x = crc >> 8 ^ *data_p++;
+			x ^= x>>4;
+			crc = (crc << 8) ^ ((uint16_t)(x << 12)) ^ ((uint16_t)(x <<5)) ^ ((uint16_t)x);
+		}
+		return crc;
+	}
 
 	void SwapShort(short *word1, short *word2)
 	{
@@ -26,6 +66,10 @@ namespace parse_prot {
 		}
 	}
 
+	void SetClkBokz(double clk) {
+		clkBokz = clk;
+	}
+
 	unsigned int ReadBinaryString(string binaryString) {
 		string test_str;
 		double sum = 0;
@@ -38,6 +82,13 @@ namespace parse_prot {
 	}
 
 //-------------Функции для чтения протоколов РКЦ "Прогресс"-------------------//
+	TDateTime GetDateTime(TDateTime _zeroDate, unsigned int _timeBOKZ)
+	{
+		TDateTime curDate;
+		curDate.Val = _zeroDate.Val + _timeBOKZ * clkBokz/86400.;
+		return curDate;
+	}
+
 	unsigned int StringToDayTime(string _line)
 	{
 		float mday, mhour, mmin, msec;
@@ -63,19 +114,32 @@ namespace parse_prot {
 	AnsiString DayTimeToString(unsigned int time)
 	{
 		AnsiString str, sTime = " ";
-		int day, hour, min, sec;
-		double day_double = time/86400.;///8.;
+		int day, hour, min, sec, msec;
+		double day_double = time/86400. * clkBokz;///8.;
 
 		day = (int)day_double;
 		hour = (day_double - (int)day) * 24 + 1e-7;
 		min  = (day_double - day - hour/24.) * 24 * 60 + 1e-7;
 		sec  = (day_double - day - hour/24. - min/24./60.) * 86400. + 1e-7;
+		msec  = (day_double - day - hour/24. - min/24./60.- sec/24./3600.) * 86400. * 1000. + 1e-7;
 		if (day > 0) {
 			sTime  = IntToStr(day) + "/";
 		}
-		str.sprintf(" %02d:%02d:%02d", hour, min, sec);
+		if (msec < 1)
+			str.sprintf(" %02d:%02d:%02d", hour, min, sec);
+		else str.sprintf(" %02d:%02d:%02d.%03d", hour, min, sec, msec);
 		sTime += str;
 		return sTime;
+	}
+
+	AnsiString OutputDateTime(TDateTime _curDate)
+	{
+		unsigned short d, ms;
+		UnicodeString uFormat;
+		DecodeTime(_curDate, d, d, d,  ms);
+		if (ms < 1) uFormat = "dd.mm.yyyy hh:mm:ss";
+		else uFormat = "dd.mm.yyyy hh:mm:ss.zzz";
+		return (AnsiString)FormatDateTime(uFormat, _curDate);
 	}
 
 	int StopReadArray(string line) {
@@ -346,7 +410,7 @@ namespace parse_prot {
 		tmi.maxHist   = 0;
 		tmi.maxHistX  = 0;
 		tmi.maxHistY  = 0;
-
+        tmi.test_short = 0;
 		for (int i = 0; i < 10; i++) {
 			tmi.Reserved[i] = 0;
 		}
@@ -358,7 +422,7 @@ namespace parse_prot {
 		float fl1, fl2, fl3, sum;
 		int Stat1, Stat2;
 
-        word = "";
+		word = "";
 		while ( (!finp.eof()) && (!StopReadArray(word)) ) {//(word.find("-----") == string::npos)) {
 			finp >> word;
 			if ((word == "КС1") || (word == "KC1")) {
@@ -537,10 +601,8 @@ namespace parse_prot {
 				tmi.LocalList[i][j] = 0;
 			}
 		}
-		tmi.Reserved[0] = 0;
-		tmi.Reserved[1] = 0;
+		tmi.Reserved = 0;
 	}
-
 
 	int TryReadLOC(ifstream &finp, struct LOC &tmi) {
 		string line, word, inpstr, test_word, test_str;
@@ -590,7 +652,7 @@ namespace parse_prot {
 				finp >> tmi.SigmaC;
 			}
 			else if (word == "Н ПИКС") {
-				finp >> tmi.Reserved[0];
+				finp >> tmi.Reserved;
 			}
 			else if (word == "ЛОК") {
 				getline(finp, line, '\n');
@@ -643,7 +705,7 @@ namespace parse_prot {
 	}
 
 	void PrintMSHI(ofstream &file, struct MSHI tmi, TDateTime curDate) {
-		file << AnsiString(DateTimeToStr(curDate)).c_str() << "\n";
+		file << OutputDateTime(curDate).c_str() << "\n";
 		file << "____________________________________" << "\n";
 		file << "Массив МШИОР" << "\n";
 		file << "Tpr\t" << DayTimeToString(tmi.timeBOKZ).c_str() << "\n";
@@ -658,15 +720,15 @@ namespace parse_prot {
 			file << "Qornt[" << i << "]:\t" << tmi.Qornt[i] << "\n";
 		}
 		for (int i = 0; i < 3; i++) {
-			file << "W[" << i << "], '':\t" << tmi.W[i] * RTS << "\n";
+			file << "W[" << i << "], ''/c:\t" << tmi.W[i] * RTS << "\n";
 		}
 		file << "____________________________________" << "\n";
 		file << flush;
 	}
 
-	void PrintLogMSHI(ofstream &file, struct MSHI tmi, TDateTime curDate, bool create) {
+	void PrintLogMSHI(ofstream &file, struct MSHI tmi, TDateTime curDate, bool &create) {
 		if (!create) {
-			file << "Date\t";
+			file << "Date&Time\t";
 			file << "Day/Time\t";
 			file << "KC1\t" << "KC2\t";
 			file << "OZ[0]\t" << "OZ[1]\t" << "OZ[2]\t";
@@ -674,9 +736,10 @@ namespace parse_prot {
 			file << "Wx,''/c\t" << "Wy,''/c\t" << "Wz,''/c\t";
 			file << "Al, deg\t" << "Dl, deg\t" << "Az, deg\t";
 			file << "\n";
+            create = true;
 		}
 
-		file << AnsiString(DateTimeToStr(curDate)).c_str() << "\t";
+		file << OutputDateTime(curDate).c_str() << "\t";
 		file << DayTimeToString(tmi.timeBOKZ).c_str() << "\t";
 		file << uppercase << hex << setfill('0');
 		file << "0x" << setw(4) << tmi.status1 << "\t";
@@ -730,7 +793,7 @@ namespace parse_prot {
 		file << flush;
 	}
 
-	void PrintLogSHTMI1(ofstream &file, struct SHTMI1 tmi, bool create) {
+	void PrintLogSHTMI1(ofstream &file, struct SHTMI1 tmi, bool &create) {
 		if (!create) {
 			file << "Day/Time\t";
 			file << "KC1\t" << "KC2\t" << "POST\t" << "№\t" << "Texp\t";
@@ -739,6 +802,7 @@ namespace parse_prot {
 			file << "Ndef\t" << "CRC\t";
 			file << "Date\t" << "Version\t";
 			file << "\n";
+			create = true;
 		}
 		file << DayTimeToString(tmi.timeBOKZ).c_str() << "\t";
 		file << uppercase << hex << setfill('0');
@@ -758,10 +822,11 @@ namespace parse_prot {
 		file << tmi.Date << "\t";
 		file << tmi.Version << "\t";
 		file << "\n";
+		file << flush;
 	}
 
 	void PrintSHTMI2(ofstream &file, struct SHTMI2 tmi, TDateTime curDate) {
-		file << AnsiString(DateToStr(curDate)).c_str() << "\n";
+		file << OutputDateTime(curDate).c_str() << "\n";
 		file << "____________________________________" << "\n";
 		file << "Массив ШТМИ2" << "\n";
 		file << "Tpr\t" << DayTimeToString(tmi.timeBOKZ).c_str() << "\n";
@@ -787,9 +852,9 @@ namespace parse_prot {
 		file << flush;
 	}
 
-	void PrintLogSHTMI2(ofstream &file, struct SHTMI2 tmi, TDateTime curDate, bool create) {
+	void PrintLogSHTMI2(ofstream &file, struct SHTMI2 tmi, TDateTime curDate, bool &create) {
 		if (!create) {
-			file << "Date\t";
+			file << "Date&Time\t";
 			file << "Day/Time\t";
 			file << "KC1\t" << "KC2\t" << "POST\t" << "№\t" << "Texp\t";
 			file << "УСД\t" << "НО\t" << "НОСЛ\t";
@@ -798,8 +863,9 @@ namespace parse_prot {
 				file << "EC" << (i+1) << "\t";
 			}
 			file << "\n";
+			create = true;
 		}
-		file << AnsiString(DateToStr(curDate)).c_str() << "\t";
+		file << OutputDateTime(curDate).c_str() << "\t";
 		file << DayTimeToString(tmi.timeBOKZ).c_str()<<"\t";
 		file << uppercase << hex << setfill('0');
 		file << "0x" << setw(4) << tmi.status1 << "\t";
@@ -818,9 +884,19 @@ namespace parse_prot {
 			file << tmi.cntStatOrient[i] << "\t";
 		}
 		file << "\n";
+        file << flush;
 	}
 
-	void PrintDTMI(ofstream &file, struct DTMI tmi) {
+	int CheckNewDtmiM60(unsigned short serial)
+	{
+		if ( ((serial>=10) && (serial<=13)) || (serial >=49) ) {
+			return 1;
+		}
+        return 0;
+	}
+
+	void PrintDTMI(ofstream &file, TDateTime curDate, struct DTMI tmi, int isM1000) {
+		file << OutputDateTime(curDate).c_str() << "\n";
 		file << "____________________________________" << "\n";
 		file << "Массив ДТМИ" << "\n";
 		file << "Tpr\t" << DayTimeToString(tmi.timeBOKZ).c_str() << "\n";
@@ -841,7 +917,7 @@ namespace parse_prot {
 			file << setw(6) << (i + 1) << "\t";
 			file << tmi.LocalList[i][0] << "\t" << tmi.LocalList[i][1] << "\t";
 			file << tmi.LocalList[i][2] << "\t";
-			if ( (tmi.LocalList[i][3] < 0.001) && (tmi.LocalList[i][2] > 0.001) ) {
+			if (CheckNewDtmiM60(tmi.serialNumber) && !isM1000) {
 				short *level, *size;
 				size = (short *)(&tmi.LocalList[i][3]);
 				level = (short *)(size + 1);
@@ -873,13 +949,14 @@ namespace parse_prot {
 		file << "NumLoc[1]: \t" << tmi.nLocal[1] << "\n";
 		file << "Эпоха: \t" << tmi.Epoch << "\n";
 		file << "MaxHist: \t" << tmi.maxHist << "\n";
-		file << "MaxHistX: \t" << tmi.maxHistX << "\n";
-		file << "MaxHistY: \t" << tmi.maxHistY << "\n";
+		file << "MaxHistX: \t" << (short)tmi.maxHistX << "\n";
+		file << "MaxHistY: \t" << (short)tmi.maxHistY << "\n";
 		file << "____________________________________" << "\n";
 		file << flush;
 	}
 
-	void PrintLOC(ofstream &file, struct LOC tmi) {
+	void PrintLOC(ofstream &file, TDateTime curDate, struct LOC tmi, int isM1000) {
+		file << OutputDateTime(curDate).c_str() << "\n";
 		file << "____________________________________" << "\n";
 		file << "Массив МЛОК" << "\n";
 		file << "Tpr\t" << DayTimeToString(tmi.timeBOKZ).c_str() << "\n";
@@ -899,20 +976,20 @@ namespace parse_prot {
 			file << setw(6) << (i + 1) << "\t";
 			file << tmi.LocalList[i][0] << "\t" << tmi.LocalList[i][1] << "\t";
 			file << tmi.LocalList[i][2] << "\t";
-			if ( (tmi.LocalList[i][3] < 0.001) && (tmi.LocalList[i][2] > 0.001) ) {
+			if (CheckNewDtmiM60(tmi.serialNumber) && !isM1000) {
 				short *level, *size;
 				size = (short *)(&tmi.LocalList[i][3]);
 				level = (short *)(size + 1);
 				file << *size << "\t" << *level << "\n";
 			}
-			else file << tmi.LocalList[i][3] << "\n";
+			else  file << tmi.LocalList[i][3] << "\n";
 		}
 
 		file << "____________________________________" << "\n";
 		file << flush;
 	}
 
-	void PrintLocalDTMI(AnsiString fileDir, TDateTime curTime, struct DTMI tmi) {
+	void PrintLocalDTMI(AnsiString fileDir, TDateTime curDate, struct DTMI tmi, int isM1000) {
 
 		AnsiString stringSerial, localDir, localName;
 		TFormatSettings curFormat;
@@ -926,8 +1003,8 @@ namespace parse_prot {
 		curFormat.ShortDateFormat = "yyyy_mm_dd";
 		curFormat.LongTimeFormat  = "hh_nn_ss_zzz";
 		localName.sprintf("%s_%s_DTMI_LOC.txt",
-				AnsiString(DateToStr(curTime, curFormat)).c_str(),
-				AnsiString(TimeToStr(curTime, curFormat)).c_str());
+				AnsiString(DateToStr(curDate, curFormat)).c_str(),
+				AnsiString(TimeToStr(curDate, curFormat)).c_str());
 		CheckFileName(localName);
 		localName = localDir + "\\" + localName;
 
@@ -944,7 +1021,7 @@ namespace parse_prot {
 			file << setw(6) << (i + 1) << "\t";
 			file << tmi.LocalList[i][0] << "\t" << tmi.LocalList[i][1] << "\t";
 			file << tmi.LocalList[i][2] << "\t";
-			if (tmi.LocalList[i][3] < 1) {
+			if (CheckNewDtmiM60(tmi.serialNumber) && !isM1000) {
 				short *level, *size;
 				size = (short *)(&tmi.LocalList[i][3]);
 				level = (short *)(size + 1);
@@ -955,7 +1032,7 @@ namespace parse_prot {
 		file.close();
 	}
 
-	void PrintLocalMLOC(AnsiString fileDir, TDateTime curTime, struct LOC tmi) {
+	void PrintLocalMLOC(AnsiString fileDir, TDateTime curDate, struct LOC tmi, int isM1000) {
 
 		AnsiString stringSerial, localDir, localName;
 		TFormatSettings curFormat;
@@ -969,8 +1046,8 @@ namespace parse_prot {
 		curFormat.ShortDateFormat = "yyyy_mm_dd";
 		curFormat.LongTimeFormat  = "hh_nn_ss_zzz";
 		localName.sprintf("%s_%s_MLOC_LOC.txt",
-				AnsiString(DateToStr(curTime, curFormat)).c_str(),
-				AnsiString(TimeToStr(curTime, curFormat)).c_str());
+				AnsiString(DateToStr(curDate, curFormat)).c_str(),
+				AnsiString(TimeToStr(curDate, curFormat)).c_str());
 		CheckFileName(localName);
 		localName = localDir + "\\" + localName;
 
@@ -987,7 +1064,7 @@ namespace parse_prot {
 			file << setw(6) << (i + 1) << "\t";
 			file << tmi.LocalList[i][0] << "\t" << tmi.LocalList[i][1] << "\t";
 			file << tmi.LocalList[i][2] << "\t";
-			if (tmi.LocalList[i][3] < 1) {
+			if (CheckNewDtmiM60(tmi.serialNumber) && !isM1000) {
 				short *level, *size;
 				size = (short *)(&tmi.LocalList[i][3]);
 				level = (short *)(size + 1);
@@ -998,15 +1075,21 @@ namespace parse_prot {
 		file.close();
 	}
 
-	void ConvertDataDTMI(struct DTMI tmi, struct CadrInfo &mCadr) {
-		mCadr.IsBinary = true;
-		// mCadr.IsReverse=true;
-		mCadr.ImageHeight = 256;
-		mCadr.ImageWidth = 256;
+	void ConvertDataDTMI(struct DTMI tmi, struct CadrInfo &mCadr, int isM1000) {
+
 		// mCadr.Time=data.Tpr_sec+data.Tpr_msec/1000.;
+        int WinWidth, WinHeight;
+		if (isM1000) {
+			mCadr.ImageHeight = mCadr.ImageWidth = 1024;
+			WinWidth = WinHeight = 13;
+		}
+		else {
+			mCadr.ImageHeight = mCadr.ImageWidth = 512;
+			WinWidth = WinHeight = 17;
+		}
 
 		mCadr.CountDeterObj = tmi.nDeterObj;
-		mCadr.CountWindows = tmi.nWindows;
+		mCadr.CountWindows  = tmi.nWindows;
 		mCadr.CountLocalObj = tmi.nLocalObj;
 
 		if (tmi.nLocalObj < MAX_OBJ_DTMI)
@@ -1015,11 +1098,19 @@ namespace parse_prot {
 			mCadr.SizeObjectsList = MAX_OBJ_DTMI;
 
 		ObjectsInfo objInfo;
+		mCadr.IsBinary = true;
 		for (int i = 0; i < mCadr.SizeObjectsList; i++) {
+			if ( (objInfo.X > (mCadr.ImageWidth >> 1))
+				|| (objInfo.Y > (mCadr.ImageHeight >> 1)) ) {
+				mCadr.IsBinary = false;
+			}
 			objInfo.X = tmi.LocalList[i][0];
 			objInfo.Y = tmi.LocalList[i][1];
 			objInfo.Bright = tmi.LocalList[i][2];
-			objInfo.Square = tmi.LocalList[i][3];
+			if (CheckNewDtmiM60(tmi.serialNumber) && !isM1000) {
+				objInfo.Square = *(short *)(&tmi.LocalList[i][3]);
+			}
+			else objInfo.Square = tmi.LocalList[i][3];
 			objInfo.Dx = 0;
 			objInfo.Dy = 0;
 			objInfo.StarID = 0;
@@ -1040,30 +1131,53 @@ namespace parse_prot {
 
 		WindowsInfo winInfo;
 		StarsInfo starList;
+		mCadr.Level = 0;
 		for (int i = 0; i < mCadr.SizeWindowsList; i++) {
 			winInfo.Level = tmi.levelWindow[i];
 			winInfo.CountObj = tmi.nObjectWindow[i];
-			winInfo.Width = 17;
-			winInfo.Height = 17;
+			winInfo.Width  = WinWidth;
+			winInfo.Height = WinHeight;
 			winInfo.Xstart = tmi.centrWindow[i][0] - (winInfo.Width >> 1);
 			winInfo.Ystart = tmi.centrWindow[i][1] - (winInfo.Height >> 1);
 			mCadr.WindowsList.push_back(winInfo);
 
 			starList.X = tmi.centrWindow[i][0];
 			starList.Y = tmi.centrWindow[i][1];
+
+			if ( (starList.X > (mCadr.ImageWidth >> 1))
+				|| (starList.Y > (mCadr.ImageHeight >> 1)) ) {
+				mCadr.IsBinary = false;
+			}
+			mCadr.Level += mCadr.WindowsList[i].Level;
+		}
+		if (mCadr.SizeWindowsList) {
+			mCadr.Level /= mCadr.SizeWindowsList;
+		}
+
+		if (mCadr.IsBinary) {
+			mCadr.ImageHeight >>= 1;
+			mCadr.ImageWidth  >>= 1;
 		}
 
 		mCadr.CountBlock = 0;
 		mCadr.CountStars = 0;
+		mCadr.SizeStarsList = 0;
 	}
 
-	void ConvertDataLOC(struct LOC tmi, struct CadrInfo &mCadr) {
-		mCadr.IsBinary = true;
-		// mCadr.IsReverse=true;
-		mCadr.ImageHeight = 256;
-		mCadr.ImageWidth = 256;
+	void ConvertDataLOC(struct LOC tmi, struct CadrInfo &mCadr, int isM1000) {
+
 		// mCadr.Time=data.Tpr_sec+data.Tpr_msec/1000.;
+		if (isM1000) {
+			mCadr.ImageHeight = mCadr.ImageWidth = 1024;
+		}
+		else {
+			mCadr.ImageHeight = mCadr.ImageWidth = 512;
+		}
+
+		mCadr.MeanBright = tmi.MeanC;
+        mCadr.SigmaBright = tmi.SigmaC;
 		mCadr.CountLocalObj = tmi.nLocalObj;
+		mCadr.SizeObjectsList = tmi.nFixedObj;
 
 		if (tmi.nLocalObj < MAX_OBJ_MLOC)
 			mCadr.SizeObjectsList = tmi.nLocalObj;
@@ -1071,11 +1185,19 @@ namespace parse_prot {
 			mCadr.SizeObjectsList = MAX_OBJ_MLOC;
 
 		ObjectsInfo objInfo;
+		mCadr.IsBinary = true;
 		for (int i = 0; i < mCadr.SizeObjectsList; i++) {
+			if ( (objInfo.X > (mCadr.ImageWidth >> 1))
+				|| (objInfo.Y > (mCadr.ImageHeight >> 1)) ) {
+				mCadr.IsBinary = false;
+			}
 			objInfo.X = tmi.LocalList[i][0];
 			objInfo.Y = tmi.LocalList[i][1];
 			objInfo.Bright = tmi.LocalList[i][2];
-			objInfo.Square = tmi.LocalList[i][3];
+			if (CheckNewDtmiM60(tmi.serialNumber) && !isM1000) {
+				objInfo.Square = *(short *)(&tmi.LocalList[i][3]);
+			}
+			else objInfo.Square = tmi.LocalList[i][3];
 			objInfo.Dx = 0;
 			objInfo.Dy = 0;
 			objInfo.StarID = 0;
@@ -1084,6 +1206,12 @@ namespace parse_prot {
 			objInfo.Sp[1] = '_';
 			mCadr.ObjectsList.push_back(objInfo);
 		}
+
+		if (mCadr.IsBinary) {
+			mCadr.ImageHeight >>= 1;
+			mCadr.ImageWidth  >>= 1;
+		}
+
 		mCadr.CountBlock = 0;
 		mCadr.CountWindows = 0;
 		mCadr.SizeWindowsList = 0;
@@ -1091,6 +1219,199 @@ namespace parse_prot {
 		mCadr.CountStars = 0;
 		mCadr.SizeStarsList = 0;
 	}
+
+//-------------функции для чтения протоколов ЭМКИ-----------------------------//
+	void PrintMshi_2V(ofstream &file, struct TBoardArray *pack, TDateTime curDate, bool &create)
+	{
+		struct TMshi_2V *tmi;
+		if (!create) {
+			file << "Date&Time\t";
+			file << "Tbshv\t";
+			file << "Q[0]\t" << "Q[1]\t" << "Q[2]\t" << "Q[3]\t";
+			file << "Serial\t" << "KC1\t" << "KC2\t";
+			file << "NumStar\t" << "NumFrag\t";
+			file << "NumLoc\t" << "NumDet\t";
+			file << "ThMax\t" << "Mxy,mkm\t" << "Tcmv\t";
+			file << "OZ[0]\t" << "OZ[1]\t" << "OZ[2]\t";
+			file << "Wx,''/c\t" << "Wy,''/c\t" << "Wz,''/c\t";
+			file << "Al, deg\t" << "Dl, deg\t" << "Az, deg\t";
+			file << "StatTmi\t" << "BoardCRC\t" << "CalcCRC\n";
+			create = true;
+		}
+
+		tmi = (TMshi_2V *)&pack->bufMIL;
+		file << dec << setfill(' ');
+//        file << OutputDateTime(curDate).c_str() << "\t";
+		file << AnsiString(DateTimeToStr(curDate)).c_str() << "\t";
+		file << tmi->time_sec << "." << setfill('0');
+		file << setw(3) << tmi->time_ms << "\t";
+		for (int i = 0; i < 4; i++) {
+			file << tmi->Qornt[i] << "\t";
+		}
+		file << uppercase << hex << setfill('0');
+		file << "0x" << setw(4) << tmi->serial << "\t";
+		file << "0x" << setw(4) << tmi->status1 << "\t";
+		file << "0x" << setw(4) << tmi->status2 << "\t";
+		file << dec << setfill(' ');
+
+		file << (unsigned short)tmi->NumStar << "\t";
+		file << (unsigned short)tmi->NumFrag << "\t";
+		file << tmi->NumLoc  << "\t" << tmi->NumDet << "\t";
+		file << tmi->ThMax  << "\t" << tmi->mxy/(1e+4) * 1000. << "\t";
+		file << tmi->Tcmv/10. << "\t";
+
+		for (int i = 0; i < 3; i++) {
+			file << tmi->OZ[i] << "\t";
+		}
+		for (int i = 0; i < 3; i++) {
+			file << tmi->W[i] * RTS << "\t";
+		}
+		double Qdbl[4], Mornt[3][3], ang[3] = {0, 0, 0};
+		for (int i = 0; i < 4; i++) {
+			 Qdbl[i] = (double)tmi->Qornt[i];
+		}
+		if ( !CheckQuatNorm(Qdbl, 0.001) ) {
+			QuatToMatrix(Qdbl, Mornt);
+			MatrixToEkvAngles(Mornt, ang);
+		}
+		for (int i = 0; i < 3; i++) {
+			file << ang[i] * RTD << "\t";
+		}
+		file << (unsigned short) pack->statTmi << "\t";
+		file << uppercase << hex << setfill('0');
+		file << "0x" << setw(4) << pack->crcBoard << "\t";
+		file << "0x" << setw(4) << pack->crcCalc  << "\n";
+	}
+
+	void PrintShtmi1_2V(ofstream &file, struct TBoardArray *pack, TDateTime curDate, bool &create)
+	{
+		struct TShtmi1_2V *tmi;
+		if (!create) {
+			file << "Date&Time\t";
+			file << "Tbshv\t";
+			file << "Serial\t" << "KC1\t" << "KC2\t" << "POST\t";
+			file << "Foc\t" << "Xg\t" << "Yg\t" ;
+			file << "Texp\t" << "Mean\t" << "Sigma\t";
+			file << "Tcmv\t" << "StatKP\t" << "CntKP\t" ;
+			file << "CatCS0\t" << "ConstCS0\t" << "ProgCS0\t";
+			file << "CatCS1\t" << "ConstCS1\t" << "ProgCS1\t";
+			file << "Version\t" << "StatTmi\t" << "BoardCRC\t" << "CalcCRC\n";
+			create = true;
+		}
+
+		tmi = (TShtmi1_2V *)&pack->bufMIL;
+		file << dec << setfill(' ');
+//        file << OutputDateTime(curDate).c_str() << "\t";
+		file << AnsiString(DateTimeToStr(curDate)).c_str() << "\t";
+		file << tmi->time_sec << "." << setfill('0');
+		file << setw(3) << tmi->time_ms << "\t";
+
+		file << uppercase << hex << setfill('0');
+		file << "0x" << setw(4) << tmi->serial << "\t";
+		file << "0x" << setw(4) << tmi->status1 << "\t";
+		file << "0x" << setw(4) << tmi->status2 << "\t";
+		file << "0x" << setw(4) << tmi->post << "\t";
+
+		file << dec << setfill(' ');
+		file << tmi->Foc << "\t" << tmi->Xg << "\t" << tmi->Yg << "\t";
+		file << tmi->timeExp  << "\t" << tmi->Mean   << "\t" << tmi->Sigma << "\t";
+		file << tmi->Tcmv/10. << "\t" << tmi->statKP << "\t" << tmi->cntKP << "\t";
+		file << tmi->CatCS[0] << "\t" << tmi->ConstCS[0] << "\t" << tmi->ProgCS[0] << "\t";
+		file << tmi->CatCS[1] << "\t" << tmi->ConstCS[1] << "\t" << tmi->ProgCS[1] << "\t";
+		file << tmi->Version << "\t";
+		file << (unsigned short) pack->statTmi << "\t";
+		file << uppercase << hex << setfill('0');
+		file << "0x" << setw(4) << pack->crcBoard << "\t";
+		file << "0x" << setw(4) << pack->crcCalc  << "\n";
+	}
+
+	void PrintShtmi2_2V(ofstream &file,  struct TBoardArray *pack, TDateTime curDate, bool &create)
+	{
+		struct TShtmi2_2V *tmi;
+		if (!create) {
+			file << "Date&Time\t";
+			file << "Tbshv\t";
+			file << "Serial\t" << "KC1\t" << "KC2\t" << "POST\t";
+			file << "УСД\t" << "НО\t" << "НОСЛ\t";
+			file << "Texp\t" << "TО\t" << "TОСЛ\t" << "СЛЕЖ\t";
+			for (int i = 0; i < MAX_STAT; i++) {
+				file << "EC" << (i+1) << "\t";
+			}
+			file << "StatTmi\t" << "BoardCRC\t" << "CalcCRC\n";
+			create = true;
+		}
+
+		tmi = (TShtmi2_2V *)&pack->bufMIL;
+		file << dec << setfill(' ');
+//        file << OutputDateTime(curDate).c_str() << "\t";
+		file << AnsiString(DateTimeToStr(curDate)).c_str() << "\t";
+		file << tmi->time_sec << "." << setfill('0');
+		file << setw(3) << tmi->time_ms << "\t";
+
+		file << uppercase << hex << setfill('0');
+		file << "0x" << setw(4) << tmi->serial << "\t";
+		file << "0x" << setw(4) << tmi->status1 << "\t";
+		file << "0x" << setw(4) << tmi->status2 << "\t";
+		file << "0x" << setw(4) << tmi->post << "\t";
+
+		file << dec << setfill(' ');
+		file << setw(6) << tmi->timeExp << "\t";
+		file << setw(6) << tmi->cntCommandWord << "\t";
+		file << setw(6) << tmi->cntCallNO << "\t";
+		file << setw(6) << tmi->cntNOtoSLEZH << "\t";
+		file << setw(6) << tmi->cntCallTO << "\t";
+		file << setw(6) << tmi->cntTOtoSLEZH << "\t";
+		file << setw(8) << tmi->cntSLEZH << "\t";
+		for (int i = 0; i < MAX_STAT; i++) {
+			file << tmi->cntStatOrient[i] << "\t";
+		}
+		file << (unsigned short) pack->statTmi << "\t";
+		file << uppercase << hex << setfill('0');
+		file << "0x" << setw(4) << pack->crcBoard << "\t";
+		file << "0x" << setw(4) << pack->crcCalc  << "\n";
+	}
+
+	void PrintDtmi_2V(ofstream &file, struct TDtmi_2V tmi, TDateTime curDate, bool &create)
+	{
+		if (!create) {
+			file << "Date&Time\t" << "Tbshv\t";
+			file << "Serial\t" << "KC1\t" << "KC2\t" << "POST\t";
+			file << "Tcmv\t" << "Texp\t";
+			file << "NumAll[0]\t" << "NumAll[1]\t";
+			file << "NumL[0]\t" << "NumL[1]\t";
+			file << "NumStore\t" << "NumDet\t";
+			file << "NumStar\t" << "NumFrag\t";
+			file << "MaxH" << "dxMaxH\t" << "dyMaxH\t";
+			file << "\n";
+            create = true;
+		}
+
+//        file << OutputDateTime(curDate).c_str() << "\t";
+		file << AnsiString(DateTimeToStr(curDate)).c_str() << "\t";
+		file << tmi.time_sec << "." << setfill('0');
+		file << setw(3) << tmi.time_ms << "\t";
+
+		file << uppercase << hex << setfill('0');
+		file << "0x" << setw(4) << tmi.serial << "\t";
+		file << "0x" << setw(4) << tmi.status1 << "\t";
+		file << "0x" << setw(4) << tmi.status2 << "\t";
+		file << "0x" << setw(4) << tmi.post << "\t";
+
+		file << dec << setfill(' ');
+		file << tmi.Tcmv/10. << "\t" << tmi.timeExp << "\t";
+		file << tmi.NumAll[0] << "\t" <<tmi.NumAll[1] << "\t";
+		file << (unsigned short)tmi.NumL[0] << "\t";
+		file << (unsigned short)tmi.NumL[1] << "\t";
+		file << tmi.NumLoc << "\t" ;
+		file << (unsigned short)tmi.NumStore << "\t";
+		file << (unsigned short)tmi.NumDet << "\t";
+		file << (unsigned short)tmi.NumStar << "\t";
+		file << (unsigned short)tmi.NumFrag << "\t";
+		file << tmi.MaxH << "\t" ;
+		file << (short)tmi.dxMaxH << "\t";
+		file << (short)tmi.dyMaxH << "\n";
+	}
+
 
 //-------------Функции для чтения протоколов РКК "Энергия"--------------------//
 	int ReadTMIArray(ifstream &_inp, string _keyWord, unsigned short *arrayTMI, const int _sizeArray)
@@ -1119,7 +1440,6 @@ namespace parse_prot {
 	void ConvertDataDTMI_BOKZM(struct DTMI_BOKZM tmi, struct CadrInfo &mCadr)
 	{
 		mCadr.IsBinary = true;
-	//	mCadr.IsReverse=true;
 		mCadr.ImageHeight = 512;
 		mCadr.ImageWidth = 512;
 	//	mCadr.Time=data.Tpr_sec+data.Tpr_msec/1000.;
@@ -1345,8 +1665,8 @@ void PrintDTMI_M2(ofstream &file, struct DTMI_M2 tmi) {
 	}
 	file << "Эпоха: \t" << tmi.Epoch << "\n";
 	file << "MaxHist: \t" << tmi.maxHist << "\n";
-	file << "MaxHistX: \t" << tmi.maxHistX << "\n";
-	file << "MaxHistY: \t" << tmi.maxHistY << "\n";
+	file << "MaxHistX: \t" << (short)tmi.maxHistX << "\n";
+	file << "MaxHistY: \t" << (short)tmi.maxHistY << "\n";
 	file << "____________________________________" << "\n";
 	file << flush;
 }

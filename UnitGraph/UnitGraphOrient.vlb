@@ -41,7 +41,7 @@ Coordinates=567,282,70,36
 Coordinates=10,146,74,58
 
 []
-Coordinates=191,350,77,36
+Coordinates=676,56,100,36
 Visible=True
 
 [N1]
@@ -67,10 +67,4 @@ Coordinates=676,1,89,36
 
 [LabelFrameReport]
 Coordinates=0,0,112,58
-
-[MenuOpenSamspace]
-Coordinates=676,56,100,36
-
-[MenuOpenEnregy]
-Coordinates=622,155,40,36
 

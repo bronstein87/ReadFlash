@@ -311,3 +311,81 @@ float GetTempSpec(char *sp) {
 	temp = TEMP[IT] - (TEMP[IT] - TEMP[IT + 1]) * ((double)NT + 0.5) / 10.;
 	return temp;
 }
+
+double DateTimeToDaysJ2000(struct _DateTime *stDateTime)
+{
+	int i, mes[12]={31,28,31,30,31,30,31,31,30,31,30,31};
+// Юлианская дата 2000 года 12 часов 1 января  = 2451545.0;
+	double JD = 0;
+// прибавляем число суток за прошедшие  года (не вкл текущий год)
+	JD += ((double)stDateTime->Year - 2000.) * 365.;
+
+// считаем  число високосных лет с 2000 года по нынешний (не включительно)
+	for (i = 2000; i < stDateTime->Year; i++) {
+		if (i % 4 == 0) JD += 1.;
+	}
+//прибавляем 29 февраля, если оно было в текущем году
+	if ((stDateTime->Year % 4 == 0) && (stDateTime->Month >= 3)) JD += 1.;
+
+	//считаем число дней в текущем году, не вкл текущий месяц
+	for (i = 1; i < stDateTime->Month; i++) JD += (double)mes[i-1];
+	JD += stDateTime->Day - 1;  // прибавляем число дней в текущем месяце
+	JD  = JD - 0.5;
+	JD += ((double)stDateTime->Hour + (double)stDateTime->Min/60.
+			+ (double)stDateTime->Sec/3600. + (double)stDateTime->mSec/3600000.)/24.;
+
+	return JD;
+}
+
+void SunVector(double JD_DEV, double mOr[3][3], double *pSunI,  double *pSunD)
+{
+int i,j;
+double Ts, Ls, Ms, eS, Es, Vs, Qs, Ekl, AlphaS, DeltaS, QsVid, Om, JD;
+
+	   Ts=(JD_DEV-2415020.0)/36525.;
+	   Ls=279.69668+36000.76892*Ts+0.0003025*Ts*Ts;
+
+	   Ls/=360.;
+	   Ls-=(int)Ls;
+	   Ls*=360.;
+
+	   Ms=358.47583+35999.04975*Ts-0.000150*Ts*Ts-0.0000033*Ts*Ts*Ts;
+	   Ms/=360.;
+	   Ms-=(int)Ms;
+	   Ms*=360.;
+
+	   Ms*=PI/180.;
+	   eS=0.01675104-0.0000418*Ts-0.000000126*Ts*Ts;
+	   Es=Ms;
+	   for (i = 0; i < 10; i++)  Es=Ms+eS*sin(Es);
+	   Vs=2*atan(sqrtm((1+eS)/(1-eS))*tan(Es/2));
+	   Qs=Ls*PI/180.+Vs-Ms;
+
+	   Om=259.18-1934.142*Ts;
+	   Om/=360.;
+	   Om-=(int)Om;
+	   Om*=2*PI;
+
+	   QsVid=Qs*180/PI-0.00569-0.00479*sin(Om);
+	   QsVid=QsVid*PI/180.;
+
+	   Ekl=23.452294-0.0130125*Ts-0.00000164*Ts*Ts+0.000000503*Ts*Ts*Ts;
+	   Ekl+=0.00256*cos(Om);
+	   Ekl*=PI/180.;
+
+	   AlphaS=atan2(cos(Ekl)*sin(QsVid),cos(QsVid));
+	   DeltaS= asin(sin(Ekl)*sin(QsVid));
+
+	   if (AlphaS<0) AlphaS+=2*PI;
+
+	   pSunI[0]=cos(AlphaS)*cos(DeltaS);
+	   pSunI[1]=sin(AlphaS)*cos(DeltaS);
+	   pSunI[2]=sin(DeltaS);
+
+	   for (i =0; i<3; i++) {
+		   pSunD[i]=0;
+		   for (j =0; j< 3; j++){
+			   pSunD[i]+=mOr[i][j]*pSunI[j];
+		   }
+	   }
+}

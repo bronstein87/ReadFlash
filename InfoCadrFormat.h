@@ -81,7 +81,7 @@ struct CadrInfo
 	double SizePixel;
 	unsigned short StatOrient;  //статус решения задачи (0 - успешно)
 	unsigned int DataType; // признак типа 0-byte, 1-ushort, 2-float
-	double MeanBright, SigmaBright;
+	double MeanBright, SigmaBright, Level;
 	float Epsilon; // допуск на распознавание
 
 	unsigned short CountStars;  //число спроектированных звезд
@@ -101,18 +101,16 @@ struct CadrInfo
 	std::vector <LinesInfo> LinesList;  //список блоков
 
 	double QuatOrient[4], MatrixOrient[3][3], AnglesOrient[3], AnglesModel[3];   //кватернион, матрица и углы ориентации
-	double AnglesDiff[3];
 	double OmegaOrient[3], OmegaModel[3], MatrixProg[3][3]; //угловая скорость, прогнозируемая матрица ориентации
-    double ozAxis[3]; // temp
-	double OmegaDiff[3];
-	double AxesDiff[3];
+
+        double AxesDiff[3], AnglesDiff[3], OmegaDiff[3];  //ошибки определения ориентации и угл. скорости
+        double SunAngle, MoonAngle;  //угол опт. оси к Солнцу и Луне
 	double MatrixTemp;     //температура КМОП-матрицы
 	double MeanErrorX, MeanErrorY, MeanErrorXY;
+
 };
 
-
-
- void GetMeanDeterError(struct CadrInfo &mCadr)
+void GetMeanDeterError(struct CadrInfo &mCadr)
 {
 int countDxDy = 0;
 

@@ -2,6 +2,7 @@
 #define MathM
 
 #include <math.h>
+#include <vcl.h>
 #include <vector>
 #include <utility>
 #define PI    3.141592653589793
@@ -27,6 +28,12 @@
 #define BAD_Ornt 0xC00 // Bad Orient() m_cur >2*Pix
 #define BAD_DetSl 0xD00 // Bad deter in SLEZH()
 #define BAD_Frag 0xE00 // Error extract fragment from buffer
+
+struct _DateTime
+{
+	unsigned short Day, Month, Year;
+	unsigned short Hour, Min, Sec, mSec;
+};
 
 struct PointXYZ {
 	_fastcall PointXYZ(double _X, double _Y, double _Z) : X(_X), Y(_Y), Z(_Z) {
@@ -63,6 +70,8 @@ void multMatrix(const double Matr1[3][3], const double Matr2[3][3],
 	double Matr[3][3]);
 void ToGMS(double gradAngle, int& gradus, int& minutes, int& seconds);
 float GetTempSpec(char *sp);
+double DateTimeToDaysJ2000(struct _DateTime *stDateTime);
+void SunVector(double JD_DEV, double mOr[3][3], double *pSunI,  double *pSunD);
 
 template<class InputIterator, class Value, class UnaryOperation>
 std::pair<Value, Value>calculateMeanStdDv(InputIterator first,

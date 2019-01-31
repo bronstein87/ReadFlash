@@ -3,7 +3,7 @@ object FormGraphOrient: TFormGraphOrient
   Top = 48
   Caption = #1055#1072#1088#1072#1084#1077#1090#1088#1099' '#1086#1088#1080#1077#1085#1090#1072#1094#1080#1080
   ClientHeight = 825
-  ClientWidth = 1448
+  ClientWidth = 1440
   Color = clBtnFace
   Constraints.MinWidth = 825
   Font.Charset = DEFAULT_CHARSET
@@ -21,7 +21,7 @@ object FormGraphOrient: TFormGraphOrient
   OnMouseWheelUp = FormMouseWheelUp
   OnResize = FormResize
   DesignSize = (
-    1448
+    1440
     825)
   PixelsPerInch = 96
   TextHeight = 13
@@ -141,21 +141,17 @@ object FormGraphOrient: TFormGraphOrient
     ParentBiDiMode = False
     TabOrder = 7
   end
-  object Fyf: TPageControl
-    Left = 16
+  object PageControl1: TPageControl
+    Left = -6
     Top = 8
     Width = 1438
     Height = 777
-    ActivePage = TabSheetImage
+    ActivePage = TabSheetMxy
     Anchors = [akLeft, akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 8
     object TabSheetAngles: TTabSheet
       Caption = #1059#1075#1083#1099' '#1086#1088#1080#1077#1085#1090#1072#1094#1080#1080
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1430
         731)
@@ -277,10 +273,7 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheetAnglesError: TTabSheet
       Caption = #1054#1096#1080#1073#1082#1072' '#1091#1075#1083#1086#1074' '#1086#1088#1080#1077#1085#1090#1072#1094#1080#1080
       ImageIndex = 10
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+
       DesignSize = (
         1430
         731)
@@ -312,7 +305,7 @@ object FormGraphOrient: TFormGraphOrient
       end
       object ChartDlError: TChart
         Left = 0
-        Top = 251
+        Top = 243
         Width = 1419
         Height = 250
         BackWall.Brush.Style = bsClear
@@ -366,10 +359,6 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheetAxesError: TTabSheet
       Caption = #1054#1096#1080#1073#1082#1072' '#1086#1089#1077#1081' '#1055#1057#1050
       ImageIndex = 12
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1430
         731)
@@ -473,16 +462,12 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheetOmega: TTabSheet
       Caption = #1059#1075#1083#1086#1074#1072#1103' '#1089#1082#1086#1088#1086#1089#1090#1100
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1430
         731)
       object ChartWx: TChart
         Left = 0
-        Top = -3
+        Top = 0
         Width = 1427
         Height = 259
         BackWall.Brush.Style = bsClear
@@ -493,7 +478,7 @@ object FormGraphOrient: TFormGraphOrient
         Title.Font.Height = -13
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
-          'Wx, '#1091#1075#1083'. '#1084#1080#1085'/c')
+          'Wx, '#1091#1075#1083'. '#1089#1077#1082'/c')
         OnClickLegend = ChartOrientClickLegend
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
@@ -525,7 +510,7 @@ object FormGraphOrient: TFormGraphOrient
         Title.Font.Height = -13
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
-          'Wy, '#1091#1075#1083'. '#1084#1080#1085'/c')
+          'Wy, '#1091#1075#1083'. '#1089#1077#1082'/c')
         OnClickLegend = ChartOrientClickLegend
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
@@ -552,7 +537,7 @@ object FormGraphOrient: TFormGraphOrient
         Title.Font.Height = -13
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
-          'Wz, '#1091#1075#1083'. '#1084#1080#1085'/c')
+          'Wz, '#1091#1075#1083'. '#1089#1077#1082'/c')
         OnClickLegend = ChartOrientClickLegend
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
@@ -570,10 +555,6 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheetOmegaError: TTabSheet
       Caption = #1054#1096#1080#1073#1082#1072' '#1091#1075#1083#1086#1074#1086#1081' '#1089#1082#1086#1088#1086#1089#1090#1080
       ImageIndex = 11
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1430
         731)
@@ -677,16 +658,12 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheetMxy: TTabSheet
       Caption = #1056#1072#1089#1089#1086#1075#1083#1072#1089#1086#1074#1072#1085#1080#1103
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1430
         731)
       object ChartMx: TChart
-        Left = 0
-        Top = -3
+        Left = 3
+        Top = 245
         Width = 1431
         Height = 259
         BackWall.Brush.Style = bsClear
@@ -697,7 +674,7 @@ object FormGraphOrient: TFormGraphOrient
         Title.Font.Height = -13
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
-          'mx, '#1084#1082#1084)
+          #1054#1089#1090#1072#1090#1086#1095#1085#1099#1077' '#1088#1072#1089#1089#1086#1075#1083#1072#1089#1086#1074#1072#1085#1080#1103' '#1087#1086' '#1086#1089#1080' OX, '#1084#1082#1084)
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
         Panning.MouseWheel = pmwNone
@@ -711,10 +688,10 @@ object FormGraphOrient: TFormGraphOrient
         ColorPaletteIndex = 13
       end
       object ChartMy: TChart
-        Left = 0
-        Top = 243
+        Left = 3
+        Top = 496
         Width = 1427
-        Height = 250
+        Height = 232
         BackWall.Brush.Style = bsClear
         Legend.CheckBoxes = True
         Legend.LegendStyle = lsSeries
@@ -723,7 +700,7 @@ object FormGraphOrient: TFormGraphOrient
         Title.Font.Height = -13
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
-          'my, '#1084#1082#1084)
+          #1054#1089#1090#1072#1090#1086#1095#1085#1099#1077' '#1088#1072#1089#1089#1086#1075#1083#1072#1089#1086#1074#1072#1085#1080#1103' '#1087#1086' '#1086#1089#1080' OY, '#1084#1082#1084)
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
         Panning.MouseWheel = pmwNone
@@ -737,8 +714,8 @@ object FormGraphOrient: TFormGraphOrient
         ColorPaletteIndex = 13
       end
       object ChartMxy: TChart
-        Left = 0
-        Top = 481
+        Left = 3
+        Top = 0
         Width = 1427
         Height = 250
         BackWall.Brush.Style = bsClear
@@ -749,7 +726,7 @@ object FormGraphOrient: TFormGraphOrient
         Title.Font.Height = -13
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
-          'm_cur, '#1084#1082#1084)
+          #1054#1089#1090#1072#1090#1086#1095#1085#1099#1077' '#1088#1072#1089#1089#1086#1075#1083#1072#1089#1086#1074#1072#1085#1080#1103', '#1084#1082#1084)
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
         LeftAxis.AxisValuesFormat = '#,##0.#####'
         Panning.MouseWheel = pmwNone
@@ -766,10 +743,6 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheetCountObjects: TTabSheet
       Caption = #1063#1080#1089#1083#1086' '#1086#1073#1098#1077#1082#1090#1086#1074
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1430
         731)
@@ -866,7 +839,7 @@ object FormGraphOrient: TFormGraphOrient
         731)
       object ChartFone: TChart
         Left = 0
-        Top = 0
+        Top = 243
         Width = 1427
         Height = 250
         BackWall.Brush.Style = bsClear
@@ -878,21 +851,9 @@ object FormGraphOrient: TFormGraphOrient
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
           #1059#1088#1086#1074#1077#1085#1100' '#1092#1086#1085#1072', '#1045#1052#1056)
-        BottomAxis.Automatic = False
-        BottomAxis.AutomaticMaximum = False
-        BottomAxis.AutomaticMinimum = False
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
-        LeftAxis.Automatic = False
-        LeftAxis.AutomaticMaximum = False
-        LeftAxis.AutomaticMinimum = False
         LeftAxis.AxisValuesFormat = '#,##0.#####'
         Panning.MouseWheel = pmwNone
-        RightAxis.Automatic = False
-        RightAxis.AutomaticMaximum = False
-        RightAxis.AutomaticMinimum = False
-        TopAxis.Automatic = False
-        TopAxis.AutomaticMaximum = False
-        TopAxis.AutomaticMinimum = False
         View3D = False
         Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
@@ -903,8 +864,8 @@ object FormGraphOrient: TFormGraphOrient
         ColorPaletteIndex = 13
       end
       object ChartNoise: TChart
-        Left = 0
-        Top = 243
+        Left = -1
+        Top = 486
         Width = 1431
         Height = 250
         BackWall.Brush.Style = bsClear
@@ -940,23 +901,69 @@ object FormGraphOrient: TFormGraphOrient
         DefaultCanvas = 'TTeeCanvas3D'
         ColorPaletteIndex = 13
       end
-      object ChartTemp: TChart
+      object ChartLevel: TChart
         Left = 0
-        Top = 481
+        Top = 3
         Width = 1427
         Height = 250
         BackWall.Brush.Style = bsClear
+        BackWall.Brush.Gradient.Direction = gdBottomTop
+        BackWall.Brush.Gradient.EndColor = clWhite
+        BackWall.Brush.Gradient.StartColor = 15395562
+        BackWall.Brush.Gradient.Visible = True
+        BackWall.Transparent = False
+        Foot.Font.Color = clBlue
+        Foot.Font.Name = 'Verdana'
+        Gradient.Direction = gdBottomTop
+        Gradient.EndColor = clWhite
+        Gradient.MidColor = 15395562
+        Gradient.StartColor = 15395562
+        LeftWall.Color = 14745599
         Legend.CheckBoxes = True
+        Legend.Font.Name = 'Verdana'
         Legend.LegendStyle = lsSeries
         Legend.Shadow.HorizSize = 0
+        Legend.Shadow.Transparency = 0
         Legend.Shadow.VertSize = 0
+        RightWall.Color = 14745599
         Title.Font.Height = -13
+        Title.Font.Name = 'Verdana'
         Title.Font.Style = [fsBold]
         Title.Text.Strings = (
-          #1058#1077#1084#1087#1077#1088#1072#1090#1091#1088#1072' '#1050#1052#1054#1055'-'#1084#1072#1090#1088#1080#1094#1099)
+          #1055#1086#1088#1086#1075' '#1083#1086#1082#1072#1083#1080#1079#1072#1094#1080#1080', '#1045#1052#1056)
+        BottomAxis.Axis.Color = 4210752
+        BottomAxis.Grid.Color = 11119017
+        BottomAxis.LabelsFormat.Font.Name = 'Verdana'
+        BottomAxis.TicksInner.Color = 11119017
         BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
+        BottomAxis.Title.Font.Name = 'Verdana'
+        DepthAxis.Axis.Color = 4210752
+        DepthAxis.Grid.Color = 11119017
+        DepthAxis.LabelsFormat.Font.Name = 'Verdana'
+        DepthAxis.TicksInner.Color = 11119017
+        DepthAxis.Title.Font.Name = 'Verdana'
+        DepthTopAxis.Axis.Color = 4210752
+        DepthTopAxis.Grid.Color = 11119017
+        DepthTopAxis.LabelsFormat.Font.Name = 'Verdana'
+        DepthTopAxis.TicksInner.Color = 11119017
+        DepthTopAxis.Title.Font.Name = 'Verdana'
+        LeftAxis.Axis.Color = 4210752
         LeftAxis.AxisValuesFormat = '#,##0.#####'
+        LeftAxis.Grid.Color = 11119017
+        LeftAxis.LabelsFormat.Font.Name = 'Verdana'
+        LeftAxis.TicksInner.Color = 11119017
+        LeftAxis.Title.Font.Name = 'Verdana'
         Panning.MouseWheel = pmwNone
+        RightAxis.Axis.Color = 4210752
+        RightAxis.Grid.Color = 11119017
+        RightAxis.LabelsFormat.Font.Name = 'Verdana'
+        RightAxis.TicksInner.Color = 11119017
+        RightAxis.Title.Font.Name = 'Verdana'
+        TopAxis.Axis.Color = 4210752
+        TopAxis.Grid.Color = 11119017
+        TopAxis.LabelsFormat.Font.Name = 'Verdana'
+        TopAxis.TicksInner.Color = 11119017
+        TopAxis.Title.Font.Name = 'Verdana'
         View3D = False
         Zoom.MouseWheel = pmwNormal
         BevelOuter = bvNone
@@ -967,13 +974,160 @@ object FormGraphOrient: TFormGraphOrient
         ColorPaletteIndex = 13
       end
     end
+    object TabSheet1: TTabSheet
+      Caption = #1044#1086#1087#1086#1083#1085#1080#1090#1077#1083#1100#1085#1086
+      ImageIndex = 17
+      DesignSize = (
+        1430
+        731)
+      object ChartTemp: TChart
+        Left = 3
+        Top = 241
+        Width = 1427
+        Height = 250
+        BackWall.Brush.Style = bsClear
+        BackWall.Brush.Gradient.Direction = gdBottomTop
+        BackWall.Brush.Gradient.EndColor = clWhite
+        BackWall.Brush.Gradient.StartColor = 15395562
+        BackWall.Brush.Gradient.Visible = True
+        BackWall.Transparent = False
+        Foot.Font.Color = clBlue
+        Foot.Font.Name = 'Verdana'
+        Gradient.Direction = gdBottomTop
+        Gradient.EndColor = clWhite
+        Gradient.MidColor = 15395562
+        Gradient.StartColor = 15395562
+        LeftWall.Color = 14745599
+        Legend.CheckBoxes = True
+        Legend.Font.Name = 'Verdana'
+        Legend.LegendStyle = lsSeries
+        Legend.Shadow.HorizSize = 0
+        Legend.Shadow.Transparency = 0
+        Legend.Shadow.VertSize = 0
+        RightWall.Color = 14745599
+        Title.Font.Height = -13
+        Title.Font.Name = 'Verdana'
+        Title.Font.Style = [fsBold]
+        Title.Text.Strings = (
+          #1058#1077#1084#1087#1077#1088#1072#1090#1091#1088#1072' '#1050#1052#1054#1055'-'#1084#1072#1090#1088#1080#1094#1099)
+        BottomAxis.Axis.Color = 4210752
+        BottomAxis.Grid.Color = 11119017
+        BottomAxis.LabelsFormat.Font.Name = 'Verdana'
+        BottomAxis.TicksInner.Color = 11119017
+        BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
+        BottomAxis.Title.Font.Name = 'Verdana'
+        DepthAxis.Axis.Color = 4210752
+        DepthAxis.Grid.Color = 11119017
+        DepthAxis.LabelsFormat.Font.Name = 'Verdana'
+        DepthAxis.TicksInner.Color = 11119017
+        DepthAxis.Title.Font.Name = 'Verdana'
+        DepthTopAxis.Axis.Color = 4210752
+        DepthTopAxis.Grid.Color = 11119017
+        DepthTopAxis.LabelsFormat.Font.Name = 'Verdana'
+        DepthTopAxis.TicksInner.Color = 11119017
+        DepthTopAxis.Title.Font.Name = 'Verdana'
+        LeftAxis.Axis.Color = 4210752
+        LeftAxis.AxisValuesFormat = '#,##0.#####'
+        LeftAxis.Grid.Color = 11119017
+        LeftAxis.LabelsFormat.Font.Name = 'Verdana'
+        LeftAxis.TicksInner.Color = 11119017
+        LeftAxis.Title.Font.Name = 'Verdana'
+        Panning.MouseWheel = pmwNone
+        RightAxis.Axis.Color = 4210752
+        RightAxis.Grid.Color = 11119017
+        RightAxis.LabelsFormat.Font.Name = 'Verdana'
+        RightAxis.TicksInner.Color = 11119017
+        RightAxis.Title.Font.Name = 'Verdana'
+        TopAxis.Axis.Color = 4210752
+        TopAxis.Grid.Color = 11119017
+        TopAxis.LabelsFormat.Font.Name = 'Verdana'
+        TopAxis.TicksInner.Color = 11119017
+        TopAxis.Title.Font.Name = 'Verdana'
+        View3D = False
+        Zoom.MouseWheel = pmwNormal
+        BevelOuter = bvNone
+        Color = clWhite
+        TabOrder = 0
+        Anchors = [akLeft, akRight]
+        DefaultCanvas = 'TTeeCanvas3D'
+        ColorPaletteIndex = 13
+      end
+      object ChartSunAngle: TChart
+        Left = 3
+        Top = 0
+        Width = 1427
+        Height = 250
+        BackWall.Brush.Style = bsClear
+        BackWall.Brush.Gradient.Direction = gdBottomTop
+        BackWall.Brush.Gradient.EndColor = clWhite
+        BackWall.Brush.Gradient.StartColor = 15395562
+        BackWall.Brush.Gradient.Visible = True
+        BackWall.Transparent = False
+        Foot.Font.Color = clBlue
+        Foot.Font.Name = 'Verdana'
+        Gradient.Direction = gdBottomTop
+        Gradient.EndColor = clWhite
+        Gradient.MidColor = 15395562
+        Gradient.StartColor = 15395562
+        LeftWall.Color = 14745599
+        Legend.CheckBoxes = True
+        Legend.Font.Name = 'Verdana'
+        Legend.LegendStyle = lsSeries
+        Legend.Shadow.HorizSize = 0
+        Legend.Shadow.Transparency = 0
+        Legend.Shadow.VertSize = 0
+        RightWall.Color = 14745599
+        Title.Font.Height = -13
+        Title.Font.Name = 'Verdana'
+        Title.Font.Style = [fsBold]
+        Title.Text.Strings = (
+          #1059#1075#1086#1083' '#1086#1087#1090#1080#1095#1077#1089#1082#1086#1081' '#1086#1089#1080' '#1082' '#1057#1086#1083#1085#1094#1091', '#1075#1088#1072#1076'.')
+        BottomAxis.Axis.Color = 4210752
+        BottomAxis.Grid.Color = 11119017
+        BottomAxis.LabelsFormat.Font.Name = 'Verdana'
+        BottomAxis.TicksInner.Color = 11119017
+        BottomAxis.Title.Caption = #1042#1088#1077#1084#1103', '#1089
+        BottomAxis.Title.Font.Name = 'Verdana'
+        DepthAxis.Axis.Color = 4210752
+        DepthAxis.Grid.Color = 11119017
+        DepthAxis.LabelsFormat.Font.Name = 'Verdana'
+        DepthAxis.TicksInner.Color = 11119017
+        DepthAxis.Title.Font.Name = 'Verdana'
+        DepthTopAxis.Axis.Color = 4210752
+        DepthTopAxis.Grid.Color = 11119017
+        DepthTopAxis.LabelsFormat.Font.Name = 'Verdana'
+        DepthTopAxis.TicksInner.Color = 11119017
+        DepthTopAxis.Title.Font.Name = 'Verdana'
+        LeftAxis.Axis.Color = 4210752
+        LeftAxis.AxisValuesFormat = '#,##0.#####'
+        LeftAxis.Grid.Color = 11119017
+        LeftAxis.LabelsFormat.Font.Name = 'Verdana'
+        LeftAxis.TicksInner.Color = 11119017
+        LeftAxis.Title.Font.Name = 'Verdana'
+        Panning.MouseWheel = pmwNone
+        RightAxis.Axis.Color = 4210752
+        RightAxis.Grid.Color = 11119017
+        RightAxis.LabelsFormat.Font.Name = 'Verdana'
+        RightAxis.TicksInner.Color = 11119017
+        RightAxis.Title.Font.Name = 'Verdana'
+        TopAxis.Axis.Color = 4210752
+        TopAxis.Grid.Color = 11119017
+        TopAxis.LabelsFormat.Font.Name = 'Verdana'
+        TopAxis.TicksInner.Color = 11119017
+        TopAxis.Title.Font.Name = 'Verdana'
+        View3D = False
+        Zoom.MouseWheel = pmwNormal
+        BevelOuter = bvNone
+        Color = clWhite
+        TabOrder = 1
+        Anchors = [akLeft, akRight]
+        DefaultCanvas = 'TTeeCanvas3D'
+        ColorPaletteIndex = 13
+      end
+    end
     object TabSheetStarsMotion: TTabSheet
       Caption = #1044#1074#1080#1078#1077#1085#1080#1077' '#1079#1074#1077#1079#1076
       ImageIndex = 5
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1430
         731)
@@ -1086,7 +1240,7 @@ object FormGraphOrient: TFormGraphOrient
         LeftAxis.Inverted = True
         LeftAxis.LabelsFormat.Font.Name = 'Verdana'
         LeftAxis.Maximum = 1014.751587508762000000
-        LeftAxis.Minimum = -85.418254175428860000
+        LeftAxis.Minimum = -85.418254175428850000
         LeftAxis.TicksInner.Color = 11119017
         LeftAxis.Title.Font.Name = 'Verdana'
         Panning.MouseWheel = pmwNone
@@ -1116,7 +1270,6 @@ object FormGraphOrient: TFormGraphOrient
         Color = clWhite
         TabOrder = 0
         Anchors = [akLeft, akTop, akRight, akBottom]
-        ExplicitWidth = 1377
         DefaultCanvas = 'TTeeCanvas3D'
         PrintMargins = (
           15
@@ -1295,10 +1448,6 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheetTableFrag: TTabSheet
       Caption = #1060#1088#1072#1075#1084#1077#1085#1090#1099
       ImageIndex = 6
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1430
         731)
@@ -1457,10 +1606,6 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheetTableObject: TTabSheet
       Caption = #1054#1073#1098#1077#1082#1090#1099
       ImageIndex = 7
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1430
         731)
@@ -1715,10 +1860,6 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheetStatFrag: TTabSheet
       Caption = #1057#1090#1072#1090#1080#1089#1090#1080#1082#1072' '#1087#1086' '#1092#1088#1072#1075#1084#1077#1085#1090#1072#1084
       ImageIndex = 9
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1430
         731)
@@ -2005,10 +2146,6 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheetStatFrag2: TTabSheet
       Caption = #1057#1090#1072#1090#1080#1089#1090#1080#1082#1072' '#1087#1086' '#1092#1088#1072#1075#1084#1077#1085#1090#1072#1084'-2'
       ImageIndex = 14
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1430
         731)
@@ -2235,10 +2372,6 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheetStatStars: TTabSheet
       Caption = #1057#1090#1072#1090#1080#1089#1090#1080#1082#1072' '#1087#1086' '#1079#1074#1077#1079#1076#1072#1084
       ImageIndex = 13
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         1430
         731)
@@ -2531,7 +2664,7 @@ object FormGraphOrient: TFormGraphOrient
       ExplicitHeight = 0
       object Label13: TLabel
         Left = 1190
-        Top = 715
+        Top = 712
         Width = 68
         Height = 13
         Caption = #1057#1086#1086#1090#1085#1086#1096#1077#1085#1080#1077
@@ -2560,7 +2693,7 @@ object FormGraphOrient: TFormGraphOrient
         Left = 771
         Top = 24
         Width = 614
-        Height = 680
+        Height = 677
         TabOrder = 1
         ColWidths = (
           64
@@ -2577,36 +2710,171 @@ object FormGraphOrient: TFormGraphOrient
       end
       object RatioEdit: TEdit
         Left = 1264
-        Top = 710
+        Top = 707
         Width = 121
         Height = 21
         TabOrder = 2
       end
     end
+    object TabSheetResStat: TTabSheet
+      Caption = #1057#1090#1072#1090#1091#1089' '#1086#1088#1080#1077#1085#1090#1072#1094#1080#1080
+      ImageIndex = 16
+      object ChartStat: TChart
+        Left = 3
+        Top = 3
+        Width = 678
+        Height = 725
+        BackWall.Brush.Style = bsClear
+        BackWall.Brush.Gradient.Direction = gdBottomTop
+        BackWall.Brush.Gradient.EndColor = clWhite
+        BackWall.Brush.Gradient.StartColor = 15395562
+        BackWall.Brush.Gradient.Visible = True
+        BackWall.Transparent = False
+        Foot.Font.Color = clBlue
+        Foot.Font.Name = 'Verdana'
+        Gradient.Direction = gdBottomTop
+        Gradient.EndColor = clWhite
+        Gradient.MidColor = 15395562
+        Gradient.StartColor = 15395562
+        LeftWall.Color = 14745599
+        Legend.Font.Name = 'Verdana'
+        Legend.LegendStyle = lsSeries
+        Legend.Shadow.HorizSize = 0
+        Legend.Shadow.Transparency = 0
+        Legend.Shadow.VertSize = 0
+        Legend.Visible = False
+        RightWall.Color = 14745599
+        Title.Font.Height = -13
+        Title.Font.Name = 'Verdana'
+        Title.Font.Style = [fsBold]
+        Title.Text.Strings = (
+          #1057#1090#1072#1090#1091#1089' '#1088#1077#1096#1077#1085#1080#1103' '#1079#1072#1076#1072#1095#1080)
+        OnClickLegend = ChartsFragClickLegend
+        BottomAxis.Axis.Color = 4210752
+        BottomAxis.Grid.Color = 11119017
+        BottomAxis.LabelsFormat.Font.Name = 'Verdana'
+        BottomAxis.TicksInner.Color = 11119017
+        BottomAxis.Title.Font.Name = 'Verdana'
+        DepthAxis.Axis.Color = 4210752
+        DepthAxis.Grid.Color = 11119017
+        DepthAxis.LabelsFormat.Font.Name = 'Verdana'
+        DepthAxis.TicksInner.Color = 11119017
+        DepthAxis.Title.Font.Name = 'Verdana'
+        DepthTopAxis.Axis.Color = 4210752
+        DepthTopAxis.Grid.Color = 11119017
+        DepthTopAxis.LabelsFormat.Font.Name = 'Verdana'
+        DepthTopAxis.TicksInner.Color = 11119017
+        DepthTopAxis.Title.Font.Name = 'Verdana'
+        LeftAxis.Axis.Color = 4210752
+        LeftAxis.AxisValuesFormat = '#,##0.#####'
+        LeftAxis.Grid.Color = 11119017
+        LeftAxis.LabelsFormat.Font.Name = 'Verdana'
+        LeftAxis.LabelStyle = talMark
+        LeftAxis.TicksInner.Color = 11119017
+        LeftAxis.Title.Font.Name = 'Verdana'
+        RightAxis.Axis.Color = 4210752
+        RightAxis.Grid.Color = 11119017
+        RightAxis.LabelsFormat.Font.Name = 'Verdana'
+        RightAxis.TicksInner.Color = 11119017
+        RightAxis.Title.Font.Name = 'Verdana'
+        TopAxis.Axis.Color = 4210752
+        TopAxis.Grid.Color = 11119017
+        TopAxis.LabelsFormat.Font.Name = 'Verdana'
+        TopAxis.TicksInner.Color = 11119017
+        TopAxis.Title.Font.Name = 'Verdana'
+        View3D = False
+        BevelOuter = bvNone
+        Color = clWhite
+        TabOrder = 0
+        DefaultCanvas = 'TTeeCanvas3D'
+        ColorPaletteIndex = 13
+      end
+      object ChartCounter: TChart
+        Left = 696
+        Top = 3
+        Width = 715
+        Height = 725
+        BackWall.Brush.Style = bsClear
+        BackWall.Brush.Gradient.Direction = gdBottomTop
+        BackWall.Brush.Gradient.EndColor = clWhite
+        BackWall.Brush.Gradient.StartColor = 15395562
+        BackWall.Brush.Gradient.Visible = True
+        BackWall.Transparent = False
+        Foot.Font.Color = clBlue
+        Foot.Font.Name = 'Verdana'
+        Gradient.Direction = gdBottomTop
+        Gradient.EndColor = clWhite
+        Gradient.MidColor = 15395562
+        Gradient.StartColor = 15395562
+        LeftWall.Color = 14745599
+        Legend.Font.Name = 'Verdana'
+        Legend.LegendStyle = lsSeries
+        Legend.Shadow.HorizSize = 0
+        Legend.Shadow.Transparency = 0
+        Legend.Shadow.VertSize = 0
+        RightWall.Color = 14745599
+        Title.Font.Height = -13
+        Title.Font.Name = 'Verdana'
+        Title.Font.Style = [fsBold]
+        Title.Text.Strings = (
+          #1057#1095#1077#1090#1095#1080#1082#1080' '#1089#1090#1072#1090#1091#1089#1086#1074)
+        OnClickLegend = ChartsFragClickLegend
+        BottomAxis.Axis.Color = 4210752
+        BottomAxis.Grid.Color = 11119017
+        BottomAxis.LabelsFormat.Font.Name = 'Verdana'
+        BottomAxis.TicksInner.Color = 11119017
+        BottomAxis.Title.Font.Name = 'Verdana'
+        DepthAxis.Axis.Color = 4210752
+        DepthAxis.Grid.Color = 11119017
+        DepthAxis.LabelsFormat.Font.Name = 'Verdana'
+        DepthAxis.TicksInner.Color = 11119017
+        DepthAxis.Title.Font.Name = 'Verdana'
+        DepthTopAxis.Axis.Color = 4210752
+        DepthTopAxis.Grid.Color = 11119017
+        DepthTopAxis.LabelsFormat.Font.Name = 'Verdana'
+        DepthTopAxis.TicksInner.Color = 11119017
+        DepthTopAxis.Title.Font.Name = 'Verdana'
+        LeftAxis.Axis.Color = 4210752
+        LeftAxis.AxisValuesFormat = '#,##0.#####'
+        LeftAxis.Grid.Color = 11119017
+        LeftAxis.LabelsFormat.Font.Name = 'Verdana'
+        LeftAxis.LabelStyle = talMark
+        LeftAxis.TicksInner.Color = 11119017
+        LeftAxis.Title.Font.Name = 'Verdana'
+        RightAxis.Axis.Color = 4210752
+        RightAxis.Grid.Color = 11119017
+        RightAxis.LabelsFormat.Font.Name = 'Verdana'
+        RightAxis.TicksInner.Color = 11119017
+        RightAxis.Title.Font.Name = 'Verdana'
+        TopAxis.Axis.Color = 4210752
+        TopAxis.Grid.Color = 11119017
+        TopAxis.LabelsFormat.Font.Name = 'Verdana'
+        TopAxis.TicksInner.Color = 11119017
+        TopAxis.Title.Font.Name = 'Verdana'
+        View3D = False
+        BevelOuter = bvNone
+        Color = clWhite
+        TabOrder = 1
+        DefaultCanvas = 'TTeeCanvas3D'
+        ColorPaletteIndex = 13
+      end
+    end
+  end
+  object CheckBoxInterval: TCheckBox
+    Left = 16
+    Top = 800
+    Width = 145
+    Height = 17
+    Caption = #1054#1090#1086#1073#1088#1072#1079#1080#1090#1100' '#1080#1085#1090#1077#1088#1074#1072#1083':'
+    TabOrder = 9
   end
   object MainMenu1: TMainMenu
     Left = 1112
     Top = 192
     object MenuOpen: TMenuItem
       Caption = #1042#1099#1073#1088#1072#1090#1100' '#1092#1072#1081#1083
-      object MenuOpenFlash: TMenuItem
-        Caption = #1044#1072#1085#1085#1099#1077' '#1080#1079' Flash-'#1087#1072#1084#1103#1090#1080' ('#1084#1041#1054#1050#1047'-2'#1042')'
-        OnClick = MenuOpenFlashClick
-      end
-      object MenuOpenSamspace: TMenuItem
-        Caption = #1055#1088#1086#1090#1086#1082#1086#1083' '#1090#1077#1083#1077#1084#1077#1090#1088#1080#1080' ('#1057#1072#1084#1072#1088#1072')'
-        OnClick = MenuOpenSamspaceClick
-      end
-      object MenuOpenEnregy: TMenuItem
-        Caption = #1055#1088#1086#1090#1086#1082#1086#1083' '#1090#1077#1083#1077#1084#1077#1090#1088#1080#1080' ('#1069#1085#1077#1088#1075#1080#1103')'
-        OnClick = MenuOpenEnergyClick
-      end
-      object MenuOpenArsenal: TMenuItem
-        Caption = #1055#1088#1086#1090#1086#1082#1086#1083' '#1090#1077#1083#1077#1084#1077#1090#1088#1080#1080' ('#1040#1088#1089#1077#1085#1072#1083')'
-        OnClick = MenuOpenArsenalClick
-      end
       object N1: TMenuItem
-        Caption = #1057#1095#1080#1090#1072#1090#1100' '#1087#1088#1086#1090#1086#1082#1086#1083
+        Caption = #1055#1088#1086#1090#1086#1082#1086#1083#1099' '#1050#1048#1040
         object BOKZ60ParseProtocol: TMenuItem
           Caption = #1041#1054#1050#1047'-'#1052'60'
           OnClick = BOKZ60ParseProtocolClick
@@ -2636,9 +2904,32 @@ object FormGraphOrient: TFormGraphOrient
           OnClick = BOKZM60MILParseClick
         end
       end
+      object N2: TMenuItem
+        Caption = #1055#1088#1086#1090#1086#1082#1086#1083#1099' '#1058#1052#1048
+        object MenuOpenEnergy: TMenuItem
+          Caption = #1041#1054#1050#1047'-'#1052' ('#1069#1085#1077#1088#1075#1080#1103')'
+          OnClick = MenuOpenEnergyClick
+        end
+        object MenuOpenSamspace: TMenuItem
+          Caption = #1041#1054#1050#1047'-'#1052'60, M1000('#1057#1072#1084#1072#1088#1072')'
+          OnClick = MenuOpenSamspaceClick
+        end
+        object MenuOpenArsenal: TMenuItem
+          Caption = #1041#1054#1050#1047'-'#1052'60, '#1052'1000 ('#1052#1050#1054')'
+          OnClick = MenuOpenMILClick
+        end
+        object MenuOpenEMKA: TMenuItem
+          Caption = #1084#1041#1054#1050#1047'-2'#1042' ('#1042#1053#1048#1048#1069#1052')'
+          OnClick = MenuOpenEMKAClick
+        end
+      end
       object ReadIKIFormat: TMenuItem
         Caption = #1044#1072#1085#1085#1099#1077' '#1080#1079' '#1092#1086#1088#1084#1072#1090#1072' '#1048#1050#1048
         OnClick = ReadIKIFormatClick
+      end
+      object MenuOpenFlash: TMenuItem
+        Caption = #1044#1072#1085#1085#1099#1077' '#1080#1079' Flash-'#1087#1072#1084#1103#1090#1080' ('#1084#1041#1054#1050#1047'-2'#1042')'
+        OnClick = MenuOpenFlashClick
       end
       object N21: TMenuItem
         Caption = #1058#1077#1083#1077#1084#1077#1090#1088#1080#1103' '#1041#1054#1050#1047'-'#1052'2 ('#1042#1086#1089#1090#1086#1095#1085#1099#1081')'
@@ -2667,8 +2958,8 @@ object FormGraphOrient: TFormGraphOrient
     GalleryWidth = 0
     Height = 0
     Width = 0
-    Left = 1176
-    Top = 568
+    Left = 1112
+    Top = 304
   end
   object FileOpenDialog1: TFileOpenDialog
     FavoriteLinks = <>
@@ -2678,8 +2969,8 @@ object FormGraphOrient: TFormGraphOrient
     Top = 248
   end
   object PopupMenu1: TPopupMenu
-    Left = 1208
-    Top = 280
+    Left = 1112
+    Top = 88
     object SaveSeriesData: TMenuItem
       Caption = #1057#1086#1093#1088#1072#1085#1080#1090#1100' '#1076#1072#1085#1085#1099#1077' '#1089' '#1075#1088#1072#1092#1080#1082#1072' '#1074' .txt'
       OnClick = SaveSeriesDataClick
