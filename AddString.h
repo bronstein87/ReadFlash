@@ -17,6 +17,8 @@ namespace add_string {
 	string toStdString(UnicodeString str);
 	UnicodeString toUString(const string& str);
 	AnsiString toString(Variant value);
+	//fromTStringDynArray(const TStringDynArray& arrayFrom, TStringList& arrayTo);
+	//fromTStringList(const TStringList& arrayFrom, TStringDynArray& arrayTo);
 
 	template<typename Stream>
 	size_t findWord(Stream& in, const string& word) {
@@ -35,7 +37,7 @@ namespace add_string {
 	}
 
     	template<typename Stream>
-	size_t findWord(Stream& in, const string& word, const string& resStr) {
+	size_t findWord(Stream& in, const string& word, string& resStr) {
 		string lineToWrite;
 		while (in >> lineToWrite) {
 			if (lineToWrite.find(word) != string::npos) {

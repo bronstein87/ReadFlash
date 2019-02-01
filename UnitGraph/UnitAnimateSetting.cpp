@@ -374,3 +374,5 @@ void __fastcall TFormAnimateSetting::FormClose(TObject *Sender, TCloseAction &Ac
 }
 //---------------------------------------------------------------------------
 
+
+

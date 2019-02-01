@@ -292,10 +292,10 @@ object FormAnimateSetting: TFormAnimateSetting
       Caption = #1060#1072#1081#1083#1099
       ImageIndex = 1
       object GroupBox5: TGroupBox
-        Left = 0
+        Left = 4
         Top = 3
         Width = 353
-        Height = 89
+        Height = 118
         Caption = #1042#1099#1073#1086#1088' '#1092#1072#1081#1083#1086#1074
         TabOrder = 0
         object Label7: TLabel
@@ -311,6 +311,13 @@ object FormAnimateSetting: TFormAnimateSetting
           Width = 57
           Height = 13
           Caption = #1053#1072#1095#1080#1085#1072#1090#1100' '#1089
+        end
+        object Label10: TLabel
+          Left = 18
+          Top = 73
+          Width = 72
+          Height = 13
+          Caption = #1060#1080#1083#1100#1090#1088#1086#1074#1072#1090#1100':'
         end
         object EditFilePrefix: TEdit
           Left = 104
@@ -335,6 +342,14 @@ object FormAnimateSetting: TFormAnimateSetting
           Height = 17
           Caption = #1055#1088#1086#1087#1091#1089#1082#1072#1090#1100' '#1082#1072#1076#1088
           TabOrder = 2
+        end
+        object FilterEdit: TEdit
+          Left = 104
+          Top = 70
+          Width = 121
+          Height = 21
+          TabOrder = 3
+          Text = 'SLEZH'
         end
       end
     end
@@ -418,6 +433,13 @@ object FormAnimateSetting: TFormAnimateSetting
         TabOrder = 5
       end
     end
+  end
+  object CheckBoxFilter: TCheckBox
+    Left = 239
+    Top = 99
+    Width = 97
+    Height = 17
+    TabOrder = 1
   end
   object ColorDialog1: TColorDialog
     Left = 392

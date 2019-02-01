@@ -103,7 +103,7 @@ std::pair<Value, Value>calculateMeanStdDv(InputIterator first,
 
 template<class InputIterator, class Value, class UnaryOperation>
 Statistika calculateStatParam(InputIterator first, InputIterator last,
-	Value init, UnaryOperation extractWtC) {
+	Value init, UnaryOperation extractWtC /*,const std::string& statusFilter*/) {
 	Statistika stat;
 	bool f = false;
 
@@ -113,7 +113,7 @@ Statistika calculateStatParam(InputIterator first, InputIterator last,
 	bool flStart = true;
 
 	for (InputIterator i = first; i < last; i++) {
-		Value temp = extractWtC(*i, f);
+		Value temp = extractWtC(*i, /*statusFilter,*/ f);
 		if (f) {
 			++count_offset;
 			f = !f;

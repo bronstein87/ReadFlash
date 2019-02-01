@@ -71,6 +71,15 @@ namespace add_string {
 		return string;
 	}
 
+//	fromTStringDynArray(const TStringDynArray& arrayFrom, TStringList& arrayTo)
+//	{
+//
+//    }
+//	fromTStringList(const TStringList& arrayFrom, TStringDynArray& arrayTo)
+//	{
+//
+//	}
+
 }
 
 

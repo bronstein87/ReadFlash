@@ -1332,7 +1332,7 @@ namespace parse_prot {
 			static vector<string>err(args, args + 10);
 			const string errorMessage =
 				string("Cчитывание протокола завершено необычным образом.");
-			const maxTimePr = 100000;
+			const int  maxTimePr = 100000;
 			double timeStep = 0.25;
 			string line;
 
@@ -1593,8 +1593,8 @@ namespace parse_prot {
 								getline(in, line);
 								vector<string>splittedStr =
 									split(line, "\t\t\t\t\t");
-								cadrInfo.ozAxis[i] =
-									atof(splittedStr[1].c_str());
+//								cadrInfo.ozAxis[i] =
+//									atof(splittedStr[1].c_str());
 							}
 
 							quatToMatr(cadrInfo.QuatOrient,
