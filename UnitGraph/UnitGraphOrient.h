@@ -231,6 +231,8 @@ __published: // IDE-managed Components
 	TChart *ChartTemp;
 	TChart *ChartSunAngle;
 	TChart *ChartLevel;
+	TMenuItem *ChooseIKIFilesThenFolders;
+	TMenuItem *ChooseIKIFolders;
 
 
 	void __fastcall MenuSaveClick(TObject *Sender);
