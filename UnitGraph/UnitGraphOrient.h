@@ -259,7 +259,6 @@ __published: // IDE-managed Components
 	void __fastcall PixelBrightCheckBoxClick(TObject *Sender);
 	void __fastcall PixelSizeEditChange(TObject *Sender);
 	void __fastcall FontSizeEditChange(TObject *Sender);
-	void __fastcall ReadIKIFormatClick(TObject *Sender);
 	void __fastcall FormResize(TObject *Sender);
 	void __fastcall ChartsFragClickLegend(TCustomChart *Sender,
 		TMouseButton Button, TShiftState Shift, int X, int Y);

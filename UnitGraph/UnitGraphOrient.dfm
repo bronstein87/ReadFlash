@@ -1719,6 +1719,10 @@ object FormGraphOrient: TFormGraphOrient
     object ShowFragmentTab: TTabSheet
       Caption = #1054#1090#1086#1073#1088#1072#1078#1077#1085#1080#1077' '#1092#1088#1072#1075#1084#1077#1085#1090#1086#1074
       ImageIndex = 8
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object FragmentShowScrollBox: TScrollBox
         Left = 0
         Top = 33
@@ -2653,6 +2657,10 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheetTableStat: TTabSheet
       Caption = #1057#1074#1086#1076#1085#1072#1103' '#1089#1090#1072#1090#1080#1089#1090#1080#1082#1072
       ImageIndex = 15
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label13: TLabel
         Left = 1190
         Top = 712
@@ -2710,6 +2718,10 @@ object FormGraphOrient: TFormGraphOrient
     object TabSheetResStat: TTabSheet
       Caption = #1057#1090#1072#1090#1091#1089' '#1086#1088#1080#1077#1085#1090#1072#1094#1080#1080
       ImageIndex = 16
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object ChartStat: TChart
         Left = 3
         Top = 3
@@ -2915,7 +2927,6 @@ object FormGraphOrient: TFormGraphOrient
       end
       object ReadIKIFormat: TMenuItem
         Caption = #1044#1072#1085#1085#1099#1077' '#1080#1079' '#1092#1086#1088#1084#1072#1090#1072' '#1048#1050#1048
-        OnClick = ReadIKIFormatClick
         object ChooseIKIFilesThenFolders: TMenuItem
           Caption = #1042#1099#1073#1088#1072#1090#1100' '#1087#1072#1087#1082#1080
         end
