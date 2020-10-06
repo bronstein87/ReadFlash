@@ -106,13 +106,6 @@ object FormAnimateSetting: TFormAnimateSetting
           Height = 13
           Caption = '2 '#1086#1073#1098#1077#1082#1090#1072
         end
-        object Label6: TLabel
-          Left = 234
-          Top = 70
-          Width = 48
-          Height = 13
-          Caption = '3 '#1080' '#1073#1086#1083#1077#1077
-        end
         object ShapeColorZeroObjTable: TShape
           Left = 180
           Top = 50
@@ -140,6 +133,13 @@ object FormAnimateSetting: TFormAnimateSetting
           Width = 16
           Height = 16
           OnMouseDown = ShapeColorThreeObjTableMouseDown
+        end
+        object Label6: TLabel
+          Left = 234
+          Top = 70
+          Width = 48
+          Height = 13
+          Caption = '3 '#1080' '#1073#1086#1083#1077#1077
         end
         object CheckBoxFillTableWindows: TCheckBox
           Left = 18
@@ -299,28 +299,35 @@ object FormAnimateSetting: TFormAnimateSetting
         Caption = #1042#1099#1073#1086#1088' '#1092#1072#1081#1083#1086#1074
         TabOrder = 0
         object Label7: TLabel
-          Left = 18
+          Left = 10
           Top = 24
           Width = 44
           Height = 13
           Caption = #1055#1088#1077#1092#1080#1082#1089
         end
         object Label8: TLabel
-          Left = 18
-          Top = 46
+          Left = 10
+          Top = 43
           Width = 57
           Height = 13
           Caption = #1053#1072#1095#1080#1085#1072#1090#1100' '#1089
         end
         object Label10: TLabel
-          Left = 18
-          Top = 73
+          Left = 10
+          Top = 72
           Width = 72
           Height = 13
           Caption = #1060#1080#1083#1100#1090#1088#1086#1074#1072#1090#1100':'
         end
+        object Label13: TLabel
+          Left = 10
+          Top = 102
+          Width = 105
+          Height = 13
+          Caption = #1060#1080#1083#1100#1090#1088#1086#1074#1072#1090#1100' '#1087#1072#1087#1082#1080':'
+        end
         object EditFilePrefix: TEdit
-          Left = 104
+          Left = 117
           Top = 16
           Width = 121
           Height = 21
@@ -328,7 +335,7 @@ object FormAnimateSetting: TFormAnimateSetting
           Text = 'Img'
         end
         object BeginFromEdit: TEdit
-          Left = 104
+          Left = 117
           Top = 43
           Width = 121
           Height = 21
@@ -336,20 +343,40 @@ object FormAnimateSetting: TFormAnimateSetting
           TabOrder = 1
         end
         object SkipFrameCheckBox: TCheckBox
-          Left = 231
-          Top = 16
+          Left = 244
+          Top = 20
           Width = 106
           Height = 17
           Caption = #1055#1088#1086#1087#1091#1089#1082#1072#1090#1100' '#1082#1072#1076#1088
           TabOrder = 2
         end
         object FilterEdit: TEdit
-          Left = 104
+          Left = 117
           Top = 70
           Width = 121
           Height = 21
           TabOrder = 3
-          Text = 'SLEZH'
+        end
+        object CheckBoxFilter: TCheckBox
+          Left = 244
+          Top = 71
+          Width = 97
+          Height = 17
+          TabOrder = 4
+        end
+        object FilterFolderEdit: TEdit
+          Left = 117
+          Top = 94
+          Width = 121
+          Height = 21
+          TabOrder = 5
+        end
+        object CheckBoxFolderFilter: TCheckBox
+          Left = 244
+          Top = 94
+          Width = 97
+          Height = 17
+          TabOrder = 6
         end
       end
     end
@@ -433,13 +460,60 @@ object FormAnimateSetting: TFormAnimateSetting
         TabOrder = 5
       end
     end
-  end
-  object CheckBoxFilter: TCheckBox
-    Left = 239
-    Top = 99
-    Width = 97
-    Height = 17
-    TabOrder = 1
+    object TabSheet1: TTabSheet
+      Caption = #1044#1086#1087#1086#1083#1085#1080#1090#1077#1083#1100#1085#1086
+      ImageIndex = 3
+      object AccuracyReportCheckBox: TCheckBox
+        Left = 24
+        Top = 16
+        Width = 305
+        Height = 17
+        Caption = #1057#1086#1093#1088#1072#1085#1103#1090#1100' '#1087#1088#1086#1090#1086#1082#1086#1083' '#1088#1072#1089#1095#1105#1090#1072' '#1090#1086#1095#1085#1086#1089#1090#1080' ('#1089' SLEZH_BORT)'
+        TabOrder = 0
+      end
+      object FillStatusTableCheckBox: TCheckBox
+        Left = 24
+        Top = 48
+        Width = 305
+        Height = 17
+        Caption = #1057#1090#1088#1086#1080#1090#1100' '#1090#1072#1073#1083#1080#1094#1091' '#1087#1086' '#1089#1090#1072#1090#1091#1089#1072#1084
+        TabOrder = 1
+      end
+      object GroupBox6: TGroupBox
+        Left = 24
+        Top = 120
+        Width = 297
+        Height = 89
+        Caption = #1054#1073#1088#1072#1073#1086#1090#1082#1072' '#1074#1089#1077#1093' '#1087#1072#1087#1086#1082' '#1082#1072#1082' '#1086#1076#1085#1086#1081' '#1074#1099#1073#1086#1088#1082#1080
+        TabOrder = 2
+        object HandleAllFoldersLikeOneSampleCheckBox: TCheckBox
+          Left = 24
+          Top = 24
+          Width = 241
+          Height = 17
+          Caption = #1042#1082#1083#1102#1095#1080#1090#1100
+          TabOrder = 0
+          OnClick = HandleAllFoldersLikeOneSampleCheckBoxClick
+        end
+        object ThroughDateTimeCheckBox: TCheckBox
+          Left = 24
+          Top = 56
+          Width = 145
+          Height = 17
+          Caption = #1057#1082#1074#1086#1079#1085#1072#1103' '#1076#1072#1090#1072'/'#1074#1088#1077#1084#1103
+          TabOrder = 1
+        end
+      end
+      object StatusReportCheckBox: TCheckBox
+        Left = 24
+        Top = 79
+        Width = 217
+        Height = 17
+        Caption = #1057#1086#1093#1088#1072#1085#1103#1090#1100' '#1087#1088#1086#1090#1086#1082#1086#1083' '#1087#1086' '#1089#1090#1072#1090#1091#1089#1072#1084
+        TabOrder = 3
+        OnClick = StatusReportCheckBoxClick
+      end
+    end
   end
   object ColorDialog1: TColorDialog
     Left = 392

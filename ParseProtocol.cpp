@@ -1774,9 +1774,8 @@ void writeProtocolToIKI(CadrInfo& cadrInfo, int counter)
 	AnsiString curDate = TDateTime::CurrentDate().DateString();
 	AnsiString FileName = GetCurrentDir() + "/" + "IKI_" + curDate + "/";
 	TDirectory::CreateDirectory(FileName);
-	char fileNumber [2];
-	sprintf (fileNumber, "%02u", counter);
-	FileName = FileName + IntToStr((int)counter) + "_" + TDateTime::CurrentDate().DateString() + "_00-00-" + fileNumber + ".iki";
+
+	FileName = FileName + IntToStr((int)counter) + "_" + TDateTime::CurrentDate().DateString() + ".iki";
 	writer->WriteFormat(FileName.c_str());
 }
 
@@ -1988,8 +1987,16 @@ CadrInfo convertIKIFormatToInfoCadr(IKI_img* reader, bool CompareIKIRes)
 		   break;
 		}
 		 WindowsInfo winInfo;
-		 winInfo.Xstart = reader->ImageData.WindowsData.Info[i].X;
-		 winInfo.Ystart = reader->ImageData.WindowsData.Info[i].Y;
+		 if (reader->ImageData.WindowsData.BottomRight) {
+			winInfo.Xstart = reader->ImageData.WindowsData.Info[i].X - reader->ImageData.WindowsData.Info[i].WindowWidth;
+			winInfo.Ystart = reader->ImageData.WindowsData.Info[i].Y - reader->ImageData.WindowsData.Info[i].WindowHeight;
+		 }
+		 else
+		 {
+		 	winInfo.Xstart = reader->ImageData.WindowsData.Info[i].X;
+			winInfo.Ystart = reader->ImageData.WindowsData.Info[i].Y;
+         }
+
 		 winInfo.Width = reader->ImageData.WindowsData.Info[i].WindowWidth;
 		 winInfo.Height = reader->ImageData.WindowsData.Info[i].WindowHeight;
 		 winInfo.CountObj = reader->ImageData.WindowsData.Info[i].ObjCount;
@@ -2089,18 +2096,14 @@ CadrInfo convertIKIFormatToInfoCadr(IKI_img* reader, bool CompareIKIRes)
 			- reader->Georeferencing.DeviceAngularVelocity[i];
 		}
 
-		for (int i = 0;  i < 3; i++)
+		for (int i = 0;  i < 2; i++)
 		{
-			double diff = cadrInfo.AnglesOrient[i] - reader->Georeferencing.OrientationAngles[i];
-//			if (abs(diff) > 5)        // потом убрать
-//			{
-//				diff = (cadrInfo.AnglesOrient[i] + reader->Georeferencing.OrientationAngles[i])
-//				-	abs(cadrInfo.AnglesOrient[i] - reader->Georeferencing.OrientationAngles[i]);
-//			}
-			if (abs(diff) >  PI) diff -= 2*PI;
-			if (abs(diff) < -PI) diff += 2*PI;
+			double diff = cadrInfo.AnglesOrient[i] - cadrInfo.AnglesModel[i];
+			if (abs(diff) >  PI) diff -= 2 * PI;
+			if (abs(diff) < -PI) diff += 2 * PI;
 			cadrInfo.AnglesDiff[i] = diff;
 		}
+		cadrInfo.AnglesDiff[2] =  asin(sin(cadrInfo.AnglesOrient[2] - reader->Georeferencing.OrientationAngles[2]));
 
 		for (int i = 0; i < 3; i++)
 		{
@@ -2119,7 +2122,8 @@ CadrInfo convertIKIFormatToInfoCadr(IKI_img* reader, bool CompareIKIRes)
 			string line;
 			for (int i = 0 ; i < rowCount; i++) {
 				getline(in, line);
-				vector <string> row =  split(line, "\t");
+				vector <string> row =  split(line, " ");
+                row.erase(row.begin());
 				while (row.size() > rowSize)
 				{
 				   row.erase(row.begin());

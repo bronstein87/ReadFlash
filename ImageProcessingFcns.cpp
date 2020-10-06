@@ -56,7 +56,7 @@
 std::unique_ptr <TBitmap> FragmentPainter::changeContrast(int ContrastCoefficient, FragmentData& FData)
   {
 	int FragmentSize = FData.SizeX * FData.SizeY;
-	if(FData.min == 0 && FData.max == 0 && FData.mean == 0)
+	if (FData.min == 0 && FData.max == 0 && FData.mean == 0)
 	{
 		FData.min = *std::min_element(FData.RawFragment, FData.RawFragment + FragmentSize - 1);
 		FData.max = *std::max_element(FData.RawFragment, FData.RawFragment + FragmentSize - 1);

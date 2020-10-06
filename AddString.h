@@ -9,12 +9,14 @@
 #include <vector>
 #include <Classes.hpp>
 #include <sysvari.h>
+#include <System.RegularExpressions.hpp>
 using namespace std;
 namespace add_string {
 
 	vector <string> split(const string& str, const string& delim);
 	bool contains (const string& str, const string& strToFind);
-	string toStdString(UnicodeString str);
+	bool contains (const string& str, TRegEx& regEx);
+	string toStdString(const UnicodeString& str);
 	UnicodeString toUString(const string& str);
 	AnsiString toString(Variant value);
 	//fromTStringDynArray(const TStringDynArray& arrayFrom, TStringList& arrayTo);
@@ -41,7 +43,7 @@ namespace add_string {
 		string lineToWrite;
 		while (in >> lineToWrite) {
 			if (lineToWrite.find(word) != string::npos) {
-                resStr = lineToWrite;
+				resStr = lineToWrite;
 				return in.tellg() - lineToWrite.size();
 			}
 		}
@@ -54,15 +56,19 @@ namespace add_string {
 	}
 
 	template<typename Stream>
-	size_t findLine(Stream& in, const string& line) {
+	size_t findLine(Stream& in, const string& line)
+	{
 		string lineToWrite;
-		while (getline(in, lineToWrite)) {
-			if (lineToWrite.find(line) != string::npos) {
+		while (getline(in, lineToWrite))
+		{
+			if (lineToWrite.find(line) != string::npos)
+			{
 				return in.tellg() - lineToWrite.size();
 			}
 		}
 
-		if (in.fail() && !in.eof()) {
+		if (in.fail() && !in.eof())
+		{
 			throw(string("Ошибка считывания файла"));
 		}
 

@@ -32,9 +32,15 @@ namespace add_string {
 		return false;
 	}
 
-	string toStdString(UnicodeString str)
+	bool contains (const string& str, TRegEx& regEx)
 	{
-		return string(AnsiString(str).c_str());
+		return regEx.IsMatch(toUString(str));
+    }
+
+	string toStdString(const UnicodeString& str)
+	{
+		string tmp =  string(AnsiString(str).c_str());
+		return tmp;
 	}
 	UnicodeString toUString(const string& str)
 	{

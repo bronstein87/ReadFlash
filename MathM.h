@@ -5,6 +5,7 @@
 #include <vcl.h>
 #include <vector>
 #include <utility>
+#include <System.RegularExpressions.hpp>
 #define PI    3.141592653589793
 #define PI_2  6.283185307179587
 #define RTD   57.29577951308232  /* RTD degries in 1 radian: 180/pi */
@@ -59,6 +60,7 @@ double asinm(double xf);
 double atan2m(double yf, double xf);
 void quatToMatr(const double Quat[], double M_ornt[3][3]);
 void MatrixToEkvAngles(const double Matrix[3][3], double Angles[3]);
+void MatrToQuat(const double mOrnt[3][3], double Quat[]);
 int CheckQuatNorm(const double quat[4], double deltaNorm);
 void QuatToMatrix(double quat[4], double matrix[3][3]);
 double GetAxisAngle(double lmn1[3], double lmn2[3]);
@@ -103,7 +105,7 @@ std::pair<Value, Value>calculateMeanStdDv(InputIterator first,
 
 template<class InputIterator, class Value, class UnaryOperation>
 Statistika calculateStatParam(InputIterator first, InputIterator last,
-	Value init,  const std::string& statusFilter, UnaryOperation extractWtC ) {
+	Value init,  TRegEx& statusFilter, UnaryOperation extractWtC ) {
 	Statistika stat;
 	bool f = false;
 
@@ -151,3 +153,5 @@ Statistika calculateStatParam(InputIterator first, InputIterator last,
 }
 
 #endif
+
+

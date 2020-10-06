@@ -14,7 +14,7 @@
 
 const int maxDev  = 4;
 const int maxZero = 10;
-
+const int maxSpaceCraftInfoCount = 200; // ?? tmp
 //struct _DateTime {
 //	unsigned short year, month, day;
 //	unsigned short hour, min, sec, msec;
@@ -36,6 +36,11 @@ void LoadSatelliteList(AnsiString _sourceDir, vector <SateliteInfo> &vSat)
 
 //load satellite list
 	finp.open(AnsiString(_sourceDir + "\\SatelliteInfo\\Satellite.txt").c_str());
+	if (!finp.is_open())
+	{
+		ShowMessage("Не удалось открыть \\SatelliteInfo\\Satellite.txt");
+		return;
+	}
 	while (getline(finp, sat.name)) {
 		vSat.push_back(sat);
 	}
@@ -44,6 +49,11 @@ void LoadSatelliteList(AnsiString _sourceDir, vector <SateliteInfo> &vSat)
 //load device list
 	int iSat = 0;
 	finp.open(AnsiString(_sourceDir + "\\SatelliteInfo\\StarTrack.txt").c_str());
+	if (!finp.is_open())
+	{
+		ShowMessage("Не удалось открыть \\SatelliteInfo\\StarTrack.txt");
+		return;
+	}
 	while (!finp.eof()) {
 		finp >> vSat[iSat].typeDev >> vSat[iSat].cntDev >> ":";
 		if (vSat[iSat].cntDev > maxDev) vSat[iSat].cntDev = maxDev;
@@ -59,6 +69,11 @@ void LoadSatelliteList(AnsiString _sourceDir, vector <SateliteInfo> &vSat)
 	int year, month, day;
 	iSat = 0;
 	finp.open(AnsiString(_sourceDir + "\\SatelliteInfo\\ZeroTime.txt").c_str());
+	if (!finp.is_open())
+	{
+		ShowMessage("Не удалось открыть \\SatelliteInfo\\ZeroTime.txt");
+		return;
+	}
 	while (!finp.eof()) {
 		finp >> vSat[iSat].cntZeroTime >> ":";
 		if (vSat[iSat].cntZeroTime > maxZero) vSat[iSat].cntZeroTime = maxZero;
@@ -75,7 +90,7 @@ void LoadSatelliteList(AnsiString _sourceDir, vector <SateliteInfo> &vSat)
 }
 
 TFormAnimateSetting* FormAnimateSetting;
-vector <SateliteInfo> vSatList;
+vector <SateliteInfo> vSatList(maxSpaceCraftInfoCount);
 __fastcall TFormAnimateSetting::TFormAnimateSetting(TComponent* Owner)
 	: TForm(Owner)
 {
@@ -175,6 +190,10 @@ void TFormAnimateSetting::ReadINI(const AnsiString& fileName)
 	EditFilePrefix->Text = Ini->ReadString("File", "FilePrefix", "Img");
 	BeginFromEdit->Text = Ini->ReadString("File", "BeginFrom", "0");
 	SkipFrameCheckBox->Checked = StrToInt(Ini->ReadString("File", "SkipFrame", "1"));
+	CheckBoxFilter->Checked = StrToInt(Ini->ReadString("File", "CheckFilter", "1"));
+	CheckBoxFolderFilter->Checked = StrToInt(Ini->ReadString("File", "CheckFolderFilter", "1"));
+	FilterEdit->Text  =  Ini->ReadString("File", "FilterEdit", "SLEZH");
+    FilterFolderEdit->Text  =  Ini->ReadString("File", "FilterFolderEdit", "*.");
 
 //Вкладка "Настройки БД"
 	CheckBoxLoadToDb->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckLoadToDb", "0")));
@@ -194,6 +213,11 @@ void TFormAnimateSetting::ReadINI(const AnsiString& fileName)
 	FormGraphOrient->ScaleEdit->Text     = Ini->ReadString("DrawFrag", "FragScale", "25");
 	FormGraphOrient->PixelSizeEdit->Text = Ini->ReadString("DrawFrag", "PixelSize", "25");
 	FormGraphOrient->FontSizeEdit->Text  = Ini->ReadString("DrawFrag", "FontSize",  "10");
+
+// Дополнительно
+	FillStatusTableCheckBox->Checked = StrToInt(Ini->ReadString("Additional", "FillStatusTable", "0"));
+	AccuracyReportCheckBox->Checked = StrToInt(Ini->ReadString("Additional", "AccuracyReport", "0"));
+	HandleAllFoldersLikeOneSampleCheckBox->Checked =  StrToInt(Ini->ReadString("Additional", "HandleAll", "0"));
 }
 //---------------------------------------------------------------------------
 
@@ -230,13 +254,16 @@ void TFormAnimateSetting::WriteINI(const AnsiString& fileName)
 	Ini->WriteString("File", "FilePrefix", EditFilePrefix->Text);
 	Ini->WriteString("File", "BeginFrom",  BeginFromEdit->Text);
 	Ini->WriteString("File", "SkipFrame",  IntToStr((int)SkipFrameCheckBox->Checked));
-
+	Ini->WriteString("File", "CheckFilter",  IntToStr((int)CheckBoxFilter->Checked));
+	Ini->WriteString("File", "CheckFolderFilter",  IntToStr((int)CheckBoxFolderFilter->Checked));
+	Ini->WriteString("File", "FilterEdit",  FilterEdit->Text);
+	Ini->WriteString("File", "FilterFolderEdit",  FilterFolderEdit->Text);
 //Вкладка "Настройки БД"
 	Ini->WriteString("DataBase", "Satellite",  IntToStr((int)KAComboBox->ItemIndex));
 	Ini->WriteString("CheckBox", "CheckLoadToDb",   IntToStr((int)CheckBoxLoadToDb->Checked));
 	Ini->WriteString("ComboBox","ZeroDate1S", ZeroDate1S->Text);
 	Ini->WriteString("Edits","ZeroTime1S", TimeToStr(ZeroTime1S->Time));
-    Ini->WriteString("CheckBox", "CheckSinc",   IntToStr((int)CheckBoxSinc->Checked));
+	Ini->WriteString("CheckBox", "CheckSinc",   IntToStr((int)CheckBoxSinc->Checked));
 
 //настройки FormGraphOrient
 	TFormGraphOrient* FormGraphOrient = dynamic_cast<TFormGraphOrient*>(this->Owner);
@@ -245,6 +272,11 @@ void TFormAnimateSetting::WriteINI(const AnsiString& fileName)
 	Ini->WriteString("DrawFrag", "FragScale", FormGraphOrient->ScaleEdit->Text);
 	Ini->WriteString("DrawFrag", "PixelSize", FormGraphOrient->PixelSizeEdit->Text);
 	Ini->WriteString("DrawFrag", "FontSize",  FormGraphOrient->FontSizeEdit->Text);
+
+	// Дополнительно
+	Ini->WriteString("Additional", "FillStatusTable", IntToStr((int)FillStatusTableCheckBox->Checked));
+	Ini->WriteString("Additional", "AccuracyReport",  IntToStr((int)AccuracyReportCheckBox->Checked));
+	Ini->WriteString("Additional", "HandleAll", IntToStr((int)HandleAllFoldersLikeOneSampleCheckBox->Checked));
 }
 //---------------------------------------------------------------------------
 
@@ -374,5 +406,31 @@ void __fastcall TFormAnimateSetting::FormClose(TObject *Sender, TCloseAction &Ac
 }
 //---------------------------------------------------------------------------
 
+
+
+
+
+
+//---------------------------------------------------------------------------
+
+void __fastcall TFormAnimateSetting::StatusReportCheckBoxClick(TObject *Sender)
+{
+	if (StatusReportCheckBox->Checked) {
+		FillStatusTableCheckBox->Checked = true;
+	}
+
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TFormAnimateSetting::HandleAllFoldersLikeOneSampleCheckBoxClick(TObject *Sender)
+
+{
+	if (!HandleAllFoldersLikeOneSampleCheckBox->Checked)
+	{
+		ThroughDateTimeCheckBox->Checked = false;
+    }
+}
+//---------------------------------------------------------------------------
 
 

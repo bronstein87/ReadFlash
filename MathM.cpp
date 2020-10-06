@@ -25,6 +25,61 @@ double asinm(double xf) {
 	return asin(xf);
 }
 
+void MatrToQuat(const double mOrnt[3][3], double Quat[])
+{
+	double QQ[4], max;
+	int i,nP;
+
+	QQ[0] =  mOrnt[0][0] + mOrnt[1][1] + mOrnt[2][2];
+	QQ[1] =  mOrnt[0][0] - mOrnt[1][1] - mOrnt[2][2];
+	QQ[2] = -mOrnt[0][0] + mOrnt[1][1] - mOrnt[2][2];
+	QQ[3] = -mOrnt[0][0] - mOrnt[1][1] + mOrnt[2][2];
+
+	max = -3.0f;
+	for (i = 0; i < 4; i++) {
+		if (QQ[i] > max) {
+			max = QQ[i]; nP = i;
+		}
+	}
+
+	switch (nP)
+	{
+	case 0:
+
+		Quat[0] = 0.5f  * sqrtm(1.0f + QQ[0]);
+		Quat[1] = 0.25f * (mOrnt[1][2] - mOrnt[2][1]) / Quat[0];
+		Quat[2] = 0.25f * (mOrnt[2][0] - mOrnt[0][2]) / Quat[0];
+		Quat[3] = 0.25f * (mOrnt[0][1] - mOrnt[1][0]) / Quat[0];
+		break;
+	case 1:
+
+		Quat[1] = 0.5f  * sqrtm(1.0f + QQ[1]);
+		Quat[0] = 0.25f * (mOrnt[1][2] - mOrnt[2][1]) / Quat[1];
+		Quat[2] = 0.25f * (mOrnt[0][1] + mOrnt[1][0]) / Quat[1];
+		Quat[3] = 0.25f * (mOrnt[2][0] + mOrnt[0][2]) / Quat[1];
+		break;
+	case 2:
+
+		Quat[2] = 0.5f  * sqrtm (1.0f + QQ[2]);
+		Quat[0] = 0.25f * (mOrnt[2][0] - mOrnt[0][2]) / Quat[2];
+		Quat[1] = 0.25f * (mOrnt[0][1] + mOrnt[1][0]) / Quat[2];
+		Quat[3] = 0.25f * (mOrnt[1][2] + mOrnt[2][1]) / Quat[2];
+		break;
+	case 3:
+
+		Quat[3] = 0.5f  * sqrtm(1.0f + QQ[3]);
+		Quat[0] = 0.25f * (mOrnt[0][1] - mOrnt[1][0]) / Quat[3];
+		Quat[1] = 0.25f * (mOrnt[2][0] + mOrnt[0][2]) / Quat[3];
+		Quat[2] = 0.25f * (mOrnt[1][2] + mOrnt[2][1]) / Quat[3];
+	}
+
+	if (Quat[0] < 0.0f)
+	{
+		Quat[0] = -Quat[0]; Quat[1] = -Quat[1];
+		Quat[2] = -Quat[2]; Quat[3] = -Quat[3];
+	}
+}
+
 int CheckQuatNorm(const double quat[4], double deltaNorm)
 {
 	double norm;
@@ -86,6 +141,8 @@ void MatrixToEkvAngles(const double Matrix[3][3], double Angles[3]) {
 	if (Angles[2] < 0)
 		Angles[2] += 2 * PI;
 }
+
+
 
 void calcTransitionMatrix(double pointAlpha, double pointBeta,
 	double pointAzimut, double M_ornt[3][3]) {

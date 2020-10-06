@@ -37,11 +37,8 @@ Coordinates=518,557,76,36
 [UpDown1]
 Coordinates=567,282,70,36
 
-[ButtonAdd]
-Coordinates=10,146,74,58
-
 []
-Coordinates=676,56,100,36
+Coordinates=10,146,74,58
 Visible=True
 
 [N1]

@@ -84,11 +84,59 @@ struct StatusInfo {
 	vector <string> ColumnTitles;
 };
 
+enum StatInfoHeader
+{
+	HeaderName,
+	Mean,
+	SKO,
+	Min,
+	Max,
+	Variance
+};
+
+
+enum StatInfoFields
+{
+	HeaderField,
+	BackgroundLevel,
+	BackgroundSKO,
+	FragmentCount,
+	ObjectCount,
+	StarCount,
+	Ra,
+	Decl,
+	Az,
+	ErrorRa,
+	ErrorDecl,
+	ErrorAz,
+	ErrorOX,
+	ErrorOY,
+	ErrorOZ,
+	SpeedOX,
+	SpeedOY,
+	SpeedOZ,
+	ErrorSpeedOX,
+	ErrorSpeedOY,
+	ErrorSpeedOZ,
+	Mx,
+	My,
+	Mxy
+};
+
+enum StatusInfoHeaders
+{
+    Invalid,
+	NO1,
+	NO2,
+	SLEZH_BORT,
+	SLEZH,
+	Count
+};
+
 class TFormAnimateSetting;
 
 class TFormGraphOrient : public TForm {
 __published: // IDE-managed Components
-	TButton *ButtonAdd;
 	TButton *ButtonClear;
 	TMainMenu *MainMenu1;
 	TMenuItem *MenuSave;
@@ -213,7 +261,6 @@ __published: // IDE-managed Components
 	TMenuItem *N21;
 	TEdit *RatioEdit;
 	TLabel *Label13;
-	TLabel *Label14;
 	TLabel *Label15;
 	TMenuItem *BOKZMParse;
 	TPopupMenu *PopupMenu1;
@@ -233,6 +280,9 @@ __published: // IDE-managed Components
 	TChart *ChartLevel;
 	TMenuItem *ChooseIKIFilesThenFolders;
 	TMenuItem *ChooseIKIFolders;
+	TLabel *LabelStatusReport;
+	TMenuItem *BOKZM60KondorParse;
+	TMenuItem *N3;
 
 
 	void __fastcall MenuSaveClick(TObject *Sender);
@@ -276,11 +326,11 @@ __published: // IDE-managed Components
 	void __fastcall MenuOpenMILClick(TObject *Sender);
 	void __fastcall BOKZMParseClick(TObject *Sender);
 	void __fastcall SaveSeriesDataClick(TObject *Sender);
-
-        //void __fastcall BOKZM60MILParseClick(TObject *Sender);
-
 	void __fastcall MenuOpenEMKAClick(TObject *Sender);
-
+	void __fastcall ChooseIKIFilesThenFoldersClick(TObject *Sender);
+	void __fastcall ChooseIKIFoldersClick(TObject *Sender);
+	void __fastcall BOKZM60KondorParseClick(TObject *Sender);
+	void __fastcall N3Click(TObject *Sender);
 
 
 private: // User declarations
@@ -508,7 +558,7 @@ private: // User declarations
 	void InitTableWindows(void);
 	void PrintTableWindows(const struct CadrInfo &mCadr);
 	void InitTableStat();
-	void InitStatusInfoTable(const string& deviceName);
+	bool InitStatusInfoTable(const string& deviceName);
 	void ClearStatusInfoTable();
 	void AddRowToStatTable(int nRow, AnsiString stringName, Statistika _stat,
 		int p1, int p2);
@@ -553,8 +603,8 @@ private: // User declarations
 	void SaveGraph(TChart *Chart, AnsiString suff);
 	int GetCadrInfo(int NC, struct CadrInfo &mCadr);
 
-	void ResizePlot(TChart *chart, double kx, double ky, int indexX,
-		int indexY);
+	void ResizePlot(TChart *chart, double kx, double ky, int indexX, int indexY);
+	void handleIKIMainFolder(TStringList* FileList, TStringList* FoldersList, const TDateTime& dt, double& deltaTime, bool handleAll = false, bool last = false);
 
 	unique_ptr <TFormAnimateSetting> FormAnimateSetting;
 	TChartShape *BlockSeries[MaxBlockSeries];
@@ -573,6 +623,7 @@ private: // User declarations
 	unsigned short ResizeCoef;
 	unsigned short FontSize;
 	StatusInfo StatusInfo;
+	bool statusTableInited;
 
 	vector <TChart*> Charts;
 	vector <CadrInfo> vCadrInfo;
@@ -580,6 +631,8 @@ private: // User declarations
 	vector <FragmentData> FragmentVector;
 	vector <FragmentScrollBox*> ImageScrollBoxVector;
 	vector <TImage*> FragmentsNumbers;
+
+
 
 public: // User declarations
 

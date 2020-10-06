@@ -408,7 +408,7 @@ void IKI_img::WriteFormat(string filename) // define_format_value = "%4x%-80.80s
 		}
 	}
 
-	if (ImageData.FrameData.FrameWidth != 0 && ImageData.FrameData.FrameHeight != 0)
+	if (ImageData.FrameData.FrameWidth != 0 && ImageData.FrameData.FrameHeight != 0 && ImageData.FrameData.Data != NULL)
 	{
 		print_string(FStream, videoframe_id, videoframe_name, "");
 		switch (ImageData.FrameData.DataType)
