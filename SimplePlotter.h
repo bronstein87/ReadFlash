@@ -31,6 +31,10 @@ public:
 		PointSize = _PointSize;
 	}
 
+	void SetLineWidth(unsigned short _LineWidth) {
+		LineWidth = _LineWidth;
+	}
+
 	void SetPointerStyle(TSeriesPointerStyle _PointerStyle) {
 		PointerStyle = _PointerStyle;
 	}
@@ -73,6 +77,7 @@ private:
 	bool ShowLines;
 	bool DateTimeX;
 	unsigned short PointSize;
+	unsigned short LineWidth;
 	TSeriesPointerStyle PointerStyle;
 
 };

@@ -2,6 +2,7 @@
 #include <vcl.h>
 #include <vector>
 #include <algorithm>
+#include <memory>
 
 struct FragmentData {
 	FragmentData() : RawFragment(NULL), SizeX(0), SizeY(0), min(0), max(0),

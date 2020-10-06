@@ -4,7 +4,7 @@
 #define UnitGraphOrientH
 
 // ---------------------------------------------------------------------------
-#include "..\\Word\\WordLibOffice.h"
+//#include "..\\Word\\WordLibOffice.h"
 
 #include <Classes.hpp>
 #include <Controls.hpp>
@@ -80,6 +80,14 @@ struct StatusInfo {
 	float NoFourCount;
 };
 
+struct TObjectParam {
+	unsigned int BrightMin, BrightMax;
+	unsigned int SquareMin, SquareMax;
+	float Xmin, Xmax, Ymin, Ymax;
+	bool isBright, isSquare;
+	bool isCoordX, isCoordY;
+};
+
 class TFormAnimateSetting;
 
 class TFormGraphOrient : public TForm {
@@ -92,7 +100,7 @@ __published: // IDE-managed Components
 	TEdit *EditSizeX;
 	TEdit *EditSizeY;
 	TLabel *Label10;
-	TEdit *EditTimeDev;
+	TEdit *EditDateTime;
 	TLabel *Label11;
 	TEdit *EditNumCadr;
 	TUpDown *UpDown1;
@@ -220,13 +228,27 @@ __published: // IDE-managed Components
 	TMenuItem *MenuOpenArsenal;
 	TMenuItem *MenuOpenEMKA;
 	TTabSheet *TabSheetResStat;
-	TChart *ChartStat;
-	TChart *ChartCounter;
 	TCheckBox *CheckBoxInterval;
-	TTabSheet *TabSheet1;
+	TTabSheet *TabSheetAdditional;
 	TChart *ChartTemp;
 	TChart *ChartSunAngle;
 	TChart *ChartLevel;
+	TMenuItem *N22;
+	TChart *ChartStat;
+	TChart *ChartCounter;
+	TMenuItem *MenuOpenSpectrRG;
+	TMenuItem *MenuOpenEnergyTest;
+	TMenuItem *MenuOpenMeteor;
+	TMenuItem *MenuOpenMR_MIL;
+	TMenuItem *MenuOpen2R_MIL;
+	TTabSheet *TabSheetAngVz;
+	TChart *ChartAngXX;
+	TChart *ChartAngYY;
+	TChart *ChartAngZZ;
+	TMenuItem *MenuDevice;
+	TMenuItem *MenuOpenMR_BI;
+	TEdit *EditTimeBoard;
+	TMenuItem *MenuOpenKondor;
 
 	void __fastcall MenuSaveClick(TObject *Sender);
 	void __fastcall MenuClearClick(TObject *Sender);
@@ -271,6 +293,22 @@ __published: // IDE-managed Components
 	void __fastcall BOKZMParseClick(TObject *Sender);
 	void __fastcall SaveSeriesDataClick(TObject *Sender);
 	void __fastcall MenuOpenEMKAClick(TObject *Sender);
+	void __fastcall MenuOpenAistClick(TObject *Sender);
+	void __fastcall SpectrClick(TObject *Sender);
+	void __fastcall MenuOpenEnergyTestClick(TObject *Sender);
+	void __fastcall MenuOpenMeteorClick(TObject *Sender);
+	void __fastcall MenuOpenMR_MILClick(TObject *Sender);
+	void __fastcall ChartZoom(TObject *Sender);
+	void __fastcall ChartMouseUp(TObject *Sender, TMouseButton Button, TShiftState Shift,
+          int X, int Y);
+	void __fastcall ChartDblClick(TObject *Sender);
+	void __fastcall MenuOpen2R_MILClick(TObject *Sender);
+	void __fastcall ChartAngGetAxisLabel(TChartAxis *Sender, TChartSeries *Series, int ValueIndex,
+          UnicodeString &LabelText);
+	void __fastcall MenuDeviceClick(TObject *Sender);
+	void __fastcall MenuOpenMR_BIClick(TObject *Sender);
+	void __fastcall FormShow(TObject *Sender);
+	void __fastcall MenuOpenKondorClick(TObject *Sender);
 
 
 private: // User declarations
@@ -517,15 +555,24 @@ private: // User declarations
 		int WheelDelta, const TPoint &MousePos, bool &Handled);
 	void __fastcall ChartMouseDown(TObject *Sender, TMouseButton Button,
 		TShiftState Shift, int X, int Y);
-
+    void DrawQuatStat(TDateTime timeFirst, TDateTime timeLast, int num, TColor arColor[2]);
+	void DrawQuatInfo(TDateTime curDate, float Q[4], int num, TColor arColor[2]);
 	void DrawMshi_2V(TMshi_2V *mshi, TDateTime curDate, int num);
+	void DrawDtmi_2V(TDtmi_2V *dtmi, TDateTime curDate, int num);
+	void DrawMloc_2V(TMloc_2V *mloc, TDateTime curDate, int num);
+
+	void DrawOrientInfo(CadrInfo mCadr, TDateTime curDate, AnsiString title, int num);
+
+    void PrintLogSKF(ofstream &file, CadrInfo mCadr, bool &create);
+
 	void OutputDTMI(ofstream &_fout, AnsiString &_SaveDir, DTMI &_tmi, TDateTime zeroDate, int isM1000);
 	void OutputLOC(ofstream &_fout, AnsiString &_SaveDir, LOC &_tmi, TDateTime zeroDate, int isM1000);
 	void StartPrintReport(IKI_img* reader);
 	void PrintReportRes(vector<CadrInfo>& cadrInfo);
 	void CalculateLocalStat(vector <CadrInfo> &vLocal, int nSeries, int &countRow);
 	void CalculateOrientStat(vector <CadrInfo> &vOrient, int nSeries, int &countRow);
-    void CalculateParamStat(vector <CadrInfo> &vOrient, int nSeries, int &countRow);
+	void CalculateParamStat(vector <CadrInfo> &vOrient, int nSeries, int &countRow);
+    void CalculateAngVzStat(vector <TAngVz> &vAngVz, int nSeries, int &countRow);
 	void CalculateSeriesSKO();
 	void SaveTableToFile(TStringGrid* table, short rowCount, short columnCount,
 		string filename);
@@ -558,6 +605,7 @@ private: // User declarations
 	unsigned short ResizeCoef;
 	unsigned short FontSize;
 	StatusInfo statusInfo;
+    TObjectParam objSelect;
 
 	vector <unsigned short> tableRows;
 	vector <string> columnTitles;
@@ -577,9 +625,14 @@ public: // User declarations
 	void DrawAnimateHandler(void);
 	void SetVisibleLabelFrame(bool isVisible);
 	void SetVisibleLabelStar(bool isVisible);
-    void SetVisibleLabelObject(bool isVisible);
+	void SetVisibleLabelObject(bool isVisible);
+	void SetBrightSelect(bool isSelect, unsigned int min, unsigned int max);
+	void SetSquareSelect(bool isSelect, unsigned int min, unsigned int max);
+	void SetCoordXSelect(bool isSelect, float min, float max);
+	void SetCoordYSelect(bool isSelect, float min, float max);
 	void PrepareChartFrag(TColor *_colorFrag, const int _maxDrawFrag);
 	void DrawChartFrag(const TColor *_colorFrag, const int _maxDrawFrag, CadrInfo& _cadrInfo);
+	void GetZoomChart(double t1, double t2);
 
 	AnsiString SourceDir;
 

@@ -27,7 +27,7 @@ struct ObjectsInfo  // фактические объекты
 		 Sp[1] = '_';
 	}
 	float X, Y;
-	unsigned short Bright;
+	int Bright; //Ann 10/07/2019
 	short Square;
 	unsigned long StarID;
 	float Mv;
@@ -62,14 +62,14 @@ struct LinesInfo
 
 struct CadrInfo
 {
-	_fastcall CadrInfo(): Time(0), FrameNumber(0), CountStars(0), CountWindows(0),
+	_fastcall CadrInfo(): Time(0), TimeBoard(0), FrameNumber(0), CountStars(0), CountWindows(0),
 	CountLocalObj(0), CountDeterObj(0), SizeStarsList(0), SizeWindowsList(0), SizeObjectsList(0),
 	 CountLines(0), CountBlock(0), MeanErrorX(0), MeanErrorY(0), MeanErrorXY(0),
 	  QuatOrient(), AnglesOrient(), AnglesModel(), //кватернион, матрица и углы ориентации
 	 AnglesDiff(),  OmegaOrient(), OmegaModel(), //угловая скорость, прогнозируемая матрица ориентации
 	 OmegaDiff(), AxesDiff() { }
 
-	double Time;
+	double Time, TimeBoard;
 	std::string DeviceInfo;
 	int FrameNumber;
 	bool IsBinary, IsReverse;   //признак бинирования, признак реверса изображения
@@ -85,7 +85,8 @@ struct CadrInfo
 
 	unsigned short CountStars;  //число спроектированных звезд
 	unsigned short CountWindows;  //число прогнозируемых окон
-	unsigned short CountLocalObj, CountDeterObj;    //число локализованных и распознанных объектов
+	short CountLocalObj;             //число локализованных объектов
+	unsigned short CountDeterObj;    //число и распознанных объектов
 
 	unsigned short SizeStarsList;
 	std::vector <StarsInfo>  StarsList;  //список спроектированных звезд
@@ -105,6 +106,11 @@ struct CadrInfo
 	double SunAngle, MoonAngle;  //угол опт. оси к Солнцу и Луне
 	double MatrixTemp;      //температура КМОП-матрицы
 	double MeanErrorX, MeanErrorY, MeanErrorXY; //остаточные рассогласования
+};
+
+struct TAngVz {
+	double Time;
+	double Ang[3];
 };
 
 void GetMeanDeterError(struct CadrInfo &mCadr)
@@ -148,7 +154,6 @@ void GetImageBright(struct CadrInfo &mCadr)
 	}
 }
 
-
 void calcOmegaDiff(std::vector <CadrInfo>& cadrInfoVec)
 {
 	double MOrientFirst[3][3];
@@ -185,8 +190,63 @@ void calcOmegaDiff(std::vector <CadrInfo>& cadrInfoVec)
 			}
 		}
 	}
-
 }
 
+void CalcAngVz(std::vector <CadrInfo> dataBokz[2], std::vector<TAngVz> &AngVz)
+{
+
+	TAngVz curAngVz;
+	double Mbokz1[3][3], Mbokz2[3][3], Mbokz1_T[3][3], Mvz12[3][3];
+	int cntQuat1 = 0;
+	int cntQuat2 = 0;
+	while ((cntQuat1 < dataBokz[0].size()) && (cntQuat2 < dataBokz[1].size()))
+	{
+		double t1 = dataBokz[0][cntQuat1].Time;
+		double t2 = dataBokz[1][cntQuat2].Time;
+		double dt = (dataBokz[0][cntQuat1].Time - dataBokz[1][cntQuat2].Time) * 86400.; //in sec
+		if (fabs(dt) < 0.01)//maxDelay)
+		{
+			if ( (dataBokz[0][cntQuat1].IsOrient) && (dataBokz[1][cntQuat2].IsOrient) ) {
+				curAngVz.Time    = dataBokz[0][cntQuat1].Time;
+				AnglesToMatrixOrient((TAngles*)dataBokz[0][cntQuat1].AnglesOrient, Mbokz1);
+				AnglesToMatrixOrient((TAngles*)dataBokz[1][cntQuat2].AnglesOrient, Mbokz2);
+
+				TranspMatrix(Mbokz1, Mbokz1_T);
+				MultMatrix(Mbokz2, Mbokz1_T, Mvz12);
+
+				double ang12[3];
+				MatrixRotationToAngles(Mvz12, (TVectXYZ*)ang12);
+
+				for (int i = 0; i < 3; i++) {
+					curAngVz.Ang[i] = acosm(Mbokz1[i][0] * Mbokz2[i][0]
+										   + Mbokz1[i][1] * Mbokz2[i][1]
+										   + Mbokz1[i][2] * Mbokz2[i][2]);
+					if (curAngVz.Ang[i] > PI/2) {
+						curAngVz.Ang[i] = PI - GetAxisAngle(&Mbokz1[i][0], &Mbokz2[i][0]);
+					}
+					else {
+						curAngVz.Ang[i] = GetAxisAngle(&Mbokz1[i][0], &Mbokz2[i][0]);
+					}
+				}
+
+	//			UnicodeString strDateTime;
+	//			DateTimeToString(strDateTime, "dd.mm.yyyy hh:nn:ss.zzz", testAngVz.DT);
+	//			fmatr << AnsiString(strDateTime).c_str() << "\t";
+	//			fmatr << setprecision(3) << testAngVz.Tbokz << "\t";
+	//			fmatr << setprecision(6) << testAngVz.Ang[0] * RTD << "\t" ;
+	//			fmatr << testAngVz.Ang[1] * RTD << "\t" << testAngVz.Ang[2] * RTD << "\n";
+				AngVz.push_back(curAngVz);
+			}
+			cntQuat1++;
+			cntQuat2++;
+		}
+		else
+		{
+			if(dataBokz[0][cntQuat1].Time < dataBokz[1][cntQuat2].Time)
+				cntQuat1++;
+			else cntQuat2++;
+		}
+	}
+}
 
 #endif

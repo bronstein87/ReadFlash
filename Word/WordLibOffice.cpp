@@ -101,7 +101,7 @@ long StartPos, EndPos;
 
 void SetCellColor(int Nrow, int Ncol, TColor clr)
 {
-  table->Cell(Nrow, Ncol)->Range->Shading->BackgroundPatternColor=clr;
+  table->Cell(Nrow, Ncol)->Range->Shading->BackgroundPatternColor = (WdColor)clr;
 }
 
 void UnionCell(int Nrow_1, int Ncol_1, int Nrow_2, int Ncol_2)
@@ -163,7 +163,7 @@ void SetTextAllign(long TypeAlign)
 */
 void AddHeader(AnsiString Text)
 {
-	WdHeaderFooterIndex  Index=1;
+	WdHeaderFooterIndex  Index = (Word_2k::WdHeaderFooterIndex)1;
 	HeaderFooter *CurHF;
 	WordDocument1->Sections->Item(1)->Headers->Item(Index, &CurHF);
 	CurHF->Range->InsertAfter((TVariant)Text);
@@ -171,7 +171,7 @@ void AddHeader(AnsiString Text)
 
 void AddFooter(AnsiString Text)
 {
-	WdHeaderFooterIndex  Index=1;
+	WdHeaderFooterIndex  Index = (Word_2k::WdHeaderFooterIndex)1;
 	HeaderFooter *CurHF;
 	WordRange *WR;
 	WordDocument1->Sections->Item(1)->Footers->Item(Index, &CurHF);
@@ -188,9 +188,10 @@ void SetFont(TVariant _start, TVariant _finish)
 {
    WordDocument1->Range(_start, _finish)->Font->set_Bold(BoldT);
    WordDocument1->Range(_start, _finish)->Font->set_Italic(ItalicT);
-   WordDocument1->Range(_start, _finish)->Font->set_Underline(UnderlineT);
+   WordDocument1->Range(_start, _finish)->Font->set_Underline((Word_2k::WdUnderline)UnderlineT);
    WordDocument1->Range(_start, _finish)->Font->set_Size(SizeT);
 }
+
 void AddFileName(void)
 {
 //   WordDocument1->Range(TVariant(WordDocument1->Characters->Count-1), EmptyParam())->

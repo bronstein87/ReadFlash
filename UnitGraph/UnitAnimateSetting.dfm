@@ -3,7 +3,7 @@ object FormAnimateSetting: TFormAnimateSetting
   Top = 0
   Caption = #1053#1072#1089#1090#1088#1086#1081#1082#1080
   ClientHeight = 558
-  ClientWidth = 368
+  ClientWidth = 383
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -12,22 +12,25 @@ object FormAnimateSetting: TFormAnimateSetting
   Font.Style = []
   OldCreateOrder = False
   OnClose = FormClose
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object PageControl: TPageControl
     Left = 0
     Top = 0
-    Width = 368
+    Width = 383
     Height = 558
     ActivePage = FilesPage
     Align = alClient
     TabOrder = 0
     object ShowPage: TTabSheet
       Caption = #1040#1085#1080#1084#1072#1094#1080#1103
+      ExplicitLeft = 8
+      ExplicitTop = 28
       object GroupBox1: TGroupBox
         Left = 3
-        Top = 3
-        Width = 353
+        Top = 286
+        Width = 369
         Height = 113
         Caption = #1058#1072#1073#1083#1080#1094#1072' '#1086#1073#1098#1077#1082#1090#1086#1074
         TabOrder = 0
@@ -79,9 +82,9 @@ object FormAnimateSetting: TFormAnimateSetting
         end
       end
       object GroupBox2: TGroupBox
-        Left = 6
-        Top = 122
-        Width = 353
+        Left = 3
+        Top = 405
+        Width = 369
         Height = 122
         Caption = #1058#1072#1073#1083#1080#1094#1072' '#1092#1088#1072#1075#1084#1077#1085#1090#1086#1074
         TabOrder = 1
@@ -161,10 +164,10 @@ object FormAnimateSetting: TFormAnimateSetting
         end
       end
       object GroupBox3: TGroupBox
-        Left = 6
-        Top = 250
-        Width = 352
-        Height = 127
+        Left = 3
+        Top = 3
+        Width = 369
+        Height = 134
         Caption = #1044#1074#1080#1078#1077#1085#1080#1077' '#1079#1074#1077#1079#1076
         TabOrder = 2
         object CheckBoxLabelFrame: TCheckBox
@@ -177,7 +180,7 @@ object FormAnimateSetting: TFormAnimateSetting
           OnClick = CheckBoxLabelFrameClick
         end
         object CheckBoxFrameMv: TCheckBox
-          Left = 220
+          Left = 231
           Top = 71
           Width = 120
           Height = 17
@@ -186,7 +189,7 @@ object FormAnimateSetting: TFormAnimateSetting
           Visible = False
         end
         object CheckBoxFrameSp: TCheckBox
-          Left = 220
+          Left = 231
           Top = 94
           Width = 123
           Height = 17
@@ -195,7 +198,7 @@ object FormAnimateSetting: TFormAnimateSetting
           Visible = False
         end
         object CheckBoxFrameID: TCheckBox
-          Left = 220
+          Left = 231
           Top = 25
           Width = 120
           Height = 17
@@ -204,7 +207,7 @@ object FormAnimateSetting: TFormAnimateSetting
           Visible = False
         end
         object CheckBoxFrameStarID: TCheckBox
-          Left = 220
+          Left = 231
           Top = 48
           Width = 97
           Height = 17
@@ -230,14 +233,170 @@ object FormAnimateSetting: TFormAnimateSetting
           TabOrder = 6
           OnClick = CheckBoxLabelObjectClick
         end
+        object CheckBoxBubbleSize: TCheckBox
+          Left = 17
+          Top = 93
+          Width = 208
+          Height = 17
+          Caption = #1055#1088#1086#1087#1086#1088#1094#1080#1086#1085#1072#1083#1100#1085#1099#1081' '#1088#1072#1079#1084#1077#1088' '#1086#1073#1098#1077#1082#1090#1072
+          TabOrder = 7
+        end
       end
+      object GroupBox7: TGroupBox
+        Left = 3
+        Top = 143
+        Width = 369
+        Height = 137
+        Caption = #1054#1090#1086#1073#1088#1072#1078#1077#1085#1080#1077' '#1086#1073#1098#1077#1082#1090#1086#1074
+        TabOrder = 3
+        object Label10: TLabel
+          Left = 256
+          Top = 24
+          Width = 13
+          Height = 13
+          Caption = #1076#1086
+        end
+        object Label13: TLabel
+          Left = 256
+          Top = 51
+          Width = 13
+          Height = 13
+          Caption = #1076#1086
+        end
+        object Label14: TLabel
+          Left = 256
+          Top = 78
+          Width = 13
+          Height = 13
+          Caption = #1076#1086
+        end
+        object Label15: TLabel
+          Left = 256
+          Top = 105
+          Width = 13
+          Height = 13
+          Caption = #1076#1086
+        end
+        object CheckBoxBright: TCheckBox
+          Left = 18
+          Top = 22
+          Width = 156
+          Height = 17
+          Caption = #1071#1088#1082#1086#1089#1090#1100' '#1086#1073#1098#1077#1082#1090#1072'             '#1086#1090' '
+          TabOrder = 0
+          OnClick = BrightSelectChange
+        end
+        object CheckBoxSquare: TCheckBox
+          Left = 18
+          Top = 49
+          Width = 156
+          Height = 17
+          Caption = #1055#1083#1086#1097#1072#1076#1100' '#1086#1073#1098#1077#1082#1090#1072'           '#1086#1090
+          TabOrder = 1
+          OnClick = SquareSelectChange
+        end
+        object EditBrightMin: TEdit
+          Left = 192
+          Top = 20
+          Width = 58
+          Height = 21
+          TabOrder = 2
+          Text = '100'
+          OnExit = BrightSelectChange
+        end
+        object EditBrightMax: TEdit
+          Left = 289
+          Top = 20
+          Width = 61
+          Height = 21
+          TabOrder = 3
+          Text = '10000'
+          OnExit = BrightSelectChange
+        end
+        object EditSquareMin: TEdit
+          Left = 192
+          Top = 47
+          Width = 58
+          Height = 21
+          TabOrder = 4
+          Text = '4'
+          OnExit = SquareSelectChange
+        end
+        object EditSquareMax: TEdit
+          Left = 289
+          Top = 47
+          Width = 61
+          Height = 21
+          TabOrder = 5
+          Text = '100'
+          OnExit = SquareSelectChange
+        end
+        object EditCoordXMin: TEdit
+          Left = 192
+          Top = 74
+          Width = 58
+          Height = 21
+          TabOrder = 6
+          Text = '0'
+          OnExit = CoordXSelectChange
+        end
+        object EditCoordXMax: TEdit
+          Left = 289
+          Top = 74
+          Width = 61
+          Height = 21
+          TabOrder = 7
+          Text = '2048'
+          OnExit = CoordXSelectChange
+        end
+        object CheckBoxCoordX: TCheckBox
+          Left = 17
+          Top = 76
+          Width = 156
+          Height = 17
+          Caption = #1050#1086#1086#1088#1076#1080#1085#1072#1090#1072' '#1087#1086' '#1086#1089#1080' OX    '#1086#1090
+          TabOrder = 8
+          OnClick = CoordXSelectChange
+        end
+        object CheckBoxCoordY: TCheckBox
+          Left = 17
+          Top = 103
+          Width = 156
+          Height = 17
+          Caption = #1050#1086#1086#1088#1076#1080#1085#1072#1090#1072' '#1087#1086' '#1086#1089#1080' OY    '#1086#1090
+          TabOrder = 9
+          OnClick = CoordYSelectChange
+        end
+        object EditCoordYMin: TEdit
+          Left = 192
+          Top = 101
+          Width = 58
+          Height = 21
+          TabOrder = 10
+          Text = '0'
+          OnExit = CoordYSelectChange
+        end
+        object EditCoordYMax: TEdit
+          Left = 289
+          Top = 101
+          Width = 61
+          Height = 21
+          TabOrder = 11
+          Text = '2048'
+          OnExit = CoordYSelectChange
+        end
+      end
+    end
+    object TabSheet1: TTabSheet
+      Caption = #1043#1088#1072#1092#1080#1082#1080
+      ImageIndex = 3
       object GroupBox4: TGroupBox
-        Left = 6
-        Top = 383
-        Width = 352
+        Left = 3
+        Top = 3
+        Width = 369
         Height = 144
         Caption = #1057#1074#1086#1076#1085#1099#1077' '#1075#1088#1072#1092#1080#1082#1080
-        TabOrder = 3
+        TabOrder = 0
         object CheckBoxCurrentTime: TCheckBox
           Left = 18
           Top = 41
@@ -291,10 +450,11 @@ object FormAnimateSetting: TFormAnimateSetting
     object FilesPage: TTabSheet
       Caption = #1060#1072#1081#1083#1099
       ImageIndex = 1
+      ExplicitWidth = 360
       object GroupBox5: TGroupBox
         Left = 0
         Top = 3
-        Width = 353
+        Width = 372
         Height = 89
         Caption = #1042#1099#1073#1086#1088' '#1092#1072#1081#1083#1086#1074
         TabOrder = 0
@@ -337,10 +497,27 @@ object FormAnimateSetting: TFormAnimateSetting
           TabOrder = 2
         end
       end
+      object GroupBox6: TGroupBox
+        Left = 3
+        Top = 98
+        Width = 369
+        Height = 71
+        Caption = #1057#1086#1093#1088#1072#1085#1077#1085#1080#1077' '#1092#1072#1081#1083#1086#1074
+        TabOrder = 1
+        object CheckBoxSaveIki: TCheckBox
+          Left = 15
+          Top = 24
+          Width = 194
+          Height = 17
+          Caption = #1089#1086#1093#1088#1072#1085#1103#1090#1100' '#1076#1072#1085#1085#1099#1077' '#1074' iki-'#1092#1086#1088#1084#1072#1090#1077
+          TabOrder = 0
+        end
+      end
     end
     object DBOptionsPage: TTabSheet
       Caption = #1053#1072#1089#1090#1088#1086#1081#1082#1080' '#1041#1044
       ImageIndex = 2
+      ExplicitWidth = 360
       object Label9: TLabel
         Left = 19
         Top = 45
@@ -420,7 +597,7 @@ object FormAnimateSetting: TFormAnimateSetting
     end
   end
   object ColorDialog1: TColorDialog
-    Left = 392
+    Left = 320
     Top = 40
   end
 end

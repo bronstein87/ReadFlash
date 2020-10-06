@@ -7,12 +7,12 @@
 // ---------------------------------------------------------------------------
 #include <Vcl.Styles.hpp>
 #include <Vcl.Themes.hpp>
-USEFORM("UnitGraph\Analyze.cpp", AnalyzeForm);
-USEFORM("UnitGraph\UnitAnimateSetting.cpp", FormAnimateSetting);
-USEFORM("UnitGraph\UnitGraphOrient.cpp", FormGraphOrient);
 USEFORM("UnitMain.cpp", MainForm);
-
-// ---------------------------------------------------------------------------
+USEFORM("UnitGraph\Analyze.cpp", AnalyzeForm);
+USEFORM("UnitGraph\UnitGraphOrient.cpp", FormGraphOrient);
+USEFORM("UnitGraph\UnitAnimateSetting.cpp", FormAnimateSetting);
+USEFORM("UnitGraph\UnitDevice.cpp", FormDevice);
+//---------------------------------------------------------------------------
 int WINAPI _tWinMain(HINSTANCE, HINSTANCE, LPTSTR, int) {
 
 	try {
@@ -20,6 +20,7 @@ int WINAPI _tWinMain(HINSTANCE, HINSTANCE, LPTSTR, int) {
 		Application->Initialize();
 		Application->MainFormOnTaskBar = true;
 		Application->CreateForm(__classid(TMainForm), &MainForm);
+		Application->CreateForm(__classid(TFormDevice), &FormDevice);
 		Application->Run();
 	}
 	catch (Exception &exception) {

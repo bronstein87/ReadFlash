@@ -5,6 +5,8 @@
 #include <vcl.h>
 #include <vector>
 #include <utility>
+#include "rotationlib.h"
+
 #define PI    3.141592653589793
 #define PI_2  6.283185307179587
 #define RTD   57.29577951308232  /* RTD degries in 1 radian: 180/pi */
@@ -53,21 +55,25 @@ struct Statistika {
 };
 
 
-double sqrtm(double xf);
-double acosm(double xf);
-double asinm(double xf);
-double atan2m(double yf, double xf);
+//double sqrtm(double xf);
+//double acosm(double xf);
+//double asinm(double xf);
+//double atan2m(double yf, double xf);
 void quatToMatr(const double Quat[], double M_ornt[3][3]);
 void MatrixToEkvAngles(const double Matrix[3][3], double Angles[3]);
+//void AnglesToMatrixOrient(const double Angles[3], double matrix[3][3]);
 int CheckQuatNorm(const double quat[4], double deltaNorm);
 void QuatToMatrix(double quat[4], double matrix[3][3]);
 double GetAxisAngle(double lmn1[3], double lmn2[3]);
+void MatrixToQuat(const double matrix[3][3], double quat[4]);
 void calcTransitionMatrix(double pointAlpha, double pointBeta,
 	double pointAzimut, double M_ornt[3][3]);
+//void GetAngleSin(double M1[3][3], double M2[3][3], double *Wd);
+void GetRotation(double M_ornt_pr[3][3], double M_ornt[3][3], double *Wop);
 void getAngularDisplacementFromOrientMatr(const double M_ornt_pr[3][3],
 	const double M_ornt[3][3], double Wop[3]);
-void multMatrix(const double Matr1[3][3], const double Matr2[3][3],
-	double Matr[3][3]);
+//void multMatrix(const double Matr1[3][3], const double Matr2[3][3],
+//	double Matr[3][3]);
 void ToGMS(double gradAngle, int& gradus, int& minutes, int& seconds);
 float GetTempSpec(char *sp);
 double DateTimeToDaysJ2000(struct _DateTime *stDateTime);

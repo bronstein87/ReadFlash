@@ -23,7 +23,7 @@ namespace add_string {
 		string lineToWrite;
 		while (in >> lineToWrite) {
 			if (lineToWrite.find(word) != string::npos) {
-				return in.tellg() - lineToWrite.size();
+				return (unsigned int)in.tellg() - lineToWrite.size();
 			}
 		}
 
@@ -34,13 +34,13 @@ namespace add_string {
 		return string::npos;
 	}
 
-    	template<typename Stream>
-	size_t findWord(Stream& in, const string& word, const string& resStr) {
+	template<typename Stream>
+	size_t findWord(Stream& in, const string& word, string& resStr) {
 		string lineToWrite;
 		while (in >> lineToWrite) {
 			if (lineToWrite.find(word) != string::npos) {
                 resStr = lineToWrite;
-				return in.tellg() - lineToWrite.size();
+				return (unsigned int)in.tellg() - lineToWrite.size();
 			}
 		}
 
@@ -56,7 +56,7 @@ namespace add_string {
 		string lineToWrite;
 		while (getline(in, lineToWrite)) {
 			if (lineToWrite.find(line) != string::npos) {
-				return in.tellg() - lineToWrite.size();
+				return (unsigned int)in.tellg() - lineToWrite.size();
 			}
 		}
 
@@ -71,7 +71,7 @@ namespace add_string {
 	size_t findLineBack(Stream& in, const string& line, string& findLine) {
 		while (getline(in, findLine)) {
 			if (findLine.find(line) != string::npos) {
-				return in.tellg() - findLine.size();
+				return (unsigned int)in.tellg() - findLine.size();
 			}
 		}
 

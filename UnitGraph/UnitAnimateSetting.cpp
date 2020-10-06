@@ -42,13 +42,14 @@ void LoadSatelliteList(AnsiString _sourceDir, vector <SateliteInfo> &vSat)
 	finp.close(); finp.clear();
 
 //load device list
+    char smb;
 	int iSat = 0;
 	finp.open(AnsiString(_sourceDir + "\\SatelliteInfo\\StarTrack.txt").c_str());
 	while (!finp.eof()) {
-		finp >> vSat[iSat].typeDev >> vSat[iSat].cntDev >> ":";
+		finp >> vSat[iSat].typeDev >> vSat[iSat].cntDev >> smb;  //":"
 		if (vSat[iSat].cntDev > maxDev) vSat[iSat].cntDev = maxDev;
 		for (int iDev = 0; iDev < vSat[iSat].cntDev; iDev++) {
-			finp >> vSat[iSat].serial[iDev] >> ";";
+			finp >> vSat[iSat].serial[iDev] >> smb; //";"
 		}
 		iSat++;
 	}
@@ -60,7 +61,7 @@ void LoadSatelliteList(AnsiString _sourceDir, vector <SateliteInfo> &vSat)
 	iSat = 0;
 	finp.open(AnsiString(_sourceDir + "\\SatelliteInfo\\ZeroTime.txt").c_str());
 	while (!finp.eof()) {
-		finp >> vSat[iSat].cntZeroTime >> ":";
+		finp >> vSat[iSat].cntZeroTime >> smb; //":"
 		if (vSat[iSat].cntZeroTime > maxZero) vSat[iSat].cntZeroTime = maxZero;
 		for (int iZero = 0; iZero < vSat[iSat].cntZeroTime; iZero++) {
 			finp >> date1S;
@@ -147,6 +148,26 @@ void TFormAnimateSetting::ReadINI(const AnsiString& fileName)
 	std::unique_ptr<TIniFile> Ini ( new TIniFile(fileName));
 
 //Вкладка "Анимация"
+	//Панель "Движение звезд"
+	CheckBoxLabelObject->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckLabelObject", "0")));
+	CheckBoxLabelStar->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckLabelStar", "0")));
+	CheckBoxLabelFrame->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckLabelFrame", "0")));
+	CheckBoxBubbleSize->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckBubbleSize", "0")));
+
+	//Панель "Отображение объектов"
+	CheckBoxBright->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckBright", "0")));
+	EditBrightMin->Text = Ini->ReadString("Edit", "BrightMin", "0");
+	EditBrightMax->Text = Ini->ReadString("Edit", "BrightMax", "60000");
+	CheckBoxSquare->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckSquare", "0")));
+	EditSquareMin->Text = Ini->ReadString("Edit", "SquareMin", "0");
+	EditSquareMax->Text = Ini->ReadString("Edit", "SquareMax", "120");
+	CheckBoxCoordX->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckCoordX", "0")));
+	EditCoordXMin->Text = Ini->ReadString("Edit", "CoordXMin", "0");
+	EditCoordXMax->Text = Ini->ReadString("Edit", "CoordXMax", "2048");
+	CheckBoxCoordY->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckCoordY", "0")));
+	EditCoordYMin->Text = Ini->ReadString("Edit", "CoordYMin", "0");
+	EditCoordYMax->Text = Ini->ReadString("Edit", "CoordYMax", "2048");
+
 	//Панель "Таблица объектов"
 	CheckBoxFillTableObjects->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckFillTableObjects", "0")));
 	CheckBoxApplyObjectsSeries->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckApplyObjectsSeries", "0")));
@@ -161,10 +182,7 @@ void TFormAnimateSetting::ReadINI(const AnsiString& fileName)
 	ShapeColorTwoObjTable->Brush->Color = TColor(StrToInt(Ini->ReadString("Colors", "TwoObjTable", clWhite)));
 	ShapeColorThreeObjTable->Brush->Color = TColor(StrToInt(Ini->ReadString("Colors", "ThreeObjTable", clWhite)));
 
-	//Панель "Движение звезд"
-	CheckBoxLabelStar->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckLabelStar", "0")));
-//	CheckBoxLabelFrame->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckLabelFrame", "0")));
-
+//Вкладка "Графики"
 	//Панель "Сводные графики"
 	CheckBoxDateTime->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckDateTime", "1")));
 	CheckBoxCurrentTime->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckCurrentTime", "1")));
@@ -175,6 +193,7 @@ void TFormAnimateSetting::ReadINI(const AnsiString& fileName)
 	EditFilePrefix->Text = Ini->ReadString("File", "FilePrefix", "Img");
 	BeginFromEdit->Text = Ini->ReadString("File", "BeginFrom", "0");
 	SkipFrameCheckBox->Checked = StrToInt(Ini->ReadString("File", "SkipFrame", "1"));
+	CheckBoxSaveIki->Checked =  StrToInt(Ini->ReadString("File", "SaveIKI", "0"));
 
 //Вкладка "Настройки БД"
 	CheckBoxLoadToDb->Checked = (int)(StrToInt(Ini->ReadString("CheckBox", "CheckLoadToDb", "0")));
@@ -202,6 +221,26 @@ void TFormAnimateSetting::WriteINI(const AnsiString& fileName)
 	std::unique_ptr<TIniFile> Ini ( new TIniFile(fileName));
 
 //Вкладка "Анимация"
+	//Панель "Движение звезд"
+	Ini->WriteString("CheckBox", "CheckLabelObject", IntToStr((int)CheckBoxLabelObject->Checked));
+	Ini->WriteString("CheckBox", "CheckLabelStar",   IntToStr((int)CheckBoxLabelStar->Checked));
+	Ini->WriteString("CheckBox", "CheckLabelFrame",  IntToStr((int)CheckBoxLabelFrame->Checked));
+	Ini->WriteString("CheckBox", "CheckBubbleSize",  IntToStr((int)CheckBoxBubbleSize->Checked));
+
+	//Панель "Отображение объектов"
+	Ini->WriteString("CheckBox", "CheckBright", IntToStr((int)CheckBoxBright->Checked));
+	Ini->WriteString("Edit", "BrightMin", EditBrightMin->Text);
+	Ini->WriteString("Edit", "BrightMax", EditBrightMax->Text);
+	Ini->WriteString("CheckBox", "CheckSquare", IntToStr((int)CheckBoxSquare->Checked));
+	Ini->WriteString("Edit", "SquareMin", EditSquareMin->Text);
+	Ini->WriteString("Edit", "SquareMax", EditSquareMax->Text);
+	Ini->WriteString("CheckBox", "CheckCoordX", IntToStr((int)CheckBoxCoordX->Checked));
+	Ini->WriteString("Edit", "CoordXMin", EditCoordXMin->Text);
+	Ini->WriteString("Edit", "CoordXMax", EditCoordXMax->Text);
+	Ini->WriteString("CheckBox", "CheckCoordY", IntToStr((int)CheckBoxCoordY->Checked));
+	Ini->WriteString("Edit", "CoordYMin", EditCoordYMin->Text);
+	Ini->WriteString("Edit", "CoordYMax", EditCoordYMax->Text);
+
 	//Панель "Таблица объектов"
 	Ini->WriteString("CheckBox", "CheckFillTableObjects",   IntToStr((int)CheckBoxFillTableObjects->Checked));
 	Ini->WriteString("CheckBox", "CheckApplyObjectsSeries", IntToStr((int)CheckBoxApplyObjectsSeries->Checked));
@@ -216,12 +255,9 @@ void TFormAnimateSetting::WriteINI(const AnsiString& fileName)
 	Ini->WriteString("Colors", "TwoObjTable", IntToStr(ShapeColorTwoObjTable->Brush->Color));
 	Ini->WriteString("Colors", "ThreeObjTable", IntToStr(ShapeColorThreeObjTable->Brush->Color));
 
-	//Панель "Движение звезд"
-	Ini->WriteString("CheckBox", "CheckLabelStar",   IntToStr((int)CheckBoxLabelStar->Checked));
-	Ini->WriteString("CheckBox", "CheckLabelFrame",  IntToStr((int)CheckBoxLabelFrame->Checked));
-
+//Вкладка "Графики"
 	//Панель "Сводные графики"
-	Ini->WriteString("CheckBox", "DateTime", IntToStr((int)CheckBoxDateTime->Checked));
+	Ini->WriteString("CheckBox", "CheckDateTime", IntToStr((int)CheckBoxDateTime->Checked));
 	Ini->WriteString("CheckBox", "CheckCurrentTime", IntToStr((int)CheckBoxCurrentTime->Checked));
 	Ini->WriteString("CheckBox", "ResultOnly", IntToStr((int)CheckBoxResultOnly->Checked));
 	Ini->WriteString("CheckBox", "PlotStarGraphs", IntToStr((int)CheckBoxOnlySummary->Checked));
@@ -230,6 +266,7 @@ void TFormAnimateSetting::WriteINI(const AnsiString& fileName)
 	Ini->WriteString("File", "FilePrefix", EditFilePrefix->Text);
 	Ini->WriteString("File", "BeginFrom",  BeginFromEdit->Text);
 	Ini->WriteString("File", "SkipFrame",  IntToStr((int)SkipFrameCheckBox->Checked));
+	Ini->WriteString("File", "SaveIKI", IntToStr((int)CheckBoxSaveIki->Checked));
 
 //Вкладка "Настройки БД"
 	Ini->WriteString("DataBase", "Satellite",  IntToStr((int)KAComboBox->ItemIndex));
@@ -247,6 +284,22 @@ void TFormAnimateSetting::WriteINI(const AnsiString& fileName)
 	Ini->WriteString("DrawFrag", "FontSize",  FormGraphOrient->FontSizeEdit->Text);
 }
 //---------------------------------------------------------------------------
+
+void TFormAnimateSetting::InitAnimateOptions(void)
+{
+//	FormGraphOrient->SetVisibleLabelFrame(CheckBoxLabelFrame->Checked);
+//	FormGraphOrient->SetVisibleLabelStar(CheckBoxLabelStar->Checked);
+//	FormGraphOrient->SetVisibleLabelObject(CheckBoxLabelObject->Checked);
+//
+//	FormGraphOrient->SetBrightSelect(CheckBoxBright->Checked, StrToInt(EditBrightMin->Text),
+//									 StrToInt(EditBrightMax->Text));
+//	FormGraphOrient->SetSquareSelect(CheckBoxSquare->Checked, StrToInt(EditSquareMin->Text),
+//									 StrToInt(EditSquareMax->Text));
+//	FormGraphOrient->SetCoordXSelect(CheckBoxCoordX->Checked, StrToInt(EditCoordXMin->Text),
+//									 StrToInt(EditCoordXMax->Text));
+//	FormGraphOrient->SetCoordYSelect(CheckBoxCoordY->Checked, StrToInt(EditCoordYMin->Text),
+//									 StrToInt(EditCoordYMax->Text));
+}
 
 void __fastcall TFormAnimateSetting::ShapeColorLocObjTableMouseDown(TObject *Sender, TMouseButton Button,
 		  TShiftState Shift, int X, int Y)
@@ -365,12 +418,55 @@ void __fastcall TFormAnimateSetting::CheckBoxApplyObjectsSeriesClick(TObject *Se
 }
 //---------------------------------------------------------------------------
 
+void __fastcall TFormAnimateSetting::BrightSelectChange(TObject *Sender)
+{
+	TFormGraphOrient* FormGraphOrient = dynamic_cast<TFormGraphOrient*>(this->Owner);
+	FormGraphOrient->SetBrightSelect(CheckBoxBright->Checked, StrToInt(EditBrightMin->Text),
+									 StrToInt(EditBrightMax->Text));
+	FormGraphOrient->DrawAnimateHandler();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormAnimateSetting::SquareSelectChange(TObject *Sender)
+{
+	TFormGraphOrient* FormGraphOrient = dynamic_cast<TFormGraphOrient*>(this->Owner);
+	FormGraphOrient->SetSquareSelect(CheckBoxSquare->Checked, StrToInt(EditSquareMin->Text),
+									 StrToInt(EditSquareMax->Text));
+	FormGraphOrient->DrawAnimateHandler();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormAnimateSetting::CoordXSelectChange(TObject *Sender)
+{
+	TFormGraphOrient* FormGraphOrient = dynamic_cast<TFormGraphOrient*>(this->Owner);
+	FormGraphOrient->SetCoordXSelect(CheckBoxCoordX->Checked, StrToInt(EditCoordXMin->Text),
+									 StrToInt(EditCoordXMax->Text));
+	FormGraphOrient->DrawAnimateHandler();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormAnimateSetting::CoordYSelectChange(TObject *Sender)
+{
+	TFormGraphOrient* FormGraphOrient = dynamic_cast<TFormGraphOrient*>(this->Owner);
+	FormGraphOrient->SetCoordYSelect(CheckBoxCoordY->Checked, StrToInt(EditCoordYMin->Text),
+									 StrToInt(EditCoordYMax->Text));
+	FormGraphOrient->DrawAnimateHandler();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TFormAnimateSetting::FormCreate(TObject *Sender)
+{
+//	TFormGraphOrient* FormGraphOrient =  dynamic_cast<TFormGraphOrient*>(this->Owner);
+//	ReadINI(FormGraphOrient->SourceDir + "\\options.ini");
+}
+//---------------------------------------------------------------------------
 
 void __fastcall TFormAnimateSetting::FormClose(TObject *Sender, TCloseAction &Action)
 
 {
 	TFormGraphOrient* FormGraphOrient=  dynamic_cast<TFormGraphOrient*>(this->Owner);
-	WriteINI(FormGraphOrient->SourceDir+"\\options.ini");
+	WriteINI(FormGraphOrient->SourceDir + "\\options.ini");
 }
 //---------------------------------------------------------------------------
+
 

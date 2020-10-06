@@ -44,19 +44,12 @@ __published:	// IDE-managed Components
 	TCheckBox *CheckBoxFrameSp;
 	TCheckBox *CheckBoxFrameStarID;
 	TCheckBox *CheckBoxFrameID;
-	TGroupBox *GroupBox4;
-	TCheckBox *CheckBoxCurrentTime;
-	TRadioButton *RadioButton1;
-	TRadioButton *RadioButton2;
 	TGroupBox *GroupBox5;
 	TLabel *Label7;
 	TEdit *EditFilePrefix;
 	TLabel *Label8;
 	TEdit *BeginFromEdit;
-	TCheckBox *CheckBoxDateTime;
 	TCheckBox *SkipFrameCheckBox;
-	TCheckBox *CheckBoxResultOnly;
-	TCheckBox *CheckBoxOnlySummary;
 	TPageControl *PageControl;
 	TTabSheet *ShowPage;
 	TTabSheet *FilesPage;
@@ -72,6 +65,34 @@ __published:	// IDE-managed Components
 	TCheckBox *CheckBoxLabelObject;
 	TDateTimePicker *ZeroTime1S;
 	TCheckBox *CheckBoxSinc;
+	TGroupBox *GroupBox6;
+	TCheckBox *CheckBoxSaveIki;
+	TCheckBox *CheckBoxBubbleSize;
+	TTabSheet *TabSheet1;
+	TGroupBox *GroupBox4;
+	TCheckBox *CheckBoxCurrentTime;
+	TRadioButton *RadioButton1;
+	TRadioButton *RadioButton2;
+	TCheckBox *CheckBoxDateTime;
+	TCheckBox *CheckBoxResultOnly;
+	TCheckBox *CheckBoxOnlySummary;
+	TGroupBox *GroupBox7;
+	TCheckBox *CheckBoxBright;
+	TCheckBox *CheckBoxSquare;
+	TEdit *EditBrightMin;
+	TEdit *EditBrightMax;
+	TEdit *EditSquareMin;
+	TEdit *EditSquareMax;
+	TEdit *EditCoordXMin;
+	TEdit *EditCoordXMax;
+	TCheckBox *CheckBoxCoordX;
+	TCheckBox *CheckBoxCoordY;
+	TEdit *EditCoordYMin;
+	TEdit *EditCoordYMax;
+	TLabel *Label10;
+	TLabel *Label13;
+	TLabel *Label14;
+	TLabel *Label15;
 	void __fastcall ShapeColorLocObjTableMouseDown(TObject *Sender, TMouseButton Button, TShiftState Shift,
           int X, int Y);
 	void __fastcall ShapeColorZeroObjTableMouseDown(TObject *Sender, TMouseButton Button,
@@ -94,6 +115,11 @@ __published:	// IDE-managed Components
 	void __fastcall CheckBoxLabelStarClick(TObject *Sender);
 	void __fastcall KAComboBoxChange(TObject *Sender);
 	void __fastcall CheckBoxLabelObjectClick(TObject *Sender);
+	void __fastcall BrightSelectChange(TObject *Sender);
+	void __fastcall SquareSelectChange(TObject *Sender);
+	void __fastcall CoordXSelectChange(TObject *Sender);
+	void __fastcall CoordYSelectChange(TObject *Sender);
+	void __fastcall FormCreate(TObject *Sender);
 
 private:	// User declarations
 	void LoadDefaultSatelliteInfo(AnsiString _curDir);
@@ -101,6 +127,7 @@ public:		// User declarations
 	__fastcall TFormAnimateSetting(TComponent* Owner);
 	void ReadINI(const AnsiString& fileName);
 	void WriteINI(const AnsiString& fileName);
+    void InitAnimateOptions(void);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TFormAnimateSetting *FormAnimateSetting;

@@ -22,9 +22,6 @@ Coordinates=77,10,91,58
 [Label10]
 Coordinates=441,10,60,58
 
-[EditTimeDev]
-Coordinates=218,214,88,58
-
 [EditSizeY]
 Coordinates=316,214,70,58
 
@@ -67,4 +64,7 @@ Coordinates=676,1,89,36
 
 [LabelFrameReport]
 Coordinates=0,0,112,58
+
+[EditDateTime]
+Coordinates=218,214,88,58
 

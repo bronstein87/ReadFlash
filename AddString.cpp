@@ -61,7 +61,7 @@ namespace add_string {
 
 			case varBoolean:
 			{
-				if (value)
+				if (value.operator bool())
 					string = "true";
 				else
 					string = "false";

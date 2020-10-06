@@ -25,9 +25,11 @@ void SimplePlotter::ClearChart(TChart* Chart) {
 }
 
 void SimplePlotter::CheckGroupSeries(TChart *chartSource, TChart *chartApply) {
-	for (int iSeries = 0; iSeries < chartSource->SeriesCount(); iSeries++) {
-		bool visible = chartSource->Series[iSeries]->Visible;
-		chartApply->Series[iSeries]->Visible = visible;
+	if (chartSource->SeriesCount() <= chartApply->SeriesCount()) {
+		for (int iSeries = 0; iSeries < chartSource->SeriesCount(); iSeries++) {
+			bool visible = chartSource->Series[iSeries]->Visible;
+			chartApply->Series[iSeries]->Visible = visible;
+		}
 	}
 }
 
@@ -40,12 +42,21 @@ void SimplePlotter::SaveChart(TChart* Chart, AnsiString name,
 	Chart->Visible = false; // paint user's size image
 	Chart->Height = StrToInt(Height);
 	Chart->Width = StrToInt(Width);
+	for (int i = 0; i < Chart->SeriesCount(); i++) {
+		if (!Chart->Series[i]->Visible) {
+			Chart->Series[i]->Legend->Visible = false;
+		}
+	}
+
 	Chart->SaveToBitmapFile(name + ".bmp"); // save image
+
 	Chart->Visible = true; // return souse size image
 	Chart->Height = SaveHeigth;
 	Chart->Width = SaveWidth;
 	Chart->Legend->Alignment = laRight;
-
+	for (int i = 0; i < Chart->SeriesCount(); i++) {
+		Chart->Series[i]->Legend->Visible = true;
+	}
 //	Chart->SaveToMetafile();
 }
 
@@ -99,6 +110,8 @@ void SimplePlotter::SetSeriesOptions(TLineSeries* Series) {
 	if (ShowPoints)
 		Series->Pointer->Size = PointSize;
 	Series->Pen->Visible = ShowLines;
+	if (ShowLines)
+		Series->Pen->Width = LineWidth;
 	Series->Pointer->Style = PointerStyle;
 	Series->XValues->DateTime = DateTimeX;
 }

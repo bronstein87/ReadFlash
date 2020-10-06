@@ -49,6 +49,17 @@ void ChangeWordPix(struct DataPixHeader &data) {
 	data.Tpr_msec = GetInt(data.Tpr_msec);
 }
 
+void ChangeWordPixLoc(struct DataPixLocHeader &data) {
+	data.Tpr_sec = GetInt(data.Tpr_sec);
+	data.Tpr_msec = GetInt(data.Tpr_msec);
+}
+
+void ChangeWordLocal(struct DataLocHeader &data) {
+	data.Tpr_sec = GetInt(data.Tpr_sec);
+	data.Tpr_msec = GetInt(data.Tpr_msec);
+	data.Temp = GetFloat(data.Temp);
+}
+
 void ChangeWordFrag(struct DataFragHeader &data) {
 	data.Tpr_sec = GetInt(data.Tpr_sec);
 	data.Tpr_msec = GetInt(data.Tpr_msec);
@@ -363,6 +374,35 @@ void PrintDataPix(FILE *ftxt, struct DataPixHeader data, int NumCadr) {
 		data.Tpr_msec);
 	fprintf(ftxt, "Время экспозиции: %d\n", data.StarExp);
 	fprintf(ftxt, "Число пикселей: %d\n", data.NumPix);
+	fprintf(ftxt, "//----------------------------------------------//\n");
+}
+
+void PrintDataPixLoc(FILE *ftxt, struct DataPixLocHeader data) {
+	fprintf(ftxt, "\n\n//----Пиксели выше порога в режиме локализации---------//\n");
+	fprintf(ftxt, "Полукомплект №:  %02d\n", (data.SerNum&0x8000 + 1) >> 15);
+	fprintf(ftxt, "Заводской номер: %02d\n", data.SerNum&0x7FFF);
+	fprintf(ftxt, "Запись пикселей № %d\n", data.CntRecord);
+	fprintf(ftxt, "Время привязки: Ts=%ld, Tms=%ld\n", data.Tpr_sec,
+		data.Tpr_msec);
+	fprintf(ftxt, "Время экспозиции: %d\n", data.StarExp);
+	fprintf(ftxt, "Порог: %d\n", data.Th);
+	fprintf(ftxt, "Число пикселей: %d, %d\n", data.NumPix[0], data.NumPix[1]);
+	fprintf(ftxt, "//----------------------------------------------//\n");
+}
+
+void PrintDataLocal(FILE *ftxt, struct DataLocHeader data) {
+	fprintf(ftxt, "\n\n//----Массив локализованных объектов--------//\n");
+	fprintf(ftxt, "Полукомплект №:  %02d\n", (data.SerNum&0x8000 + 1) >> 15);
+	fprintf(ftxt, "Заводской номер: %02d\n", data.SerNum&0x7FFF);
+	fprintf(ftxt, "Запись пикселей № %d\n", data.CntRecord);
+	fprintf(ftxt, "Время привязки: Ts=%ld, Tms=%ld\n", data.Tpr_sec,
+		data.Tpr_msec);
+	fprintf(ftxt, "Температура: %6.2f\n", data.Temp);
+	fprintf(ftxt, "Время экспозиции: %d\n", data.StarExp);
+	fprintf(ftxt, "Порог: %d\n", data.Th);
+	fprintf(ftxt, "Число пикселей: %d, %d\n", data.NumPix[0], data.NumPix[1]);
+	fprintf(ftxt, "Число зафиксированных объектов: %d\n", data.NumL);
+	fprintf(ftxt, "Общее число объектов: %d\n", data.NumLoc);
 	fprintf(ftxt, "//----------------------------------------------//\n");
 }
 

@@ -1,29 +1,29 @@
 #include "mathM.h"
 
-double sqrtm(double xf) {
-	if (xf < 1e-20)
-		return 0.;
-	else
-		return sqrt(xf);
-}
-
-double acosm(double xf) {
-	if (xf > 1.)
-		xf = 1.;
-	else if (xf < -1.)
-		xf = -1.;
-
-	return acos(xf);
-}
-
-double asinm(double xf) {
-	if (xf > 1.)
-		xf = 1.;
-	else if (xf < -1.)
-		xf = -1.;
-
-	return asin(xf);
-}
+//double sqrtm(double xf) {
+//	if (xf < 1e-20)
+//		return 0.;
+//	else
+//		return sqrt(xf);
+//}
+//
+//double acosm(double xf) {
+//	if (xf > 1.)
+//		xf = 1.;
+//	else if (xf < -1.)
+//		xf = -1.;
+//
+//	return acos(xf);
+//}
+//
+//double asinm(double xf) {
+//	if (xf > 1.)
+//		xf = 1.;
+//	else if (xf < -1.)
+//		xf = -1.;
+//
+//	return asin(xf);
+//}
 
 int CheckQuatNorm(const double quat[4], double deltaNorm)
 {
@@ -87,6 +87,83 @@ void MatrixToEkvAngles(const double Matrix[3][3], double Angles[3]) {
 		Angles[2] += 2 * PI;
 }
 
+//void AnglesToMatrixOrient(const double Angles[3], double matrix[3][3])
+//{
+//	double cos_al, cos_dl, cos_Az;
+//	double sin_al, sin_dl, sin_Az;
+//
+//	cos_al = cos(Angles[0]);   sin_al = sin(Angles[0]);
+//	cos_dl = cos(Angles[1]);   sin_dl = sin(Angles[1]);
+//	cos_Az = cos(Angles[2]);   sin_Az = sin(Angles[2]);
+//
+//	matrix[0][0] = -cos_Az * sin_al - sin_Az * cos_al * sin_dl;
+//	matrix[0][1] =  cos_Az * cos_al - sin_Az * sin_al * sin_dl;
+//	matrix[0][2] =  sin_Az * cos_dl;
+//
+//	matrix[1][0] =  sin_Az * sin_al - cos_Az * cos_al * sin_dl;
+//	matrix[1][1] = -sin_Az * cos_al - cos_Az * sin_al * sin_dl;
+//	matrix[1][2] =  cos_Az * cos_dl;
+//
+//	matrix[2][0] =  cos_dl * cos_al;
+//	matrix[2][1] =  cos_dl * sin_al;
+//	matrix[2][2] =  sin_dl;
+//}
+
+void MatrixToQuat(const double matrix[3][3], double quat[4])
+{
+	double QQ[4], max;
+	int i,nP;
+
+	QQ[0] =  matrix[0][0] + matrix[1][1] + matrix[2][2];
+	QQ[1] =  matrix[0][0] - matrix[1][1] - matrix[2][2];
+	QQ[2] = -matrix[0][0] + matrix[1][1] - matrix[2][2];
+	QQ[3] = -matrix[0][0] - matrix[1][1] + matrix[2][2];
+
+	max = -3.0;
+	for (i = 0; i < 4; i++) {
+		if (QQ[i] > max) {
+			max = QQ[i]; nP = i;
+		}
+	}
+
+	switch (nP)
+	{
+	case 0:
+  // ?«®? P0
+		quat[0] = 0.5  * sqrtm(1.0l + QQ[0]);
+		quat[1] = 0.25 * (matrix[1][2] - matrix[2][1]) / quat[0];
+		quat[2] = 0.25 * (matrix[2][0] - matrix[0][2]) / quat[0];
+		quat[3] = 0.25 * (matrix[0][1] - matrix[1][0]) / quat[0];
+		break;
+	case 1:
+  // ?«®? P1
+		quat[1] = 0.5  * sqrtm(1.0l + QQ[1]);
+		quat[0] = 0.25 * (matrix[1][2] - matrix[2][1]) / quat[1];
+		quat[2] = 0.25 * (matrix[0][1] + matrix[1][0]) / quat[1];
+		quat[3] = 0.25 * (matrix[2][0] + matrix[0][2]) / quat[1];
+		break;
+	case 2:
+  // ?«®? P2
+		quat[2] = 0.5  * sqrtm (1.0l + QQ[2]);
+		quat[0] = 0.25 * (matrix[2][0] - matrix[0][2]) / quat[2];
+		quat[1] = 0.25 * (matrix[0][1] + matrix[1][0]) / quat[2];
+		quat[3] = 0.25 * (matrix[1][2] + matrix[2][1]) / quat[2];
+		break;
+	case 3:
+  // ?«®? P3
+		quat[3] = 0.5  * sqrtm(1.0l + QQ[3]);
+		quat[0] = 0.25 * (matrix[0][1] - matrix[1][0]) / quat[3];
+		quat[1] = 0.25 * (matrix[2][0] + matrix[0][2]) / quat[3];
+		quat[2] = 0.25 * (matrix[1][2] + matrix[2][1]) / quat[3];
+	}
+
+	if (quat[0] < 0.0)
+	{
+		quat[0] = -quat[0]; quat[1] = -quat[1];
+		quat[2] = -quat[2]; quat[3] = -quat[3];
+	}
+}
+
 void calcTransitionMatrix(double pointAlpha, double pointBeta,
 	double pointAzimut, double M_ornt[3][3]) {
 	float PS, PC, QS, QC, RS, RC;
@@ -108,6 +185,100 @@ void calcTransitionMatrix(double pointAlpha, double pointBeta,
 	M_ornt[2][2] = QS;
 }
 
+//void MultMatrix(double Matr1[3][3], double Matr2[3][3], double Matr[3][3])
+//{
+//	float buf;
+//	int i,j,k;
+//
+//	for(i=0;i<3;i++)
+//	{
+//		for(j=0;j<3;j++)
+//		{
+//			buf=0;
+//			for (k=0;k<3;k++)
+//			{
+//				buf=buf+Matr1[i][k]*Matr2[k][j];
+//			}
+//			Matr[i][j]=buf;
+//		}
+//	}
+//}
+
+void AxisRotate(double lmn1[3], double lmn2[3], double ANG[3])
+{
+  double z,omega;
+  double l_or,m_or,n_or;
+  double l1,l2,m1,m2,n1,n2;
+
+  l1=lmn1[0]; m1=lmn1[1]; n1=lmn1[2];
+  l2=lmn2[0]; m2=lmn2[1]; n2=lmn2[2];
+
+  l_or=m1*n2-m2*n1;
+  m_or=n1*l2-n2*l1;
+  n_or=l1*m2-l2*m1;
+
+  z=sqrtm(l_or*l_or+m_or*m_or+n_or*n_or);
+  omega=asin(z);
+  if (fabs(z)< 1E-20)
+  {
+	ANG[0]= ANG[1]= ANG[2]=0.0;
+	return;
+  }
+  l_or=l_or/z; m_or=m_or/z; n_or=n_or/z;
+  ANG[0]=omega*l_or; ANG[1]=omega*m_or; ANG[2]=omega*n_or;
+}
+
+void GetAngleSin(double M1[3][3], double M2[3][3], double *Wd)
+{
+	double Wx[3],Wy[3],Wz[3];
+	double LMN1[3], LMN2[3];
+//  Z rotation ISC --> PSC
+	LMN1[0]=M1[0][2]; LMN1[1]=M1[1][2]; LMN1[2]=M1[2][2];
+	LMN2[0]=M2[0][2]; LMN2[1]=M2[1][2]; LMN2[2]=M2[2][2];
+	AxisRotate(LMN1, LMN2, Wz);
+//  X rotation ISC --> PSC
+	LMN1[0]=M1[0][0]; LMN1[1]=M1[1][0]; LMN1[2]=M1[2][0];
+	LMN2[0]=M2[0][0]; LMN2[1]=M2[1][0]; LMN2[2]=M2[2][0];
+	AxisRotate(LMN1, LMN2, Wx);
+//  Y rotation ISC --> PSC
+	LMN1[0]=M1[0][1]; LMN1[1]=M1[1][1]; LMN1[2]=M1[2][1];
+	LMN2[0]=M2[0][1]; LMN2[1]=M2[1][1]; LMN2[2]=M2[2][1];
+	AxisRotate(LMN1, LMN2, Wy);
+//  Cadr rotation PSC
+	Wd[0]=-(Wx[0]+Wy[0]+Wz[0])/2.0;
+	Wd[1]=-(Wx[1]+Wy[1]+Wz[1])/2.0;
+	Wd[2]=-(Wx[2]+Wy[2]+Wz[2])/2.0;
+}
+
+void GetRotation(double M_ornt_pr[3][3], double M_ornt[3][3], double *Wop)
+{
+		double MT_ornt_pr[3][3], dMB[3][3];
+		double delta, sdt;
+		int  i,j;
+		for (i=0;i<3;i++)
+		  for (j=0;j<3;j++)
+			MT_ornt_pr[i][j]=M_ornt_pr[j][i];
+
+		MultMatrix(M_ornt,MT_ornt_pr,dMB);
+
+		delta=(dMB[0][0]+dMB[1][1]+dMB[2][2]-1)/2;
+		if (delta>1) delta=1;
+
+		if (fabs(delta-1.0)< 1E-4) // omega < 10"
+		{
+		  GetAngleSin(M_ornt_pr, M_ornt,Wop);
+		}
+        else
+		{
+				delta = acosm(delta);
+				sdt = sin(delta);
+//                08.07.09  (-delta !!!)
+				Wop[0]=-delta*(dMB[2][1]-dMB[1][2])/(2.0*sdt);
+				Wop[1]=-delta*(dMB[0][2]-dMB[2][0])/(2.0*sdt);
+				Wop[2]=-delta*(dMB[1][0]-dMB[0][1])/(2.0*sdt);
+		}
+}
+
 void getAngularDisplacementFromOrientMatr(const double M_ornt_pr[3][3],
 	const double M_ornt[3][3], double Wop[3])
 
@@ -121,7 +292,7 @@ void getAngularDisplacementFromOrientMatr(const double M_ornt_pr[3][3],
 		}
 	}
 	// перемножаем, чтобы получить разницу
-	multMatrix(M_ornt, MT_ornt_pr, dMB);
+	MultMatrix(M_ornt, MT_ornt_pr, dMB);
 
 	delta = (dMB[0][0] + dMB[1][1] + dMB[2][2] - 1.) / 2.;
 	// если угол очень маленький, то считаем дельта равной 0
@@ -142,21 +313,21 @@ void getAngularDisplacementFromOrientMatr(const double M_ornt_pr[3][3],
 	}
 }
 
-void multMatrix(const double Matr1[3][3], const double Matr2[3][3],
-	double Matr[3][3]) {
-	double buf;
-	int i, j, k;
-
-	for (i = 0; i < 3; i++) {
-		for (j = 0; j < 3; j++) {
-			buf = 0;
-			for (k = 0; k < 3; k++) {
-				buf = buf + Matr1[i][k] * Matr2[k][j];
-			}
-			Matr[i][j] = buf;
-		}
-	}
-}
+//void multMatrix(const double Matr1[3][3], const double Matr2[3][3],
+//	double Matr[3][3]) {
+//	double buf;
+//	int i, j, k;
+//
+//	for (i = 0; i < 3; i++) {
+//		for (j = 0; j < 3; j++) {
+//			buf = 0;
+//			for (k = 0; k < 3; k++) {
+//				buf = buf + Matr1[i][k] * Matr2[k][j];
+//			}
+//			Matr[i][j] = buf;
+//		}
+//	}
+//}
 
 double GetAxisAngle(double lmn1[3], double lmn2[3]) {
 	double l1, m1, n1, l2, m2, n2;
@@ -337,55 +508,61 @@ double DateTimeToDaysJ2000(struct _DateTime *stDateTime)
 	return JD;
 }
 
-void SunVector(double JD_DEV, double mOr[3][3], double *pSunI,  double *pSunD)
+void SunVector(double era, double mOr[3][3], double *pSunI,  double *pSunD)
 {
 int i,j;
-double Ts, Ls, Ms, eS, Es, Vs, Qs, Ekl, AlphaS, DeltaS, QsVid, Om, JD;
+double era_2, era_3;
+double Ls, Ms, eS, Es, Vs, Qs, Ekl, AlphaS, DeltaS, QsVid, Om, JD;
 
-	   Ts=(JD_DEV-2415020.0)/36525.;
-	   Ls=279.69668+36000.76892*Ts+0.0003025*Ts*Ts;
+//	Ts=(JD_DEV-2415020.0)/36525.;
+	era_2 = era * era;
+	era_3 = era_2 * era;
 
-	   Ls/=360.;
-	   Ls-=(int)Ls;
-	   Ls*=360.;
+	Ls=279.69668 + 36000.76892 * era + 0.0003025 * era_2;
+	Ls/=360.;
+	Ls-=(int)Ls;
+	Ls*=360.;
+	Ls*=PI/180.;
 
-	   Ms=358.47583+35999.04975*Ts-0.000150*Ts*Ts-0.0000033*Ts*Ts*Ts;
-	   Ms/=360.;
-	   Ms-=(int)Ms;
-	   Ms*=360.;
+	Ms=358.47583+35999.04975*era-0.000150*era_2-0.0000033*era_3;
+	Ms/=360.;
+	Ms-=(int)Ms;
+	Ms*=360.;
+	Ms*=PI/180.;
 
-	   Ms*=PI/180.;
-	   eS=0.01675104-0.0000418*Ts-0.000000126*Ts*Ts;
-	   Es=Ms;
-	   for (i = 0; i < 10; i++)  Es=Ms+eS*sin(Es);
-	   Vs=2*atan(sqrtm((1+eS)/(1-eS))*tan(Es/2));
-	   Qs=Ls*PI/180.+Vs-Ms;
+	eS=0.01675104-0.0000418*era-0.000000126*era_2;
+	Es=Ms;
+	for (i = 0; i < 10; i++) {
+		Es=Ms+eS*sin(Es);
+	}
+	Vs=2*atan(sqrtm((1+eS)/(1-eS))*tan(Es/2));
+	Qs=Ls+Vs-Ms;
 
-	   Om=259.18-1934.142*Ts;
-	   Om/=360.;
-	   Om-=(int)Om;
-	   Om*=2*PI;
+	Om=259.18-1934.142*era;
+	Om/=360.;
+	Om-=(int)Om;
+	Om*=2*PI;
 
-	   QsVid=Qs*180/PI-0.00569-0.00479*sin(Om);
-	   QsVid=QsVid*PI/180.;
+	QsVid=Qs*180/PI-0.00569-0.00479*sin(Om);
+	QsVid=QsVid*PI/180.;
 
-	   Ekl=23.452294-0.0130125*Ts-0.00000164*Ts*Ts+0.000000503*Ts*Ts*Ts;
-	   Ekl+=0.00256*cos(Om);
-	   Ekl*=PI/180.;
+	Ekl=23.452294-0.0130125*era-0.00000164*era_2+0.000000503*era_3;
+	Ekl+=0.00256*cos(Om);
+	Ekl*=PI/180.;
 
-	   AlphaS=atan2(cos(Ekl)*sin(QsVid),cos(QsVid));
-	   DeltaS= asin(sin(Ekl)*sin(QsVid));
+	AlphaS=atan2(cos(Ekl)*sin(QsVid),cos(QsVid));
+	DeltaS= asin(sin(Ekl)*sin(QsVid));
 
-	   if (AlphaS<0) AlphaS+=2*PI;
+	if (AlphaS<0) AlphaS+=2*PI;
 
-	   pSunI[0]=cos(AlphaS)*cos(DeltaS);
-	   pSunI[1]=sin(AlphaS)*cos(DeltaS);
-	   pSunI[2]=sin(DeltaS);
+	pSunI[0]=cos(AlphaS)*cos(DeltaS);
+	pSunI[1]=sin(AlphaS)*cos(DeltaS);
+	pSunI[2]=sin(DeltaS);
 
-	   for (i =0; i<3; i++) {
-		   pSunD[i]=0;
-		   for (j =0; j< 3; j++){
-			   pSunD[i]+=mOr[i][j]*pSunI[j];
-		   }
-	   }
+	for (i =0; i<3; i++) {
+		pSunD[i]=0;
+		for (j =0; j< 3; j++){
+			pSunD[i]+=mOr[i][j]*pSunI[j];
+		}
+	}
 }

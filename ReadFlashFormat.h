@@ -30,6 +30,8 @@
 #define ALL_REG_MARKER  	0xAAAA4444
 #define SINGLE_REG_MARKER 	0xAAAA5555
 #define FRAG_MARKER 		0xAAAA6666
+#define PIX_LOC_MARKER 		0xAAAA7777
+#define LOC_MARKER 			0xAAAA8888
 #define COUNT_REG  			128
 
 
@@ -44,8 +46,45 @@ struct DataPixHeader {
 	INT16U NumPix;
 };
 
+struct DataPixLocHeader {
+	INT16U SerNum;
+	INT16U CntRecord;
+	INT32U Tpr_sec;
+	INT32U Tpr_msec;
+	INT16U StarExp;
+	INT16U Th;
+	INT16U NumPix[2];
+};
+struct DataPixLocHeader_Aist {
+//	INT16U SerNum;
+//	INT16U CntRecord;
+	INT32U Tpr_sec;
+	INT32U Tpr_msec;
+	INT16U StarExp;
+//	INT16U Th;
+//	INT16U NumPix[2];
+	INT16U NumPix;
+};
+
 struct DataPixFlt {
 	INT16U Y, X, BR;
+};
+
+struct DataLocHeader {
+	INT16U SerNum;
+	INT16U CntRecord;
+	INT32U Tpr_sec;
+	INT32U Tpr_msec;
+	FP32 Temp;
+	INT16U StarExp;
+	INT16U Th;
+	INT16U NumPix[2];
+    INT16U NumL, NumLoc;
+};
+
+struct DataLocObj {
+	FP32 X, Y, B;
+	INT16S S;
 };
 
 struct DataFragHeader {
@@ -284,6 +323,8 @@ int GetInt(int ptr);
 
 void ChangeWordSingleReg(struct DataSingleReg &data);
 void ChangeWordPix(struct DataPixHeader &data);
+void ChangeWordPixLoc(struct DataPixLocHeader &data);
+void ChangeWordLocal(struct DataLocHeader &data);
 void ChangeWordFrag(struct DataFragHeader &data);
 void ChangeWordNO(struct DataNO &data);
 void ChangeWordSLEZH(struct DataSLEZH &data);
@@ -296,6 +337,8 @@ void PrintSingleReg(FILE *ftxt, struct DataSingleReg data);
 void PrintDataNO(FILE *ftxt, struct DataNO data);
 void PrintDataSLEZH(FILE *ftxt, struct DataSLEZH data);
 void PrintDataPix(FILE *ftxt, struct DataPixHeader data, int NumCadr);
+void PrintDataPixLoc(FILE *ftxt, struct DataPixLocHeader data);
+void PrintDataLocal(FILE *ftxt, struct DataLocHeader data);
 void PrintDataFrag(FILE *ftxt, struct DataFragHeader data);
 
 #endif

@@ -64,11 +64,11 @@
         <DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
         <SanitizedProjectName>ReadFlash</SanitizedProjectName>
         <LinkPackageStatics>rtl.lib;vcl.lib;Tee.lib;vclimg.lib</LinkPackageStatics>
-        <ILINK_LibraryPath>Word\;UnitGraph\;C:\IKI\PROGRAMS_CB6\ReadFlashEMKA\;$(ILINK_LibraryPath)</ILINK_LibraryPath>
+        <ILINK_LibraryPath>Lib\;Word\;UnitGraph\;C:\IKI\PROGRAMS_CB6\ReadFlashEMKA\;$(ILINK_LibraryPath)</ILINK_LibraryPath>
         <PackageImports>rtl.bpi;vcl.bpi;bcbie.bpi;xmlrtl.bpi;vclactnband.bpi;vclx.bpi;bcbsmp.bpi;svnui.bpi;svn.bpi;bdertl.bpi;TeeUI.bpi;TeeDB.bpi;Tee.bpi;vclimg.bpi;vcldb.bpi;dbrtl.bpi;vcldbx.bpi;vcltouch.bpi;dsnap.bpi;dsnapcon.bpi;vclib.bpi;ibxpress.bpi;adortl.bpi;IndyCore.bpi;IndySystem.bpi;IndyProtocols.bpi;inet.bpi;intrawebdb_110_150.bpi;Intraweb_110_150.bpi;vclie.bpi;websnap.bpi;webdsnap.bpi;inetdb.bpi;inetdbbde.bpi;inetdbxpress.bpi;soaprtl.bpi;vclribbon.bpi;dbexpress.bpi;DbxCommonDriver.bpi;DataSnapIndy10ServerTransport.bpi;DataSnapProviderClient.bpi;DbxClientDriver.bpi;DataSnapClient.bpi;dbxcds.bpi;DataSnapServer.bpi;AzureCloud.bpi;DBXInterBaseDriver.bpi;DBXMySQLDriver.bpi;DBXFirebirdDriver.bpi;DBXSybaseASEDriver.bpi;DBXSybaseASADriver.bpi;DBXOracleDriver.bpi;DBXMSSQLDriver.bpi;DBXInformixDriver.bpi;DBXDb2Driver.bpi;$(PackageImports)</PackageImports>
         <Multithreaded>true</Multithreaded>
         <ProjectType>CppVCLApplication</ProjectType>
-        <IncludePath>Word\;UnitGraph\;$(IncludePath)</IncludePath>
+        <IncludePath>Lib\;Word\;UnitGraph\;$(IncludePath)</IncludePath>
         <AllPackageLibs>rtl.lib;vcl.lib;vclimg.lib;vclwinx.lib;Tee924.lib;TeePro924.lib;TeeUI924.lib;vclx.lib;xmlrtl.lib;dbrtl.lib;adortl.lib;bcboffice2k.lib;vclFireDAC.lib;FireDAC.lib;FireDACSqliteDriver.lib;FireDACCommonDriver.lib;FireDACCommon.lib;vcldb.lib;FireDACPgDriver.lib</AllPackageLibs>
         <_TCHARMapping>wchar_t</_TCHARMapping>
         <DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
@@ -127,6 +127,7 @@
         <ILINK_TranslatedLibraryPath>$(BDSLIB)\$(PLATFORM)\debug\$(LANGDIR);$(ILINK_TranslatedLibraryPath)</ILINK_TranslatedLibraryPath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <BCC_UseClassicCompiler>false</BCC_UseClassicCompiler>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <LinkPackageStatics>rtl.lib;vcl.lib;vclimg.lib;vclwinx.lib;Tee924.lib;TeePro924.lib;TeeUI924.lib;vclx.lib;xmlrtl.lib;dbrtl.lib;adortl.lib;bcboffice2k.lib;vclFireDAC.lib;FireDAC.lib;FireDACSqliteDriver.lib;FireDACCommonDriver.lib;FireDACCommon.lib;vcldb.lib;FireDACPgDriver.lib</LinkPackageStatics>
         <BT_BuildType>Debug</BT_BuildType>
@@ -185,6 +186,33 @@
         <None Include="InfoCadrFormat.h">
             <BuildOrder>11</BuildOrder>
         </None>
+        <None Include="Lib\config.h">
+            <BuildOrder>24</BuildOrder>
+        </None>
+        <CppCompile Include="Lib\mathlib.c">
+            <BuildOrder>25</BuildOrder>
+        </CppCompile>
+        <None Include="Lib\mathlib.h">
+            <BuildOrder>26</BuildOrder>
+        </None>
+        <CppCompile Include="Lib\rotationlib.c">
+            <BuildOrder>27</BuildOrder>
+        </CppCompile>
+        <None Include="Lib\rotationlib.h">
+            <BuildOrder>28</BuildOrder>
+        </None>
+        <CppCompile Include="Lib\solarlib.c">
+            <BuildOrder>29</BuildOrder>
+        </CppCompile>
+        <None Include="Lib\solarlib.h">
+            <BuildOrder>30</BuildOrder>
+        </None>
+        <CppCompile Include="Lib\timelib.c">
+            <BuildOrder>31</BuildOrder>
+        </CppCompile>
+        <None Include="Lib\timelib.h">
+            <BuildOrder>32</BuildOrder>
+        </None>
         <CppCompile Include="MathM.cpp">
             <BuildOrder>4</BuildOrder>
         </CppCompile>
@@ -224,6 +252,12 @@
             <DependentOn>UnitGraph\UnitAnimateSetting.h</DependentOn>
             <BuildOrder>10</BuildOrder>
         </CppCompile>
+        <CppCompile Include="UnitGraph\UnitDevice.cpp">
+            <Form>FormDevice</Form>
+            <FormType>dfm</FormType>
+            <DependentOn>UnitGraph\UnitDevice.h</DependentOn>
+            <BuildOrder>30</BuildOrder>
+        </CppCompile>
         <CppCompile Include="UnitGraph\UnitGraphOrient.cpp">
             <Form>FormGraphOrient</Form>
             <DependentOn>UnitGraph\UnitGraphOrient.h</DependentOn>
@@ -234,19 +268,11 @@
             <DependentOn>UnitMain.h</DependentOn>
             <BuildOrder>2</BuildOrder>
         </CppCompile>
-        <None Include="Word\ConstWord.h">
-            <BuildOrder>16</BuildOrder>
-        </None>
-        <CppCompile Include="Word\WordLibOffice.cpp">
-            <BuildOrder>17</BuildOrder>
-        </CppCompile>
-        <None Include="Word\WordLibOffice.h">
-            <BuildOrder>18</BuildOrder>
-        </None>
-        <FormResources Include="UnitGraph\Analyze.dfm"/>
-        <FormResources Include="UnitGraph\UnitAnimateSetting.dfm"/>
+        <FormResources Include="UnitGraph\UnitDevice.dfm"/>
         <FormResources Include="UnitGraph\UnitGraphOrient.dfm"/>
         <FormResources Include="UnitMain.dfm"/>
+        <FormResources Include="UnitGraph\UnitAnimateSetting.dfm"/>
+        <FormResources Include="UnitGraph\Analyze.dfm"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -302,7 +328,6 @@
                     <ProjectProperties Name="IndexFiles">False</ProjectProperties>
                 </ProjectProperties>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k240.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\bcbofficexp240.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
                 </Excluded_Packages>
             </CPlusPlusBuilder.Personality>
@@ -312,6 +337,12 @@
             </Platforms>
             <ModelSupport>False</ModelSupport>
             <Deployment Version="3">
+                <DeployFile LocalName="ReadFlash.res" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName=".\Debug\Win32\ReadFlash.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>ReadFlash.exe</RemoteName>
@@ -370,6 +401,12 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="Lib\timelib.c" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName=".\Debug\Win32\ReadFlash.tds" Configuration="Debug" Class="DebugSymbols">
                     <Platform Name="Win32">
                         <RemoteName>ReadFlash.tds</RemoteName>
@@ -387,14 +424,26 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile Condition="'$(DynamicRTL)'=='true' And '$(Multithreaded)'!='true'" LocalName="$(BDS)\bin\cc32c240.dll" Class="DependencyModule">
+                <DeployFile LocalName="Lib\mathlib.c" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="ReadFlash.res" Configuration="Debug" Class="ProjectFile">
+                <DeployFile LocalName="Lib\rotationlib.c" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
                         <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Lib\solarlib.c" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile Condition="'$(DynamicRTL)'=='true' And '$(Multithreaded)'!='true'" LocalName="$(BDS)\bin\cc32c240.dll" Class="DependencyModule">
+                    <Platform Name="Win32">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -404,12 +453,27 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployClass Name="ProjectiOSDeviceResourceRules">
+                <DeployClass Name="DependencyModule">
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                        <Extensions>.dll;.bpl</Extensions>
+                    </Platform>
                     <Platform Name="iOSDevice64">
                         <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
                     </Platform>
                     <Platform Name="iOSDevice32">
                         <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="ProjectOSXResource">
@@ -788,27 +852,12 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <DeployClass Name="DependencyModule">
-                    <Platform Name="Win32">
-                        <Operation>0</Operation>
-                        <Extensions>.dll;.bpl</Extensions>
-                    </Platform>
+                <DeployClass Name="ProjectiOSDeviceResourceRules">
                     <Platform Name="iOSDevice64">
                         <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
-                    </Platform>
-                    <Platform Name="OSX32">
-                        <RemoteDir>Contents\MacOS</RemoteDir>
-                        <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
                     </Platform>
                     <Platform Name="iOSDevice32">
                         <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
-                    </Platform>
-                    <Platform Name="iOSSimulator">
-                        <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
                     </Platform>
                 </DeployClass>
                 <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>

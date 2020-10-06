@@ -4,6 +4,7 @@
 #define ParseProtocolH
 
 #include "InfoCadrFormat.h"
+#include "ReadFlashFormat.h"
 #include <system.hpp>
 #include "AddString.h"
 #include "SimplePlotter.h"
@@ -13,11 +14,14 @@
 #include <math.h>
 #include <algorithm>
 #include "MathM.h"
+#include <memory>
 
 #define MAX_STAT 	   16
+#define MAX_STAT_M2    15
 #define MAX_OBJ_DTMI   15
 #define MAX_OBJ_MLOC   32
 #define MAX_OBJ_BOKZM  30
+#define MAX_OBJ_METEOR 16
 #define MAX_WINDOW 	   16
 
 using namespace std;
@@ -27,25 +31,114 @@ double clkBokz = 1.;
 
 namespace parse_prot {
 
+	#pragma pack(push, 1)
+
 	struct stLocal {
 		float x, y;
-		float bright, size;
+		float bright;
+		short size;
+	};
+
+	struct stLocalFloat {
+		float x, y;
+		float bright;
+		float size;
+	};
+
+	struct GYRO {
+		unsigned long timeGyro;
+		double omegaGyro[3], omegaSat[3];
+		double quatGyro[4], quatSat[4];
+	};
+
+	struct ERR_BOKZ {
+		unsigned int timeBoard;
+		unsigned int clkPowerOff;
+		unsigned int clkError;
+		unsigned int timeFirst;
+		float Qfirst[4];
+		unsigned int timeLast;
+		float Qlast[4];
+	};
+
+	struct QBOKZ {
+		unsigned long timeBokz1;
+		double quatBokz1[4], OZ1[3];
+		unsigned long timeBokz2;
+		double quatBokz2[4], OZ2[3];
+	};
+
+	struct MSHI_M2 {
+		unsigned short serialNumber;
+		unsigned short status1, status2;
+		unsigned long timeBOKZ;
+		float OZ[3], Qornt[4];
+		float W[3];
+		short nLocalObj, nDeterObj;
+		unsigned short thMax, m_cur;
+	};
+
+	struct TMI1_M2 {
+		unsigned long timeBOKZ;
+		unsigned short status1, status2;
+		unsigned short serialNumber, post;
+		float Foc, Xg, Yg;
+		unsigned short timeExp, Mean, Sigma;
+		unsigned short countDefect, countStar;
+		unsigned short reserved[8];
+		unsigned short CRC, Date, Version, Build;
+	};
+
+	struct TMI2_M2 {
+		unsigned long timeBOKZ;
+		unsigned short status1, status2;
+		unsigned short serialNumber, post, timeExp;
+		unsigned short cntCommandWord, cntCallNO, cntNOtoSLEZH;
+		unsigned short cntCallTO, cntTOtoSLEZH;
+		unsigned int cntSLEZH;
+		unsigned short cntStatOrient[MAX_STAT_M2];
 	};
 
 	struct DTMI_M2 {
 		unsigned long timeBOKZ;
 		unsigned short status1, status2;
-		unsigned short serialNumber, POST, timeExp;
-		unsigned short nLocalObj1, nLocalObj2;
-		unsigned short nLocal[2], meanCadr[2], maxHist;
-		unsigned short maxHistX, maxHistY;
+		unsigned short serialNumber, post, timeExp;
+		short nLocalObj[2], nLocalAll[2];
+		unsigned short meanCadr[2], maxHist;
+		short maxHistX, maxHistY;
 		unsigned short nStoreObj, nDeterObj, nWindows, nSec;
 		unsigned long timeQuatLast;
 		float quatLast[4], m_cur;
 		float omega[3], Vline[3];
 		float quatBoard[4], Epoch;
-		stLocal LocalList1[15], LocalList2[15], ResultList[12];
+		struct stLocalFloat LocalList[2][15], ResultList[12];
 		unsigned char nObjectWindow[16];
+	};
+	struct MLOC_M2 {
+		unsigned long timeBOKZ;
+		unsigned short status1, status2;
+		unsigned short serialNumber, timeExp;
+		short nLocalObj1, nLocalObj2;
+		unsigned short meanCadr;
+		struct stLocal LocalList[36];
+	};
+
+	struct DTMI_M60K {
+		unsigned long timeBOKZ;
+		unsigned short status1, status2;
+		unsigned short serialNumber, post, timeExp;
+		short nLocalObj[2], nLocalAll[2];
+		unsigned short meanCadr[2], maxHist;
+		short maxHistX, maxHistY;
+		unsigned short nStoreObj, nDeterObj, nWindows, nSec;
+		unsigned long timeMatrixLast;
+		float matrixLast[3][3], m_cur;
+		float deltaT, omega[3], Vline[3];
+		float matrixBoard[3][3], Epoch;
+		struct stLocal LocalList1[15];
+		struct stLocalFloat LocalList2[15];
+		struct stLocal ResultList[14];
+		unsigned char nObjectWindow[14];
 	};
 
 	struct SINCHRO {
@@ -57,7 +150,7 @@ namespace parse_prot {
 		unsigned short status1, status2;
 		unsigned int timeBOKZ;
 		float OZ[3], Qornt[4];
-        float W[3];
+		float W[3];
 	};
 
 	struct SHTMI1 {
@@ -116,6 +209,27 @@ namespace parse_prot {
 		float Mornt[3][3];
 	};
 
+	struct MSHIA_BOKZM {
+		unsigned short status1, status2;
+		float timeBOKZ;
+		float Mornt[3][3];
+		unsigned short serialNumber;
+		unsigned short numSec, nFrag;
+		unsigned short nLocalObj, nDeterObj;
+		unsigned short thMax, mxy, timeExp;
+        float deltaT;
+	};
+
+	struct DTMI_BOKZM {
+		float timeBOKZ;
+		unsigned short status1, status2;
+		unsigned short serialNumber;
+		float Foc, Xg, Yg;
+		unsigned short timeExp;
+		unsigned short nLocalObj, nDeterObj;
+		float LocalList[MAX_OBJ_BOKZM][4];
+	};
+
 	struct SHTMI1_BOKZM {
 		float timeBOKZ;
 		unsigned short status1, status2;
@@ -136,14 +250,25 @@ namespace parse_prot {
 		unsigned short cntStatOrient[12];
 	};
 
-	struct DTMI_BOKZM {
+	struct DTMIA_BOKZM {
 		float timeBOKZ;
 		unsigned short status1, status2;
 		unsigned short serialNumber;
-		float Foc, Xg, Yg;
 		unsigned short timeExp;
 		unsigned short nLocalObj, nDeterObj;
-		float LocalList[MAX_OBJ_BOKZM][4];
+		unsigned short nWindow, eps;
+		float deltaT;
+		stLocal LocalList[15];
+		float Mapr[3][3];
+		float XYc[15][4];
+		unsigned short ThFrag[15], ObjFrag[15];
+		float Tpsk, Mpsk[3][3], Epoch;
+		short NumL[2];
+		unsigned short MaxH;
+		short dxmaxH, dymaxH;
+		float Wop[3];
+		unsigned short NumLocSl, reserved[11];
+
 	};
 
 	struct MSI_BOKZM {
@@ -160,12 +285,62 @@ namespace parse_prot {
 	};
 
 	struct TLOCBOKZM {
-		float LocalList[MAX_OBJ_BOKZM][4];
+		float LocalList[MAX_OBJ_MLOC][4];
 	};
 
 	struct TFRAGBOKZM {
-		float fragList [MAX_OBJ_BOKZM][2];
-    };
+		float fragList [MAX_OBJ_MLOC][2];
+	};
+
+	struct DTMI_METEOR {
+		unsigned long timeBOKZ;
+		unsigned short status1, status2;
+		unsigned short serialNumber, timeExp;
+		float Foc, Xg, Yg;
+		unsigned short nLocalObj, nDeterObj;
+		float LocalList[MAX_OBJ_METEOR][4];
+	};
+
+	struct TAistQuat {
+		unsigned short status1, status2;
+		unsigned int timeFirst;
+		float Qfirst[4];
+		unsigned int timeLast;
+		float Qlast[4], Qssk[4];
+		int clkPowerOff;
+	};
+
+	struct TAistMshi {
+		unsigned short status1, status2;
+		unsigned int time_sec;
+		float OZ[3], Qornt[4], W[3];
+		unsigned short serial, NumSec;
+		unsigned short NumStar, NumFrag;
+		unsigned short NumLoc, NumDet;
+		unsigned short ThMax, mxy;
+	};
+
+	struct TAistShtmi1 {
+		unsigned int time_sec;
+		unsigned short status1, status2;
+		unsigned short serial, post;
+		float Foc, Xg, Yg;
+		unsigned short timeExp;
+		unsigned short Mean, Sigma;
+		unsigned short Reserved[10];
+		unsigned short ConstCS, ProgCS;
+		unsigned short X_ident, Date, Version;
+	};
+
+	struct TAistShtmi2 {
+		unsigned int time_sec;
+		unsigned short status1, status2;
+		unsigned short serial, post, timeExp;
+		unsigned short cntCommandWord, cntCallNO, cntNOtoSLEZH;
+		unsigned short cntCallTO, cntTOtoSLEZH;
+		unsigned int cntSLEZH;
+		unsigned short cntStatOrient[MAX_STAT];
+	};
 
 	struct TMshi_2V {
 		unsigned short status1, status2;
@@ -179,7 +354,7 @@ namespace parse_prot {
 	};
 
 	struct TShtmi1_2V {
-        unsigned short nAr;
+		unsigned short nAr;
 		unsigned int time_sec;
 		unsigned short time_ms;
 		unsigned short status1, status2;
@@ -206,17 +381,52 @@ namespace parse_prot {
 	};
 
 	struct TDtmi_2V {
-		unsigned short nAr;
+//ƒ“Ã»1
 		unsigned int time_sec;
 		unsigned short time_ms;
 		unsigned short status1, status2;
 		unsigned short serial, post, Tcmv;
 		unsigned short cntRegErr, timeExp;
-		unsigned short NumAll[2], NumL[2], NumLoc;
+		unsigned short NumAll[2];
+		unsigned char  NumL[2];
+		unsigned short NumLoc;
 		unsigned char  NumStore, NumDet;
 		unsigned char  NumStar, NumFrag;
-		unsigned short MaxH;
-		unsigned char  dxMaxH, dyMaxH;
+		short MaxH;
+		char  dxMaxH, dyMaxH;
+		unsigned char  numSec, eps;
+		unsigned short deltaT;
+		unsigned int timeLast_sec;
+		unsigned short timeLast_ms;
+		float Qlast[4];
+//ƒ“Ã»2
+		unsigned short m_cur;
+		float Wop[3];
+		float Vline[3];
+		float Qapr[4], era;
+//ƒ“Ã»3-ƒ“Ã»9
+		unsigned short pixFilterCnt[2], pixCurrent;
+		struct DataLocObj RsLocT[2][15];
+//ƒ“Ã»10
+		unsigned short XYc[15][2];
+//ƒ“Ã»11
+		unsigned short MeanFrag[15][2];
+//ƒ“Ã»12
+		unsigned short ThFrag[15];
+		unsigned char ObjFrag[8];
+		unsigned char MultXY[8];
+		unsigned char ZipXY[14];
+	};
+
+	struct TMloc_2V {
+		unsigned int time_sec;
+		unsigned short time_ms;
+		unsigned short status1, status2;
+		unsigned short serial, timeExp;
+		unsigned short NumLoc, NumObj;
+		unsigned short Reserved[4];
+		float ArrLoc[32][4];
+		unsigned short NumPix;
 	};
 
 	struct TBoardArray {
@@ -224,6 +434,281 @@ namespace parse_prot {
 		unsigned short bufMIL[32];
 		unsigned short statTmi, crcBoard, crcCalc;
 	};
+
+	struct TMshi_2R_old {
+		unsigned short status1, status2;
+		unsigned int time_sec;
+		unsigned short time_ms;
+		float OZ[3], Qornt[4], W[3];
+		unsigned short serial;
+		short Tcmv;
+		unsigned char  NumStar, NumFrag;
+		unsigned short NumLoc, NumDet;
+		unsigned short ThMax, mxy;
+	};
+
+	struct TMshi_2R {
+		unsigned short status1, status2;
+		unsigned int time_sec;
+		unsigned short time_ms;
+		float OZ[3], Qornt[4], W[3];
+		unsigned short serial;
+		short Tcmv;
+		unsigned char NumFrag, NumLoc;
+		unsigned char NumDet, LightMv5;
+		unsigned short Mean, ThMax, mxy;
+	};
+
+	struct TShtmi1_2R {
+		unsigned short nAr;
+		unsigned int time_sec;
+		unsigned short time_ms;
+		unsigned short status1, status2;
+		unsigned short serial, post;
+		float Foc, Xg, Yg;
+		unsigned short timeExp;
+		unsigned short Mean, Sigma;
+		unsigned short statKP, cntKP, cntUPN;
+		unsigned short Tcmv, Reserved[2], optSerial, optConstCS;
+		unsigned short CatCS[2], ConstCS[2], ProgCS[2];
+		unsigned short Version;
+	};
+
+	struct TShtmi2_2R {
+		unsigned short nAr;
+		unsigned int time_sec;
+		unsigned short time_ms;
+		unsigned short status1, status2;
+		unsigned short serial, post, timeExp;
+		unsigned short cntCommandWord, cntCallNO, cntNOtoSLEZH;
+		unsigned short cntCallTO, cntTOtoSLEZH;
+		unsigned int cntSLEZH;
+		unsigned short cntStatOrient[MAX_STAT];
+	};
+
+	struct TMloc_2R {
+		unsigned int time_sec;
+		unsigned short time_ms;
+		unsigned short status1, status2;
+		unsigned short serial, timeExp;
+		unsigned short NumLoc, NumObj;
+		unsigned short Reserved[2];
+		float sigma;
+		stLocal RsLoc[36];
+		unsigned short NumPix, Th;
+	};
+
+	struct TDtmi_2R_old {
+//ƒ“Ã»1
+		unsigned int time_sec;
+		unsigned short time_ms;
+		unsigned short status1, status2;
+		unsigned short serial, post;
+		short Tcmv;
+		unsigned short cntRegErr, timeExp;
+		unsigned short NumAll[2];
+		unsigned char  NumL[2];
+		unsigned short NumLoc;
+		unsigned char  NumStore, NumDet;
+		unsigned char  NumStar, NumFrag;
+		short MaxH;
+		char  dxMaxH, dyMaxH;
+		unsigned char  numSec, eps;
+		unsigned short deltaT;
+		unsigned int timeLast_sec;
+		unsigned short timeLast_ms;
+		float Qlast[4];
+//ƒ“Ã»2
+		unsigned short m_cur;
+		float Wop[3];
+		float Vline[3];
+		float Qapr[4], era;
+		unsigned char brightHist[16];
+//ƒ“Ã»3-ƒ“Ã»9
+		unsigned short pixFilterCnt[2], pixCurrent;
+		stLocal RsLocT[2][15];
+//ƒ“Ã»10
+		unsigned short XYc[15][2];
+//ƒ“Ã»11
+		unsigned short MeanFrag[15][2];
+//ƒ“Ã»12
+		unsigned short ThFrag[15];
+		unsigned char ObjFrag[8];
+		unsigned char MultXY[8];
+		unsigned char ZipXY[14];
+	};
+
+	struct TDtmi_2R {
+//ƒ“Ã»1
+		unsigned int time_sec;
+		unsigned short time_ms;
+		unsigned short status1, status2;
+		unsigned short serial, post;
+		short Tcmv;
+		unsigned short cntRegErr, timeExp;
+//		unsigned short NumAll[2];   //before 30.03.2020
+        unsigned short Mean, Sigma; //after 30.03.2020
+		unsigned char  NumL[2];
+		unsigned short NumLoc;
+		unsigned char  NumStore, NumDet;
+		unsigned char  NumStar, NumFrag;
+		short MaxH;
+		char  dxMaxH, dyMaxH;
+		unsigned char  numSec, eps;
+		unsigned short deltaT;
+		unsigned int timeLast_sec;
+		unsigned short timeLast_ms;
+		float Qlast[4];
+//ƒ“Ã»2
+		unsigned short m_cur;
+		float Wop[3];
+		float Vline[3];
+		float Qapr[4], era;
+		unsigned char brightHist[16];
+//ƒ“Ã»3-ƒ“Ã»9
+		unsigned short pixFilterCnt[2], pixCurrent;
+		stLocal RsLocT[2][15];
+//ƒ“Ã»10
+		unsigned short XYc[15][2];
+//ƒ“Ã»11
+		unsigned short MeanFrag[15][2];
+//ƒ“Ã»12
+		unsigned short ThFrag[15];
+		unsigned char ObjFrag[8];
+		unsigned char MultXY[8];
+		unsigned char ZipXY[14];
+	};
+
+	struct TMshi_MR {
+		unsigned short status1, status2;
+		unsigned int time_sec;
+		float OZ[3], Qornt[4], W[3];
+		short Tcmv;
+		unsigned char NumFrag, NumLoc;
+		unsigned char NumDet, LigntMv5;
+        unsigned short Mean, Sigma;
+//		unsigned short NumStar, NumFrag;
+//		unsigned short NumLoc, NumDet;
+		unsigned short ThMax, mxy, serial;
+	};
+
+	struct TShtmi1_MR {
+		unsigned short code1, code2;
+		unsigned int time_sec;
+		unsigned short status1, status2;
+		unsigned short serial, post;
+		float Foc, Xg, Yg;
+		unsigned short timeExp;
+		unsigned short Mean, Sigma;
+		unsigned short statKP, cntKP, cntUPN;
+		short Tcmv, Tsens[4];
+		unsigned short CatCS[2], ConstCS[2], ProgCS[2];
+		unsigned short Version;
+	};
+
+	struct TShtmi2_MR {
+		unsigned short code1, code2;
+		unsigned int time_sec;
+		unsigned short status1, status2;
+		unsigned short serial, post, timeExp;
+		unsigned short cntCommandWord, cntCallNO, cntNOtoSLEZH;
+		unsigned short cntCallTO, cntTOtoSLEZH;
+		unsigned int cntSLEZH;
+		unsigned short cntStatOrient[MAX_STAT];
+	};
+
+	struct TDtmi_MR {
+//ƒ“Ã»1
+		unsigned int time_sec;
+		unsigned short status1, status2;
+		unsigned short serial, post;
+		short Tcmv;
+		unsigned short Mean;
+		float Sigma;
+		unsigned short timeExp;
+		unsigned char nLocalObj[2];
+		unsigned short NumLoc; //PixCount in NO
+		unsigned char  NumStore, NumDet;
+		unsigned char  NumStar, NumFrag;
+		short MaxH;
+		char  dxMaxH, dyMaxH;
+		unsigned char  numSec, eps;
+		unsigned short deltaT, m_cur;
+		unsigned int timeLast_sec;
+		float Qlast[4];
+//ƒ“Ã»2
+		float Wop[3];
+		float Vline[3];
+		float Qapr[4], era;
+		unsigned char brightHist[16];
+//ƒ“Ã»3-ƒ“Ã»9
+		float RsLoc[2][15][3];
+		short RsLocSize[2][15];
+//ƒ“Ã»10
+		unsigned short XYc[15][2];
+//ƒ“Ã»11
+		unsigned short MeanFrag[15][2];
+//ƒ“Ã»12
+		unsigned short ThFrag[15];
+		unsigned char ObjFrag[8];
+		unsigned char MultXY[8];
+		unsigned char ZipXY[14];
+	};
+
+	struct TTmi_MR {
+		unsigned int time_sec;
+		unsigned short status1, status2;
+		unsigned short serial;
+//		unsigned short timeExp, nLocalObj;
+//		float LocXY[13][2];
+		unsigned char timeExp, nLocalObj;
+		float LocXY[18][2];
+	};
+
+	struct TMloc_MR {
+		unsigned int time_sec;
+		unsigned short status1, status2;
+		unsigned short serial, timeExp;
+		unsigned short nLocalObj, nFixedObj;
+		unsigned short nPixFlt, mean;
+		float sigma;
+		float RsLoc[36][3];
+		short RsLocSize[36];
+		unsigned short nPixNoise, nPixXXX, Th;
+	};
+
+	struct TRtmi_MR {
+		unsigned int time_sec;
+		unsigned short status1, status2;
+		unsigned short serial, timeExp, nLocalObj;
+		struct stLocal Local[17];
+		unsigned short ThFrag[17];
+		short Tcmv, Tsens[4];
+		unsigned short Ip;
+	};
+	struct TRtmiFrag_MR {
+		unsigned int time_sec;
+		unsigned short timeExp, SwitchBin, NumFrag;
+	};
+
+	struct TMshi_MF {
+		unsigned int time_sec;
+		unsigned short dT;
+		unsigned short status1, status2;
+		float Tpr;
+		float Mornt[3][3];
+	};
+
+	struct TMshi_SED {
+		unsigned int time_sec;
+		unsigned short status;
+		unsigned char NumLoc, NumDet;
+		unsigned short mean;
+		unsigned short dT1, dT2;
+		double Qornt[4];
+        float W[3];
+	};
+	#pragma pack (pop)
 
 	static string arrStatErrorEng[MAX_STAT] = {
 		{"EC1"}, {"EC2"}, {"EC3"}, {"EC4"}, {"EC5"}, {"EC6"}, {"EC7"}, {"EC8"},
@@ -238,8 +723,11 @@ namespace parse_prot {
 	unsigned short GetCRC16(unsigned char *buf, int size);
     unsigned short crc16_ccitt(unsigned char *data_p, int length);
 
+    int FloatToInteger(const float var, int& res);
 	void SwapShort(short *word1, short *word2);
-
+    void Swap2Word(short word[2]);
+	int GetSizeFrag_2R(char multXY, unsigned short *fragX,  unsigned short *fragY);
+    int GetSizeFrag_MR(char multXY, unsigned short *fragX,  unsigned short *fragY);
 	void CheckFileName(AnsiString &fileName);
 
 	void SetClkBokz(double clk);
@@ -249,28 +737,39 @@ namespace parse_prot {
 	unsigned int StringToDayTime(string _line);
 
 	TDateTime GetDateTime(TDateTime _zeroDate, unsigned int _timeBOKZ);
+	TDateTime GetDateTime_2R(TDateTime _zeroDate, unsigned int _time_sec,
+												  unsigned int _time_msec);
 
 	AnsiString DayTimeToString(unsigned int time);
 
 	AnsiString OutputDateTime(TDateTime _curDate);
+	AnsiString OutputDateTime2(TDateTime _curDate);
 
 	int StopReadArray(string line);
 
+	int TryReadErrorBokz(ifstream &finp, struct ERR_BOKZ &tmi);
+	void PrintLogError(ofstream &file, struct ERR_BOKZ tmi, TDateTime curDate, bool &create);
+
+	void ClearGyro(struct GYRO &tmi);
+	int TryReadGyro(ifstream &finp, struct GYRO &tmi);
+
+	void ClearQuat(struct QBOKZ &tmi);
+    int TryReadQuat(ifstream &finp, struct QBOKZ &tmi);
+
 	void ClearSHTMI1(struct SHTMI1 &tmi);
-
-	void ClearSHTMI2(struct SHTMI2 &tmi);
-
-	void ClearDTMI(struct DTMI &tmi);
-
-    void ClearLOC(struct LOC &tmi);
-
 	int TryReadSHTMI1(ifstream &finp, struct SHTMI1 &tmi);
 
+	void ClearSHTMI2(struct SHTMI2 &tmi);
 	int TryReadSHTMI2(ifstream &finp, struct SHTMI2 &tmi);
 
+	void ClearDTMI(struct DTMI &tmi);
 	int TryReadDTMI(ifstream &finp, struct DTMI &tmi);
 
+	void ClearLOC(struct LOC &tmi);
 	int TryReadLOC(ifstream &finp, struct LOC &tmi);
+
+	void PrintLogGyro(ofstream &file, struct GYRO tmi, TDateTime curDate, bool &create);
+	void PrintLogQuat(ofstream &file, struct QBOKZ tmi, TDateTime curDate, bool &create);
 
 	void PrintMSHI(ofstream &file, struct MSHI tmi, TDateTime curDate);
 	void PrintLogMSHI(ofstream &file, struct MSHI tmi, TDateTime curDate, bool &create);
@@ -290,10 +789,56 @@ namespace parse_prot {
 	void ConvertDataDTMI(struct DTMI tmi, struct CadrInfo &mCadr, int isM1000);
 	void ConvertDataLOC(struct LOC tmi, struct CadrInfo &mCadr, int isM1000);
 
+	void SwapShtmi1_2R(TShtmi1_2R *tmi);
+    void SwapShtmi2_2R(TShtmi2_2R *tmi);
+	void SwapMshi_2R(TMshi_2R *tmi);
+    void SwapDtmi_2R(TDtmi_2R *tmi);
+    void SwapMloc_2R(TMloc_2R *tmi);
+	void PrintLogShtmi1_2R(ofstream &file, TShtmi1_2R *tmi, TDateTime curDate, bool &create);
+	void PrintLogShtmi2_2R(ofstream &file, TShtmi2_2R *tmi, TDateTime curDate, bool &create);
+	void PrintLogMshi_2R(ofstream &file, TMshi_2R *tmi, TDateTime curDate, bool &create);
+	void PrintLogDtmi_2R(ofstream &file, TDtmi_2R tmi, TDateTime curDate, bool &create);
+	void PrintLogMloc_2R(ofstream &file, TMloc_2R tmi, TDateTime curDate, bool &create);
+	void PrintDtmi_2R(ofstream &file, const TDtmi_2R &tmi, TDateTime curDate, bool &create);
+	void PrintMloc_2R(ofstream &file, TMloc_2R tmi, TDateTime curDate);
+
+	void PrintLogMshi_2R_old(ofstream &file, TMshi_2R_old *tmi, TDateTime curDate, bool &create);
+	void PrintLogDtmi_2R_old(ofstream &file, TDtmi_2R_old tmi, TDateTime curDate, bool &create);
+	void PrintDtmi_2R_old(ofstream &file, const TDtmi_2R_old &tmi, TDateTime curDate, bool &create);
+
+	void PrintLogShtmi1_MR(ofstream &file, TShtmi1_MR tmi, TDateTime curDate, bool &create);
+	void PrintLogShtmi2_MR(ofstream &file, TShtmi2_MR tmi, TDateTime curDate, bool &create);
+	void PrintLogMshi_MR(ofstream &file, TMshi_MR tmi, TDateTime curDate, bool &create);
+	void PrintLogTmi_MR(ofstream &file, TTmi_MR tmi, TDateTime curDate, bool &create);
+	void PrintLogRtmi_MR(ofstream &file, TRtmi_MR tmi, TDateTime curDate, bool &create);
+	void PrintLogDtmi_MR(ofstream &file, TDtmi_MR tmi, TDateTime curDate, bool &create);
+	void PrintLogMloc_MR(ofstream &file, TMloc_MR tmi, TDateTime curDate, bool &create);
+	void PrintDtmi_MR(ofstream &file, TDtmi_MR tmi, TDateTime curDate);
+	void PrintMloc_MR(ofstream &file, TMloc_MR tmi, TDateTime curDate);
+
+	void ClearAistQuat(struct TAistQuat &tmi);
+	int TryReadAistQuat(ifstream &finp, struct TAistQuat &tmi);
+	void ClearAistMshi(struct TAistMshi &tmi);
+	int TryReadAistMshi(ifstream &finp, struct TAistMshi &tmi);
+	void ClearAistShtmi1(struct TAistShtmi1 &tmi);
+	int TryReadAistShtmi1(ifstream &finp, struct TAistShtmi1 &tmi);
+	void ClearAistShtmi2(struct TAistShtmi2 &tmi);
+	int TryReadAistShtmi2(ifstream &finp, struct TAistShtmi2 &tmi);
+	void PrintLogAistQuat(ofstream &file, struct TAistQuat tmi, TDateTime curDate, bool &create);
+//	void PrintAistMshi(ofstream &file, struct TAistMshi tmi, TDateTime curDate);
+	void PrintLogAistMshi(ofstream &file, struct TAistMshi tmi, TDateTime curDate, bool &create);
+	void PrintAistShtmi1(ofstream &file, struct TAistShtmi1 tmi);
+	void PrintLogAistShtmi1(ofstream &file, struct TAistShtmi1 tmi, bool &create);
+	void PrintAistShtmi2(ofstream &file, struct TAistShtmi2 tmi, TDateTime curDate);
+	void PrintLogAistShtmi2(ofstream &file, struct TAistShtmi2 tmi, TDateTime curDate, bool &create);
+
 	void PrintMshi_2V(ofstream &file, struct TBoardArray *pack, TDateTime curDate, bool &create);
 	void PrintShtmi1_2V(ofstream &file, struct TBoardArray *pack, TDateTime curDate, bool &create);
 	void PrintShtmi2_2V(ofstream &file, struct TBoardArray *pack, TDateTime curDate, bool &create);
+	void ClearDtmi2V(struct TDtmi_2V &tmi);
 	void PrintDtmi_2V(ofstream &file, struct TDtmi_2V tmi, TDateTime curDate, bool &create);
+	void ClearMloc2V(struct TMloc_2V &tmi);
+    void PrintMloc_2V(ofstream &file, struct TMloc_2V tmi, TDateTime curDate, bool &create);
 
 	int ReadTMIArray(ifstream &_inp, string _keyWord, unsigned short *arrayTMI,
 		const int _sizeArray);
@@ -301,16 +846,23 @@ namespace parse_prot {
 	void ConvertDataDTMI_BOKZM(struct DTMI_BOKZM tmi, struct CadrInfo &mCadr);
 
 	void PrintMSHI_BOKZM(ofstream &file, struct MSHI_BOKZM tmi);
-
 	void PrintSHTMI1_BOKZM(ofstream &file, struct SHTMI1_BOKZM tmi);
-
 	void PrintSHTMI2_BOKZM(ofstream &file, struct SHTMI2_BOKZM tmi);
-
 	void PrintDTMI_BOKZM(ofstream &file, struct DTMI_BOKZM tmi);
-
 	void PrintLocalDTMI_BOKZM(AnsiString fileName, struct DTMI_BOKZM tmi);
 
-	void PrintDTMI_M2(ofstream &file, struct DTMI_M2 tmi);
+	void PrintDtmiMeteor(ofstream &file, struct DTMI_METEOR tmi);
+    void PrintDtmiM60K(ofstream &file, struct DTMI_M60K tmi);
+
+	void PrintMSHI_M2(ofstream &file, struct MSHI_M2 tmi, TDateTime curDate);
+	void PrintTMI1_M2(ofstream &file, struct TMI1_M2 tmi);
+	void PrintTMI2_M2(ofstream &file, struct TMI2_M2 tmi, TDateTime curDate);
+	void PrintDTMI_M2(ofstream &file, struct DTMI_M2 tmi, TDateTime curDate);
+	void PrintMLOC_M2(ofstream &file, struct MLOC_M2 tmi, TDateTime curDate);
+	void PrintLogMSHI_M2(ofstream &file, MSHI_M2 tmi, TDateTime curDate, bool &create);
+	void PrintLogTMI1_M2(ofstream &file, TMI1_M2 tmi, TDateTime curDate, bool &create);
+	void PrintLogTMI2_M2(ofstream &file, TMI2_M2 tmi, TDateTime curDate, bool &create);
+	void PrintLogDTMI_M2(ofstream &file, DTMI_M2 tmi, TDateTime curDate, int cntError, bool &create);
 
 	// ÔÓ‚ÂˇÂÏ ÒÓ‰ÂÊËÚ ÎË ÔÓÚÓÍÓÎ ÂÊËÏ ÎÓÍ‡ÎËÁ‡ˆËË
 	bool checkLocFile(ifstream& in);
@@ -1220,7 +1772,7 @@ namespace parse_prot {
 			static vector<string>err(args, args + 10);
 			const string errorMessage =
 				string("C˜ËÚ˚‚‡ÌËÂ ÔÓÚÓÍÓÎ‡ Á‡‚Â¯ÂÌÓ ÌÂÓ·˚˜Ì˚Ï Ó·‡ÁÓÏ.");
-			const maxTimePr = 100000;
+			const int maxTimePr = 100000;      //C++11
 			double timeStep = 0.25;
 			string line;
 
