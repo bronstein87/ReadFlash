@@ -1265,7 +1265,7 @@
 
 			while (getline(in, line)) {
 				TColor PointColor = clBlue;
-				if (line.find("2,3	Время привязки информации	[с]")
+				if (line.find("2.3      Время привязки информации [с]")
 					!= string::npos) {
 
 					CadrInfo cadrInfo;
@@ -1291,27 +1291,27 @@
 
 					// если нашли строку с числом принятых пикселей, проверяем, что их число не ноль
 					// если ноль, пропускаем такт
-					if (findLine(in, "20 Номер сектора (0..7 биты)")
+					if (findLine(in, "20[ 7:0] Номер сектора")
 						!= string::npos) {
 						getline(in, line);
-						vector<string>splitted = split(line, "\t");
+						vector<string>splitted = split(line, " ");
 						cadrInfo.Epsilon = atoi(splitted[1].c_str());
 					}
 					else
 						throw logic_error(errorMessage);
 
-					if (findWord(in, "кадре") != string::npos) {
-						int number;
-						in >> number;
-						if (number == 0)
-							continue;
-					}
-					else
-						throw logic_error(errorMessage);
+//					if (findWord(in, "кадре") != string::npos) {
+//						int number;
+//						in >> number;
+//						if (number == 0)
+//							continue;
+//					}
+//					else
+//						throw logic_error(errorMessage);
 
 					// ищем начало массива лок и фрагментов
 					if (findLine(in,
-						"18, 19	Массив локализованных объектов на 1-ом кадре")
+						"Массив локализованных объектов на 1-ом кадре")
 						!= string::npos) {
 						vector<string>splittedStr;
 						const int maxCountLocObj = 15;
@@ -1320,74 +1320,74 @@
 
 						for (int i = 0; i < maxCountLocObj; i++) {
 							getline(in, line);
-							splittedStr = split(line, "\t");
+							splittedStr = split(line, " ");
 
 							// если всё-таки объектов меньше
 							if (atof(splittedStr[0].c_str()) == 0) {
 								break;
 							}
 							// заполняем все о лок
-							objInfo.X = atof(splittedStr[0].c_str());
-							objInfo.Y = atof(splittedStr[1].c_str());
-							objInfo.Bright = atof(splittedStr[2].c_str());
-							objInfo.Square = atoi(splittedStr[3].c_str());
+							objInfo.X = atof(splittedStr[1].c_str());
+							objInfo.Y = atof(splittedStr[2].c_str());
+							objInfo.Bright = atof(splittedStr[3].c_str());
+							objInfo.Square = atoi(splittedStr[4].c_str());
 							cadrInfo.ObjectsList.push_back(objInfo);
 
-							// заполняем всё о фрагментах
-							winInfo.Mv = 0;
-							winInfo.Mean = atof(splittedStr[6].c_str());
-							winInfo.Sigma = atof(splittedStr[7].c_str());
-							winInfo.Level = atof(splittedStr[8].c_str());
-							winInfo.CountObj = atoi(splittedStr[9].c_str());
-							unsigned short windowSize =
-								atoi(splittedStr[10].c_str());
-
-							switch (windowSize) {
-							case 15:
-								winInfo.Width = 24;
-								winInfo.Height = 24;
-								break;
-							case 14:
-								winInfo.Width = 24;
-								winInfo.Height = 48;
-								break;
-							case 11:
-								winInfo.Width = 48;
-								winInfo.Height = 24;
-								break;
-							case 10:
-								winInfo.Width = 48;
-								winInfo.Height = 48;
-								break;
-							}
-							winInfo.Xstart = (atof(splittedStr[4].c_str())) -
-								winInfo.Width / 2;
-							winInfo.Ystart = (atof(splittedStr[5].c_str())) -
-								winInfo.Height / 2;
-							cadrInfo.WindowsList.push_back(winInfo);
-
-							if (objInfo.Square < 0) {
-								objInfo.StarID = 1;
-							}
+//							// заполняем всё о фрагментах
+//							winInfo.Mv = 0;
+//							winInfo.Mean = atof(splittedStr[6].c_str());
+//							winInfo.Sigma = atof(splittedStr[7].c_str());
+//							winInfo.Level = atof(splittedStr[8].c_str());
+//							winInfo.CountObj = atoi(splittedStr[9].c_str());
+//							unsigned short windowSize =
+//								atoi(splittedStr[10].c_str());
+//
+//							switch (windowSize) {
+//							case 15:
+//								winInfo.Width = 24;
+//								winInfo.Height = 24;
+//								break;
+//							case 14:
+//								winInfo.Width = 24;
+//								winInfo.Height = 48;
+//								break;
+//							case 11:
+//								winInfo.Width = 48;
+//								winInfo.Height = 24;
+//								break;
+//							case 10:
+//								winInfo.Width = 48;
+//								winInfo.Height = 48;
+//								break;
+//							}
+//							winInfo.Xstart = (atof(splittedStr[4].c_str())) -
+//								winInfo.Width / 2;
+//							winInfo.Ystart = (atof(splittedStr[5].c_str())) -
+//								winInfo.Height / 2;
+//							cadrInfo.WindowsList.push_back(winInfo);
+//
+//							if (objInfo.Square < 0) {
+//								objInfo.StarID = 1;
+//							}
 
 						}
 
 						if (findLine(in,
-							"18, 19	Массив локализованных объектов на 2-ом кадре")
+							"Массив локализованных объектов на 2-ом кадре")
 							!= string::npos) {
 							for (int i = 0; i < maxCountLocObj; i++) {
 								getline(in, line);
-								splittedStr = split(line, "\t");
+								splittedStr = split(line, " ");
 
 								// если всё-таки объектов меньше
 								if (atof(splittedStr[0].c_str()) == 0) {
 									break;
 								}
 								// заполняем все о лок
-								objInfo.X = atof(splittedStr[0].c_str());
-								objInfo.Y = atof(splittedStr[1].c_str());
-								objInfo.Bright = atof(splittedStr[2].c_str());
-								objInfo.Square = atoi(splittedStr[3].c_str());
+								objInfo.X = atof(splittedStr[1].c_str());
+								objInfo.Y = atof(splittedStr[2].c_str());
+								objInfo.Bright = atof(splittedStr[3].c_str());
+								objInfo.Square = atoi(splittedStr[4].c_str());
 								cadrInfo.ObjectsList.push_back(objInfo);
 
 								if (objInfo.Square < 0) {
@@ -1404,6 +1404,14 @@
 					cadrInfo.SizeObjectsList = cadrInfo.ObjectsList.size();
 					GetImageBright(cadrInfo);
 
+
+										// ищем время привязки в секундах
+					if (findWord(in, "такта:") != string::npos) {
+						   in >> cadrInfo.timePr;
+					}
+					else
+						throw logic_error(errorMessage);
+
 					// ищем время привязки в секундах
 					if (findWord(in, "информации") != string::npos) {
 						int secs = 0;
@@ -1417,7 +1425,7 @@
 							getline(in, line);
 							getline(in, line);
 
-							vector<string>splittedStr = split(line, "\t");
+							vector<string>splittedStr = split(line, " ");
 							msecs = atoi(splittedStr[1].c_str());
 						}
 
@@ -1444,13 +1452,13 @@
 					else
 						throw logic_error(errorMessage);
 
-					if (findLine(in, "6) Кватернион ориентации, Qо")
+					if (findLine(in, "Кватернион ориентации")
 						!= string::npos) {
 
 						for (int i = 0; i < 4; i++) {
 							getline(in, line);
-							vector<string>splittedStr = split(line, "\t\t\t\t");
-							cadrInfo.QuatOrient[i] = atof(splittedStr[1].c_str());
+							vector<string>splittedStr = split(line, " ");
+							cadrInfo.QuatOrient[i] = atof(splittedStr.back().c_str());
 						}
 
 						double matrixOfOrientation[3][3];
@@ -1463,26 +1471,26 @@
 						throw logic_error(errorMessage);
 
 					if (findLine(in,
-						"Угловая скорость по оптическим измерениям в проекциях на оси ПСК")
+						"Угловая скорость в проекциях на оси ПСК")
 						!= string::npos) {
 						for (int i = 0; i < 3; i++) {
 							getline(in, line);
-							vector<string>splittedStr = split(line, "\t\t\t\t");
-							cadrInfo.OmegaOrient[i] = atof(splittedStr[i].c_str());
+							vector<string>splittedStr = split(line, " ");
+							cadrInfo.OmegaOrient[i] = atof(splittedStr.back().c_str());
 						}
 
 					}
 					else
 						throw logic_error(errorMessage);
 
-					if (findWord(in, "Tcmv") != string::npos) {
+					if (findWord(in, "матрицы") != string::npos) {
 						in >> cadrInfo.MatrixTemp;
 					}
 					else
 						throw logic_error(errorMessage);
 
 					// ищем число спроектированных звезд
-					if (findWord(in, "NumProgFrag") != string::npos) {
+					if (findWord(in, "фрагментов") != string::npos) {
 						in >> cadrInfo.CountStars;
 						if (cadrInfo.CountStars <= 0)
 							continue;
@@ -1490,18 +1498,9 @@
 					else
 						throw logic_error(errorMessage);
 
-					// ищем число фрагментов
-					if (findWord(in, "NumFrag") != string::npos) {
-						// общее число фрагментов
-						in >> cadrInfo.CountWindows;
-						if (cadrInfo.CountWindows <= 0)
-							continue;
-					}
-					else
-						throw logic_error(errorMessage);
 
 					// число локализ. объектов
-					if (findWord(in, "NumLoc[0]") != string::npos) {
+					if (findWord(in, "объектов") != string::npos) {
 						in >> cadrInfo.CountLocalObj;
 						if (cadrInfo.CountLocalObj <= 0)
 							continue;
@@ -1510,7 +1509,7 @@
 						throw logic_error(errorMessage);
 
 					// ищем число распознанных объектов
-					if (findWord(in, "NumDet") != string::npos) {
+					if (findWord(in, "объектов") != string::npos) {
 						in >> cadrInfo.CountDeterObj;
 						if (cadrInfo.CountDeterObj <= 0)
 							continue;
@@ -1518,7 +1517,7 @@
 					else
 						throw logic_error(errorMessage);
 
-					if (findWord(in, "m_cur") != string::npos) {
+					if (findWord(in, "МНК") != string::npos) {
 						in >> cadrInfo.MeanErrorXY;
 					}
 					else
@@ -2664,10 +2663,12 @@
 					UnicodeString date = toUString(splitted[0]);
 					UnicodeString time = toUString(splitted[1]);
 					cadrInfo.Time = StrToDateTime(date + " " + time).Val;
+					cadrInfo.timePr =  atoi(splitted[5].c_str());
 					int status1 = strtoul(string(splitted[6]).c_str(), NULL, 16);
 					if (!((status1 >> 15) & 1))
 						// если 16 бит не установлен, то это НО
 					{
+						continue;
 						if (contains(splitted[7], "000"))
 							cadrInfo.DeviceInfo = "HO 4";
 						else if (contains(splitted[7], "010"))
@@ -2806,6 +2807,7 @@
 
 	// ---------------------------------------------------------------------------
 	#endif
+
 
 
 

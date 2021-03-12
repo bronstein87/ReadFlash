@@ -363,7 +363,7 @@ bool TFormGraphOrient::InitStatusInfoTable(const string& deviceName)
 		vector <string> splitted = split(line, "/");
 		StatusInfo.InitModePos = atoi(splitted[0].c_str());
 		StatusInfo.ResultModePos = atoi(splitted[1].c_str());
-        getline(in, line);
+		getline(in, line);
 		splitted = split(line, "\t");
 		StatusInfo.ColumnTitles = split(splitted[1], ";");
 		TableStatusInfo->ColCount  = StatusInfo.ColumnTitles.size() + 1;
@@ -3512,6 +3512,19 @@ void __fastcall TFormGraphOrient::BOKZM2VParseProtocolClick(TObject *Sender) {
 		}
 			PrepareStartDraw();
 			CheckTabSheet();
+						ofstream out("quatinfo.txt");
+			for (int i = 0; i < vCadrInfo.size(); i++) {
+				out << setprecision(10) << vCadrInfo[i].timePr <<  "\t"
+				<< vCadrInfo[i].QuatOrient[0] << "\t"
+				<< vCadrInfo[i].QuatOrient[1] << "\t"
+				<< vCadrInfo[i].QuatOrient[2] << "\t"
+				<< vCadrInfo[i].QuatOrient[3] << "\t"
+				<< vCadrInfo[i].CountLocalObj << "\t"
+				<< vCadrInfo[i].CountDeterObj << "\t"
+				<< vCadrInfo[i].AnglesOrient[0] << "\t"
+				<< vCadrInfo[i].AnglesOrient[1] << "\t"
+				<< vCadrInfo[i].AnglesOrient[2] << "\n";
+			}
 		}
 		catch (exception &e) {
 			ShowMessage(e.what());
@@ -4446,6 +4459,19 @@ void __fastcall TFormGraphOrient::BOKZM2ParseProtocolClick(TObject *Sender)
 
 			FillStatusTable();
 			CalculateSeriesSKO();
+						ofstream out("quatinfo.txt");
+			for (int i = 0; i < vCadrInfo.size(); i++) {
+				out << setprecision(10) << vCadrInfo[i].timePr <<  "\t"
+				<< vCadrInfo[i].QuatOrient[0] << "\t"
+				<< vCadrInfo[i].QuatOrient[1] << "\t"
+				<< vCadrInfo[i].QuatOrient[2] << "\t"
+				<< vCadrInfo[i].QuatOrient[3] << "\t"
+				<< vCadrInfo[i].CountLocalObj << "\t"
+				<< vCadrInfo[i].CountDeterObj << "\t"
+				<< vCadrInfo[i].AnglesOrient[0] << "\t"
+				<< vCadrInfo[i].AnglesOrient[1] << "\t"
+				<< vCadrInfo[i].AnglesOrient[2] << "\n";
+			}
 		}
 			PrepareStartDraw();
 			CheckTabSheet();
